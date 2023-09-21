@@ -30,3 +30,18 @@
 *.exe
 *.out
 *.app
+
+# Editor Folders
+.vs
+.vscode
+.idea
+
+# VS Solutions
+*.sln
+
+# Folders
+bin
+build
+
+examples/**/bin
+examples/**/build
