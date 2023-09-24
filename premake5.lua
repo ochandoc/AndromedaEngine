@@ -1,3 +1,5 @@
+include("build/deps/Debug/conanbuildinfo.premake.lua")
+
 workspace "AndromedEngine"
   architecture "x86_64"    
 
@@ -53,6 +55,8 @@ project "Andromeda"
     "src/**.h",
     "premake5.lua"
   }
+
+  conan_basic_setup()
 
   -- Tipos de configuracion y sus flags
   filter "configurations:Debug"
