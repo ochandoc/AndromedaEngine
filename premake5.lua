@@ -1,15 +1,44 @@
-include("build/deps/Debug/conanbuildinfo.premake.lua")
+build_configurations = { "Debug", "RelWithDebInfo", "Release" }
+
+function get_conan_config()
+  local configurations = {}
+  for i,build_cfg in ipairs(build_configurations) do
+    include("build/deps/"..build_cfg.."/conanbuildinfo.premake.lua")
+    configurations[build_cfg] = {}
+    local cfg = configurations[build_cfg]
+    cfg["includedirs"] = conan_includedirs
+    cfg["libdirs"] = conan_libdirs
+    cfg["bindirs"] = conan_bindirs
+    cfg["libs"] = conan_libs
+    cfg["system_libs"] = conan_system_libs
+    cfg["defines"] = conan_defines
+    cfg["frameworks"] = conan_frameworks
+  end
+  return configurations
+end
+
+function setup_dependencies(conan_config)
+  for i,build_cfg in ipairs(build_configurations) do
+    local cfg = conan_config[build_cfg]
+    filter("configurations:"..build_cfg)
+      includedirs{cfg["includedirs"]}
+      libdirs{cfg["libdirs"]}
+      links{cfg["libs"]}
+      links{cfg["system_libs"]}
+      links{cfg["frameworks"]}
+      defines{cfg["defines"]}
+      bindirs{cfg["bindirs"]}
+  end
+end
 
 workspace "AndromedEngine"
   architecture "x86_64"    
 
-  startproject "Andromeda"
+  startproject "Sanbox"
 
   configurations
   {
-    "Debug",
-    "RelWithDebInfo",
-    "Release",    
+    build_configurations    
   }
   
   flags
@@ -33,7 +62,7 @@ project "Andromeda"
   targetdir "bin/%{cfg.buildcfg}"
 
   -- Carpeta donde van a ir los obj generados
-  objdir "build/%{cfg.buildcfg}"
+  objdir "build/%{prj.name}/%{cfg.buildcfg}"
 
   defines
   {
@@ -56,19 +85,20 @@ project "Andromeda"
     "premake5.lua"
   }
 
-  conan_basic_setup()
+  conan_cfg = get_conan_config()
+  setup_dependencies(conan_cfg)
 
   -- Tipos de configuracion y sus flags
   filter "configurations:Debug"
     defines { "DEBUG" }
     runtime "Debug"
     symbols "on"
-
+  
   filter "configurations:Release"
     defines { "NDEBUG" }
     runtime "Release"
     optimize "on"
-
+  
   filter "configurations:RelWithDebInfo"
     defines { "DEBUG" }
     runtime "Release"
@@ -80,3 +110,5 @@ group ""
 group "Examples"
   include "examples/Sandbox"
 group ""
+
+
