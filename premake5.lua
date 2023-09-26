@@ -21,13 +21,13 @@ function setup_dependencies(conan_config)
   for i,build_cfg in ipairs(build_configurations) do
     local cfg = conan_config[build_cfg]
     filter("configurations:"..build_cfg)
-      includedirs{cfg["includedirs"]}
-      libdirs{cfg["libdirs"]}
-      links{cfg["libs"]}
-      links{cfg["system_libs"]}
-      links{cfg["frameworks"]}
-      defines{cfg["defines"]}
-      bindirs{cfg["bindirs"]}
+      includedirs{ cfg["includedirs"] }
+      libdirs{ cfg["libdirs"] }
+      links{ cfg["libs"] }
+      links{ cfg["system_libs"] }
+      links{ cfg["frameworks"] }
+      defines{ cfg["defines"] }
+      bindirs{ cfg["bindirs"] }
   end
 end
 
@@ -92,12 +92,15 @@ project "Andromeda"
   filter "configurations:Debug"
     defines { "DEBUG" }
     runtime "Debug"
+    optimize "Debug"
     symbols "on"
   
   filter "configurations:Release"
     defines { "NDEBUG" }
     runtime "Release"
-    optimize "on"
+    optimize "Speed"
+    symbols "off"
+
   
   filter "configurations:RelWithDebInfo"
     defines { "DEBUG" }

@@ -45,3 +45,5 @@ build
 
 examples/**/bin
 examples/**/build
+
+tools/scripts/__pycache__
