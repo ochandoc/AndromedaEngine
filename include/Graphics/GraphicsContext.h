@@ -1,12 +1,16 @@
 #pragma once
 
+#include <memory>
+
 enum GraphicsAPI
 {
   GraphicsAPI_OpenGL,
 };
 
-class GraphicsContext{
-  
+class Renderer;
+
+class GraphicsContext
+{  
 public:
   GraphicsContext();
   GraphicsContext(const GraphicsContext&) = delete;
@@ -16,6 +20,8 @@ public:
 
   GraphicsAPI& operator =(const GraphicsAPI&) = delete;
   GraphicsAPI& operator =(const GraphicsAPI&&) = delete;
+
+  virtual std::shared_ptr<Renderer> create_renderer() = 0;
 
   virtual void create_info() = 0;
 

@@ -57,6 +57,7 @@ WindowGLFW::~WindowGLFW()
 
 void WindowGLFW::update()
 {
+  glfwSwapBuffers(m_Window);
   glfwPollEvents();
 }
 
