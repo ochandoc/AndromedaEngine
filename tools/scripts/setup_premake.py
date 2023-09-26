@@ -43,6 +43,12 @@ class Premake:
   @classmethod
   def InstallPremake(self):
     premakePath = f"{self.premake_directory}/premake-{self.premake_version}-windows.zip"
+    permission_garanted = False
+    while not permission_garanted:
+      reply = str(input("Would you like to download premake.exe [Y/N]: ")).lower().strip()[:1]
+      if reply == 'n':
+        return False
+      permission_garanted = (reply == 'y')
     DownloadFile(self.premake_zip_urls, premakePath)
     UnzipFile(premakePath)
     return True
