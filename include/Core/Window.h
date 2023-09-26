@@ -4,10 +4,13 @@
 #include <memory>
 #include <functional>
 
+#include "Graphics/GraphicsContext.h"
+
 struct WindowCreationInfo
 {
 	unsigned int width, height;
 	std::string title;
+	GraphicsAPI api;
 };
 
 class Window
@@ -33,5 +36,12 @@ public:
 
 	virtual void* get_native_window() = 0;
 
+	virtual std::shared_ptr<GraphicsContext> create_context() = 0;
+
+	std::shared_ptr<GraphicsContext> get_context() const { return m_Context; }
+
 	std::function<void()> m_OnWindowClose;
+
+protected:
+	std::shared_ptr<GraphicsContext> m_Context;
 };
