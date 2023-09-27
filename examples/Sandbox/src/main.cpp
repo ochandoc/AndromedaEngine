@@ -4,16 +4,16 @@
 
 int main(int argc, char** argv)
 {
-  WindowCreationInfo WindowInfo;
+  And::WindowCreationInfo WindowInfo;
   WindowInfo.width = 1024;
   WindowInfo.height = 720;
-  WindowInfo.api = GraphicsAPI_OpenGL;
+  WindowInfo.api = And::GraphicsAPI_OpenGL;
   WindowInfo.title = "Andromeda Engine";
 
 
-  std::shared_ptr<Window> window = Window::Create(WindowInfo);
-  std::shared_ptr<GraphicsContext> g_context = window->create_context();
-  std::shared_ptr<Renderer> g_renderer = g_context->create_renderer();
+  std::shared_ptr<And::Window> window = And::Window::Create(WindowInfo);
+  std::shared_ptr<And::GraphicsContext> g_context = window->create_context();
+  std::shared_ptr<And::Renderer> g_renderer = g_context->create_renderer();
 
   float clear_color[4] = {1.0f, 0.0f, 0.0f, 1.0f};
   g_renderer->set_clear_color(clear_color);

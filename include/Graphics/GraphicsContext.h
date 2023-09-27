@@ -2,6 +2,9 @@
 
 #include <memory>
 
+namespace And
+{
+
 enum GraphicsAPI
 {
   GraphicsAPI_OpenGL,
@@ -26,3 +29,5 @@ public:
   virtual void create_info() = 0;
 
 };
+
+}

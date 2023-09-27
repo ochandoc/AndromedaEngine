@@ -1,6 +1,9 @@
 #include "OpenGLRenderer.h"
 #include "GL/glew.h"
 
+namespace And
+{
+
 OpenGLRenderer::OpenGLRenderer()
 {
   static float default_color[4] = {1.0f, 1.0f, 1.0f, 1.0f};
@@ -8,7 +11,7 @@ OpenGLRenderer::OpenGLRenderer()
 }
 
 OpenGLRenderer::~OpenGLRenderer(){
-  
+
 }
 
 
@@ -25,4 +28,6 @@ void OpenGLRenderer::clear()
   // Limpia el buffer
   // Limpia el buffer de profundidad
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 }

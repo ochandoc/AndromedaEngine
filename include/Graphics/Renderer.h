@@ -1,5 +1,8 @@
 #pragma once
 
+namespace And
+{
+
 class Renderer
 {
 public:
@@ -18,3 +21,5 @@ public:
 
   virtual void clear() = 0;
 };
+
+}

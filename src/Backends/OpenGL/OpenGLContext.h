@@ -6,6 +6,9 @@
 
 #include <string>
 
+namespace And
+{
+
 class OpenGLContext : public GraphicsContext
 {
 public:
@@ -21,3 +24,5 @@ private:
   GLFWwindow* m_Window;
   std::string m_ContextInfo;
 };
+
+}

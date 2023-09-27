@@ -80,10 +80,16 @@ project "Andromeda"
   files
   {
     "include/**.h",
+    "include/**.hpp",
     "src/**.cpp",
     "src/**.h",
+    "src/**.hpp",
     "premake5.lua"
   }
+
+  pchheader "andpch.hpp"
+  pchsource "src/andpch.cpp"
+  forceincludes { "andpch.hpp" }
 
   conan_cfg = get_conan_config()
   setup_dependencies(conan_cfg)

@@ -2,6 +2,9 @@
 
 #include "OpenGLRenderer.h"
 
+namespace And
+{
+
 // Cuando hay un error en opengl, llama a esta funcion y recibe el error
 static void GLAPIENTRY MessageCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message,
 		const void* userParam) {}
@@ -42,3 +45,6 @@ std::shared_ptr<Renderer> OpenGLContext::create_renderer()
 {
   return std::shared_ptr<Renderer>(new OpenGLRenderer());
 }
+
+}
+

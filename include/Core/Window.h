@@ -6,6 +6,9 @@
 
 #include "Graphics/GraphicsContext.h"
 
+namespace And
+{
+
 struct WindowCreationInfo
 {
 	unsigned int width, height;
@@ -45,3 +48,5 @@ public:
 protected:
 	std::shared_ptr<GraphicsContext> m_Context;
 };
+
+}

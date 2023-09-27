@@ -4,8 +4,11 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-class WindowGLFW : public Window{
+namespace And
+{
 
+class WindowGLFW : public Window
+{
 public:
 	WindowGLFW(const WindowCreationInfo& info);
 
@@ -27,3 +30,5 @@ private:
 	bool m_IsVSync;
 	WindowCreationInfo m_CreationInfo;
 };
+
+}

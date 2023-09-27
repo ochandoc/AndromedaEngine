@@ -2,6 +2,9 @@
 
 #include "Graphics/Renderer.h"
 
+namespace And
+{
+
 class OpenGLRenderer : public Renderer
 {
 public:
@@ -15,3 +18,5 @@ public:
 
   virtual void clear() override;
 };
+
+}

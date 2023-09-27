@@ -4,6 +4,9 @@
 
 #include "Backends/OpenGL/OpenGLContext.h"
 
+namespace And
+{
+
 static void close_window_callback(GLFWwindow* window)
 {
   WindowGLFW* glfw_window = reinterpret_cast<WindowGLFW*>(glfwGetWindowUserPointer(window));
@@ -91,3 +94,6 @@ std::shared_ptr<GraphicsContext> WindowGLFW::create_context()
 
   return m_Context;
 }
+
+}
+
