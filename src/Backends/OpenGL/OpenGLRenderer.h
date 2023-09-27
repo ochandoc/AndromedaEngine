@@ -18,7 +18,9 @@ public:
 
   virtual void clear() override;
 
-  virtual void showDemo() override;
+  virtual std::shared_ptr<Shader> createShader(std::vector<ShaderInfo> s_info) override;
+
+  virtual void showDemo(float triangle[6]) override;
   void printDemo() override;
 };
 

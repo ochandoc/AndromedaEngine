@@ -1,4 +1,6 @@
 #pragma once
+#include "Shader.h"
+#include <vector>
 
 namespace And
 {
@@ -21,8 +23,11 @@ public:
 
   virtual void clear() = 0;
 
+  virtual std::shared_ptr<Shader> createShader(std::vector<ShaderInfo> s_info) = 0;
+
+
   // Draw a simple triangle on window
-  virtual void showDemo() = 0;
+  virtual void showDemo(float triangle[6]) = 0;
   virtual void printDemo() = 0;
 };
 

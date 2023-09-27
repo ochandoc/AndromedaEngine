@@ -3,5 +3,5 @@
 namespace And{
   
   Shader::Shader(){}
-  Shader::~Shader(){}
+  Shader::~Shader() { printf("cagaste"); }
 }

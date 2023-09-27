@@ -14,26 +14,26 @@ namespace And{
   struct ShaderInfo{
     ShaderType type;
     // It should be the path of file or todo lo que tiene el archivo cargado en memoria
-    std::string file; 
+    std::string file;
   };
 
-class Shader{
-  public:
+  class Shader{
+    public:
 
-  Shader();
-  Shader(const Shader&) = delete;
-  Shader(const Shader&&) = delete;
+    Shader();
+    Shader(const Shader&) = delete;
+    Shader(const Shader&&) = delete;
 
-  virtual ~Shader();
+    virtual ~Shader();
 
-  Shader& operator=(const Shader&) = delete;
-  Shader& operator=(const Shader&&) = delete;
+    Shader& operator=(const Shader&) = delete;
+    Shader& operator=(const Shader&&) = delete;
 
-  virtual void CreateShader() = 0;
-  
-  private:
+    virtual void CreateShader() = 0;
+    
+    private:
 
-  //virtual unsigned int  CompileShader(const std::string& source, unsigned int type) = 0;
+    //virtual unsigned int  CompileShader(const std::string& source, unsigned int type) = 0;
 
-};
+  };
 }

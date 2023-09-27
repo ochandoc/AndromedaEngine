@@ -13,7 +13,7 @@ namespace And{
     for(ShaderInfo& shader : S_info){
       switch (shader.type){
       case Shader_Vertex:
-        id = glCreateShader(GL_VERTEX_SHADER);
+        id = glCreateShader(GL_VERTEX_SHADER);        
       break;
       case Shader_Fragment:
         id = glCreateShader(GL_FRAGMENT_SHADER);
@@ -30,12 +30,13 @@ namespace And{
       }
 
 
-      // Compilamos todos los shaders y hacemos el attach
+      // Compilamos todos los shaders y hacemos el attach del program al shader
       const char* src = shader.file.c_str();
       glShaderSource(id, 1, &src, nullptr);
       glCompileShader(id);
-
       glAttachShader(program, id);
+
+
     }
 
     // Cuando ya tenemos todos los shader compilados, linkamos el program
@@ -47,7 +48,7 @@ namespace And{
   }
 
   OpenGLShader::~OpenGLShader(){
-
+      printf("cagaste");
   }
 
   void OpenGLShader::CreateShader(){
