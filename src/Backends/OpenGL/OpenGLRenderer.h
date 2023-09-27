@@ -17,6 +17,9 @@ public:
   virtual void set_clear_color(float* color) override;
 
   virtual void clear() override;
+
+  virtual void showDemo() override;
+  void printDemo() override;
 };
 
 }

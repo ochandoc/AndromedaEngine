@@ -20,6 +20,10 @@ public:
   virtual void set_clear_color(float* color) = 0;
 
   virtual void clear() = 0;
+
+  // Draw a simple triangle on window
+  virtual void showDemo() = 0;
+  virtual void printDemo() = 0;
 };
 
 }
