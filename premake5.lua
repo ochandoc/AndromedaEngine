@@ -81,18 +81,25 @@ project "Andromeda"
   {
     "include/**.h",
     "include/**.hpp",
-    "src/**.cpp",
-    "src/**.h",
-    "src/**.hpp",
+    "src/Core/**.*",
+    "src/Graphics/**.*",
+    "src/Backends/OpenGL/**.*",
+    "include/andpch.hpp",
     "premake5.lua"
   }
 
-  pchheader "andpch.hpp"
-  pchsource "src/andpch.cpp"
-  forceincludes { "andpch.hpp" }
+  --pchheader "andpch.hpp"
+  --pchsource "src/andpch.cpp"
+  --forceincludes { "andpch.hpp" }
 
   conan_cfg = get_conan_config()
   setup_dependencies(conan_cfg)
+
+  filter "system:windows"
+    files 
+    {
+        "src/Platform/Windows/**.*",
+    }
 
   -- Tipos de configuracion y sus flags
   filter "configurations:Debug"

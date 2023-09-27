@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Graphics/GraphicsContext.h"
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
+
+#include "Graphics/GraphicsContext.h"
 
 #include <string>
 

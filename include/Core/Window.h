@@ -1,11 +1,9 @@
 #pragma once
 
 #include <string>
-#include <memory>
 #include <functional>
 
 #include "Graphics/GraphicsContext.h"
-#include "Graphics/Renderer.h"
 
 namespace And
 {
@@ -17,10 +15,12 @@ struct WindowCreationInfo
 	GraphicsAPI api;
 };
 
+class Renderer;
+
 class Window
 {
 public:
-	Window();
+	Window(const WindowCreationInfo& info);
 	Window(const Window&) = delete;
 	Window(Window&&) = delete;
 
@@ -29,24 +29,25 @@ public:
 	Window& operator =(const Window&) = delete;
 	Window& operator =(Window&&) = delete;
 
-	static std::shared_ptr<Window> Create(const WindowCreationInfo& info);
+	virtual void update();
 
-	virtual void update() = 0;
+	virtual bool is_open() const;
 
-	virtual bool is_open() const = 0;
+	virtual void set_vsync(bool vsync);
+	virtual bool is_vsync() const;
 
-	virtual void set_vsync(bool vsync) = 0;
-	virtual bool is_vsync() const = 0;
+	virtual void* get_native_window() const;
 
-	virtual void* get_native_window() = 0;
-
-	virtual Renderer& create_renderer() = 0;
+	virtual Renderer& create_renderer();
 
 	std::shared_ptr<GraphicsContext> get_context() const { return m_Context; }
 
 	std::function<void()> m_OnWindowClose;
 
-protected:
+private:
+	void* m_Handle;
+	bool m_IsVSync;
+	WindowCreationInfo m_CreationInfo;
 	std::shared_ptr<GraphicsContext> m_Context;
 	std::unique_ptr<Renderer> m_Renderer;
 };

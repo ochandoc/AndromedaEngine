@@ -2,6 +2,9 @@
 #include "Graphics/GraphicsContext.h"
 #include "Graphics/Renderer.h"
 
+#include <algorithm>
+#include <utility>
+
 int main(int argc, char** argv)
 {
   And::WindowCreationInfo WindowInfo;
@@ -11,7 +14,7 @@ int main(int argc, char** argv)
   WindowInfo.title = "Andromeda Engine";
 
 
-  std::shared_ptr<And::Window> window = And::Window::Create(WindowInfo);
+  std::shared_ptr<And::Window> window(new And::Window(WindowInfo));
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer& g_renderer = window->create_renderer();
 
@@ -23,7 +26,7 @@ int main(int argc, char** argv)
   while (window->is_open()){
     g_renderer.new_frame();
     
-
+  
     g_renderer.end_frame();
   }
   

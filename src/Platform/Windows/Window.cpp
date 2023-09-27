@@ -1,23 +1,26 @@
-#include "WindowGLFW.h"
+#include "Core/Window.h"
 
 #include <assert.h>
 
+
 #include "Backends/OpenGL/OpenGLRenderer.h"
 #include "Backends/OpenGL/OpenGLContext.h"
+
+#include "GLFW/glfw3.h"
 
 namespace And
 {
 
 static void close_window_callback(GLFWwindow* window)
 {
-  WindowGLFW* glfw_window = reinterpret_cast<WindowGLFW*>(glfwGetWindowUserPointer(window));
+  Window* glfw_window = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
   if (glfw_window->m_OnWindowClose)
   {
     glfw_window->m_OnWindowClose();
   }
 }
 
-WindowGLFW::WindowGLFW(const WindowCreationInfo& info){
+Window::Window(const WindowCreationInfo& info){
   
   m_CreationInfo = info;
 
@@ -41,55 +44,56 @@ WindowGLFW::WindowGLFW(const WindowCreationInfo& info){
   }
 
 
-  m_Window = glfwCreateWindow(info.width, info.height, info.title.c_str(), NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(info.width, info.height, info.title.c_str(), NULL, NULL);
 
   // pointer to our window class, glfw se lo guarda y luego en el evento de close window podemos acceder al puntero cuando se llama a close_window_callback
-  glfwSetWindowUserPointer(m_Window, this);
+  glfwSetWindowUserPointer(window, this);
 
-  glfwSetWindowCloseCallback(m_Window, close_window_callback);
+  glfwSetWindowCloseCallback(window, close_window_callback);
   
   switch (m_CreationInfo.api)
   {
   case GraphicsAPI_OpenGL:
-    m_Context = std::make_shared<OpenGLContext>(m_Window);
+    m_Context = std::make_shared<OpenGLContext>(window);
     break;
   }
 
   set_vsync(false);
+  m_Handle = (void*)window;
 }
 
-WindowGLFW::~WindowGLFW()
+Window::~Window()
 {
-  glfwDestroyWindow(m_Window);
+  glfwDestroyWindow((GLFWwindow*)m_Handle);
   glfwTerminate();
 }
 
-void WindowGLFW::update()
+void Window::update()
 {
-  glfwSwapBuffers(m_Window);
+  glfwSwapBuffers((GLFWwindow*)m_Handle);
   glfwPollEvents();
 }
 
-bool WindowGLFW::is_open() const{
-  return !glfwWindowShouldClose(m_Window);
+bool Window::is_open() const{
+  return !glfwWindowShouldClose((GLFWwindow*)m_Handle);
 }
 
-void WindowGLFW::set_vsync(bool vsync) {
+void Window::set_vsync(bool vsync) {
   vsync ? glfwSwapInterval(1) : glfwSwapInterval(0);
   m_IsVSync = vsync;
 }
 
-bool WindowGLFW::is_vsync() const
+bool Window::is_vsync() const
 {
   return m_IsVSync;
 }
 
-void* WindowGLFW::get_native_window()
+void* Window::get_native_window() const
 {
-  return m_Window;
+  return m_Handle;
 }
 
-Renderer& WindowGLFW::create_renderer()
+Renderer& Window::create_renderer()
 {
   switch (m_CreationInfo.api)
   {
