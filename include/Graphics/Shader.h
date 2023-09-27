@@ -1,7 +1,21 @@
 #pragma once
 #include <iostream>
 
+
 namespace And{
+
+   enum ShaderType{
+    Shader_Vertex,
+    Shader_Fragment,
+    Shader_Geometry,
+    Shader_Teselation,
+  };
+
+  struct ShaderInfo{
+    ShaderType type;
+    // It should be the path of file or todo lo que tiene el archivo cargado en memoria
+    std::string file; 
+  };
 
 class Shader{
   public:
@@ -15,8 +29,11 @@ class Shader{
   Shader& operator=(const Shader&) = delete;
   Shader& operator=(const Shader&&) = delete;
 
-  virtual unsigned int  CreateShader(const std::string& vertexShader, const std::string& fragmentShader) = 0;
-  virtual unsigned int  CompileShader(const std::string& source, unsigned int type) = 0;
+  virtual void CreateShader() = 0;
+  
+  private:
+
+  //virtual unsigned int  CompileShader(const std::string& source, unsigned int type) = 0;
 
 };
 }

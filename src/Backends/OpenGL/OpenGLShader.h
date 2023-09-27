@@ -2,19 +2,23 @@
 
 #include "Graphics/Shader.h"
 
+
 namespace And{
 
 class OpenGLShader : public Shader{
 
 public:
 
-  OpenGLShader();
+  OpenGLShader(std::vector<ShaderInfo> S_info);
   
   virtual ~OpenGLShader();
 
-  virtual unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader) override;
-  virtual unsigned int CompileShader(const std::string& source, unsigned int type) override;
+  virtual void CreateShader() override;
+  //virtual unsigned int CompileShader(Shader) override;
 
+private:
+
+  unsigned int m_shader_id;
 
 };
 }
