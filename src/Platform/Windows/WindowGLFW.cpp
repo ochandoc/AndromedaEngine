@@ -2,6 +2,7 @@
 
 #include <assert.h>
 
+#include "Backends/OpenGL/OpenGLRenderer.h"
 #include "Backends/OpenGL/OpenGLContext.h"
 
 namespace And
@@ -47,9 +48,14 @@ WindowGLFW::WindowGLFW(const WindowCreationInfo& info){
 
   glfwSetWindowCloseCallback(m_Window, close_window_callback);
   
-  set_vsync(false);
+  switch (m_CreationInfo.api)
+  {
+  case GraphicsAPI_OpenGL:
+    m_Context = std::make_shared<OpenGLContext>(m_Window);
+    break;
+  }
 
-  //printf("%s\n", glGetString(GL_VERSION));
+  set_vsync(false);
 }
 
 WindowGLFW::~WindowGLFW()
@@ -83,16 +89,15 @@ void* WindowGLFW::get_native_window()
   return m_Window;
 }
 
-std::shared_ptr<GraphicsContext> WindowGLFW::create_context()
+Renderer& WindowGLFW::create_renderer()
 {
   switch (m_CreationInfo.api)
   {
   case GraphicsAPI_OpenGL:
-    m_Context = std::shared_ptr<GraphicsContext>(new OpenGLContext(m_Window));
+    m_Renderer = std::make_unique<OpenGLRenderer>(*this);
     break;
   }
-
-  return m_Context;
+  return *m_Renderer;
 }
 
 }

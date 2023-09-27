@@ -3,7 +3,10 @@
 
 namespace And
 {
-  Window::Window() {}
+  Window::Window()
+  {
+
+  }
 
   Window::~Window() {}
 

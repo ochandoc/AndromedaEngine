@@ -8,15 +8,15 @@ namespace And
 class OpenGLRenderer : public Renderer
 {
 public:
-  OpenGLRenderer();
+  OpenGLRenderer(Window& window);
 
   virtual ~OpenGLRenderer();
 
-  virtual void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) override;
-  
-  virtual void set_clear_color(float* color) override;
+  virtual void new_frame() override;
+  virtual void end_frame() override;
 
-  virtual void clear() override;
+  virtual void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) override;
+  virtual void set_clear_color(float* color) override;
 };
 
 }

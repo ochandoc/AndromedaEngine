@@ -5,6 +5,7 @@
 #include <functional>
 
 #include "Graphics/GraphicsContext.h"
+#include "Graphics/Renderer.h"
 
 namespace And
 {
@@ -39,7 +40,7 @@ public:
 
 	virtual void* get_native_window() = 0;
 
-	virtual std::shared_ptr<GraphicsContext> create_context() = 0;
+	virtual Renderer& create_renderer() = 0;
 
 	std::shared_ptr<GraphicsContext> get_context() const { return m_Context; }
 
@@ -47,6 +48,7 @@ public:
 
 protected:
 	std::shared_ptr<GraphicsContext> m_Context;
+	std::unique_ptr<Renderer> m_Renderer;
 };
 
 }

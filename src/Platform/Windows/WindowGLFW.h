@@ -23,7 +23,7 @@ public:
 
 	virtual void* get_native_window() override;
 
-	virtual std::shared_ptr<GraphicsContext> create_context() override;
+	virtual Renderer& create_renderer() override;
 
 private:
 	GLFWwindow* m_Window; // struct of glfw

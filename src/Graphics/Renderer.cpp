@@ -3,7 +3,10 @@
 namespace And
 {
 
-Renderer::Renderer() {}
+Renderer::Renderer(Window& window) : m_Window(window)
+{
+
+}
 
 Renderer::~Renderer() {}
 

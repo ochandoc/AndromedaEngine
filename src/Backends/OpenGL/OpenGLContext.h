@@ -17,8 +17,6 @@ public:
   virtual ~OpenGLContext();
 
   virtual void create_info() override;
-
-  virtual std::shared_ptr<Renderer> create_renderer() override;
     
 private:
   GLFWwindow* m_Window;

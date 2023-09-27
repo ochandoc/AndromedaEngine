@@ -41,10 +41,5 @@ void OpenGLContext::create_info(){
   printf("%s\n", m_ContextInfo.c_str());
 }
 
-std::shared_ptr<Renderer> OpenGLContext::create_renderer()
-{
-  return std::shared_ptr<Renderer>(new OpenGLRenderer());
-}
-
 }
 
