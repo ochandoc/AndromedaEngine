@@ -32,6 +32,7 @@ namespace And{
     Shader& operator=(const Shader&&) = delete;
 
     virtual void CreateShader() = 0;
+    virtual bool LoadShaderFromFile(const char* filename, char** data, size_t& size) = 0;
     
     private:
 

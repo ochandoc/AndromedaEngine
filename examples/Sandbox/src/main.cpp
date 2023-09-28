@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv){
 
-  
+  /*
   std::string vs_test = 
     "#version 430 core\n "
 
@@ -29,6 +29,9 @@ int main(int argc, char** argv){
       "FragColor = vec4(blend_color.xy, 0.0, 1.0);\n"
       
     "}\n";
+    */
+
+   
   
   And::ShaderInfo vs_info = {
     And::Shader_Vertex,

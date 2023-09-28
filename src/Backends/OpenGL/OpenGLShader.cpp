@@ -2,6 +2,9 @@
 
 #include <vector>
 #include "GL/glew.h"
+#include <iostream>
+#include <fstream>
+
 
 namespace And{
 
@@ -55,6 +58,38 @@ namespace And{
   OpenGLShader::~OpenGLShader(){
       printf("cagaste");
   }
+
+  int OpenGLShader::LoadShaderFromFile(char** path){
+
+  }
+
+  //static const char *kLoadFilesErrors[] = {"Can't open the file\0", "Not enough memory\0", "The data si not been loaded correctly\0"};
+  
+  bool LoadShaderFromFile(const char* filename, char** data, size_t& size) {
+    // Abre el archivo en modo binario
+    std::ifstream file(filename, std::ios::binary);
+    
+    if (!file) {
+        std::cerr << "Error al abrir el archivo: " << filename << std::endl;
+        return false;
+    }
+    
+    // Obtiene el tamaño del archivo
+    file.seekg(0, std::ios::end);
+    size = static_cast<size_t>(file.tellg());
+    file.seekg(0, std::ios::beg);
+    
+    // Asigna memoria para almacenar los datos del archivo
+    *data = new char[size];
+    
+    // Lee los datos del archivo en el buffer
+    file.read(*data, size);
+    
+    // Cierra el archivo
+    file.close();
+    
+    return true;
+}
 
   void OpenGLShader::CreateShader(){
 

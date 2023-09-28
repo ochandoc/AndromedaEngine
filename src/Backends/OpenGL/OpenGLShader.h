@@ -15,6 +15,7 @@ public:
   virtual ~OpenGLShader();
 
   virtual void CreateShader() override;
+  virtual bool LoadShaderFromFile(const char* filename, char** data, size_t& size) override;
   //virtual unsigned int CompileShader(Shader) override;
 
 private:
