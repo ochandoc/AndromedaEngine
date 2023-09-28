@@ -32,16 +32,21 @@ namespace And{
 
       // Compilamos todos los shaders y hacemos el attach del program al shader
       const char* src = shader.file.c_str();
+      printf("%s",src);
       glShaderSource(id, 1, &src, nullptr);
       glCompileShader(id);
       glAttachShader(program, id);
-
-
     }
 
     // Cuando ya tenemos todos los shader compilados, linkamos el program
     glLinkProgram(program);
-    // glValidateProgram(program);
+    glValidateProgram(program);
+
+    int succes;
+    glGetProgramiv(program, GL_VALIDATE_STATUS, &succes);
+    printf("%d", succes);
+
+    glUseProgram(program);
    
     // glDeleteShader(shader)
 
