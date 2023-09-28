@@ -27,8 +27,7 @@ public:
 
 
   // Draw a simple triangle on window
-  virtual void showDemo(float triangle[6]) = 0;
-  virtual void printDemo() = 0;
+  virtual void showDemo() = 0;
 };
 
 }

@@ -32,58 +32,39 @@ void OpenGLRenderer::clear()
 }
 
 
-void OpenGLRenderer::showDemo(float triangle[6]){
-  
-  GLenum error =  glGetError();
+void OpenGLRenderer::showDemo(){
+
+  float triangle[6] = {
+    -0.5f, -0.5f,
+    0.0f, 0.5f,
+    0.5f, -0.5f,
+  };
   
   // Bindeamos el vao
   unsigned int VAO;
   glGenVertexArrays(1, &VAO);
   glBindVertexArray(VAO);
 
+  // Generamos los buffers de pintado
   unsigned int VBO;
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), triangle, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_STATIC_DRAW);
 
-
+  // Pasamos el layout
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
 
-  // Desbindeamos el vao
-  //glBindVertexArray(0);
-
-  //error =  glGetError();
-  // Desbindeamos el vbo
-  //glBindBuffer(GL_ARRAY_BUFFER, 0);
-  //error =  glGetError();
-
-
-
-  error =  glGetError();
-  /*GLenum error =  glGetError();
-  if(error != GL_NO_ERROR){
-    printf("cagaste");
-  }*/
-}
-
-
-void OpenGLRenderer::printDemo(){
-
+  // Pintamos
   unsigned int indices[3] = {2, 1, 0};
-
-  GLenum error =  glGetError();
   glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, indices);
-  error =  glGetError();
 
-  switch (error){
-  case GL_INVALID_ENUM:  printf("invalid enum\n");break;
-  case GL_INVALID_VALUE: printf("invalid value\n");break;
-  case GL_INVALID_OPERATION: printf("invalid operation or non-zero buffer object name is bound to an enabled array\n");break; // Aqui
-  
-  default:
-    break;
-  }
+  // Desbindeamos el vao
+  glBindVertexArray(0);
+
+  // Desbindeamos el vbo
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 }
 
 std::shared_ptr<Shader> OpenGLRenderer::createShader(std::vector<ShaderInfo> s_info){

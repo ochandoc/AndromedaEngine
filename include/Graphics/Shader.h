@@ -12,7 +12,9 @@ namespace And{
   };
 
   struct ShaderInfo{
+    // Shader type
     ShaderType type;
+    
     // It should be the path of file or todo lo que tiene el archivo cargado en memoria
     std::string file;
   };

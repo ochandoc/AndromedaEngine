@@ -9,6 +9,7 @@ class OpenGLShader : public Shader{
 
 public:
 
+  // Recibe un vector de ShaderInfo con todos los shaders que se van a utilizar
   OpenGLShader(std::vector<ShaderInfo> S_info);
   
   virtual ~OpenGLShader();
