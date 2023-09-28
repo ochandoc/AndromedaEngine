@@ -1,21 +1,17 @@
 #pragma once
 
-#include <string>
-#include <functional>
 
-#include "Common/GraphicsContext.h"
 
 namespace And
 {
+class Renderer;
+class GraphicsContext;
 
 struct WindowCreationInfo
 {
 	unsigned int width, height;
 	std::string title;
-	GraphicsAPI api;
 };
-
-class Renderer;
 
 class Window
 {

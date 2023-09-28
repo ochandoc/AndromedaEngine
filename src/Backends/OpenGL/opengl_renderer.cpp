@@ -1,5 +1,5 @@
-#include "Common/Window.h"
 #include "Common/Renderer.h"
+#include "Common/Window.h"
 
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"

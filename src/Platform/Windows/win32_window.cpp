@@ -1,7 +1,5 @@
 #include "Common/Window.h"
 
-#include <assert.h>
-
 #include "Common/Renderer.h"
 #include "Common/GraphicsContext.h"
 
@@ -36,22 +34,13 @@ namespace And
 
     glfwInit();
 
-    switch (info.api)
-    {
-    case GraphicsAPI_OpenGL:  
-      // Configurar GLFW para crear un contexto OpenGL
-      glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-      glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // Version principal de OpenGL
-      glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);  // Version menor de OpenGL
-  #   ifdef DEBUG
-      glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); // Activar debug
-  #   endif
-      glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Perfil de OpenGL
-      break;
-    default:
-      assert(false && "Api not suported!");
-      break;
-    }
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // Version principal de OpenGL
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);  // Version menor de OpenGL
+#   ifdef DEBUG
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); // Activar debug
+#   endif
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Perfil de OpenGL
 
 
     GLFWwindow* window = glfwCreateWindow(info.width, info.height, info.title.c_str(), NULL, NULL);
@@ -62,13 +51,8 @@ namespace And
 
     glfwSetWindowCloseCallback(window, close_window_callback);
   
-    switch (m_Data->creation_info.api)
-    {
-    case GraphicsAPI_OpenGL:
-      m_Data->context = std::move(std::shared_ptr<GraphicsContext>(new GraphicsContext(*this)));
-      break;
-    }
-
+    m_Data->context = std::move(std::shared_ptr<GraphicsContext>(new GraphicsContext(*this)));
+    
     set_vsync(false);
   }
 
@@ -99,12 +83,7 @@ namespace And
 
   Renderer& Window::create_renderer()
   {
-    switch (m_Data->creation_info.api)
-    {
-    case GraphicsAPI_OpenGL:
-      m_Data->renderer = std::make_unique<Renderer>(*this);
-      break;
-    }
+    m_Data->renderer = std::make_unique<Renderer>(*this);
     return *(m_Data->renderer);
   }
 
@@ -132,12 +111,7 @@ namespace And
       style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
 
-    switch (m_Data->creation_info.api)
-    {
-    case GraphicsAPI_OpenGL:
-      ImGui_ImplGlfw_InitForOpenGL(m_Data->handle, true);
-      break;
-    }
+    ImGui_ImplGlfw_InitForOpenGL(m_Data->handle, true);
   }
 
   void Window::imgui_end()

@@ -1,11 +1,8 @@
 #pragma once
 
-#include <memory>
-
-#include "Common/Window.h"
-
 namespace And
 {
+class Window;
 
 class Renderer
 {
