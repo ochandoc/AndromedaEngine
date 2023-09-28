@@ -1,13 +1,10 @@
 #pragma once
 
-#include <memory>
-
-#include "Common/Window.h"
-#include "Common/Shader.h"
-
 namespace And
 {
 class Window;
+class Shader;
+struct ShaderInfo;
 
 class Renderer
 {

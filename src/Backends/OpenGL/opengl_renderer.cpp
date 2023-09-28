@@ -1,5 +1,4 @@
 #include "Common/Renderer.h"
-#include "OpenGLShader.h"
 #include "Common/Window.h"
 
 #include "GL/glew.h"
@@ -7,6 +6,8 @@
 
 #include "imgui_impl_opengl3.h"
 
+#include "OpenGLShader.h"
+#include "Common/Shader.h"
 
 namespace And
 {

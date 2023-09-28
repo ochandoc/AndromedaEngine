@@ -13,10 +13,7 @@
 #include "Common/Window.h"
 #include "Common/GraphicsContext.h"
 #include "Common/Renderer.h"
-
-#include <algorithm>
-#include <utility>
-#include <string>
+#include "Common/Shader.h"
 
 int main(int argc, char** argv){
   And::WindowCreationInfo WindowInfo;

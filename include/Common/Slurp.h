@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 namespace And
 {
   class Slurp
