@@ -1,10 +1,12 @@
 #include "Common/Window.h"
 #include "Common/Renderer.h"
+#include "OpenGLShader.h"
 
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 
 #include "imgui_impl_opengl3.h"
+
 
 namespace And
 {
@@ -76,5 +78,46 @@ void Renderer::set_viewport(unsigned int x, unsigned int y, unsigned int width, 
 void Renderer::set_clear_color(float* color){
   glClearColor(color[0], color[1], color[2], color[3]);
 }
+
+void Renderer::showDemo(){
+
+  float triangle[6] = {
+    -0.5f, -0.5f,
+    0.0f, 0.5f,
+    0.5f, -0.5f,
+  };
+  
+  // Bindeamos el vao
+  unsigned int VAO;
+  glGenVertexArrays(1, &VAO);
+  glBindVertexArray(VAO);
+
+  // Generamos los buffers de pintado
+  unsigned int VBO;
+  glGenBuffers(1, &VBO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_STATIC_DRAW);
+
+  // Pasamos el layout
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+
+  // Pintamos
+  unsigned int indices[3] = {2, 1, 0};
+  glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, indices);
+
+  // Desbindeamos el vao
+  glBindVertexArray(0);
+
+  // Desbindeamos el vbo
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+}
+
+std::shared_ptr<Shader> Renderer::createShader(std::vector<ShaderInfo> s_info){
+  return std::shared_ptr<Shader>(new OpenGLShader(s_info));
+}
+
+
 
 }

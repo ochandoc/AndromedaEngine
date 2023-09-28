@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "Common/Window.h"
+#include "Common/Shader.h"
 
 namespace And
 {
@@ -25,6 +26,10 @@ public:
   void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 
   void set_clear_color(float* color);
+
+  void showDemo();
+
+  std::shared_ptr<Shader> createShader(std::vector<ShaderInfo> s_info);
 
 protected:
   Window& m_Window;
