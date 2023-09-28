@@ -4,12 +4,6 @@
 
 namespace And
 {
-
-enum GraphicsAPI
-{
-  GraphicsAPI_OpenGL,
-};
-
 class Window;
 
 class GraphicsContext
@@ -23,8 +17,8 @@ public:
 
   ~GraphicsContext();
 
-  GraphicsAPI& operator =(const GraphicsAPI&) = delete;
-  GraphicsAPI& operator =(const GraphicsAPI&&) = delete;
+  GraphicsContext& operator =(const GraphicsContext&) = delete;
+  GraphicsContext& operator =(const GraphicsContext&&) = delete;
 
   void create_info();
 
