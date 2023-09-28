@@ -1,4 +1,4 @@
-#include "Graphics/GraphicsContext.h"
+#include "Common/GraphicsContext.h"
 
 namespace And
 {

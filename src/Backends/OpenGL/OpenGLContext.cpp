@@ -1,6 +1,6 @@
 #include "OpenGLContext.h"
 
-#include "OpenGLRenderer.h"
+#include "Common/Renderer.h"
 
 namespace And
 {

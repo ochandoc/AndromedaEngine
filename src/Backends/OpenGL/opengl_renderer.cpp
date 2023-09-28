@@ -1,25 +1,26 @@
-#include "OpenGLRenderer.h"
+#include "Common/Renderer.h"
 #include "GL/glew.h"
 
-#include "Core/Window.h"
+#include "Common/Window.h"
 
 #include "imgui_impl_opengl3.h"
 
 namespace And
 {
 
-OpenGLRenderer::OpenGLRenderer(Window& window) : Renderer(window)
+Renderer::Renderer(Window& window) : m_Window(window)
 {
   static float default_color[4] = {1.0f, 1.0f, 1.0f, 1.0f};
   set_clear_color(default_color);
+	m_ImGuiImpl = std::move(m_Window.make_imgui_impl());
   ImGui_ImplOpenGL3_Init("#version 430");
 }
 
-OpenGLRenderer::~OpenGLRenderer(){
+Renderer::~Renderer(){
   m_ImGuiImpl.release();
 }
 
-void OpenGLRenderer::new_frame()
+void Renderer::new_frame()
 {
 	static ImGuiID s_Dockspace;
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -57,7 +58,7 @@ void OpenGLRenderer::new_frame()
 	ImGui::PopStyleVar(2);
 }
 
-void OpenGLRenderer::end_frame()
+void Renderer::end_frame()
 {
   ImGui::ShowDemoWindow();
 
@@ -66,11 +67,11 @@ void OpenGLRenderer::end_frame()
   m_ImGuiImpl->end_frame();
 }
 
-void OpenGLRenderer::set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height){
+void Renderer::set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height){
   glViewport(x, y, width, height);
 }
   
-void OpenGLRenderer::set_clear_color(float* color){
+void Renderer::set_clear_color(float* color){
   glClearColor(color[0], color[1], color[2], color[3]);
 }
 

@@ -84,7 +84,7 @@ project "Andromeda"
   {
     "include/**.h",
     "include/**.hpp",
-    "src/Core/**.*",
+    "src/Common/**.*",
     "src/Graphics/**.*",
     "include/andpch.hpp",
     "premake5.lua"

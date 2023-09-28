@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Core/Window.h"
+#include "Common/Window.h"
 
 namespace And
 {
@@ -14,17 +14,17 @@ public:
   Renderer(const Renderer&) = delete;
   Renderer(const Renderer&&) = delete;
 
-  virtual ~Renderer();
+  ~Renderer();
 
   Renderer& operator =(const Renderer&) = delete;
   Renderer& operator =(Renderer&&) = delete;
 
-  virtual void new_frame() = 0;
-  virtual void end_frame() = 0;
+  void new_frame();
+  void end_frame();
 
-  virtual void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) = 0;
+  void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 
-  virtual void set_clear_color(float* color) = 0;
+  void set_clear_color(float* color);
 
 protected:
   Window& m_Window;

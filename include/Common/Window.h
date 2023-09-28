@@ -3,7 +3,7 @@
 #include <string>
 #include <functional>
 
-#include "Graphics/GraphicsContext.h"
+#include "Common/GraphicsContext.h"
 
 namespace And
 {
@@ -38,7 +38,7 @@ public:
 
 	Renderer& create_renderer();
 
-	std::shared_ptr<GraphicsContext> get_context() const { return m_Context; }
+	std::shared_ptr<GraphicsContext> get_context() const;
 
 	std::function<void()> m_OnWindowClose;
 
@@ -59,12 +59,7 @@ public:
 private:
 	std::unique_ptr<class ImGuiImpl> make_imgui_impl();
 
-	void* m_Handle;
-	bool m_IsVSync;
-	WindowCreationInfo m_CreationInfo;
-	std::shared_ptr<GraphicsContext> m_Context;
-	std::unique_ptr<Renderer> m_Renderer;
-
+	std::unique_ptr<struct WindowData> m_Data;
 };
 
 }

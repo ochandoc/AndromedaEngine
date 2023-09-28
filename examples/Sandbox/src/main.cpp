@@ -1,6 +1,6 @@
-#include "Core/Window.h"
-#include "Graphics/GraphicsContext.h"
-#include "Graphics/Renderer.h"
+#include "Common/Window.h"
+#include "Common/GraphicsContext.h"
+#include "Common/Renderer.h"
 
 #include <algorithm>
 #include <utility>
