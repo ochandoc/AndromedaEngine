@@ -3,7 +3,7 @@
 #include <assert.h>
 
 #include "Common/Renderer.h"
-#include "Backends/OpenGL/OpenGLContext.h"
+#include "Common/GraphicsContext.h"
 
 #include "GLFW/glfw3.h"
 
@@ -55,6 +55,7 @@ namespace And
 
 
     GLFWwindow* window = glfwCreateWindow(info.width, info.height, info.title.c_str(), NULL, NULL);
+    m_Data->handle = window;
 
     // pointer to our window class, glfw se lo guarda y luego en el evento de close window podemos acceder al puntero cuando se llama a close_window_callback
     glfwSetWindowUserPointer(window, this);
@@ -64,12 +65,11 @@ namespace And
     switch (m_Data->creation_info.api)
     {
     case GraphicsAPI_OpenGL:
-      m_Data->context = std::make_shared<OpenGLContext>(window);
+      m_Data->context = std::move(std::shared_ptr<GraphicsContext>(new GraphicsContext(*this)));
       break;
     }
 
     set_vsync(false);
-    m_Data->handle = window;
   }
 
   Window::~Window()
@@ -92,7 +92,7 @@ namespace And
     return m_Data->is_vsync;
   }
 
-  void* Window::get_native_window() const
+  void* Window::get_native_window()
   {
     return m_Data->handle;
   }
@@ -113,12 +113,7 @@ namespace And
     return m_Data->context;
   }
 
-  std::unique_ptr<Window::ImGuiImpl> Window::make_imgui_impl()
-  {
-    return std::unique_ptr<Window::ImGuiImpl>(new Window::ImGuiImpl(*this));
-  }
-
-  Window::ImGuiImpl::ImGuiImpl(Window& window) : m_Window(window)
+  void Window::imgui_start()
   {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
@@ -128,7 +123,7 @@ namespace And
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
-    //io.IniFilename = "./Config/ImGui.ini";
+    io.IniFilename = "./ImGui.ini";
 
     ImGuiStyle& style = ImGui::GetStyle();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -136,31 +131,30 @@ namespace And
       style.WindowRounding = 0.0f;
       style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
-  
-    switch (window.m_Data->creation_info.api)
+
+    switch (m_Data->creation_info.api)
     {
     case GraphicsAPI_OpenGL:
-      ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_Window.get_native_window(), true);
+      ImGui_ImplGlfw_InitForOpenGL(m_Data->handle, true);
       break;
     }
   }
 
-  Window::ImGuiImpl::~ImGuiImpl()
+  void Window::imgui_end()
   {
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
   }
 
-  void Window::ImGuiImpl::new_frame()
+  void Window::new_frame()
   {
     glfwPollEvents();
     ImGui_ImplGlfw_NewFrame();
   }
 
-  void Window::ImGuiImpl::end_frame()
-  {
-    GLFWwindow* window = (GLFWwindow*)m_Window.get_native_window();
 
+  void Window::end_frame()
+  {
     ImGuiIO& io = ImGui::GetIO();
 
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -171,7 +165,7 @@ namespace And
       glfwMakeContextCurrent(backup_current_context);
     }
 
-    glfwSwapBuffers((GLFWwindow*)window);
+    glfwSwapBuffers(m_Data->handle);
   }
 
 }

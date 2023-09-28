@@ -34,7 +34,7 @@ public:
 	void set_vsync(bool vsync);
 	bool is_vsync() const;
 
-	void* get_native_window() const;
+	void* get_native_window();
 
 	Renderer& create_renderer();
 
@@ -42,22 +42,13 @@ public:
 
 	std::function<void()> m_OnWindowClose;
 
-	class ImGuiImpl
-	{
-	private:
-		ImGuiImpl(Window& window);
-	public:
-		~ImGuiImpl();
-		void new_frame();
-		void end_frame();
-
-		friend class Window;
-	private:
-		Window& m_Window;
-	};
 	friend class Renderer;
 private:
-	std::unique_ptr<class ImGuiImpl> make_imgui_impl();
+	void imgui_start();
+	void imgui_end();
+
+	void new_frame();
+	void end_frame();
 
 	std::unique_ptr<struct WindowData> m_Data;
 };

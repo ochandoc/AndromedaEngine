@@ -10,20 +10,27 @@ enum GraphicsAPI
   GraphicsAPI_OpenGL,
 };
 
+class Window;
+
 class GraphicsContext
 {  
+private:
+  GraphicsContext(Window& window);
+
 public:
-  GraphicsContext();
   GraphicsContext(const GraphicsContext&) = delete;
   GraphicsContext(const GraphicsContext&&) = delete;
 
-  virtual ~GraphicsContext();
+  ~GraphicsContext();
 
   GraphicsAPI& operator =(const GraphicsAPI&) = delete;
   GraphicsAPI& operator =(const GraphicsAPI&&) = delete;
 
-  virtual void create_info() = 0;
+  void create_info();
 
+  friend class Window;
+private:
+  std::unique_ptr<struct ContextData> m_Data;
 };
 
 }

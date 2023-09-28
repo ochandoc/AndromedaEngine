@@ -19,7 +19,7 @@ int main(int argc, char** argv)
   And::Renderer& g_renderer = window->create_renderer();
 
   float clear_color[4] = {1.0f, 0.0f, 0.0f, 1.0f};
-  g_renderer.set_clear_color(clear_color);
+  //g_renderer.set_clear_color(clear_color);
 
   g_context->create_info();
 

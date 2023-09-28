@@ -28,7 +28,6 @@ public:
 
 protected:
   Window& m_Window;
-  std::unique_ptr<Window::ImGuiImpl> m_ImGuiImpl;
 };
 
 }
