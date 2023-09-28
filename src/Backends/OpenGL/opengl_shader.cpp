@@ -1,16 +1,19 @@
-#include "OpenGLShader.h"
+#include "Common/Shader.h"
 
-#include <vector>
-#include "GL/glew.h"
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
 #include "Common/Slurp.h"
+
+#include "GL/glew.h"
+
 
 
 namespace And{
 
-  OpenGLShader::OpenGLShader(std::vector<ShaderInfo> S_info){
+  struct ShaderData
+  {
+
+  };
+
+  Shader::Shader(std::vector<ShaderInfo> S_info) : m_Data(new ShaderData){
 
     unsigned int program = glCreateProgram();
     unsigned int id;
@@ -60,7 +63,7 @@ namespace And{
 
   }
 
-  OpenGLShader::~OpenGLShader(){
+  Shader::~Shader(){
       
   }
 

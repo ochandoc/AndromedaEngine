@@ -6,7 +6,6 @@
 
 #include "imgui_impl_opengl3.h"
 
-#include "OpenGLShader.h"
 #include "Common/Shader.h"
 
 namespace And
@@ -116,7 +115,7 @@ void Renderer::showDemo(){
 }
 
 std::shared_ptr<Shader> Renderer::createShader(std::vector<ShaderInfo> s_info){
-  return std::shared_ptr<Shader>(new OpenGLShader(s_info));
+  return std::shared_ptr<Shader>(new Shader(s_info));
 }
 
 
