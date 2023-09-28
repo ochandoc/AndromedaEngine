@@ -1,3 +1,15 @@
+#include <assert.h>
+
+#include <functional>
+#include <algorithm>
+#include <utility>
+
+#include <optional>
+#include <memory>
+
+#include <string>
+#include <vector>
+
 #include "Common/Window.h"
 #include "Common/GraphicsContext.h"
 #include "Common/Renderer.h"
@@ -10,7 +22,6 @@ int main(int argc, char** argv){
   And::WindowCreationInfo WindowInfo;
   WindowInfo.width = 1024;
   WindowInfo.height = 720;
-  WindowInfo.api = And::GraphicsAPI_OpenGL;
   WindowInfo.title = "Andromeda Engine";
 
 

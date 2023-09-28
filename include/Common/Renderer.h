@@ -7,6 +7,7 @@
 
 namespace And
 {
+class Window;
 
 class Renderer
 {

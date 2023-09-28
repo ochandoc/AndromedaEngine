@@ -75,9 +75,9 @@ project "Andromeda"
     "src",
   }
   
-  --pchheader "andpch.hpp"
-  --pchsource "src/andpch.cpp"
-  --forceincludes { "andpch.hpp" }
+  pchheader "andpch.hpp"
+  pchsource "src/andpch.cpp"
+  forceincludes { "andpch.hpp" }
 
   -- Todos los ficheros que van a aparecer en la solucion
   files
@@ -87,6 +87,7 @@ project "Andromeda"
     "src/Common/**.*",
     "src/Graphics/**.*",
     "include/andpch.hpp",
+    "src/andpch.cpp",
     "premake5.lua"
   }
   
