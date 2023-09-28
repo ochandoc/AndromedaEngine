@@ -14,8 +14,7 @@ namespace And{
   struct ShaderInfo{
     // Shader type
     ShaderType type;
-    
-    // It should be the path of file or todo lo que tiene el archivo cargado en memoria
+    // File path
     const char* file_path;
   };
 
@@ -30,8 +29,6 @@ namespace And{
 
     Shader& operator=(const Shader&) = delete;
     Shader& operator=(const Shader&&) = delete;
-
-    virtual void CreateShader() = 0;
     
     private:
 

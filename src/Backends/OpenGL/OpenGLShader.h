@@ -8,12 +8,14 @@ class OpenGLShader : public Shader{
 
 public:
 
-  // Recibe un vector de ShaderInfo con todos los shaders que se van a utilizar
+  /**
+   * @brief Construct a new OpenGL Shader object
+   * 
+   * @param S_info std::vector of ShaderInfo with all shaders you need
+   */
   OpenGLShader(std::vector<ShaderInfo> S_info);
   
   virtual ~OpenGLShader();
-
-  virtual void CreateShader() override;
 
   //virtual unsigned int CompileShader(Shader) override;
 

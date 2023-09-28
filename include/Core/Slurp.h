@@ -16,7 +16,18 @@ namespace And
     Slurp& operator =(const Slurp&) = delete;
     Slurp& operator =(Slurp&& other);
 
+    /**
+     * @brief file data
+     * 
+     * @return char* of file data
+     */
     char* data();
+
+    /**
+     * @brief size in bytes of file
+     * 
+     * @return size_t 
+     */
     size_t size() const;
 
   private:
