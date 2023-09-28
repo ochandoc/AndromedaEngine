@@ -35,16 +35,19 @@ int main(int argc, char** argv){
   
   And::ShaderInfo vs_info = {
     And::Shader_Vertex,
-    vs_test,
+    "../../data/vshader.vs",
   };
   And::ShaderInfo fs_info = {
     And::Shader_Fragment,
-    fs_test,
+    "../../data/fshader.fs",
   };
+  
 
+  
   std::vector<And::ShaderInfo> shaders_vec;
   shaders_vec.push_back(vs_info);
   shaders_vec.push_back(fs_info);
+  
 
 
 

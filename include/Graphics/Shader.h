@@ -16,7 +16,7 @@ namespace And{
     ShaderType type;
     
     // It should be the path of file or todo lo que tiene el archivo cargado en memoria
-    std::string file;
+    const char* file_path;
   };
 
   class Shader{
@@ -32,7 +32,6 @@ namespace And{
     Shader& operator=(const Shader&&) = delete;
 
     virtual void CreateShader() = 0;
-    virtual bool LoadShaderFromFile(const char* filename, char** data, size_t& size) = 0;
     
     private:
 
