@@ -66,11 +66,6 @@ namespace And{
 
   //static const char *kLoadFilesErrors[] = {"Can't open the file\0", "Not enough memory\0", "The data si not been loaded correctly\0"};
 
-
-  void OpenGLShader::CreateShader(){
-
-  }
-
   
 
 }
