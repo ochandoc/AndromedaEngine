@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Graphics/Renderer.h"
+#include "Core/Window.h"
 
 namespace And
 {
@@ -16,7 +17,7 @@ public:
   virtual void end_frame() override;
 
   virtual void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) override;
-  virtual void set_clear_color(float* color) override;
+  virtual void set_clear_color(float* color) override;  
 };
 
 }

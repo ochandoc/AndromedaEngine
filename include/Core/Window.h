@@ -24,32 +24,47 @@ public:
 	Window(const Window&) = delete;
 	Window(Window&&) = delete;
 
-	virtual ~Window();
+	~Window();
 
 	Window& operator =(const Window&) = delete;
 	Window& operator =(Window&&) = delete;
 
-	virtual void update();
+	bool is_open() const;
 
-	virtual bool is_open() const;
+	void set_vsync(bool vsync);
+	bool is_vsync() const;
 
-	virtual void set_vsync(bool vsync);
-	virtual bool is_vsync() const;
+	void* get_native_window() const;
 
-	virtual void* get_native_window() const;
-
-	virtual Renderer& create_renderer();
+	Renderer& create_renderer();
 
 	std::shared_ptr<GraphicsContext> get_context() const { return m_Context; }
 
 	std::function<void()> m_OnWindowClose;
 
+	class ImGuiImpl
+	{
+	private:
+		ImGuiImpl(Window& window);
+	public:
+		~ImGuiImpl();
+		void new_frame();
+		void end_frame();
+
+		friend class Window;
+	private:
+		Window& m_Window;
+	};
+	friend class Renderer;
 private:
+	std::unique_ptr<class ImGuiImpl> make_imgui_impl();
+
 	void* m_Handle;
 	bool m_IsVSync;
 	WindowCreationInfo m_CreationInfo;
 	std::shared_ptr<GraphicsContext> m_Context;
 	std::unique_ptr<Renderer> m_Renderer;
+
 };
 
 }

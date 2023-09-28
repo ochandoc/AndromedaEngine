@@ -46,7 +46,6 @@ workspace "AndromedEngine"
     "MultiProcessorCompile"
   }
 
-
 group "Core"
 
 project "Andromeda"
@@ -76,6 +75,10 @@ project "Andromeda"
     "src",
   }
   
+  --pchheader "andpch.hpp"
+  --pchsource "src/andpch.cpp"
+  --forceincludes { "andpch.hpp" }
+
   -- Todos los ficheros que van a aparecer en la solucion
   files
   {
@@ -83,15 +86,10 @@ project "Andromeda"
     "include/**.hpp",
     "src/Core/**.*",
     "src/Graphics/**.*",
-    "src/Backends/OpenGL/**.*",
     "include/andpch.hpp",
     "premake5.lua"
   }
-
-  --pchheader "andpch.hpp"
-  --pchsource "src/andpch.cpp"
-  --forceincludes { "andpch.hpp" }
-
+  
   conan_cfg = get_conan_config()
   setup_dependencies(conan_cfg)
 
@@ -99,6 +97,12 @@ project "Andromeda"
     files 
     {
         "src/Platform/Windows/**.*",
+    }
+
+  filter { "options:GraphicsAPI=OpenGL" }
+    files
+    {
+      "src/Backends/OpenGL/**.*",
     }
 
   -- Tipos de configuracion y sus flags
@@ -127,4 +131,11 @@ group "Examples"
   include "examples/Sandbox"
 group ""
 
-
+newoption
+{
+  trigger = "GraphicsAPI",
+  value = "API",
+  description = "Choose a particular API for rendering",
+  allowed = { {"OpenGL",}, {"Vulkan",}, },
+  default = "OpenGL",
+}

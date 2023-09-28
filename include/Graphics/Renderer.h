@@ -1,9 +1,11 @@
 #pragma once
 
+#include <memory>
+
+#include "Core/Window.h"
+
 namespace And
 {
-
-class Window;
 
 class Renderer
 {
@@ -26,6 +28,7 @@ public:
 
 protected:
   Window& m_Window;
+  std::unique_ptr<Window::ImGuiImpl> m_ImGuiImpl;
 };
 
 }

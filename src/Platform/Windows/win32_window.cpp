@@ -8,6 +8,8 @@
 
 #include "GLFW/glfw3.h"
 
+#include "imgui_impl_glfw.h"
+
 namespace And
 {
 
@@ -68,12 +70,6 @@ Window::~Window()
   glfwTerminate();
 }
 
-void Window::update()
-{
-  glfwSwapBuffers((GLFWwindow*)m_Handle);
-  glfwPollEvents();
-}
-
 bool Window::is_open() const{
   return !glfwWindowShouldClose((GLFWwindow*)m_Handle);
 }
@@ -102,6 +98,67 @@ Renderer& Window::create_renderer()
     break;
   }
   return *m_Renderer;
+}
+
+std::unique_ptr<Window::ImGuiImpl> Window::make_imgui_impl()
+{
+  return std::unique_ptr<Window::ImGuiImpl>(new Window::ImGuiImpl(*this));
+}
+
+Window::ImGuiImpl::ImGuiImpl(Window& window) : m_Window(window)
+{
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+
+  ImGuiIO& io = ImGui::GetIO();
+
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+  io.IniFilename = "./Config/ImGui.ini";
+
+  ImGuiStyle& style = ImGui::GetStyle();
+  if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+  {
+    style.WindowRounding = 0.0f;
+    style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+  }
+  
+  switch (window.m_CreationInfo.api)
+  {
+  case GraphicsAPI_OpenGL:
+    ImGui_ImplGlfw_InitForOpenGL((GLFWwindow*)m_Window.get_native_window(), true);
+    break;
+  }
+}
+
+Window::ImGuiImpl::~ImGuiImpl()
+{
+  ImGui_ImplGlfw_Shutdown();
+  ImGui::DestroyContext();
+}
+
+void Window::ImGuiImpl::new_frame()
+{
+  ImGui_ImplGlfw_NewFrame();
+}
+
+void Window::ImGuiImpl::end_frame()
+{
+  static GLFWwindow* window = (GLFWwindow*)m_Window.get_native_window();
+
+  ImGuiIO& io = ImGui::GetIO();
+
+  if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+  {
+    GLFWwindow* backup_current_context = glfwGetCurrentContext();
+    ImGui::UpdatePlatformWindows();
+    ImGui::RenderPlatformWindowsDefault();
+    glfwMakeContextCurrent(backup_current_context);
+  }
+
+  glfwSwapBuffers((GLFWwindow*)window);
+  glfwPollEvents();
 }
 
 }
