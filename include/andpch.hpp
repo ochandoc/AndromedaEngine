@@ -2,6 +2,10 @@
 
 #include <assert.h>
 
+#include <stdio.h>
+#include <iostream>
+#include <fstream>
+
 #include <functional>
 #include <algorithm>
 #include <utility>
