@@ -10,12 +10,12 @@ namespace And{
 
   struct ShaderData
   {
-
+    unsigned int id;
   };
 
-  Shader::Shader(std::vector<ShaderInfo> S_info) : m_Data(new ShaderData){
-
-    unsigned int program = glCreateProgram();
+  Shader::Shader(std::vector<ShaderInfo> S_info) : m_Data(new ShaderData)
+  {
+    m_Data->id = glCreateProgram();
     unsigned int id;
     
     for(ShaderInfo& shader : S_info){
@@ -63,25 +63,30 @@ namespace And{
       }
 
 
-      glAttachShader(program, id);
+      glAttachShader(m_Data->id, id);
     }
 
     // Cuando ya tenemos todos los shader compilados, linkamos el program
-    glLinkProgram(program);
-    glValidateProgram(program);
+    glLinkProgram(m_Data->id);
+    glValidateProgram(m_Data->id);
 
     int succes;
-    glGetProgramiv(program, GL_VALIDATE_STATUS, &succes);
+    glGetProgramiv(m_Data->id, GL_VALIDATE_STATUS, &succes);
     //printf("%d", succes);
 
-    glUseProgram(program);
+
    
     // glDeleteShader(shader)
 
   }
 
+  void Shader::use()
+  {
+    glUseProgram(m_Data->id);
+  }
+
   Shader::~Shader(){
-      
+    glDeleteProgram(m_Data->id);
   }
 
   

@@ -31,6 +31,8 @@ namespace And{
     Shader& operator=(const Shader&) = delete;
     Shader& operator=(Shader&&) = delete;
     
+    void use();
+
   private:
     std::unique_ptr<struct ShaderData> m_Data;
   };
