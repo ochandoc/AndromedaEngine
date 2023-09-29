@@ -65,7 +65,7 @@ project "Andromeda"
 
   defines
   {
-    "_CRT_SECURE_NO_WARNINGS"
+    "_CRT_SECURE_NO_WARNINGS",
   }
 
   -- Directorios donde estan los include
@@ -101,6 +101,7 @@ project "Andromeda"
     }
 
   filter { "options:GraphicsAPI=OpenGL" }
+    defines { "AND_OPENGL", }
     files
     {
       "src/Backends/OpenGL/**.*",

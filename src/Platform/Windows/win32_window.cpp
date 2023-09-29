@@ -1,3 +1,5 @@
+#include "configuration.h"
+
 #include "Common/Window.h"
 
 #include "Common/Renderer.h"
@@ -34,6 +36,7 @@ namespace And
 
     glfwInit();
 
+#ifdef AND_OPENGL
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // Version principal de OpenGL
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);  // Version menor de OpenGL
@@ -41,7 +44,7 @@ namespace And
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); // Activar debug
 #   endif
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Perfil de OpenGL
-
+#endif
 
     GLFWwindow* window = glfwCreateWindow(info.width, info.height, info.title.c_str(), NULL, NULL);
     m_Data->handle = window;
