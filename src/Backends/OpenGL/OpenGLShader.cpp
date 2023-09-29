@@ -34,15 +34,32 @@ namespace And{
         break;
       }
 
-
-      // Compilamos todos los shaders y hacemos el attach del program al shader
-      //const char* src = shader.file.c_str();
-      //printf("%s",src);
-
       Slurp file{shader.file_path};
       char *shader_data = file.data();
       glShaderSource(id, 1, &shader_data, nullptr);
       glCompileShader(id);
+
+      // Get compile error
+      int result;
+      glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+      if(result == GL_FALSE){
+        int lenght;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &lenght);
+        char *msg = new char[lenght];
+
+        glGetShaderInfoLog(id, lenght, &lenght, msg);
+
+        printf("\nFailed to compile ");
+        
+        switch (shader.type){
+          case Shader_Vertex: printf("vertex shader ");break;
+          case Shader_Fragment: printf("fragment shader ");break;
+        }
+
+        printf("%s\n", msg);
+      }
+
+
       glAttachShader(program, id);
     }
 
