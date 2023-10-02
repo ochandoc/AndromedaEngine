@@ -15,6 +15,9 @@
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
 
+#include "Platform/Windows/win32_input.h"
+
+
 int main(int argc, char** argv){
   And::WindowCreationInfo WindowInfo;
   WindowInfo.width = 1024;
@@ -41,11 +44,28 @@ int main(int argc, char** argv){
   // Show pc info
   g_context->create_info();
 
+  And::Input input;
+
   
   while (window->is_open()){
     g_renderer.new_frame();
     
+    // Checking inputs
+    if(input.IsKeyPressed(And::Key::Space)){
+      printf("Space");
+    }
+
+    if(input.IsMouseButtonPressed(And::Key::MouseLeft)){
+      printf("Left click");
+    }
+    
+    if(input.IsMouseButtonPressed(And::Key::MouseRight)){
+      printf("Right click");
+    }
+    
+    g_shader->use();
     g_renderer.showDemo();
+    
     
     g_renderer.end_frame();
   }
