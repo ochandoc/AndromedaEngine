@@ -15,7 +15,7 @@
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
 
-#include "Platform/Windows/win32_input.h"
+#include "Common/KeyboardInput.h"
 
 
 int main(int argc, char** argv){
@@ -46,6 +46,8 @@ int main(int argc, char** argv){
 
   And::Input input;
 
+  double mouseX = -1.0f, mouseY = -1.0f;
+
   
   while (window->is_open()){
     g_renderer.new_frame();
@@ -62,6 +64,12 @@ int main(int argc, char** argv){
     if(input.IsMouseButtonPressed(And::Key::MouseRight)){
       printf("Right click");
     }
+
+    input.GetMousePosition((GLFWwindow*)window->get_native_window(), &mouseX, &mouseY);
+
+    printf("X[%f] Y[%f]\n", mouseX, mouseY);
+
+
     
     g_shader->use();
     g_renderer.showDemo();

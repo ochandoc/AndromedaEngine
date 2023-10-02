@@ -162,7 +162,7 @@ namespace And{
     return isPressed;
   }
 
-  void Input::GetMousePosition(double *x, double *y){
+  void Input::GetMousePosition(GLFWwindow *window,double *x, double *y){
 
     glfwGetCursorPos(window, x, y);
 
@@ -170,15 +170,15 @@ namespace And{
   double Input::GetMouseX(){
     double x,y;
 
-    glfwGetCursorPos(window, &x, &y);
-    return x;
+    //glfwGetCursorPos(window, &x, &y);
+    return 0.0f;
   }
 
   double Input::GetMouseY(){
     double x,y;
 
-    glfwGetCursorPos(window, &x, &y);
-    return y;
+    //glfwGetCursorPos(window, &x, &y);
+    return 0.0f;
   }
 
 
