@@ -11,17 +11,34 @@
 
 namespace And
 {
-  struct InputData{
+
+  struct InputData
+  {
 
     Window* window = nullptr;
     //std::unordered_map<> 
   };
 
-  static InputData s_Data;
+  static InputData s_Data = {};
+
+  static LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
+    if (nCode >= 0) {
+        // Manejar el evento de teclado
+        if (wParam == WM_KEYDOWN) {
+            KBDLLHOOKSTRUCT* pKeyData = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
+
+            // Imprimir el código de la tecla presionada
+            printf("Tecla pulsada-> %d\n", pKeyData->vkCode);
+        }
+    }
+
+    // Pasar el control al siguiente hook en la cadena
+    return CallNextHookEx(NULL, nCode, wParam, lParam);
+  }
+
 
   void Input::SetWindow(Window *w){
     s_Data.window = w;
-    printf("Me caguen todoooo\n");
   }
 
   //void Input::SetWindowCojones(Window* w){
@@ -200,8 +217,5 @@ namespace And
     //glfwGetCursorPos(window, &x, &y);
     return 0.0f;
   }
-
- 
-
 
 };

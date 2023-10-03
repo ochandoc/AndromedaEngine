@@ -22,6 +22,8 @@ namespace And{
     static double GetMouseX();
     static double GetMouseY();
 
+    //LRESULT CALLBACK Input::KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
+
 
   };
   

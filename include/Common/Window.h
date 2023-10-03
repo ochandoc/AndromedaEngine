@@ -11,6 +11,7 @@ struct WindowCreationInfo
 	std::string title;
 };
 
+
 class Window
 {
 public:

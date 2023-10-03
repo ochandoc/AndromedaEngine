@@ -17,6 +17,13 @@
 
 #include "Common/KeyboardInput.h"
 
+#include <windows.h>
+
+
+// que te parece si hacemos que la ventana tenga una instancia del input, es muy poarecido a lo que esta diciendo el
+// hacemos lo del input de mientras o que
+// espera porqie si nos ponemos focus no atendemos y esta diciendo cosas importantes
+
 
 int main(int argc, char** argv){
   And::WindowCreationInfo WindowInfo;
@@ -50,6 +57,8 @@ int main(int argc, char** argv){
 
   double mouseX = -1.0f, mouseY = -1.0f;
 
+  // Instalar el hook de teclado
+  HHOOK hook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, NULL, 0);
   
   while (window->is_open()){
     g_renderer.new_frame();
@@ -68,7 +77,17 @@ int main(int argc, char** argv){
     }
 
     And::Input::GetMousePosition(&mouseX, &mouseY);
-    printf("X[%f] Y[%f]\n", mouseX, mouseY);
+    //printf("X[%f] Y[%f]\n", mouseX, mouseY);
+
+
+     // Bucle principal
+    MSG msg;
+    if(GetMessage(&msg, NULL, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    
+
 
 
     
@@ -78,6 +97,10 @@ int main(int argc, char** argv){
     
     g_renderer.end_frame();
   }
+
+
+  // Desinstalar el hook antes de salir
+    UnhookWindowsHookEx(hook);
   
 
   
