@@ -44,8 +44,9 @@ int main(int argc, char** argv){
   // Show pc info
   g_context->create_info();
 
-  And::Input input;
-  input.SetWindow(window.get());
+  //And::Input input;
+  //input.SetWindowCojones(window.get());
+  And::Input::SetWindow(window.get());
 
   double mouseX = -1.0f, mouseY = -1.0f;
 
@@ -54,20 +55,19 @@ int main(int argc, char** argv){
     g_renderer.new_frame();
     
     // Checking inputs
-    if(input.IsKeyPressed(And::Key::Space)){
+    if(And::Input::IsKeyPressed(And::Key::Space)){
       printf("Space");
     }
 
-    if(input.IsMouseButtonPressed(And::Key::MouseLeft)){
+    if(And::Input::IsMouseButtonPressed(And::Key::MouseLeft)){
       printf("Left click");
     }
     
-    if(input.IsMouseButtonPressed(And::Key::MouseRight)){
+    if(And::Input::IsMouseButtonPressed(And::Key::MouseRight)){
       printf("Right click");
     }
 
-    input.GetMousePosition(&mouseX, &mouseY);
-
+    And::Input::GetMousePosition(&mouseX, &mouseY);
     printf("X[%f] Y[%f]\n", mouseX, mouseY);
 
 

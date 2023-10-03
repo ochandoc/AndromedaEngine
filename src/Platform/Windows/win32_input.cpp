@@ -19,6 +19,15 @@ namespace And
 
   static InputData s_Data;
 
+  void Input::SetWindow(Window *w){
+    s_Data.window = w;
+    printf("Me caguen todoooo\n");
+  }
+
+  //void Input::SetWindowCojones(Window* w){
+    //s_Data.window = w;
+  //}
+
   bool Input::IsKeyPressed(Key::KeyCode key){
 
     bool isPressed = false;
@@ -192,9 +201,7 @@ namespace And
     return 0.0f;
   }
 
-  void Input::SetWindow(Window* w){
-    s_Data.window = w;
-  }
+ 
 
 
 };
