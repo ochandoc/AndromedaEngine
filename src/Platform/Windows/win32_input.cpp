@@ -1,12 +1,23 @@
 #include "configuration.h"
 
 #include "Common/KeyboardInput.h"
-#include "GLFW/glfw3.h"
+#include "Common/Window.h"
+
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+#include "GLFW/glfw3.h"
 
-namespace And{
 
+namespace And
+{
+  struct InputData{
+
+    Window* window = nullptr;
+    //std::unordered_map<> 
+  };
+
+  static InputData s_Data;
 
   bool Input::IsKeyPressed(Key::KeyCode key){
 
@@ -162,9 +173,9 @@ namespace And{
     return isPressed;
   }
 
-  void Input::GetMousePosition(GLFWwindow *window,double *x, double *y){
+  void Input::GetMousePosition(double *x, double *y){
 
-    glfwGetCursorPos(window, x, y);
+    glfwGetCursorPos((GLFWwindow*)s_Data.window->get_native_window(), x, y);
 
   }
   double Input::GetMouseX(){
@@ -179,6 +190,10 @@ namespace And{
 
     //glfwGetCursorPos(window, &x, &y);
     return 0.0f;
+  }
+
+  void Input::SetWindow(Window* w){
+    s_Data.window = w;
   }
 
 

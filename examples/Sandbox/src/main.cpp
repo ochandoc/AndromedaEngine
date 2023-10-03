@@ -45,6 +45,7 @@ int main(int argc, char** argv){
   g_context->create_info();
 
   And::Input input;
+  input.SetWindow(window.get());
 
   double mouseX = -1.0f, mouseY = -1.0f;
 
@@ -65,7 +66,7 @@ int main(int argc, char** argv){
       printf("Right click");
     }
 
-    input.GetMousePosition((GLFWwindow*)window->get_native_window(), &mouseX, &mouseY);
+    input.GetMousePosition(&mouseX, &mouseY);
 
     printf("X[%f] Y[%f]\n", mouseX, mouseY);
 
