@@ -1,6 +1,4 @@
 #pragma once
-//This file os only needed for building the library
-
 
 //Single define for window platform
 #if defined(_WIN32)
@@ -11,11 +9,11 @@
 	#endif 
 #endif 
 
+//Chech if the api is avaliable in the platform
 #if defined(AND_BUILD_LIB)
-	//Chech if the api is avaliable in the platform
 	#if defined(AND_WINDOWS)
 		#if !defined(AND_OPENGL)
 			#error "A graphics api must be defined! (AND_OPENGL)"
 		#endif
 	#endif
-#endif
+#endif 

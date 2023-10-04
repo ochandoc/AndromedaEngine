@@ -11,11 +11,11 @@
 namespace And
 {
 
-Renderer::Renderer(Window& window) : m_Window(window)
+Renderer::Renderer(Window& window) : m_Window(window) 
 {
-	static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
+  static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
   set_clear_color(default_color);
-	window.imgui_start();
+  window.imgui_start();
   ImGui_ImplOpenGL3_Init("#version 430");
 }
 

@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 
+#include "Common/Engine.h"
 #include "Common/Window.h"
 #include "Common/GraphicsContext.h"
 #include "Common/Renderer.h"
@@ -26,15 +27,11 @@
 
 
 int main(int argc, char** argv){
-  And::WindowCreationInfo WindowInfo;
-  WindowInfo.width = 1024;
-  WindowInfo.height = 720;
-  WindowInfo.title = "Andromeda Engine";
+  And::Engine e;
 
-
-  std::shared_ptr<And::Window> window(new And::Window(WindowInfo));
+  std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
-  And::Renderer& g_renderer = window->create_renderer();
+  And::Renderer g_renderer(*window);
 
   // Create basic shader
   And::ShaderInfo vs_info = { And::Shader_Vertex, "../../data/vshader.vs" };
@@ -61,41 +58,8 @@ int main(int argc, char** argv){
 
   
   while (window->is_open()){
+    window->update();
     g_renderer.new_frame();
-    
-    // Testing inputs
-    if(input.IsMouseButtonPressed(And::Key::MouseLeft)){
-      printf("Left click");
-    }
-    
-    if(input.IsMouseButtonPressed(And::Key::MouseRight)){
-      printf("Right click");
-    }
-
-    input.GetMousePosition(&mouseX, &mouseY);
-    mouseXx = input.GetMouseX();
-    mouseYy = input.GetMouseY();
-    //printf("X[%f] Y[%f] x[%f] y[%f]\n", mouseX, mouseY, mouseXx, mouseYy);
-
-
-     // Bucle principal
-    MSG msg;
-    if(GetMessage(&msg, NULL, 0, 0)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
-
-    if(input.IsKeyDown(And::Key::KeyCode::Space)){
-      printf("Space down!\n");
-    }
-    
-    if(input.IsKeyPressed(And::Key::KeyCode::Space)){
-      printf("Space pressed!\n");
-    }
-    if(input.IsKeyRelease(And::Key::KeyCode::Space)){
-      printf("Space release!\n");
-    }
-
     
     g_shader->use();
     g_renderer.showDemo();
