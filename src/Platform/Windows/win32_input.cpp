@@ -9,11 +9,9 @@
 #include "GLFW/glfw3.h"
 
 
-namespace And
-{
+namespace And{
 
-  struct InputData
-  {
+  struct InputData{
     //std::unordered_map<> 
     HHOOK hook;
 
@@ -25,10 +23,6 @@ namespace And
   };
 
   static InputData s_Data = {};
-
-  void PressKey(KBDLLHOOKSTRUCT* key){
-
-  }
 
   void PressedKey(unsigned int keyCode){
     int key = 0;
@@ -55,7 +49,6 @@ namespace And
         //case 59: key = Key::KeyCode::Semicolon; break;
         //case 61: key = Key::KeyCode::Equal; break;
 
-        // bloque ok
         case 65: key = Key::KeyCode::A; break;
         case 66: key = Key::KeyCode::B; break;
         case 67: key = Key::KeyCode::C; break;
@@ -262,22 +255,22 @@ namespace And
 
   void Input::GetMousePosition(double *x, double *y){
 
-    //glfwGetCursorPos((GLFWwindow*)s_Data.window->get_native_window(), x, y);
+    glfwGetCursorPos((GLFWwindow*)m_window.get_native_window(), x, y);
 
   }
   
   double Input::GetMouseX(){
     double x,y;
 
-    //glfwGetCursorPos(window, &x, &y);
-    return 0.0f;
+    glfwGetCursorPos((GLFWwindow*)m_window.get_native_window(), &x, &y);
+    return x;
   }
 
   double Input::GetMouseY(){
     double x,y;
 
-    //glfwGetCursorPos(window, &x, &y);
-    return 0.0f;
+    glfwGetCursorPos((GLFWwindow*)m_window.get_native_window(), &x, &y);
+    return y;
   }
 
 

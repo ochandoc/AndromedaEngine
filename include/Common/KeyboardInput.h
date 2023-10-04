@@ -27,17 +27,8 @@ namespace And{
 
     const unsigned int kTotalKeys = 123;
 
-
-    friend void PressedKey(unsigned int keyCode);
-
     private:
-    
     Window& m_window;
-    //LRESULT CALLBACK Input::KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
-
-    
-
-
   };
   
 };

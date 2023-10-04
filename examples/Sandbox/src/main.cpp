@@ -55,6 +55,7 @@ int main(int argc, char** argv){
 
 
   double mouseX = -1.0f, mouseY = -1.0f;
+  double mouseXx = -1.0f, mouseYy = -1.0f;
 
   input.init_input();
 
@@ -72,7 +73,9 @@ int main(int argc, char** argv){
     }
 
     input.GetMousePosition(&mouseX, &mouseY);
-    //printf("X[%f] Y[%f]\n", mouseX, mouseY);
+    mouseXx = input.GetMouseX();
+    mouseYy = input.GetMouseY();
+    printf("X[%f] Y[%f] x[%f] y[%f]\n", mouseX, mouseY, mouseXx, mouseYy);
 
 
      // Bucle principal
