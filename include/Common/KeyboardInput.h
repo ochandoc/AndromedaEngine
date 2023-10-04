@@ -4,6 +4,7 @@
 
 
 namespace And{
+  struct KeyboardState;
   class Window;
 
   class Input{
@@ -24,11 +25,13 @@ namespace And{
 
     void update_input();
     void init_input();
+    
 
     const unsigned int kTotalKeys = 123;
 
     private:
     Window& m_window;
+    KeyboardState& m_KeyBoard;
   };
   
 };

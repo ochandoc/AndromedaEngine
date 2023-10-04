@@ -75,7 +75,7 @@ int main(int argc, char** argv){
     input.GetMousePosition(&mouseX, &mouseY);
     mouseXx = input.GetMouseX();
     mouseYy = input.GetMouseY();
-    printf("X[%f] Y[%f] x[%f] y[%f]\n", mouseX, mouseY, mouseXx, mouseYy);
+    //printf("X[%f] Y[%f] x[%f] y[%f]\n", mouseX, mouseY, mouseXx, mouseYy);
 
 
      // Bucle principal
@@ -100,7 +100,7 @@ int main(int argc, char** argv){
     g_shader->use();
     g_renderer.showDemo();
     
-    input.update_input();
+    //input.update_input();
     g_renderer.end_frame();
   }
 

@@ -11,6 +11,16 @@ struct WindowCreationInfo
 	std::string title;
 };
 
+struct KeyboardState
+{
+	// estado del key buffer al iniciar el frame (todo en false) que cambia cuando recibe input
+	bool keysBufferBefore[128];
+
+	// estado del key buffer cuando acaba el frame (en el siguiente frame es el estado que habia en el frame anterior)
+	bool keysBufferAfter[128];
+
+	const int buffer_size = 128;
+};
 
 class Window
 {
@@ -38,6 +48,7 @@ public:
 	std::function<void()> m_OnWindowClose;
 
 	friend class Renderer;
+	friend class Input;
 private:
 	void imgui_start();
 	void imgui_end();
@@ -46,6 +57,7 @@ private:
 	void end_frame();
 
 	std::unique_ptr<struct WindowData> m_Data;
+	KeyboardState m_KeyBoard;
 };
 
 }
