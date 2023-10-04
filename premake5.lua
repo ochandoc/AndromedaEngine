@@ -66,6 +66,7 @@ project "Andromeda"
   defines
   {
     "_CRT_SECURE_NO_WARNINGS",
+    "AND_BUILD_LIB",
   }
 
   -- Directorios donde estan los include
