@@ -58,16 +58,11 @@ int main(int argc, char** argv){
 
   input.init_input();
 
-  bool space_press = false;
   
   while (window->is_open()){
     g_renderer.new_frame();
     
-    // Checking inputs
-    if(input.IsKeyPressed(And::Key::Space)){
-      printf("Space");
-    }
-
+    // Testing inputs
     if(input.IsMouseButtonPressed(And::Key::MouseLeft)){
       printf("Left click");
     }
@@ -87,22 +82,22 @@ int main(int argc, char** argv){
         DispatchMessage(&msg);
     }
 
-    space_press = input.get_space();
-
-    if(!space_press){
-      printf("No\n");
-    }else{
-      printf("Si\n");
+    if(input.IsKeyDown(And::Key::KeyCode::Space)){
+      printf("Space down!\n");
     }
     
-
-
+    if(input.IsKeyPressed(And::Key::KeyCode::Space)){
+      printf("Space pressed!\n");
+    }
+    if(input.IsKeyRelease(And::Key::KeyCode::Space)){
+      printf("Space release!\n");
+    }
 
     
     g_shader->use();
     g_renderer.showDemo();
     
-    input.update_keys();
+    input.update_input();
     g_renderer.end_frame();
   }
 

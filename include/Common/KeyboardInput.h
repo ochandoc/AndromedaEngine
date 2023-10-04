@@ -22,20 +22,19 @@ namespace And{
     double GetMouseX();
     double GetMouseY();
 
-    void update_keys();
+    void update_input();
     void init_input();
 
     const unsigned int kTotalKeys = 123;
 
-    bool keysBufferBefore[123];
-    bool keysBufferAfter[123];
 
-    bool get_space();
+    friend void PressedKey(unsigned int keyCode);
 
     private:
     
     Window& m_window;
     //LRESULT CALLBACK Input::KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam);
+
     
 
 

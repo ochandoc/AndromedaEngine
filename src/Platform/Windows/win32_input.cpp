@@ -16,7 +16,12 @@ namespace And
   {
     //std::unordered_map<> 
     HHOOK hook;
-    bool space = false;
+
+    // estado del key buffer al iniciar el frame (todo en false) que cambia cuando recibe input
+    bool keysBufferBefore[123];
+
+    // estado del key buffer cuando acaba el frame (en el siguiente frame es el estado que habia en el frame anterior)
+    bool keysBufferAfter[123];
   };
 
   static InputData s_Data = {};
@@ -25,24 +30,159 @@ namespace And
 
   }
 
-  bool Input::get_space(){
-    return s_Data.space;
+  void PressedKey(unsigned int keyCode){
+    int key = 0;
+
+    switch (keyCode) {
+        case 32: key = Key::KeyCode::Space; break;
+        case 39: key = Key::KeyCode::Apostrophe; break;
+        case 44: key = Key::KeyCode::Comma; break;
+        case 45: key = Key::KeyCode::Minus; break;
+        case 46: key = Key::KeyCode::Period; break;
+        case 47: key = Key::KeyCode::Slash; break;
+
+        // case 48: key = Key::KeyCode::D0; break;
+        // case 49: key = Key::KeyCode::D1; break;
+        // case 50: key = Key::KeyCode::D2; break;
+        // case 51: key = Key::KeyCode::D3; break;
+        // case 52: key = Key::KeyCode::D4; break;
+        // case 53: key = Key::KeyCode::D5; break;
+        // case 54: key = Key::KeyCode::D6; break;
+        // case 55: key = Key::KeyCode::D7; break;
+        // case 56: key = Key::KeyCode::D8; break;
+        // case 57: key = Key::KeyCode::D9; break;
+
+        //case 59: key = Key::KeyCode::Semicolon; break;
+        //case 61: key = Key::KeyCode::Equal; break;
+
+        // bloque ok
+        case 65: key = Key::KeyCode::A; break;
+        case 66: key = Key::KeyCode::B; break;
+        case 67: key = Key::KeyCode::C; break;
+        case 68: key = Key::KeyCode::D; break;
+        case 69: key = Key::KeyCode::E; break;
+        case 70: key = Key::KeyCode::F; break;
+        case 71: key = Key::KeyCode::G; break;
+        case 72: key = Key::KeyCode::H; break;
+        case 73: key = Key::KeyCode::I; break;
+        case 74: key = Key::KeyCode::J; break;
+        case 75: key = Key::KeyCode::K; break;
+        case 76: key = Key::KeyCode::L; break;
+        case 77: key = Key::KeyCode::M; break;
+        case 78: key = Key::KeyCode::N; break;
+        case 79: key = Key::KeyCode::O; break;
+        case 80: key = Key::KeyCode::P; break;
+        case 81: key = Key::KeyCode::Q; break;
+        case 82: key = Key::KeyCode::R; break;
+        case 83: key = Key::KeyCode::S; break;
+        case 84: key = Key::KeyCode::T; break;
+        case 85: key = Key::KeyCode::U; break;
+        case 86: key = Key::KeyCode::V; break;
+        case 87: key = Key::KeyCode::W; break;
+        case 88: key = Key::KeyCode::X; break;
+        case 89: key = Key::KeyCode::Y; break;
+        case 90: key = Key::KeyCode::Z; break;
+
+        case 91: key = Key::KeyCode::LeftBracket; break;
+        case 92: key = Key::KeyCode::Backslash; break;
+        case 93: key = Key::KeyCode::RightBracket; break;
+        case 96: key = Key::KeyCode::GraveAccent; break;
+
+        case 49: key = Key::KeyCode::World1; break;
+        case 50: key = Key::KeyCode::World2; break;
+
+        case 51: key = Key::KeyCode::Escape; break;
+        case 52: key = Key::KeyCode::Enter; break;
+        case 53: key = Key::KeyCode::Tab; break;
+        case 54: key = Key::KeyCode::Backspace; break;
+        case 55: key = Key::KeyCode::Insert; break;
+        case 56: key = Key::KeyCode::Delete; break;
+        case 57: key = Key::KeyCode::Right; break;
+        case 58: key = Key::KeyCode::Left; break;
+        case 59: key = Key::KeyCode::Down; break;
+        case 60: key = Key::KeyCode::Up; break;
+        case 61: key = Key::KeyCode::PageUp; break;
+        case 62: key = Key::KeyCode::PageDown; break;
+        case 63: key = Key::KeyCode::Home; break;
+        case 64: key = Key::KeyCode::End; break;
+        //case 65: key = Key::KeyCode::CapsLock; break;
+        //case 66: key = Key::KeyCode::ScrollLock; break;
+        //case 67: key = Key::KeyCode::NumLock; break;
+        //case 68: key = Key::KeyCode::PrintScreen; break;
+        //case 69: key = Key::KeyCode::Pause; break;
+
+
+        case 112: key = Key::KeyCode::F1; break;
+        case 113: key = Key::KeyCode::F2; break;
+        case 114: key = Key::KeyCode::F3; break;
+        case 115: key = Key::KeyCode::F4; break;
+        case 116: key = Key::KeyCode::F5; break;
+        case 117: key = Key::KeyCode::F6; break;
+        case 118: key = Key::KeyCode::F7; break;
+        case 119: key = Key::KeyCode::F8; break;
+        case 120: key = Key::KeyCode::F9; break;
+        case 121: key = Key::KeyCode::F10; break;
+        case 122: key = Key::KeyCode::F11; break;
+        case 123: key = Key::KeyCode::F12; break;
+        //case 82: key = Key::KeyCode::F13; break;
+        //case 83: key = Key::KeyCode::F14; break;
+        //case 84: key = Key::KeyCode::F15; break;
+        //case 85: key = Key::KeyCode::F16; break;
+        //case 86: key = Key::KeyCode::F17; break;
+        //case 87: key = Key::KeyCode::F18; break;
+        //case 88: key = Key::KeyCode::F19; break;
+        //case 89: key = Key::KeyCode::F20; break;
+        //case 90: key = Key::KeyCode::F21; break;
+        //case 91: key = Key::KeyCode::F22; break;
+        //case 92: key = Key::KeyCode::F23; break;
+        //case 93: key = Key::KeyCode::F24; break;
+        //case 94: key = Key::KeyCode::F25; break;
+
+        //case 95: key = Key::KeyCode::KP0; break;
+        //case 96: key = Key::KeyCode::KP1; break;
+        //case 97: key = Key::KeyCode::KP2; break;
+        //case 98: key = Key::KeyCode::KP3; break;
+        //case 99: key = Key::KeyCode::KP4; break;
+        //case 100: key = Key::KeyCode::KP5; break;
+        //case 101: key = Key::KeyCode::KP6; break;
+        //case 102: key = Key::KeyCode::KP7; break;
+        //case 103: key = Key::KeyCode::KP8; break;
+        //case 104: key = Key::KeyCode::KP9; break;
+        //case 105: key = Key::KeyCode::KPDecimal; break;
+        //case 106: key = Key::KeyCode::KPDivide; break;
+        //case 107: key = Key::KeyCode::KPMultiply; break;
+        //case 108: key = Key::KeyCode::KPSubtract; break;
+        //case 109: key = Key::KeyCode::KPAdd; break;
+        //case 110: key = Key::KeyCode::KPEnter; break;
+        //case 111: key = Key::KeyCode::KPEqual; break;
+
+        //case 112: key = Key::KeyCode::LeftShift; break;
+        //case 113: key = Key::KeyCode::LeftControl; break;
+        //case 114: key = Key::KeyCode::LeftAlt; break;
+        //case 115: key = Key::KeyCode::LeftSuper; break;
+        //case 116: key = Key::KeyCode::RightShift; break;
+        //case 117: key = Key::KeyCode::RightControl; break;
+        //case 118: key = Key::KeyCode::RightAlt; break;
+        //case 119: key = Key::KeyCode::RightSuper; break;
+        //case 120: key = Key::KeyCode::Menu; break;
+        default: break;
+    }
+
+    s_Data.keysBufferBefore[key] = true;
+
   }
 
   static LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam){
     if (nCode >= 0) {
         // Manejar el evento de teclado
         if (wParam == WM_KEYDOWN) {
-            KBDLLHOOKSTRUCT* pKeyData = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
+          KBDLLHOOKSTRUCT* pKeyData = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
 
-            // Imprimir el código de la tecla presionada
-            //printf("Tecla pulsada-> %d\n", pKeyData->vkCode);
-            
-            if(pKeyData->vkCode == 32){
-              s_Data.space = true;
-            }
+          // Imprimir el código de la tecla presionada
+          //printf("Tecla pulsada-> %d\n", pKeyData->vkCode);
 
-            //keysBufferBefore[pKeyData->vkCode] = true;
+          PressedKey(pKeyData->vkCode);
+
         }
     }
 
@@ -55,160 +195,54 @@ namespace And
   }
 
   void Input::init_input(){
-     // Instalar el hook de teclado
+
+    // Instalar el hook de teclado
     s_Data.hook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, NULL, 0);
+
+    for(int i = 0; i < kTotalKeys; i++){
+      s_Data.keysBufferBefore[i] = false;
+      s_Data.keysBufferAfter[i] = false;
+    }
+
   }
 
-  //void Input::SetWindowCojones(Window* w){
-    //s_Data.window = w;
-  //}
-
-
-  void Input::update_keys(){
+  void Input::update_input(){
     
+    // Swap input buffers
     for(unsigned int i = 0; i < kTotalKeys; i++){
-      //keysBufferAfter[i] = keysBufferBefore[i];
+      s_Data.keysBufferAfter[i] = s_Data.keysBufferBefore[i];
+      s_Data.keysBufferBefore[i] = false;
     }
-    s_Data.space = false;
+  
   }
 
   bool Input::IsKeyPressed(Key::KeyCode key){
 
-    bool isPressed = false;
+    // Si en el frame de antes estaba presionada y en este tambien
+    if(s_Data.keysBufferAfter[key]){
+      return s_Data.keysBufferBefore[key];
+    }
 
-    switch (key){
-      case Key::Space: isPressed = GetAsyncKeyState(VK_SPACE) & 0x8000; break;
-      case Key::Apostrophe: isPressed = GetAsyncKeyState(VK_OEM_7) & 0x8000; break;
-      case Key::Comma: isPressed = GetAsyncKeyState(VK_OEM_COMMA) & 0x8000; break;
-      case Key::Minus: isPressed = GetAsyncKeyState(VK_OEM_MINUS) & 0x8000; break;
-      case Key::Period: isPressed = GetAsyncKeyState(VK_OEM_PERIOD) & 0x8000; break;
-      case Key::Slash: isPressed = GetAsyncKeyState(VK_OEM_2) & 0x8000; break;
-      case Key::D0: isPressed = GetAsyncKeyState('0') & 0x8000; break;
-      case Key::D1: isPressed = GetAsyncKeyState('1') & 0x8000; break;
-      case Key::D2: isPressed = GetAsyncKeyState('2') & 0x8000; break;
-      case Key::D3: isPressed = GetAsyncKeyState('3') & 0x8000; break;
-      case Key::D4: isPressed = GetAsyncKeyState('4') & 0x8000; break;
-      case Key::D5: isPressed = GetAsyncKeyState('5') & 0x8000; break;
-      case Key::D6: isPressed = GetAsyncKeyState('6') & 0x8000; break;
-      case Key::D7: isPressed = GetAsyncKeyState('7') & 0x8000; break;
-      case Key::D8: isPressed = GetAsyncKeyState('8') & 0x8000; break;
-      case Key::D9: isPressed = GetAsyncKeyState('9') & 0x8000; break;
-      case Key::Semicolon: isPressed = GetAsyncKeyState(VK_OEM_1) & 0x8000; break;
-      case Key::Equal: isPressed = GetAsyncKeyState(VK_OEM_PLUS) & 0x8000; break;
-      case Key::A: isPressed = GetAsyncKeyState('A') & 0x8000; break;
-      case Key::B: isPressed = GetAsyncKeyState('B') & 0x8000; break;
-      case Key::C: isPressed = GetAsyncKeyState('C') & 0x8000; break;
-      case Key::D: isPressed = GetAsyncKeyState('D') & 0x8000; break;
-      case Key::E: isPressed = GetAsyncKeyState('E') & 0x8000; break;
-      case Key::F: isPressed = GetAsyncKeyState('F') & 0x8000; break;
-      case Key::G: isPressed = GetAsyncKeyState('G') & 0x8000; break;
-      case Key::H: isPressed = GetAsyncKeyState('H') & 0x8000; break;
-      case Key::I: isPressed = GetAsyncKeyState('I') & 0x8000; break;
-      case Key::J: isPressed = GetAsyncKeyState('J') & 0x8000; break;
-      case Key::K: isPressed = GetAsyncKeyState('K') & 0x8000; break;
-      case Key::L: isPressed = GetAsyncKeyState('L') & 0x8000; break;
-      case Key::M: isPressed = GetAsyncKeyState('M') & 0x8000; break;
-      case Key::N: isPressed = GetAsyncKeyState('N') & 0x8000; break;
-      case Key::O: isPressed = GetAsyncKeyState('O') & 0x8000; break;
-      case Key::P: isPressed = GetAsyncKeyState('P') & 0x8000; break;
-      case Key::Q: isPressed = GetAsyncKeyState('Q') & 0x8000; break;
-      case Key::R: isPressed = GetAsyncKeyState('R') & 0x8000; break;
-      case Key::S: isPressed = GetAsyncKeyState('S') & 0x8000; break;
-      case Key::T: isPressed = GetAsyncKeyState('T') & 0x8000; break;
-      case Key::U: isPressed = GetAsyncKeyState('U') & 0x8000; break;
-      case Key::V: isPressed = GetAsyncKeyState('V') & 0x8000; break;
-      case Key::W: isPressed = GetAsyncKeyState('W') & 0x8000; break;
-      case Key::X: isPressed = GetAsyncKeyState('X') & 0x8000; break;
-      case Key::Y: isPressed = GetAsyncKeyState('Y') & 0x8000; break;
-      case Key::Z: isPressed = GetAsyncKeyState('Z') & 0x8000; break;
-      case Key::LeftBracket: isPressed = GetAsyncKeyState(VK_OEM_4) & 0x8000; break;
-      case Key::Backslash: isPressed = GetAsyncKeyState(VK_OEM_5) & 0x8000; break;
-      case Key::RightBracket: isPressed = GetAsyncKeyState(VK_OEM_6) & 0x8000; break;
-      case Key::GraveAccent: isPressed = GetAsyncKeyState(VK_OEM_3) & 0x8000; break;
-      case Key::World1: isPressed = GetAsyncKeyState(VK_OEM_102) & 0x8000; break;
-      case Key::World2: isPressed = GetAsyncKeyState(VK_OEM_8) & 0x8000; break;
-      case Key::Escape: isPressed = GetAsyncKeyState(VK_ESCAPE) & 0x8000; break;
-      case Key::Enter: isPressed = GetAsyncKeyState(VK_RETURN) & 0x8000; break;
-      case Key::Tab: isPressed = GetAsyncKeyState(VK_TAB) & 0x8000; break;
-      case Key::Backspace: isPressed = GetAsyncKeyState(VK_BACK) & 0x8000; break;
-      case Key::Insert: isPressed = GetAsyncKeyState(VK_INSERT) & 0x8000; break;
-      case Key::Delete: isPressed = GetAsyncKeyState(VK_DELETE) & 0x8000; break;
-      case Key::Right: isPressed = GetAsyncKeyState(VK_RIGHT) & 0x8000; break;
-      case Key::Left: isPressed = GetAsyncKeyState(VK_LEFT) & 0x8000; break;
-      case Key::Down: isPressed = GetAsyncKeyState(VK_DOWN) & 0x8000; break;
-      case Key::Up: isPressed = GetAsyncKeyState(VK_UP) & 0x8000; break;
-      case Key::PageUp: isPressed = GetAsyncKeyState(VK_PRIOR) & 0x8000; break;
-      case Key::PageDown: isPressed = GetAsyncKeyState(VK_NEXT) & 0x8000; break;
-      case Key::Home: isPressed = GetAsyncKeyState(VK_HOME) & 0x8000; break;
-      case Key::End: isPressed = GetAsyncKeyState(VK_END) & 0x8000; break;
-      case Key::CapsLock: isPressed = GetAsyncKeyState(VK_CAPITAL) & 0x8000; break;
-      case Key::ScrollLock: isPressed = GetAsyncKeyState(VK_SCROLL) & 0x8000; break;
-      case Key::NumLock: isPressed = GetAsyncKeyState(VK_NUMLOCK) & 0x8000; break;
-      case Key::PrintScreen: isPressed = GetAsyncKeyState(VK_SNAPSHOT) & 0x8000; break;
-      case Key::Pause: isPressed = GetAsyncKeyState(VK_PAUSE) & 0x8000; break;
-      case Key::F1: isPressed = GetAsyncKeyState(VK_F1) & 0x8000; break;
-      case Key::F2: isPressed = GetAsyncKeyState(VK_F2) & 0x8000; break;
-      case Key::F3: isPressed = GetAsyncKeyState(VK_F3) & 0x8000; break;
-      case Key::F4: isPressed = GetAsyncKeyState(VK_F4) & 0x8000; break;
-      case Key::F5: isPressed = GetAsyncKeyState(VK_F5) & 0x8000; break;
-      case Key::F6: isPressed = GetAsyncKeyState(VK_F6) & 0x8000; break;
-      case Key::F7: isPressed = GetAsyncKeyState(VK_F7) & 0x8000; break;
-      case Key::F8: isPressed = GetAsyncKeyState(VK_F8) & 0x8000; break;
-      case Key::F9: isPressed = GetAsyncKeyState(VK_F9) & 0x8000; break;
-      case Key::F10: isPressed = GetAsyncKeyState(VK_F10) & 0x8000; break;
-      case Key::F11: isPressed = GetAsyncKeyState(VK_F11) & 0x8000; break;
-      case Key::F12: isPressed = GetAsyncKeyState(VK_F12) & 0x8000; break;
-      case Key::F13: isPressed = GetAsyncKeyState(VK_F13) & 0x8000; break;
-      case Key::F14: isPressed = GetAsyncKeyState(VK_F14) & 0x8000; break;
-      case Key::F15: isPressed = GetAsyncKeyState(VK_F15) & 0x8000; break;
-      case Key::F16: isPressed = GetAsyncKeyState(VK_F16) & 0x8000; break;
-      case Key::F17: isPressed = GetAsyncKeyState(VK_F17) & 0x8000; break;
-      case Key::F18: isPressed = GetAsyncKeyState(VK_F18) & 0x8000; break;
-      case Key::F19: isPressed = GetAsyncKeyState(VK_F19) & 0x8000; break;
-      case Key::F20: isPressed = GetAsyncKeyState(VK_F20) & 0x8000; break;
-      case Key::F21: isPressed = GetAsyncKeyState(VK_F21) & 0x8000; break;
-      case Key::F22: isPressed = GetAsyncKeyState(VK_F22) & 0x8000; break;
-      case Key::F23: isPressed = GetAsyncKeyState(VK_F23) & 0x8000; break;
-      case Key::F24: isPressed = GetAsyncKeyState(VK_F24) & 0x8000; break;
-      //case Key::F25: isPressed = GetAsyncKeyState(VK_F25) & 0x8000; break;
-      case Key::KP0: isPressed = GetAsyncKeyState(VK_NUMPAD0) & 0x8000; break;
-      case Key::KP1: isPressed = GetAsyncKeyState(VK_NUMPAD1) & 0x8000; break;
-      case Key::KP2: isPressed = GetAsyncKeyState(VK_NUMPAD2) & 0x8000; break;
-      case Key::KP3: isPressed = GetAsyncKeyState(VK_NUMPAD3) & 0x8000; break;
-      case Key::KP4: isPressed = GetAsyncKeyState(VK_NUMPAD4) & 0x8000; break;
-      case Key::KP5: isPressed = GetAsyncKeyState(VK_NUMPAD5) & 0x8000; break;
-      case Key::KP6: isPressed = GetAsyncKeyState(VK_NUMPAD6) & 0x8000; break;
-      case Key::KP7: isPressed = GetAsyncKeyState(VK_NUMPAD7) & 0x8000; break;
-      case Key::KP8: isPressed = GetAsyncKeyState(VK_NUMPAD8) & 0x8000; break;
-      case Key::KP9: isPressed = GetAsyncKeyState(VK_NUMPAD9) & 0x8000; break;
-      case Key::KPDecimal: isPressed = GetAsyncKeyState(VK_DECIMAL) & 0x8000; break;
-      case Key::KPDivide: isPressed = GetAsyncKeyState(VK_DIVIDE) & 0x8000; break;
-      case Key::KPMultiply: isPressed = GetAsyncKeyState(VK_MULTIPLY) & 0x8000; break;
-      case Key::KPSubtract: isPressed = GetAsyncKeyState(VK_SUBTRACT) & 0x8000; break;
-      case Key::KPAdd: isPressed = GetAsyncKeyState(VK_ADD) & 0x8000; break;
-      case Key::KPEnter: isPressed = GetAsyncKeyState(VK_RETURN) & 0x8000; break;
-      case Key::KPEqual: isPressed = GetAsyncKeyState(VK_OEM_NEC_EQUAL) & 0x8000; break;
-      case Key::LeftShift: isPressed = GetAsyncKeyState(VK_LSHIFT) & 0x8000; break;
-      case Key::LeftControl: isPressed = GetAsyncKeyState(VK_LCONTROL) & 0x8000; break;
-      case Key::LeftAlt: isPressed = GetAsyncKeyState(VK_LMENU) & 0x8000; break;
-      case Key::LeftSuper: isPressed = GetAsyncKeyState(VK_LWIN) & 0x8000; break;
-      case Key::RightShift: isPressed = GetAsyncKeyState(VK_RSHIFT) & 0x8000; break;
-      case Key::RightControl: isPressed = GetAsyncKeyState(VK_RCONTROL) & 0x8000; break;
-      case Key::RightAlt: isPressed = GetAsyncKeyState(VK_RMENU) & 0x8000; break;
-      case Key::RightSuper: isPressed = GetAsyncKeyState(VK_RWIN) & 0x8000; break;
-      case Key::Menu: isPressed = GetAsyncKeyState(VK_APPS) & 0x8000; break;
-      default: isPressed = false; break;
-    };
-
-    return isPressed;
-
+    return false;
   }
 
   bool Input::IsKeyDown(Key::KeyCode key){
+
+    // Si antes no estaba presionada y ahora si
+    if(s_Data.keysBufferAfter[key] == false){
+      return s_Data.keysBufferBefore[key];
+    }
+
+    // Si en el frame de antes estaba siendo presionada, ya no puede ser true
     return false;
   }
 
   bool Input::IsKeyRelease(Key::KeyCode key){
+
+    // Si en el frame de antes estaba presionada y en este frame ya no
+    if(s_Data.keysBufferAfter[key] && !s_Data.keysBufferBefore[key]){
+      return true;
+    }
 
     return false;
   }
