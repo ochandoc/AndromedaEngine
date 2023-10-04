@@ -37,7 +37,6 @@ namespace And
   Window::~Window()
   {
     glfwDestroyWindow(m_Data.handle);
-    glfwTerminate();
   }
 
   std::shared_ptr<Window> Window::make(Engine& e, uint32 w, uint32 h, const char* title)
