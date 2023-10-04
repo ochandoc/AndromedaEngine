@@ -1,6 +1,7 @@
 #pragma once
 
 #include "configuration.h"
+#include "platform.h"
 #include "types.h"
 
 #define NON_COPYABLE_CLASS(name)								\

@@ -1,27 +1,24 @@
 #pragma once
 
+#include "base.h"
+
 namespace And
 {
+class Engine;
 class Renderer;
 class GraphicsContext;
 
-struct WindowCreationInfo
-{
-	unsigned int width, height;
-	std::string title;
-};
-
 class Window
 {
-public:
-	Window(const WindowCreationInfo& info);
-	Window(const Window&) = delete;
-	Window(Window&&) = delete;
+	NON_COPYABLE_CLASS(Window)
+	NON_MOVABLE_CLASS(Window)
+private:
+	Window();
 
+public:
 	~Window();
 
-	Window& operator =(const Window&) = delete;
-	Window& operator =(Window&&) = delete;
+	static std::shared_ptr<Window> make(Engine& e, uint32 w, uint32 h, const char* title);
 
 	bool is_open() const;
 
@@ -30,7 +27,7 @@ public:
 
 	void* get_native_window();
 
-	Renderer& create_renderer();
+	void update();
 
 	std::shared_ptr<GraphicsContext> get_context() const;
 
@@ -44,7 +41,8 @@ private:
 	void new_frame();
 	void end_frame();
 
-	std::unique_ptr<struct WindowData> m_Data;
+	std::shared_ptr<GraphicsContext> m_Context;
+	PLATFORM_WINDOW_DATA m_Data;
 };
 
 }

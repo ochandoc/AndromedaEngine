@@ -1,5 +1,7 @@
 #pragma once
 
+#include "base.h"
+
 namespace And
 {
 class Window;
@@ -8,15 +10,12 @@ struct ShaderInfo;
 
 class Renderer
 {
+  NON_COPYABLE_CLASS(Renderer)
+  NON_MOVABLE_CLASS(Renderer)
 public:
   Renderer(Window& window);
-  Renderer(const Renderer&) = delete;
-  Renderer(const Renderer&&) = delete;
-
   ~Renderer();
 
-  Renderer& operator =(const Renderer&) = delete;
-  Renderer& operator =(Renderer&&) = delete;
 
   void new_frame();
   void end_frame();

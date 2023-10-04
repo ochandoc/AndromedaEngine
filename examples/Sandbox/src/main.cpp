@@ -10,21 +10,18 @@
 #include <string>
 #include <vector>
 
+#include "Common/Engine.h"
 #include "Common/Window.h"
 #include "Common/GraphicsContext.h"
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
 
 int main(int argc, char** argv){
-  And::WindowCreationInfo WindowInfo;
-  WindowInfo.width = 1024;
-  WindowInfo.height = 720;
-  WindowInfo.title = "Andromeda Engine";
+  And::Engine e;
 
-
-  std::shared_ptr<And::Window> window(new And::Window(WindowInfo));
+  std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
-  And::Renderer& g_renderer = window->create_renderer();
+  And::Renderer g_renderer(*window);
 
   // Create basic shader
   And::ShaderInfo vs_info = { And::Shader_Vertex, "../../data/vshader.vs" };
@@ -43,8 +40,10 @@ int main(int argc, char** argv){
 
   
   while (window->is_open()){
+    window->update();
     g_renderer.new_frame();
     
+    g_shader->use();
     g_renderer.showDemo();
     
     g_renderer.end_frame();
