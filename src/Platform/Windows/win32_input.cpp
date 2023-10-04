@@ -14,21 +14,35 @@ namespace And
 
   struct InputData
   {
-
-    Window* window = nullptr;
     //std::unordered_map<> 
+    HHOOK hook;
+    bool space = false;
   };
 
   static InputData s_Data = {};
 
-  static LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
+  void PressKey(KBDLLHOOKSTRUCT* key){
+
+  }
+
+  bool Input::get_space(){
+    return s_Data.space;
+  }
+
+  static LRESULT CALLBACK KeyboardProc(int nCode, WPARAM wParam, LPARAM lParam){
     if (nCode >= 0) {
         // Manejar el evento de teclado
         if (wParam == WM_KEYDOWN) {
             KBDLLHOOKSTRUCT* pKeyData = reinterpret_cast<KBDLLHOOKSTRUCT*>(lParam);
 
             // Imprimir el código de la tecla presionada
-            printf("Tecla pulsada-> %d\n", pKeyData->vkCode);
+            //printf("Tecla pulsada-> %d\n", pKeyData->vkCode);
+            
+            if(pKeyData->vkCode == 32){
+              s_Data.space = true;
+            }
+
+            //keysBufferBefore[pKeyData->vkCode] = true;
         }
     }
 
@@ -36,14 +50,27 @@ namespace And
     return CallNextHookEx(NULL, nCode, wParam, lParam);
   }
 
+  Input::Input(Window& w) : m_window(w){
 
-  void Input::SetWindow(Window *w){
-    s_Data.window = w;
+  }
+
+  void Input::init_input(){
+     // Instalar el hook de teclado
+    s_Data.hook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, NULL, 0);
   }
 
   //void Input::SetWindowCojones(Window* w){
     //s_Data.window = w;
   //}
+
+
+  void Input::update_keys(){
+    
+    for(unsigned int i = 0; i < kTotalKeys; i++){
+      //keysBufferAfter[i] = keysBufferBefore[i];
+    }
+    s_Data.space = false;
+  }
 
   bool Input::IsKeyPressed(Key::KeyCode key){
 
@@ -201,9 +228,10 @@ namespace And
 
   void Input::GetMousePosition(double *x, double *y){
 
-    glfwGetCursorPos((GLFWwindow*)s_Data.window->get_native_window(), x, y);
+    //glfwGetCursorPos((GLFWwindow*)s_Data.window->get_native_window(), x, y);
 
   }
+  
   double Input::GetMouseX(){
     double x,y;
 
@@ -218,4 +246,9 @@ namespace And
     return 0.0f;
   }
 
+
+  Input::~Input(){
+    // Desinstalar el hook antes de salir
+    UnhookWindowsHookEx(s_Data.hook);
+  }
 };

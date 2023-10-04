@@ -51,32 +51,32 @@ int main(int argc, char** argv){
   // Show pc info
   g_context->create_info();
 
-  //And::Input input;
-  //input.SetWindowCojones(window.get());
-  And::Input::SetWindow(window.get());
+  And::Input input{*window};
+
 
   double mouseX = -1.0f, mouseY = -1.0f;
 
-  // Instalar el hook de teclado
-  HHOOK hook = SetWindowsHookEx(WH_KEYBOARD_LL, KeyboardProc, NULL, 0);
+  input.init_input();
+
+  bool space_press = false;
   
   while (window->is_open()){
     g_renderer.new_frame();
     
     // Checking inputs
-    if(And::Input::IsKeyPressed(And::Key::Space)){
+    if(input.IsKeyPressed(And::Key::Space)){
       printf("Space");
     }
 
-    if(And::Input::IsMouseButtonPressed(And::Key::MouseLeft)){
+    if(input.IsMouseButtonPressed(And::Key::MouseLeft)){
       printf("Left click");
     }
     
-    if(And::Input::IsMouseButtonPressed(And::Key::MouseRight)){
+    if(input.IsMouseButtonPressed(And::Key::MouseRight)){
       printf("Right click");
     }
 
-    And::Input::GetMousePosition(&mouseX, &mouseY);
+    input.GetMousePosition(&mouseX, &mouseY);
     //printf("X[%f] Y[%f]\n", mouseX, mouseY);
 
 
@@ -86,6 +86,14 @@ int main(int argc, char** argv){
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
+    space_press = input.get_space();
+
+    if(!space_press){
+      printf("No\n");
+    }else{
+      printf("Si\n");
+    }
     
 
 
@@ -94,13 +102,12 @@ int main(int argc, char** argv){
     g_shader->use();
     g_renderer.showDemo();
     
-    
+    input.update_keys();
     g_renderer.end_frame();
   }
 
 
-  // Desinstalar el hook antes de salir
-    UnhookWindowsHookEx(hook);
+  
   
 
   

@@ -129,7 +129,6 @@ namespace And
     ImGui_ImplGlfw_NewFrame();
   }
 
-
   void Window::end_frame()
   {
     ImGuiIO& io = ImGui::GetIO();
