@@ -10,19 +10,11 @@ namespace And{
     Shader_Teselation,
   };
 
-  struct ShaderInfo
-  {
-    // Shader type
-    ShaderType type;
-    // File path
-    const char* file_path;
-  };
-
   class Shader
   {
   public:
 
-    Shader(std::vector<ShaderInfo> S_info);
+    Shader();
     Shader(const Shader&) = delete;
     Shader(Shader&&) = delete;
 
@@ -33,7 +25,16 @@ namespace And{
     
     void use();
 
+    void upload_shader(ShaderType t, const char* path);
+
+    // returns link program error code
+    int link_shaders();
+
+    // returns error of the last shader uploaded
+    char* get_upload_shader_error();
+
   private:
     std::unique_ptr<struct ShaderData> m_Data;
+    char m_shader_error[1024] = {0};
   };
 }

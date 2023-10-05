@@ -114,8 +114,8 @@ void Renderer::showDemo(){
 
 }
 
-std::shared_ptr<Shader> Renderer::createShader(std::vector<ShaderInfo> s_info){
-  return std::shared_ptr<Shader>(new Shader(s_info));
+std::shared_ptr<Shader> Renderer::createShader(){
+  return std::shared_ptr<Shader>(new Shader());
 }
 
 

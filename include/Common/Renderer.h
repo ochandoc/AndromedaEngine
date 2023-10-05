@@ -26,7 +26,7 @@ public:
 
   void showDemo();
 
-  std::shared_ptr<Shader> createShader(std::vector<ShaderInfo> s_info);
+  std::shared_ptr<Shader> createShader();
 
 protected:
   Window& m_Window;

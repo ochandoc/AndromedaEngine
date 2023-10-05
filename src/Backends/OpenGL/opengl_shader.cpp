@@ -13,58 +13,50 @@ namespace And{
     unsigned int id;
   };
 
-  Shader::Shader(std::vector<ShaderInfo> S_info) : m_Data(new ShaderData)
-  {
-    m_Data->id = glCreateProgram();
+  char* Shader::get_upload_shader_error(){
+    return m_shader_error;
+  }
+
+  void Shader::upload_shader(ShaderType type, const char* path){
+
     unsigned int id;
+
+    switch (type){
+    case Shader_Vertex:
+      id = glCreateShader(GL_VERTEX_SHADER);  
+    break;
+    case Shader_Fragment:
+      id = glCreateShader(GL_FRAGMENT_SHADER);  
+    break;
     
-    for(ShaderInfo& shader : S_info){
-      switch (shader.type){
-        case Shader_Vertex:
-          id = glCreateShader(GL_VERTEX_SHADER);        
-        break;
-        case Shader_Fragment:
-          id = glCreateShader(GL_FRAGMENT_SHADER);
-        break;
-        case Shader_Geometry:
-          
-        break;
-        case Shader_Teselation:
-          
-        break;
-        
-        default:
-        break;
-      }
+    default:
+      break;
+    }
 
-      Slurp file{shader.file_path};
-      char *shader_data = file.data();
-      glShaderSource(id, 1, &shader_data, nullptr);
-      glCompileShader(id);
+    // Cargamos en memoria el archivo del shader
+    Slurp file{path};
+    char *shader_data = file.data();
+    glShaderSource(id, 1, &shader_data, nullptr);
 
-      // Get compile error
-      int result;
-      glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-      if(result == GL_FALSE){
-        int lenght;
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &lenght);
-        char *msg = new char[lenght];
+    // Compilamos
+    glCompileShader(id);
 
-        glGetShaderInfoLog(id, lenght, &lenght, msg);
+    // Recogemos codigo de error en caso de que lo haya
+    int result;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
 
-        printf("\nFailed to compile ");
-        
-        switch (shader.type){
-          case Shader_Vertex: printf("vertex shader ");break;
-          case Shader_Fragment: printf("fragment shader ");break;
-        }
-
-        printf("%s\n", msg);
-      }
-
-
+    if(result == GL_FALSE){
+      int lenght;
+      glGetShaderiv(id, GL_INFO_LOG_LENGTH, &lenght);
+      glGetShaderInfoLog(id, lenght, &lenght, m_shader_error);
+    }else{
+      // Si no hay error atachamos
       glAttachShader(m_Data->id, id);
     }
+
+  }
+
+  int Shader::link_shaders(){
 
     // Cuando ya tenemos todos los shader compilados, linkamos el program
     glLinkProgram(m_Data->id);
@@ -72,12 +64,16 @@ namespace And{
 
     int succes;
     glGetProgramiv(m_Data->id, GL_VALIDATE_STATUS, &succes);
-    //printf("%d", succes);
+
+    return succes;
+  }
 
 
-   
-    // glDeleteShader(shader)
 
+
+  Shader::Shader() : m_Data(new ShaderData){
+
+    m_Data->id = glCreateProgram();
   }
 
   void Shader::use()
