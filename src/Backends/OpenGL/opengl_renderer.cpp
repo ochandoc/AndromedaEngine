@@ -112,12 +112,11 @@ void Renderer::showDemo(){
   // Desbindeamos el vbo
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-}
+  // Borramos los buffers
+  //glDeleteBuffers(1, &VAO);
+  //glDeleteBuffers(1, &VBO);
 
-std::shared_ptr<Shader> Renderer::createShader(){
-  return std::shared_ptr<Shader>(new Shader());
 }
-
 
 
 }

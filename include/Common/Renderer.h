@@ -26,7 +26,7 @@ public:
 
   void showDemo();
 
-  std::shared_ptr<Shader> createShader();
+  //void print_triangle(Triangle t);
 
 protected:
   Window& m_Window;

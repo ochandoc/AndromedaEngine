@@ -10,18 +10,25 @@ namespace And{
     Shader_Teselation,
   };
 
+  struct ShaderInfo{
+    const char* path_fragment = nullptr;
+    const char* path_vertex = nullptr;
+    const char* path_teselation = nullptr;
+    const char* path_geometry = nullptr;
+  };
+
   class Shader
   {
   public:
 
-    Shader();
-    Shader(const Shader&) = delete;
-    Shader(Shader&&) = delete;
-
+    static std::optional<Shader> make(ShaderInfo s_info);
+    Shader(const Shader& other);
+    Shader(Shader&& other);
     ~Shader();
 
-    Shader& operator=(const Shader&) = delete;
-    Shader& operator=(Shader&&) = delete;
+
+    Shader& operator=(const Shader& other);
+    Shader& operator=(Shader&& other);
     
     void use();
 
@@ -34,6 +41,7 @@ namespace And{
     char* get_upload_shader_error();
 
   private:
+    Shader();
     std::unique_ptr<struct ShaderData> m_Data;
     char m_shader_error[1024] = {0};
   };
