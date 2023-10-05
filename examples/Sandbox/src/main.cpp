@@ -17,6 +17,7 @@
 #include "Common/Shader.h"
 
 #include "Common/Input.h"
+#include "Common/ActionInput.h"
 
 #include <windows.h>
 
@@ -50,6 +51,7 @@ int main(int argc, char** argv){
 
   And::Input input{*window};
 
+  And::ActionInput jump{"Jump", And::KeyState::Press, { And::KeyCode::L, And::KeyCode::V }};
 
   double mouseX = -1.0f, mouseY = -1.0f;
   double mouseXx = -1.0f, mouseYy = -1.0f;
@@ -59,6 +61,11 @@ int main(int argc, char** argv){
     window->update();
     g_renderer.new_frame();
     
+    if (input.check_action(jump))
+    {
+      printf("Jummpinggggg!!!\n");
+    }
+
     if (input.IsKeyDown(And::KeyCode::Space))
     {
       printf("Space down!\n");

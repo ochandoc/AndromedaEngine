@@ -8,6 +8,7 @@ namespace And
 {
 struct KeyboardState;
 class Window;
+class ActionInput;
 
 class Input
 {
@@ -16,6 +17,8 @@ class Input
 public:
   Input(Window& w);
   ~Input();
+
+  bool check_action(const ActionInput& action);
 
   bool IsKeyPressed(KeyCode key);
   bool IsKeyDown(KeyCode key);
