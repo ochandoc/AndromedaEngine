@@ -33,14 +33,27 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
 
-  // Create basic shader
-  And::ShaderInfo vs_info = { And::Shader_Vertex, "../../data/vshader.vs" };
-  And::ShaderInfo fs_info = { And::Shader_Fragment, "../../data/fshader.fs" };
-  std::vector<And::ShaderInfo> shaders_vec;
-  shaders_vec.push_back(vs_info);
-  shaders_vec.push_back(fs_info);
 
-  std::shared_ptr<And::Shader> g_shader = g_renderer.createShader(shaders_vec);
+  // Creamos el shader
+  std::shared_ptr<And::Shader> g_shader = g_renderer.createShader();
+
+  char* error = nullptr;
+  // Subimos los shader que queramos y comprobamos que no hay error
+  g_shader->upload_shader(And::Shader_Vertex,"../../data/vshader.vs");
+  error = g_shader->get_upload_shader_error();
+  if(error){ 
+    printf("Error: %s\n", error);
+  }
+  
+  g_shader->upload_shader(And::Shader_Fragment,"../../data/fshader.fs");
+  error = g_shader->get_upload_shader_error();
+  if(error){ 
+    printf("Error: %s\n", error);
+  }
+
+  // Una vez subimos, linkamos
+  g_shader->link_shaders();
+
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
