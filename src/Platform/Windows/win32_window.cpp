@@ -25,7 +25,6 @@ namespace And
     WindowData* data = CAST_PTR(WindowData, glfwGetWindowUserPointer(window));
     Window* w = data->class_instance;
     data->glfw.is_open = false;
-
   }
 
   static void PressedKey(GLFWwindow* window, int keyCode, int scancode, int action, int mods){
@@ -208,7 +207,7 @@ namespace And
     window->m_Data->glfw.is_open = true;
     window->m_Data->keyboard = &window->m_KeyBoard;
 
-    glfwSetWindowUserPointer(window->m_Data->glfw.handle, &window->m_Data->glfw);
+    glfwSetWindowUserPointer(window->m_Data->glfw.handle, window->m_Data.get());
     glfwSetWindowCloseCallback(window->m_Data->glfw.handle, close_window_callback);
     glfwSetKeyCallback(window->m_Data->glfw.handle, PressedKey);
 
@@ -224,7 +223,7 @@ namespace And
   }
 
   bool Window::is_open() const{
-    return !glfwWindowShouldClose(m_Data->glfw.handle);
+    return m_Data->glfw.is_open;
   }
 
   void Window::set_vsync(bool vsync) {
