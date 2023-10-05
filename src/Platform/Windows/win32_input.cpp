@@ -1,6 +1,6 @@
 #include "configuration.h"
 
-#include "Common/KeyboardInput.h"
+#include "Common/Input.h"
 #include "Common/Window.h"
 
 #define WIN32_LEAN_AND_MEAN
@@ -13,58 +13,27 @@ namespace And{
 
   Input::Input(Window& w) : m_window(w), m_KeyBoard(w.m_KeyBoard){}
 
-  void Input::init_input(){
-    
+
+  bool Input::IsKeyPressed(KeyCode key){
+    return m_KeyBoard.keys[(int)key] == KeyState::Repeat;
   }
 
-  void Input::update_input(){
-      
-    // Swap input buffers
-    for(unsigned int i = 0; i < kTotalKeys; i++){
-      m_KeyBoard.keysBufferAfter[i] = m_KeyBoard.keysBufferBefore[i];
-      m_KeyBoard.keysBufferBefore[i] = false;
-    }
-  
+  bool Input::IsKeyDown(KeyCode key){
+    return m_KeyBoard.keys[(int)key] == KeyState::Press;
   }
 
-  bool Input::IsKeyPressed(Key::KeyCode key){
+  bool Input::IsKeyRelease(KeyCode key){
+    return m_KeyBoard.keys[(int)key] == KeyState::Release;
 
-    // Si en el frame de antes estaba presionada y en este tambien
-    if(m_KeyBoard.keysBufferAfter[key]){
-      return m_KeyBoard.keysBufferBefore[key];
-    }
-
-    return false;
   }
 
-  bool Input::IsKeyDown(Key::KeyCode key){
-
-    // Si antes no estaba presionada y ahora si
-    if(m_KeyBoard.keysBufferAfter[key] == false){
-      return m_KeyBoard.keysBufferBefore[key];
-    }
-
-    // Si en el frame de antes estaba siendo presionada, ya no puede ser true
-    return false;
-  }
-
-  bool Input::IsKeyRelease(Key::KeyCode key){
-
-    // Si en el frame de antes estaba presionada y en este frame ya no
-    if(m_KeyBoard.keysBufferAfter[key] && !m_KeyBoard.keysBufferBefore[key]){
-      return true;
-    }
-
-    return false;
-  }
-
-  bool Input::IsMouseButtonPressed(Key::MouseCode key){
+  bool Input::IsMouseButtonPressed(MouseCode key){
 
     bool isPressed = false;
 
     switch (key){
-      case Key::MouseLeft: isPressed = GetAsyncKeyState(VK_LBUTTON) & 0x8000; break;
-      case Key::MouseRight: isPressed = GetAsyncKeyState(VK_RBUTTON) & 0x8000; break;
+    case MouseCode::Left: isPressed = GetAsyncKeyState(VK_LBUTTON) & 0x8000; break;
+      case MouseCode::Right: isPressed = GetAsyncKeyState(VK_RBUTTON) & 0x8000; break;
       default: isPressed = false; break;
     }
 
@@ -92,7 +61,5 @@ namespace And{
 
 
   Input::~Input(){
-    // Desinstalar el hook antes de salir
-    //UnhookWindowsHookEx(s_Data.hook);
   }
 };

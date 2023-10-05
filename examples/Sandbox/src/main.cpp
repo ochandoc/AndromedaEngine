@@ -16,7 +16,7 @@
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
 
-#include "Common/KeyboardInput.h"
+#include "Common/Input.h"
 
 #include <windows.h>
 
@@ -54,13 +54,26 @@ int main(int argc, char** argv){
   double mouseX = -1.0f, mouseY = -1.0f;
   double mouseXx = -1.0f, mouseYy = -1.0f;
 
-  input.init_input();
-
   
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
     
+    if (input.IsKeyDown(And::KeyCode::Space))
+    {
+      printf("Space down!\n");
+    }
+
+    if (input.IsKeyPressed(And::KeyCode::Space))
+    {
+      printf("Space pressed!\n");
+    }
+
+    if (input.IsKeyRelease(And::KeyCode::Space))
+    {
+      printf("Space released!\n");
+    }
+
     g_shader->use();
     g_renderer.showDemo();
     

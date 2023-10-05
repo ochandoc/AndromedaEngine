@@ -1,10 +1,8 @@
 #pragma once
 
-namespace And{
-namespace Key{
-  
-  enum KeyCode{
-    // From glfw3.h
+namespace And
+{
+  enum class KeyCode : int{
     Space               = 1,
     Apostrophe          = 2,  /* ' */
     Comma               = 3,  /* , */
@@ -137,10 +135,24 @@ namespace Key{
     Menu                = 120
   };
 	
-  enum MouseCode{
-    MouseLeft           = 121,
-    MouseRight          = 122
+  const int kNumKeys = 123;
+
+  enum class MouseCode : int {
+    Left           = 121,
+    Right          = 122
   };
 
-};
+  enum class KeyState
+  {
+    Release,
+    Press,
+    Repeat,
+    Default
+  };
+
+  struct KeyboardState
+  {
+    KeyState keys[kNumKeys];
+  };
+
 };

@@ -2,28 +2,13 @@
 
 #include "base.h"
 
+#include "Common/KeyCodes.h"
+
 namespace And
 {
 class Engine;
 class Renderer;
 class GraphicsContext;
-
-struct WindowCreationInfo
-{
-	unsigned int width, height;
-	std::string title;
-};
-
-struct KeyboardState
-{
-	// estado del key buffer al iniciar el frame (todo en false) que cambia cuando recibe input
-	bool keysBufferBefore[128];
-
-	// estado del key buffer cuando acaba el frame (en el siguiente frame es el estado que habia en el frame anterior)
-	bool keysBufferAfter[128];
-
-	const int buffer_size = 128;
-};
 
 class Window
 {
@@ -48,8 +33,6 @@ public:
 
 	std::shared_ptr<GraphicsContext> get_context() const;
 
-	std::function<void()> m_OnWindowClose;
-
 	friend class Renderer;
 	friend class Input;
 private:
@@ -59,9 +42,9 @@ private:
 	void new_frame();
 	void end_frame();
 
-	std::shared_ptr<GraphicsContext> m_Context;
+	
   KeyboardState m_KeyBoard;
-	PLATFORM_WINDOW_DATA m_Data;
+	std::unique_ptr<struct WindowData> m_Data;
 };
 
 }
