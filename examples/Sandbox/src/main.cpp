@@ -42,7 +42,7 @@ int main(int argc, char** argv){
   s_info.path_fragment = "../../data/fshader.fs";
   s_info.path_vertex = "../../data/vshader.vs";
 
-  std::optional<And::Shader> g_shader = And::Shader::make(s_info);
+   std::optional<And::Shader> g_shader = And::Shader::make(s_info);
 
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};

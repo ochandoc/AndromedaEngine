@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 
 namespace And{
 
@@ -22,23 +23,15 @@ namespace And{
   public:
 
     static std::optional<Shader> make(ShaderInfo s_info);
-    Shader(const Shader& other);
+    Shader(const Shader& other) = delete;
     Shader(Shader&& other);
     ~Shader();
 
 
-    Shader& operator=(const Shader& other);
+    Shader& operator=(const Shader& other) = delete;
     Shader& operator=(Shader&& other);
     
     void use();
-
-    void upload_shader(ShaderType t, const char* path);
-
-    // returns link program error code
-    int link_shaders();
-
-    // returns error of the last shader uploaded
-    char* get_upload_shader_error();
 
   private:
     Shader();

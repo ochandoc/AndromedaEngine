@@ -3,42 +3,44 @@
 #include "Common/Slurp.h"
 
 #include "GL/glew.h"
-
+#include "andpch.hpp"
 
 
 namespace And{
 
   struct ShaderData{
     unsigned int id;
+    ShaderInfo shader_info;
   };
 
-
+/*
   Shader::Shader(const Shader& other) : Shader(){
     m_Data->id = other.m_Data->id;
   }
+*/
 
   Shader::Shader(Shader&& other) : Shader(){
     m_Data->id = other.m_Data->id;
+    m_Data->shader_info = other.m_Data->shader_info;
     other.m_Data->id = 0;
   }
 
+  /*
   Shader& Shader::operator=(const Shader& other){
     m_Data->id = other.m_Data->id; 
 
     return *this;
   }
+  */
 
   Shader& Shader::operator=(Shader&& other){
     m_Data->id = other.m_Data->id;
+    m_Data->shader_info = other.m_Data->shader_info;
     other.m_Data->id = 0;
 
     return *this;
   }
 
-
-  char* Shader::get_upload_shader_error(){
-    return m_shader_error;
-  }
 
   // Returns true if gets an error
   bool GetShaderError(unsigned int id){
@@ -46,6 +48,7 @@ namespace And{
     int result;
     glGetShaderiv(id, GL_COMPILE_STATUS, &result);
 
+    // Fallo en la compilacion
     if(result == GL_FALSE){
       int lenght;
       char shader_error[1024];
@@ -63,10 +66,11 @@ namespace And{
     unsigned int id_program = glCreateProgram();
     // Error
     if(id_program == 0){
-      return std::optional<Shader>(std::nullopt);
+        //return std::nullopt;
+      return std::nullopt;
     }
 
-    const char* paths[4] = {{s_info.path_vertex}, {s_info.path_fragment}, {s_info.path_geometry}, {s_info.path_teselation}};
+    const char* paths[4] = {s_info.path_vertex, s_info.path_fragment, s_info.path_geometry, s_info.path_teselation};
 
     for(int i = 0; i < 4; i++){
 
@@ -93,7 +97,7 @@ namespace And{
           glAttachShader(id_program, id_shader);
         }else{
           // Error
-          return std::optional<Shader>(std::nullopt);
+          return std::nullopt;
         }
       }
     }
@@ -106,15 +110,16 @@ namespace And{
     int succes;
     glGetProgramiv(id_program, GL_VALIDATE_STATUS, &succes);
     if(succes != GL_TRUE){
-      return std::optional<Shader>(std::nullopt);
+      return std::nullopt;
     }
 
 
     // Llegados hasta aqui, todo ha ido bien y creamos el shader
-    ShaderData data = {id_program};
+    //ShaderData data = {id_program};
     Shader s;
-    s.m_Data->id = id_program;  
-    return std::optional<Shader>(s);
+    s.m_Data->id = id_program;
+    s.m_Data->shader_info = s_info;
+    return std::optional<Shader>(std::move(s));
   }
 
 
