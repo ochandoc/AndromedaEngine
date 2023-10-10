@@ -1,7 +1,7 @@
 project "Sandbox"
   kind "ConsoleApp"
   language "C++"
-  cppdialect "C++2a"
+  cppdialect "C++20"
   staticruntime "Off"
 
   location "build/%{prj.name}"

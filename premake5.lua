@@ -51,7 +51,7 @@ group "Core"
 project "Andromeda"
   kind "StaticLib"
   language "C++"
-  cppdialect "C++2a"
+  cppdialect "C++20"
   staticruntime "Off"
 
   -- Archivos del proyecto de visual

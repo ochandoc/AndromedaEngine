@@ -15,6 +15,7 @@
 #include "Common/GraphicsContext.h"
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
+#include "Common/Triangle.h"
 
 #include "Common/Input.h"
 
@@ -55,6 +56,18 @@ int main(int argc, char** argv){
   double mouseX = -1.0f, mouseY = -1.0f;
   double mouseXx = -1.0f, mouseYy = -1.0f;
 
+  And::Vertex ver = {
+  {
+    -0.5f, -0.5f, 0.0f,
+    0.0f, 0.5f, 0.0f,
+    0.5f, -0.5f, 0.0f,
+  },
+  {0.0f, 0.0f, 0.0f},
+  {1.0f, 0.0f, 0.0f, 1.0f},
+  {2, 1, 0}};
+
+  And::Triangle tri{ver};
+
   
   while (window->is_open()){
     window->update();
@@ -79,7 +92,8 @@ int main(int argc, char** argv){
       g_shader->use();
     }
     
-    g_renderer.showDemo();
+    //g_renderer.showDemo();
+    g_renderer.draw_triangle(&tri);
     
     //input.update_input();
     g_renderer.end_frame();

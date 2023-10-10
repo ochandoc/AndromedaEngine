@@ -6,7 +6,9 @@ namespace And
 {
 class Window;
 class Shader;
+class Triangle;
 struct ShaderInfo;
+
 
 class Renderer
 {
@@ -26,7 +28,7 @@ public:
 
   void showDemo();
 
-  //void print_triangle(Triangle t);
+  void draw_triangle(Triangle *t);
 
 protected:
   Window& m_Window;
