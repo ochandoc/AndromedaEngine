@@ -56,15 +56,26 @@ int main(int argc, char** argv){
   double mouseX = -1.0f, mouseY = -1.0f;
   double mouseXx = -1.0f, mouseYy = -1.0f;
 
-  And::Vertex ver = {
-  {
-    -0.5f, -0.5f, 0.0f,
-    0.0f, 0.5f, 0.0f,
-    0.5f, -0.5f, 0.0f,
-  },
-  {0.0f, 0.0f, 0.0f},
-  {1.0f, 0.0f, 0.0f, 1.0f},
-  {2, 1, 0}};
+  
+    
+
+  And::Vertex ver[3] = {
+    {-0.5f, -0.5f, 0.0f},
+    {0.0f, 0.0f, 0.0f},
+    {1.0f, 0.0f, 0.0f, 1.0f},
+    {2, 1, 0},
+
+    {0.0f, 0.5f, 0.0f},
+    {0.0f, 0.0f, 0.0f},
+    {1.0f, 0.0f, 0.0f, 1.0f},
+    {2, 1, 0},
+
+    {0.5f, -0.5f, 0.0f},
+    {0.0f, 0.0f, 0.0f},
+    {1.0f, 0.0f, 0.0f, 1.0f},
+    {2, 1, 0},
+  
+  };
 
   And::Triangle tri{ver};
 

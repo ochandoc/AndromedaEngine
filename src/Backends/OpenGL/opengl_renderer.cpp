@@ -83,8 +83,15 @@ void Renderer::set_clear_color(float* color){
 
 void Renderer::draw_triangle(Triangle *t){
     
-  const Vertex& v = t->get_vertex();
+  Vertex *v = t->get_vertex();
+  const float vertices[9] = {
+    v[0].points[0], v[0].points[1], v[0].points[2],
+    v[1].points[0], v[1].points[1], v[1].points[2],
+    v[2].points[0], v[2].points[1], v[2].points[2],
+    
+    };
 
+  
   unsigned int VAO;
   glGenVertexArrays(1, &VAO);
   glBindVertexArray(VAO);
@@ -92,7 +99,7 @@ void Renderer::draw_triangle(Triangle *t){
   unsigned int VBO;
   glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(v.vertex), v.vertex, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
