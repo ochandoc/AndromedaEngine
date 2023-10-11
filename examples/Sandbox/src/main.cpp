@@ -86,19 +86,37 @@ int main(int argc, char** argv){
 
   And::Triangle tri{ver};
 
-  
+  float speed = 0.01f;
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
     
-    if (input.check_action(jump))
-    {
+    if (input.check_action(jump)){
       printf("Jummpinggggg!!!\n");
     }
 
-    if (input.IsKeyDown(And::KeyCode::Space))
-    {
-      printf("Space down!\n");
+    And::Vertex *vertices = tri.get_vertex();
+
+    if (input.IsKeyDown(And::KeyCode::W) || input.IsKeyPressed(And::KeyCode::W)){
+      for(int i = 0; i < 3; i++){
+        vertices[i].position[1] += speed;
+      }
+    }
+    if (input.IsKeyDown(And::KeyCode::S) || input.IsKeyPressed(And::KeyCode::S)){
+      for(int i = 0; i < 3; i++){
+        vertices[i].position[1] -= speed;
+      }
+    }
+    
+    if (input.IsKeyDown(And::KeyCode::A) || input.IsKeyPressed(And::KeyCode::A)){
+      for(int i = 0; i < 3; i++){
+        vertices[i].position[0] -= speed;
+      }
+    }
+    if (input.IsKeyDown(And::KeyCode::D) || input.IsKeyPressed(And::KeyCode::D)){
+      for(int i = 0; i < 3; i++){
+        vertices[i].position[0] += speed;
+      }
     }
 
     if (input.IsKeyPressed(And::KeyCode::Space)){
@@ -107,7 +125,6 @@ int main(int argc, char** argv){
     }
 
     if (input.IsKeyRelease(And::KeyCode::Space)){
-
       printf("Space released!\n");
     }
 
