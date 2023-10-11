@@ -7,6 +7,7 @@
 #include "imgui_impl_opengl3.h"
 
 #include "Common/Shader.h"
+#include "Common/Triangle.h"
 
 namespace And
 {
@@ -79,6 +80,45 @@ void Renderer::set_clear_color(float* color){
   glClearColor(color[0], color[1], color[2], color[3]);
 }
 
+
+void Renderer::draw_triangle(Triangle *t){
+    
+  Vertex *v = t->get_vertex();
+  const float vertices[9] = {
+    v[0].points[0], v[0].points[1], v[0].points[2],
+    v[1].points[0], v[1].points[1], v[1].points[2],
+    v[2].points[0], v[2].points[1], v[2].points[2],
+    
+    };
+
+  
+  unsigned int VAO;
+  glGenVertexArrays(1, &VAO);
+  glBindVertexArray(VAO);
+
+  unsigned int VBO;
+  glGenBuffers(1, &VBO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
+
+  glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, v.indices);
+
+  // Desbindeamos el vao
+  glBindVertexArray(0);
+
+  // Desbindeamos el vbo
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  // Borramos los buffers
+  //glDeleteBuffers(1, &VAO);
+  //glDeleteBuffers(1, &VBO);
+
+  
+}
+
 void Renderer::showDemo(){
 
   float triangle[6] = {
@@ -112,12 +152,11 @@ void Renderer::showDemo(){
   // Desbindeamos el vbo
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-}
+  // Borramos los buffers
+  //glDeleteBuffers(1, &VAO);
+  //glDeleteBuffers(1, &VBO);
 
-std::shared_ptr<Shader> Renderer::createShader(){
-  return std::shared_ptr<Shader>(new Shader());
 }
-
 
 
 }

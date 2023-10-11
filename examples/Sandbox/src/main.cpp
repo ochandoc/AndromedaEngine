@@ -15,6 +15,7 @@
 #include "Common/GraphicsContext.h"
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
+#include "Common/Triangle.h"
 
 #include "Common/Input.h"
 
@@ -33,33 +34,21 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
 
+  // Show pc info
+  g_context->create_info();
+
 
   // Creamos el shader
-  std::shared_ptr<And::Shader> g_shader = g_renderer.createShader();
+  And::ShaderInfo s_info;
+  s_info.path_fragment = "../../data/fshader.fs";
+  s_info.path_vertex = "../../data/vshader.vs";
 
-  char* error = nullptr;
-  // Subimos los shader que queramos y comprobamos que no hay error
-  g_shader->upload_shader(And::Shader_Vertex,"../../data/vshader.vs");
-  error = g_shader->get_upload_shader_error();
-  if(error){ 
-    printf("Error: %s\n", error);
-  }
-  
-  g_shader->upload_shader(And::Shader_Fragment,"../../data/fshader.fs");
-  error = g_shader->get_upload_shader_error();
-  if(error){ 
-    printf("Error: %s\n", error);
-  }
-
-  // Una vez subimos, linkamos
-  g_shader->link_shaders();
+   std::optional<And::Shader> g_shader = And::Shader::make(s_info);
 
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
 
-  // Show pc info
-  g_context->create_info();
 
   And::Input input{*window};
 
@@ -68,27 +57,54 @@ int main(int argc, char** argv){
   double mouseXx = -1.0f, mouseYy = -1.0f;
 
   
+    
+
+  And::Vertex ver[3] = {
+    {-0.5f, -0.5f, 0.0f},
+    {0.0f, 0.0f, 0.0f},
+    {1.0f, 0.0f, 0.0f, 1.0f},
+    {2, 1, 0},
+
+    {0.0f, 0.5f, 0.0f},
+    {0.0f, 0.0f, 0.0f},
+    {1.0f, 0.0f, 0.0f, 1.0f},
+    {2, 1, 0},
+
+    {0.5f, -0.5f, 0.0f},
+    {0.0f, 0.0f, 0.0f},
+    {1.0f, 0.0f, 0.0f, 1.0f},
+    {2, 1, 0},
+  
+  };
+
+  And::Triangle tri{ver};
+
+  
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
     
-    if (input.IsKeyDown(And::KeyCode::Space))
-    {
+    if (input.IsKeyDown(And::KeyCode::Space)){
+
       printf("Space down!\n");
     }
 
-    if (input.IsKeyPressed(And::KeyCode::Space))
-    {
+    if (input.IsKeyPressed(And::KeyCode::Space)){
+
       printf("Space pressed!\n");
     }
 
-    if (input.IsKeyRelease(And::KeyCode::Space))
-    {
+    if (input.IsKeyRelease(And::KeyCode::Space)){
+
       printf("Space released!\n");
     }
 
-    g_shader->use();
-    g_renderer.showDemo();
+    if(g_shader.has_value()){
+      g_shader->use();
+    }
+    
+    //g_renderer.showDemo();
+    g_renderer.draw_triangle(&tri);
     
     //input.update_input();
     g_renderer.end_frame();
