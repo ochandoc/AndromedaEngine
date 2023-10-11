@@ -85,9 +85,9 @@ void Renderer::draw_triangle(Triangle *t){
     
   Vertex *v = t->get_vertex();
   const float vertices[9] = {
-    v[0].points[0], v[0].points[1], v[0].points[2],
-    v[1].points[0], v[1].points[1], v[1].points[2],
-    v[2].points[0], v[2].points[1], v[2].points[2],
+    v[0].position[0], v[0].position[1], v[0].position[2],
+    v[1].position[0], v[1].position[1], v[1].position[2],
+    v[2].position[0], v[2].position[1], v[2].position[2],
     
     };
 
@@ -104,7 +104,7 @@ void Renderer::draw_triangle(Triangle *t){
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, 0);
 
-  glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, v.indices);
+  glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, v->indices);
 
   // Desbindeamos el vao
   glBindVertexArray(0);
