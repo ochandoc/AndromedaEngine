@@ -23,10 +23,18 @@ class Triangle{
 
   const Vertex* get_vertex() const;
 
+  bool buffers_created = false;
+
+  void set_buffers(unsigned int vao, unsigned int vbo);
+  
+  const unsigned int get_vao();
+  const unsigned int get_vbo();
 
   private:
 
   Vertex m_vertex[3];
+  unsigned int m_VAO;
+  unsigned int m_VBO;
 
 };
 }

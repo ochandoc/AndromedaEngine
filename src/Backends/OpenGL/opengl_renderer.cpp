@@ -17,7 +17,7 @@ Renderer::Renderer(Window& window) : m_Window(window)
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
   set_clear_color(default_color);
   window.imgui_start();
-  ImGui_ImplOpenGL3_Init("#version 430");
+  ImGui_ImplOpenGL3_Init("#version 430 core");
 }
 
 Renderer::~Renderer(){
@@ -92,13 +92,19 @@ void Renderer::draw_triangle(Triangle *t){
     };
 
   
-  unsigned int VAO;
-  glGenVertexArrays(1, &VAO);
-  glBindVertexArray(VAO);
+  // Generate buffers
 
-  unsigned int VBO;
-  glGenBuffers(1, &VBO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  if(!t->buffers_created){
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    t->set_buffers(VAO, VBO);
+  }
+
+  glBindVertexArray(t->get_vao());
+  glBindBuffer(GL_ARRAY_BUFFER, t->get_vbo());
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
   glEnableVertexAttribArray(0);
