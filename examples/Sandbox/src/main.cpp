@@ -1,5 +1,9 @@
 #include <assert.h>
 
+#include <stdio.h>
+#include <iostream>
+#include <fstream>
+
 #include <functional>
 #include <algorithm>
 #include <utility>
@@ -9,7 +13,14 @@
 
 #include <string>
 #include <vector>
+#include <queue>
 
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <future>
+
+#include "Common/JobSystem.h"
 #include "Common/Engine.h"
 #include "Common/Window.h"
 #include "Common/GraphicsContext.h"
