@@ -2,6 +2,7 @@
 
 #include "Common/Input.h"
 #include "Common/Window.h"
+#include "Common/ActionInput.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -13,6 +14,16 @@ namespace And{
 
   Input::Input(Window& w) : m_window(w), m_KeyBoard(w.m_KeyBoard){}
 
+
+  bool Input::check_action(const ActionInput& action)
+  {
+    bool activated = false;
+    for (int32 i = 0; i < action.m_Keys.size() && !activated; i++)
+    {
+      activated = (m_KeyBoard.keys[(int)action.m_Keys[i]] == action.m_State);
+    }
+    return activated;
+  }
 
   bool Input::IsKeyPressed(KeyCode key){
     return m_KeyBoard.keys[(int)key] == KeyState::Repeat;
