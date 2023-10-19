@@ -26,9 +26,47 @@
 #include "Common/GraphicsContext.h"
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
+#include "Common/JobSystem.h"
+
+int select_num(int i)
+{
+  printf("Num selected\n");
+  return i;
+}
+
+int select_num1(int i)
+{
+  std::this_thread::sleep_for(std::chrono::seconds(2));
+  printf("Num selected 1\n");
+  return i;
+}
+
+int select_num2(int i)
+{
+  std::this_thread::sleep_for(std::chrono::seconds(5));
+  printf("Num selected 2\n");
+  return i;
+}
+
+void print_value(int i, int a, int b)
+{
+  printf("Num: %d\n", i + a + b);
+}
 
 int main(int argc, char** argv){
   And::Engine e;
+
+  And::JobSystem js;
+
+  And::future<int> f{ 10 };
+  And::future<int> f1{ 20 };
+  And::future<int> f2{ 30 };
+
+  And::future<int> future1 = js.add_job(select_num, f);
+  And::future<int> future2 = js.add_job(select_num1, f1);
+  And::future<int> future3 = js.add_job(select_num2, f2);
+
+  js.add_job(print_value, future1, future2, future3);
 
   std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
