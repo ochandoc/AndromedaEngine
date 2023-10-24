@@ -137,6 +137,7 @@ int main(int argc, char** argv){
     
     //input.update_input();
     g_renderer.end_frame();
+    window->swap_buffers();
   }
 
 

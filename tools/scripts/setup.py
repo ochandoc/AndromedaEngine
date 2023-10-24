@@ -31,8 +31,10 @@ installed = Premake.Validate()
 
 if installed:
   if platform.system() == "Windows":
-    print("Building dependencies")
-    subprocess.call([os.path.abspath("build_dependencies.bat"), "nopause"])
+    reply = str(input("Would you like to install Python package? [Y/N]: ")).lower().strip()[:1]
+    if reply == 'y':
+      print("Building dependencies")
+      subprocess.call([os.path.abspath("build_dependencies.bat"), "nopause"])
     print("\nRunning premake...")
     subprocess.call([os.path.abspath("premake.bat"), "nopause"])
   

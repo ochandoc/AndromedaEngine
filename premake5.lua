@@ -132,6 +132,7 @@ group ""
 
 group "Examples"
   include "examples/Sandbox"
+  include "examples/Window"
 group ""
 
 newoption
