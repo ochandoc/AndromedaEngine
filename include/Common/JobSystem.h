@@ -198,6 +198,7 @@ namespace And
 						internal::job j = jobs[i];
 						jobs.erase(jobs.begin() + i);
 						m_JobsQueue.push(j);
+						m_Condition.notify_one();
 					}
 				}
 			}
