@@ -11,6 +11,7 @@ namespace And
 		struct component_list_base 
 		{
 			virtual void add_empty() = 0;
+			virtual void clear_comp(size_t indes) = 0;
 		};
 
 		template<typename T>
@@ -19,6 +20,11 @@ namespace And
 			virtual void add_empty() override
 			{
 				m_Coponents.push_back(std::nullopt);
+			}
+
+			virtual void clear_comp(size_t index)
+			{
+				m_Coponents[index] = std::nullopt;
 			}
 
 			std::vector<std::optional<T>> m_Coponents;
@@ -46,13 +52,23 @@ namespace And
 		{
 			m_CurrentId++;
 			Entity new_e = m_CurrentId;
-			size_t index = m_CurrentIndex;
-			m_CurrentIndex++;
-
-			for (auto& comp : m_Components)
+			size_t index;
+			if (m_EnitiesDeleted.size())
 			{
-				comp.second->add_empty();
+				index = m_EnitiesDeleted.front();
+				m_EnitiesDeleted.pop();
 			}
+			else
+			{
+				index = m_CurrentIndex;
+				m_CurrentIndex++;
+
+				for (auto& comp : m_Components)
+				{
+					comp.second->add_empty();
+				}
+			}
+
 
 			(insert_comp(comps, index), ...);
 
@@ -62,12 +78,23 @@ namespace And
 
 		void remove_entity(Entity e)
 		{
-
+			if (m_Entities.contains(e))
+			{
+				size_t index = m_Entities[e];
+				m_Entities.erase(e);
+				for (auto& comp : m_Components)
+				{
+					comp.second->clear_comp(index);
+				}
+				m_EnitiesDeleted.push(index);
+			}
 		}
 
 		template<typename comp_t>
 		comp_t* get_entity_component(Entity e)
 		{
+			if (!e) return nullptr;
+			
 			size_t type_id = typeid(comp_t).hash_code();
 			if (m_Components.contains(type_id))
 			{
@@ -98,7 +125,7 @@ namespace And
 
 		std::unordered_map<size_t, std::unique_ptr<internal::component_list_base>> m_Components;
 		std::unordered_map<Entity, size_t> m_Entities;
-		//std::vector<Entity> m_EnitiesMarked;
+		std::queue<size_t> m_EnitiesDeleted;
 		uint64 m_CurrentId = 0;
 		size_t m_CurrentIndex = 0;
 	};
