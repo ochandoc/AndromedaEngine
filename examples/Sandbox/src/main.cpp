@@ -61,8 +61,7 @@ void print_value(int i, int a, int b)
 
 
 int main(int argc, char** argv){
-  ComponentManager c_manager;
-  c_manager.get_component(1);
+
   And::Engine e;
 
   And::JobSystem js;
