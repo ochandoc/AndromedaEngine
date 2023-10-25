@@ -26,6 +26,10 @@
 #include "Common/GraphicsContext.h"
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
+#include "Common/Triangle.h"
+#include "Common/Input.h"
+#include "Common/ActionInput.h"
+
 #include "Common/JobSystem.h"
 
 int select_num(int i)
@@ -53,6 +57,8 @@ void print_value(int i, int a, int b)
   printf("Num: %d\n", i + a + b);
 }
 
+
+
 int main(int argc, char** argv){
   And::Engine e;
 
@@ -72,31 +78,113 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
 
-  // Create basic shader
-  And::ShaderInfo vs_info = { And::Shader_Vertex, "../../data/vshader.vs" };
-  And::ShaderInfo fs_info = { And::Shader_Fragment, "../../data/fshader.fs" };
-  std::vector<And::ShaderInfo> shaders_vec;
-  shaders_vec.push_back(vs_info);
-  shaders_vec.push_back(fs_info);
+  // Show pc info
+  g_context->create_info();
 
-  std::shared_ptr<And::Shader> g_shader = g_renderer.createShader(shaders_vec);
+
+  // Creamos el shader
+  And::ShaderInfo s_info;
+  s_info.path_fragment = "../../data/fshader.fs";
+  s_info.path_vertex = "../../data/vshader.vs";
+
+   std::optional<And::Shader> g_shader = And::Shader::make(s_info);
+
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
 
-  // Show pc info
-  g_context->create_info();
+
+  And::Input input{*window};
+
+  And::ActionInput jump{"Jump", And::KeyState::Press, { And::KeyCode::L, And::KeyCode::V }};
+
+  double mouseX = -1.0f, mouseY = -1.0f;
+  double mouseXx = -1.0f, mouseYy = -1.0f;
 
   
+    
+
+  And::Vertex ver[3] = {
+    {
+      {-0.5f, -0.5f, 0.0f},
+      {0.0f, 0.0f, 0.0f},
+      {1.0f, 0.0f, 0.0f, 1.0f},
+      {2, 1, 0}
+    },
+    {
+
+      {0.0f, 0.5f, 0.0f},
+      {0.0f, 0.0f, 0.0f},
+      {1.0f, 0.0f, 0.0f, 1.0f},
+      {2, 1, 0},
+    },
+    {
+      {0.5f, -0.5f, 0.0f},
+      {0.0f, 0.0f, 0.0f},
+      {1.0f, 0.0f, 0.0f, 1.0f},
+      {2, 1, 0},
+    }
+  
+  };
+
+  And::Triangle tri{ver};
+
+  float speed = 0.01f;
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
     
-    g_shader->use();
-    g_renderer.showDemo();
+    if (input.check_action(jump)){
+      printf("Jummpinggggg!!!\n");
+    }
+
+    And::Vertex *vertices = tri.get_vertex();
+
+    if (input.IsKeyDown(And::KeyCode::W) || input.IsKeyPressed(And::KeyCode::W)){
+      for(int i = 0; i < 3; i++){
+        vertices[i].position[1] += speed;
+      }
+    }
+    if (input.IsKeyDown(And::KeyCode::S) || input.IsKeyPressed(And::KeyCode::S)){
+      for(int i = 0; i < 3; i++){
+        vertices[i].position[1] -= speed;
+      }
+    }
     
+    if (input.IsKeyDown(And::KeyCode::A) || input.IsKeyPressed(And::KeyCode::A)){
+      for(int i = 0; i < 3; i++){
+        vertices[i].position[0] -= speed;
+      }
+    }
+    if (input.IsKeyDown(And::KeyCode::D) || input.IsKeyPressed(And::KeyCode::D)){
+      for(int i = 0; i < 3; i++){
+        vertices[i].position[0] += speed;
+      }
+    }
+
+    if (input.IsKeyPressed(And::KeyCode::Space)){
+
+      printf("Space pressed!\n");
+    }
+
+    if (input.IsKeyRelease(And::KeyCode::Space)){
+      printf("Space released!\n");
+    }
+
+    if(g_shader.has_value()){
+      g_shader->use();
+    }
+    
+    //g_renderer.showDemo();
+    g_renderer.draw_triangle(&tri);
+    
+    //input.update_input();
     g_renderer.end_frame();
+    window->swap_buffers();
   }
+
+
+  
   
 
   

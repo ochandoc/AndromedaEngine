@@ -6,7 +6,9 @@ namespace And
 {
 class Window;
 class Shader;
+class Triangle;
 struct ShaderInfo;
+
 
 class Renderer
 {
@@ -26,7 +28,7 @@ public:
 
   void showDemo();
 
-  std::shared_ptr<Shader> createShader(std::vector<ShaderInfo> s_info);
+  void draw_triangle(Triangle *t);
 
 protected:
   Window& m_Window;

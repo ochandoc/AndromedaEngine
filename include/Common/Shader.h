@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 
 namespace And{
 
@@ -10,30 +11,31 @@ namespace And{
     Shader_Teselation,
   };
 
-  struct ShaderInfo
-  {
-    // Shader type
-    ShaderType type;
-    // File path
-    const char* file_path;
+  struct ShaderInfo{
+    const char* path_fragment = nullptr;
+    const char* path_vertex = nullptr;
+    const char* path_teselation = nullptr;
+    const char* path_geometry = nullptr;
   };
 
   class Shader
   {
   public:
 
-    Shader(std::vector<ShaderInfo> S_info);
-    Shader(const Shader&) = delete;
-    Shader(Shader&&) = delete;
-
+    static std::optional<Shader> make(ShaderInfo s_info);
+    Shader(const Shader& other) = delete;
+    Shader(Shader&& other);
     ~Shader();
 
-    Shader& operator=(const Shader&) = delete;
-    Shader& operator=(Shader&&) = delete;
+
+    Shader& operator=(const Shader& other) = delete;
+    Shader& operator=(Shader&& other);
     
     void use();
 
   private:
+    Shader();
     std::unique_ptr<struct ShaderData> m_Data;
+    char m_shader_error[1024] = {0};
   };
 }

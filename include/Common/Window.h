@@ -2,6 +2,8 @@
 
 #include "base.h"
 
+#include "Common/KeyCodes.h"
+
 namespace And
 {
 class Engine;
@@ -28,12 +30,12 @@ public:
 	void* get_native_window();
 
 	void update();
+	void swap_buffers();
 
 	std::shared_ptr<GraphicsContext> get_context() const;
 
-	std::function<void()> m_OnWindowClose;
-
 	friend class Renderer;
+	friend class Input;
 private:
 	void imgui_start();
 	void imgui_end();
@@ -41,8 +43,9 @@ private:
 	void new_frame();
 	void end_frame();
 
-	std::shared_ptr<GraphicsContext> m_Context;
-	PLATFORM_WINDOW_DATA m_Data;
+	
+  KeyboardState m_KeyBoard;
+	std::unique_ptr<struct WindowData> m_Data;
 };
 
 }

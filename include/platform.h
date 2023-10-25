@@ -10,7 +10,6 @@ struct GLFWwindow;
 
 struct _window_data
 {
-	void* user_data;
 	WindowHandle handle;
 	uint32 width, height;
 	bool is_open;

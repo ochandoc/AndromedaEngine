@@ -20,13 +20,13 @@ namespace And
     fseek(f, 0L, SEEK_SET);
 
     
-    printf("Size of file in bytes-> %d\n", (int)m_Size);
+    //printf("Size of file in bytes-> %d\n", (int)m_Size);
 
     m_Content = new char[m_Size+1];
     
     fread(m_Content, sizeof(char), m_Size, f);
     m_Content[m_Size] = '\0';
-    printf("\n%s\n",m_Content);
+    //printf("\n%s\n",m_Content);
 
     fclose(f);
 
