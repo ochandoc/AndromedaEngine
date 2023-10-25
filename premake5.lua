@@ -133,6 +133,7 @@ group ""
 group "Examples"
   include "examples/Sandbox"
   include "examples/Window"
+  include "examples/ResourceSystem"
 group ""
 
 newoption

@@ -10,3 +10,4 @@
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
 #include "Common/Triangle.h"
+#include "Common/resource.h"
