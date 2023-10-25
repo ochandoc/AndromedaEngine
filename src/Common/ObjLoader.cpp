@@ -1,59 +1,50 @@
 #include "Common/ObjLoader.h"
+#include "tiny_obj_loader.h"
 
 namespace And{
 
 
-std::optional<ObjLoader> ObjLoader::load(std::string path){
+std::optional<ObjLoader> ObjLoader::load(std::string filename){
 
-  ObjInfo obj_info;
 
-  std::string err;
+
+
+  std::cout << "Loading obj... " << filename << std::endl;
+
+  tinyobj::attrib_t attrib;
+  std::vector<tinyobj::shape_t> shapes;
+  std::vector<tinyobj::material_t> materials;
   std::string warn;
-  bool error = tinyobj::LoadObj(&(obj_info.attrib), &(obj_info.shapes), &(obj_info.materials), &err, path.c_str(), NULL, true); 
-  //bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename, basepath, triangulate);
+  std::string err;
+
+  // Si le pasamos la ruta y luego el nombre, cogera los .mtl del directorio
+  bool error = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str());
 
   if (!err.empty()) {
-    m_obj_info.err = err;
+    //m_obj_info.replace(0, err.length(), err.c_str());
+    printf("Obj not loaded correctly %s\n", err.c_str());
+  }else{
+    printf("Obj loaded correctly\n");
   }
 
   if (!error) {
       //std::cerr << "Failed to load/parse .obj" << std::endl;
-      //return optional;
+      return std::nullopt;
   }
 
-  ObjLoader obj{obj_info};
+  ObjLoader obj{};
 
   return std::optional<ObjLoader>(std::move(obj));
 
 }
 
-ObjLoader::ObjLoader(ObjInfo info) : m_obj_info(info){
-
-}
-
-ObjLoader::ObjLoader(const ObjLoader& other){
-
-}
-
-ObjLoader::ObjLoader(ObjLoader&& other){
-
-}
-
-Attribute ObjLoader::get_attrib(){
-
-}
-
-std::vector<Shape> ObjLoader::get_shapes(){
-
-}
-
-std::vector<Material> ObjLoader::get_materials(){
+ObjLoader::ObjLoader(){
 
 }
 
 
 std::string ObjLoader::get_error(){
-
+  return m_error;
 }
 
 }

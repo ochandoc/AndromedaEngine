@@ -16,6 +16,7 @@
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
 #include "Common/Triangle.h"
+#include "Common/ObjLoader.h"
 
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
@@ -85,8 +86,10 @@ int main(int argc, char** argv){
   };
 
   And::Triangle tri{ver};
-
   float speed = 0.01f;
+
+  std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/faro.obj"); 
+
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();

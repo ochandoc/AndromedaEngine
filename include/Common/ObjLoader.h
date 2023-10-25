@@ -1,47 +1,47 @@
 #pragma once
-#include "tiny_obj_loader.h"
+
 
 namespace And{
+
+ 
+  /*
+    struct ObjInfo{
+      std::string inputfile;
+      //tinyobj::attrib_t attrib;
+      //std::vector<tinyobj::shape_t> shapes;
+      //std::vector<tinyobj::material_t> materials;
+      //std::string err;
+      Attribute attrib;
+      Shape shapes;
+      Material materials;
+      std::string err;
+    };
+  */
+
 class ObjLoader{
-
-  // Tiny obj wrappers
-  struct Attribute{
-    tinyobj::attrib_t attrib;
-  };
-
-  struct Shape{
-     std::vector<tinyobj::shape_t> shapes;
-  };
-
-  struct Material{
-    std::vector<tinyobj::material_t> materials;
-  };
-
-  struct ObjInfo{
-    std::string inputfile;
-    tinyobj::attrib_t attrib;
-    std::vector<tinyobj::shape_t> shapes;
-    std::vector<tinyobj::material_t> materials;
-    std::string err;
-  };
-
   public:
-  ObjLoader(const ObjLoader&);
-  ObjLoader(ObjLoader&&);
+  ObjLoader(const ObjLoader&) = default;
+  ObjLoader(ObjLoader&&) = default;
 
-  static std::optional<ObjLoader> load(std::string path);
+  //static std::optional<ObjLoader> load(std::string path, std::string filename);
+  static std::optional<ObjLoader> load(std::string filename);
 
-  Attribute get_attrib();
-  std::vector<Shape> get_shapes();
-  std::vector<Material> get_materials();
+  //Attribute get_attrib();
+  //Shape get_shapes();
+  //Material get_materials();
 
   std::string get_error();
 
 
   private:
+
   ObjLoader();
 
-  ObjInfo m_obj_info;
+  float m_points;
+
+
+  std::string m_error;
+  //ObjInfo m_obj_info;
 
 
 };
