@@ -29,6 +29,7 @@
 #include "Common/Triangle.h"
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
+#include "Common/EntityComponentSystem.h"
 
 #include "Common/JobSystem.h"
 
@@ -60,6 +61,8 @@ void print_value(int i, int a, int b)
 
 
 int main(int argc, char** argv){
+  ComponentManager c_manager;
+  c_manager.get_component(1);
   And::Engine e;
 
   And::JobSystem js;
