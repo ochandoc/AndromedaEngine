@@ -11,7 +11,7 @@ namespace And
 		struct component_list_base 
 		{
 			virtual void add_empty() = 0;
-			virtual void clear_comp(size_t indes) = 0;
+			virtual void clear_at_index(size_t indes) = 0;
 		};
 
 		template<typename T>
@@ -22,7 +22,7 @@ namespace And
 				m_Coponents.push_back(std::nullopt);
 			}
 
-			virtual void clear_comp(size_t index)
+			virtual void clear_at_index(size_t index)
 			{
 				m_Coponents[index] = std::nullopt;
 			}
@@ -84,7 +84,7 @@ namespace And
 				m_Entities.erase(e);
 				for (auto& comp : m_Components)
 				{
-					comp.second->clear_comp(index);
+					comp.second->clear_at_index(index);
 				}
 				m_EnitiesDeleted.push(index);
 			}
