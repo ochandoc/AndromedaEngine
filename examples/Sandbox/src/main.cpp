@@ -88,7 +88,8 @@ int main(int argc, char** argv){
   And::Triangle tri{ver};
   float speed = 0.01f;
 
-  std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/faro.obj"); 
+  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/faro/faro.obj"); 
+  std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/boat/boat.obj", "../../data/boat/boat.mtl"); 
 
   while (window->is_open()){
     window->update();

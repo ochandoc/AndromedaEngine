@@ -4,7 +4,7 @@
 namespace And{
 
 
-std::optional<ObjLoader> ObjLoader::load(std::string filename){
+std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string material_name){
 
 
 
@@ -13,7 +13,7 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename){
 
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
-  std::vector<tinyobj::material_t> materials;
+  std::vector<tinyobj::material_t> materials_obj;
   std::string warn;
   std::string err;
 
@@ -23,8 +23,10 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename){
   std::vector<float> normals;
   std::vector<float> tex_coords;
 
+  Material_info mat;
+
   // Si le pasamos la ruta y luego el nombre, cogera los .mtl del directorio
-  bool error = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str());
+  bool error = tinyobj::LoadObj(&attrib, &shapes, &materials_obj, &warn, &err, filename.c_str());
 
   if (!err.empty()) {
     //m_obj_info.replace(0, err.length(), err.c_str());
@@ -39,18 +41,47 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename){
     normals = attrib.normals;
     tex_coords = attrib.texcoords;
     colors = attrib.colors;
-    //vertices.swap(m_vertices);
+
+    if(material_name.length() != 0){
+
+      std::map<std::string, int> *material_map;
+      std::vector<tinyobj::material_t> *materials;
+      std::istream *inStream;
+      std::string *warning = new std::string("nothing");
+      std::string *error_mat = new std::string("nothing");
+
+      std::ifstream matIStream(material_name.c_str());
+      if(matIStream){
+        //tinyobj::LoadMtl(material_map, materials, inStream, warning, error_mat);
+      }
+    }
+
+    /*if(materials){
+
+      mat.ambient[0] = materials.ambient[0];
+      mat.ambient[1] = materials.ambient[1];
+      mat.ambient[2] = materials.ambient[2];
+
+      mat.diffuse[0] = materials.diffuse[0];
+      mat.diffuse[1] = materials.diffuse[1];
+      mat.diffuse[2] = materials.diffuse[2];
+
+      mat.specular[0] = materials.specular[0];
+      mat.specular[1] = materials.specular[1];
+      mat.specular[2] = materials.specular[2];
+    }*/
 
 
   }
 
 
 
-  ObjLoader obj{vertices, vertices_wheights, normals, tex_coords, colors };
+  ObjLoader obj{vertices, vertices_wheights, normals, tex_coords, colors, mat };
   return std::optional<ObjLoader>(std::move(obj));
 }
 
-ObjLoader::ObjLoader(std::vector<float> v, std::vector<float> v_w, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors) : m_vertex(v), m_vertex_weights(v_w), m_normals(normals), m_texcoords(tex_coords), m_colors(colors){
+ObjLoader::ObjLoader(std::vector<float> v, std::vector<float> v_w, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, Material_info mat) :
+ m_vertex(v), m_vertex_weights(v_w), m_normals(normals), m_texcoords(tex_coords), m_colors(colors), m_mat_info(mat){
 
 }
 

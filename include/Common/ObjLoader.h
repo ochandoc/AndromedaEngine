@@ -4,9 +4,9 @@
 namespace And{
 
   struct Material_info{
-    float ambient[3];
-    float diffuse[3];
-    float specular[3];
+    float ambient[3] = {0, 0, 0};
+    float diffuse[3] = {0, 0, 0};
+    float specular[3] = {0, 0, 0};
   };
 
 class ObjLoader{
@@ -15,7 +15,7 @@ class ObjLoader{
   ObjLoader(ObjLoader&&) = default;
 
   //static std::optional<ObjLoader> load(std::string path, std::string filename);
-  static std::optional<ObjLoader> load(std::string filename);
+  static std::optional<ObjLoader> load(std::string filename, std::string material_name = "");
 
   std::string get_error();
   std::vector<float> getVertices();
@@ -23,7 +23,7 @@ class ObjLoader{
 
   private:
 
-  ObjLoader(std::vector<float> vertices,  std::vector<float> vertices_weights, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors);
+  ObjLoader(std::vector<float> vertices,  std::vector<float> vertices_weights, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, Material_info mat);
   std::string m_error;
 
   std::vector<float> m_vertex;            // 'v (x, y, z)
@@ -31,6 +31,8 @@ class ObjLoader{
   std::vector<float> m_normals;           // 'vn'
   std::vector<float> m_colors;
   std::vector<float> m_texcoords;
+
+  Material_info m_mat_info;
 
 };
 }
