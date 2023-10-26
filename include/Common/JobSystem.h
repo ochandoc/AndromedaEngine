@@ -76,16 +76,16 @@ namespace And
 		class job
 		{
 		private:
-			job() = default;
+			job(bool resource = false) { m_Resource = resource; };
 
 		public:
-			job(const job& other) { m_Job = other.m_Job; m_Id = other.m_Id; }
-			job(job&& other) { m_Job = std::move(other.m_Job); std::swap(m_Id, other.m_Id); }
+			job(const job& other) { m_Job = other.m_Job; m_Id = other.m_Id; m_Resource = other.m_Resource; }
+			job(job&& other) { m_Job = std::move(other.m_Job); std::swap(m_Id, other.m_Id); std::swap(m_Resource, other.m_Resource); }
 
 			~job() = default;
 
-			job& operator =(const job& other) { if (this != &other) { m_Job = other.m_Job; } return *this; }
-			job& operator =(job& other) { if (this != &other) { m_Job = std::move(other.m_Job); std::swap(m_Id, other.m_Id); } return *this; }
+			job& operator =(const job& other) { if (this != &other) { m_Job = other.m_Job; m_Id = other.m_Id; m_Resource = other.m_Resource; } return *this; }
+			job& operator =(job& other) { if (this != &other) { m_Job = std::move(other.m_Job); std::swap(m_Id, other.m_Id); std::swap(m_Resource, other.m_Resource); } return *this; }
 
 			size_t get_id() const
 			{
@@ -107,10 +107,17 @@ namespace And
 				return m_Job->get_future_availability();
 			}
 
-			friend class And::JobSystem;
+			bool is_resource() const
+			{
+				return m_Resource;
+			}
+
+			friend class ResourceManager;
+			friend class JobSystem;
 		private:
 			std::shared_ptr<job_base> m_Job;
 			size_t m_Id = 0;
+			bool m_Resource;
 		};
 	}
 
@@ -118,7 +125,7 @@ namespace And
 	{
 	public:
 		NON_COPYABLE_CLASS(JobSystem)
-			NON_MOVABLE_CLASS(JobSystem)
+		NON_MOVABLE_CLASS(JobSystem)
 	public:
 		JobSystem() : m_Stop(false)
 		{
@@ -182,6 +189,7 @@ namespace And
 			return f;
 		}
 
+		friend class ResourceManager;
 	private:
 
 		void check_job_blocked(size_t future_id)
@@ -189,7 +197,7 @@ namespace And
 			std::lock_guard<std::mutex> lock{ m_MapMutex };
 			if (m_FutureJobUnion.contains(future_id))
 			{
-				int num_jobs = m_FutureJobUnion[future_id].size();
+				int num_jobs = (int)m_FutureJobUnion[future_id].size();
 				std::vector<internal::job>& jobs = m_FutureJobUnion[future_id];
 				for (int i = 0; i < num_jobs; i++)
 				{
@@ -197,8 +205,16 @@ namespace And
 					{
 						internal::job j = jobs[i];
 						jobs.erase(jobs.begin() + i);
-						m_JobsQueue.push(j);
-						m_Condition.notify_one();
+						if (j.is_resource())
+						{
+							m_ResourceJobsQueue.push(j);
+							m_ResourceCondition.notify_one();
+						}
+						else
+						{
+							m_JobsQueue.push(j);
+							m_Condition.notify_one();
+						}
 					}
 				}
 			}
@@ -221,8 +237,11 @@ namespace And
 		std::vector<std::thread> m_Threads;
 		std::mutex m_MapMutex;
 		std::mutex m_QueueMutex;
+		std::mutex m_ResourceQueueMutex;
 		std::condition_variable m_Condition;
+		std::condition_variable m_ResourceCondition;
 		std::queue<internal::job> m_JobsQueue;
+		std::queue<internal::job> m_ResourceJobsQueue;
 		std::unordered_map<size_t, std::vector<internal::job>> m_FutureJobUnion;
 	};
 }

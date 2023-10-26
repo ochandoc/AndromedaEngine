@@ -32,6 +32,8 @@
 
 #include "Common/JobSystem.h"
 
+#include "Common/ResourceManager.h"
+
 int select_num(int i)
 {
   printf("Num selected\n");
