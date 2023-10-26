@@ -24,13 +24,13 @@
 #include <future>
 
 #include "Andromeda.h"
-
-#include "Common/OpenGLTexture2D.h"
+#include "Common/ResourceManager.h" 
+#include "Common/OpenGLTexture2D.h" 
 
 int main(int argc, char** argv){
   And::Engine e;
 
-  And::JobSystem js;
+  And::JobSystem js{e};
 
 
   std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
@@ -41,8 +41,7 @@ int main(int argc, char** argv){
 
   And::ResourceManager rm(*window, js);
 
-  And::resource<OpenGLTexture2D> tex = rm.new_texture2D("./test.jpg");
-  
+  And::resource<OpenGLTexture2D> tex = rm.new_texture2D("./test.png");
 
   while (window->is_open()) {
     window->update();

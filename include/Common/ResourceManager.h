@@ -37,18 +37,16 @@ namespace And
 
 			if (j.is_available())
 			{
-				m_JobSystem.m_ResourceJobsQueue.push(j);
+				m_ThreadsData->m_ResourceJobsQueue.push(j);
 			}
 
 			return f;
 		}
 
+		bool m_Stop;
     Window& m_Window;
 		JobSystem& m_JobSystem;
-		std::mutex& m_ResourceQueueMutex;
-		std::condition_variable& m_ResourceCondition;
-		std::queue<internal::job>& m_ResourceJobsQueue;
-		bool& m_Stop;
+		std::shared_ptr<ThreadsData> m_ThreadsData;
     std::unique_ptr<struct ResourceManagerData> m_Data;
 		std::unordered_map<size_t, std::function<void()>> m_SwapMap;
 		std::unordered_map <size_t, std::shared_ptr<internal::resource_base>> m_Resources;

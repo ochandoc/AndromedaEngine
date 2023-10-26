@@ -14,8 +14,9 @@ namespace And
     GLFWwindow* window = nullptr;
   };
 
-  ResourceManager::ResourceManager(Window& w, JobSystem& js) : m_Window(w), m_JobSystem(js), m_ResourceQueueMutex(js.m_ResourceQueueMutex), m_ResourceCondition(js.m_ResourceCondition), m_ResourceJobsQueue(js.m_ResourceJobsQueue), m_Stop(js.m_Stop), m_Data(new ResourceManagerData)
+  ResourceManager::ResourceManager(Window& w, JobSystem& js) : m_Window(w), m_JobSystem(js), m_Stop(false), m_Data(new ResourceManagerData)
   {
+    m_ThreadsData = js.m_ThreadsData;
     GLFWwindow* main_window = (GLFWwindow*)w.get_native_window();
 
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -35,11 +36,11 @@ namespace And
       glfwMakeContextCurrent(m_Data->window);
       internal::job j;
       {
-        std::unique_lock<std::mutex> lock{m_ResourceQueueMutex};
-        m_ResourceCondition.wait(lock, [this]() {return !m_ResourceJobsQueue.empty() || m_Stop; });
-        if (m_ResourceJobsQueue.empty() && m_Stop) return;
-        j = std::move(m_ResourceJobsQueue.front());
-        m_ResourceJobsQueue.pop();
+        std::unique_lock<std::mutex> lock{ m_ThreadsData->m_ResourceQueueMutex};
+        m_ThreadsData->m_ResourceCondition.wait(lock, [this]() {return !m_ThreadsData->m_ResourceJobsQueue.empty() || m_Stop; });
+        if (m_ThreadsData->m_ResourceJobsQueue.empty() && m_Stop) return;
+        j = std::move(m_ThreadsData->m_ResourceJobsQueue.front());
+        m_ThreadsData->m_ResourceJobsQueue.pop();
       }
       j();
       future_availability fa = j.get_future_availability();
@@ -53,6 +54,8 @@ namespace And
 
   ResourceManager::~ResourceManager()
   {
+    m_Stop = true;
+    m_ThreadsData->m_ResourceCondition.notify_all();
     if (m_Data->thread->joinable())
     {
       m_Data->thread->join();
@@ -68,10 +71,10 @@ namespace And
     r.m_Resource->m_Value = std::shared_ptr<OpenGLTexture2D>(new OpenGLTexture2D);
     r.m_Resource->m_Value->m_Id = 0;
     future<std::string> f_path(path);
-    future<OpenGLTexture2D> f = add_resource([](std::string path) {std::this_thread::sleep_for(std::chrono::seconds(5)); return OpenGLTexture2D(path); }, f_path);
-    m_ResourceCondition.notify_one();
+    future<std::shared_ptr<OpenGLTexture2D>> f = add_resource([](std::string path) {std::this_thread::sleep_for(std::chrono::seconds(5)); return std::shared_ptr<OpenGLTexture2D>(new OpenGLTexture2D(path)); }, f_path);
+    m_ThreadsData->m_ResourceCondition.notify_one();
 
-    std::function<void()> swap_f = [f, value]() { *value->m_Value = std::move(f.get()); };
+    std::function<void()> swap_f = [f, value]() { value->m_Value = f.get(); };
 
     m_SwapMap.insert({f.get_id(), swap_f});
 

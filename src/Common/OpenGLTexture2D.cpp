@@ -36,10 +36,12 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Info.width, m_Info.height, 0, m_Format, GL_UNSIGNED_BYTE, pixels);
 		glGenerateMipmap(GL_TEXTURE_2D);
 		m_Info.mipmaps = true;
-		//ISDEV_LOG("Image %s loaded", path.c_str());
+		//ISDEV_LOG();
+		printf("Image %s loaded", path.c_str());
 	}
 	else {
-		//LOG_ERROR("Failed to load texture %s", path.c_str());
+		printf("Failed to load texture %s", path.c_str());
+		//LOG_ERROR();
 	}
 
 	stbi_image_free(pixels);
