@@ -3,20 +3,11 @@
 
 namespace And{
 
- 
-  /*
-    struct ObjInfo{
-      std::string inputfile;
-      //tinyobj::attrib_t attrib;
-      //std::vector<tinyobj::shape_t> shapes;
-      //std::vector<tinyobj::material_t> materials;
-      //std::string err;
-      Attribute attrib;
-      Shape shapes;
-      Material materials;
-      std::string err;
-    };
-  */
+  struct Material_info{
+    float ambient[3];
+    float diffuse[3];
+    float specular[3];
+  };
 
 class ObjLoader{
   public:
@@ -26,23 +17,20 @@ class ObjLoader{
   //static std::optional<ObjLoader> load(std::string path, std::string filename);
   static std::optional<ObjLoader> load(std::string filename);
 
-  //Attribute get_attrib();
-  //Shape get_shapes();
-  //Material get_materials();
-
   std::string get_error();
+  std::vector<float> getVertices();
 
 
   private:
 
-  ObjLoader();
-
-  float m_points;
-
-
+  ObjLoader(std::vector<float> vertices,  std::vector<float> vertices_weights, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors);
   std::string m_error;
-  //ObjInfo m_obj_info;
 
+  std::vector<float> m_vertex;            // 'v (x, y, z)
+  std::vector<float> m_vertex_weights;    // 'v'(w)
+  std::vector<float> m_normals;           // 'vn'
+  std::vector<float> m_colors;
+  std::vector<float> m_texcoords;
 
 };
 }
