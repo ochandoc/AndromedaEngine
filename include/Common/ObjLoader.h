@@ -1,4 +1,7 @@
 #pragma once
+#include <optional>
+#include <vector>
+#include <string>
 
 
 namespace And{
@@ -15,16 +18,14 @@ class ObjLoader{
   ObjLoader(ObjLoader&&) = default;
 
   //static std::optional<ObjLoader> load(std::string path, std::string filename);
-  static std::optional<ObjLoader> load(std::string filename, std::string material_name = "");
+  static std::optional<ObjLoader> load(std::string filename, std::string base_path = "");
 
-  std::string get_error();
   std::vector<float> getVertices();
 
 
   private:
 
   ObjLoader(std::vector<float> vertices,  std::vector<float> vertices_weights, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, Material_info mat);
-  std::string m_error;
 
   std::vector<float> m_vertex;            // 'v (x, y, z)
   std::vector<float> m_vertex_weights;    // 'v'(w)

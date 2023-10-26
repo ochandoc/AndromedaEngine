@@ -4,10 +4,7 @@
 namespace And{
 
 
-std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string material_name){
-
-
-
+std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_path){
 
   std::cout << "Loading obj... " << filename << std::endl;
 
@@ -26,7 +23,8 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string mater
   Material_info mat;
 
   // Si le pasamos la ruta y luego el nombre, cogera los .mtl del directorio
-  bool error = tinyobj::LoadObj(&attrib, &shapes, &materials_obj, &warn, &err, filename.c_str());
+  //bool error = tinyobj::LoadObj(&attrib, &shapes, &materials_obj, &warn, &err, filename.c_str(), base_path.c_str());
+  bool error = tinyobj::LoadObj(&attrib, &shapes, &materials_obj, &warn, &err, filename.c_str(), base_path.c_str());
 
   if (!err.empty()) {
     //m_obj_info.replace(0, err.length(), err.c_str());
@@ -42,7 +40,7 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string mater
     tex_coords = attrib.texcoords;
     colors = attrib.colors;
 
-    if(material_name.length() != 0){
+    /*if(material_name.length() != 0){
 
       std::map<std::string, int> *material_map;
       std::vector<tinyobj::material_t> *materials;
@@ -54,22 +52,30 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string mater
       if(matIStream){
         //tinyobj::LoadMtl(material_map, materials, inStream, warning, error_mat);
       }
-    }
-
-    /*if(materials){
-
-      mat.ambient[0] = materials.ambient[0];
-      mat.ambient[1] = materials.ambient[1];
-      mat.ambient[2] = materials.ambient[2];
-
-      mat.diffuse[0] = materials.diffuse[0];
-      mat.diffuse[1] = materials.diffuse[1];
-      mat.diffuse[2] = materials.diffuse[2];
-
-      mat.specular[0] = materials.specular[0];
-      mat.specular[1] = materials.specular[1];
-      mat.specular[2] = materials.specular[2];
     }*/
+
+    if(materials_obj.size() > 0){
+
+      for(auto& m : materials_obj){
+        if(m.ambient){
+          mat.ambient[0] = m.ambient[0];
+          mat.ambient[1] = m.ambient[1];
+          mat.ambient[2] = m.ambient[2];
+        }
+
+        if(m.diffuse){
+          mat.diffuse[0] = m.diffuse[0];
+          mat.diffuse[1] = m.diffuse[1];
+          mat.diffuse[2] = m.diffuse[2];
+        }
+
+        if(m.specular){
+          mat.specular[0] = m.specular[0];
+          mat.specular[1] = m.specular[1];
+          mat.specular[2] = m.specular[2];
+        }
+      }
+    }
 
 
   }
@@ -83,11 +89,6 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string mater
 ObjLoader::ObjLoader(std::vector<float> v, std::vector<float> v_w, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, Material_info mat) :
  m_vertex(v), m_vertex_weights(v_w), m_normals(normals), m_texcoords(tex_coords), m_colors(colors), m_mat_info(mat){
 
-}
-
-
-std::string ObjLoader::get_error(){
-  return m_error;
 }
 
 }

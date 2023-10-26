@@ -89,7 +89,7 @@ int main(int argc, char** argv){
   float speed = 0.01f;
 
   //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/faro/faro.obj"); 
-  std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/boat/boat.obj", "../../data/boat/boat.mtl"); 
+  std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/boat/boat.obj", "../../data/boat/"); 
 
   while (window->is_open()){
     window->update();
