@@ -46,7 +46,17 @@ class ComponentManager{
     component_clases_.insert(typeid(T).has_code(), std::make_unique<component_list<T>>());
   }
 
-  size_t new_entity();
+  size_t new_entity(){
+
+    size_t size;
+    for (auto& [key, value] : component_clases_) {
+      value->grow();
+      size = value->size();
+
+    }
+    return size;
+  }
+
 
   template <typename T>
   T* get_component(size_t e){
@@ -64,6 +74,12 @@ class ComponentManager{
 
     assert(e < component_clases_.size());
   
+  }
+
+  template <typename T>
+  void remove_component(size_t e){
+    
+
   }
 
   private:
