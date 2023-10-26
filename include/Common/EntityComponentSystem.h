@@ -12,6 +12,7 @@ namespace And
 		{
 			virtual void add_empty() = 0;
 			virtual void clear_at_index(size_t indes) = 0;
+			virtual size_t size() = 0;
 		};
 
 		template<typename T>
@@ -25,6 +26,11 @@ namespace And
 			virtual void clear_at_index(size_t index)
 			{
 				m_Coponents[index] = std::nullopt;
+			}
+
+			virtual size_t size() override
+			{
+				return m_Coponents.size();
 			}
 
 			std::vector<std::optional<T>> m_Coponents;
@@ -60,8 +66,7 @@ namespace And
 			}
 			else
 			{
-				index = m_CurrentIndex;
-				m_CurrentIndex++;
+				index = m_Components.begin()->second->size();
 
 				for (auto& comp : m_Components)
 				{
@@ -109,6 +114,32 @@ namespace And
 			return nullptr;
 		}
 
+		template<typename comp_t>
+		void add_entity_component(Entity e, comp_t& comp)
+		{
+			size_t type_id = typeid(comp_t).hash_code();
+			if (m_Components.contains(type_id))
+			{
+				internal::component_list_imp<comp_t>* list = CAST_PTR(internal::component_list_imp<comp_t>, m_Components[type_id].get());
+				size_t index = m_Entities[e];
+				std::optional<comp_t>& opt = list->m_Coponents[index];
+				opt = comp;
+			}
+		}
+
+		template<typename comp_t>
+		void remove_entity_component(Entity e)
+		{
+			size_t type_id = typeid(comp_t).hash_code();
+			if (m_Components.contains(type_id))
+			{
+				internal::component_list_imp<comp_t>* list = CAST_PTR(internal::component_list_imp<comp_t>, m_Components[type_id].get());
+				size_t index = m_Entities[e];
+				std::optional<comp_t>& opt = list->m_Coponents[index];
+				opt = std::nullopt;
+			}
+		}
+
 	private:
 
 		template<typename comp_t>
@@ -127,7 +158,6 @@ namespace And
 		std::unordered_map<Entity, size_t> m_Entities;
 		std::queue<size_t> m_EnitiesDeleted;
 		uint64 m_CurrentId = 0;
-		size_t m_CurrentIndex = 0;
 	};
 
 }

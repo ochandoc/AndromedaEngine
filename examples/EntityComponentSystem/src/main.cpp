@@ -38,7 +38,9 @@ int main(int argc, char** argv){
   ecs.add_component_class<int_comp>();
 
   int_comp c = { 10 };
-  And::Entity a = ecs.new_entity(c);
+  And::Entity a = ecs.new_entity();
+
+  ecs.add_entity_component(a, c);
 
   int_comp* comp = ecs.get_entity_component<int_comp>(a);
   if (comp)
