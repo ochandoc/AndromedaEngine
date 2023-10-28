@@ -7,9 +7,9 @@
 namespace And{
 
   struct Material_info{
-    float ambient[3] = {0, 0, 0};
-    float diffuse[3] = {0, 0, 0};
-    float specular[3] = {0, 0, 0};
+    float ambient[3] = {0.0f, 0.0f, 0.0f};
+    float diffuse[3] = {0.0f, 0.0f, 0.0f};
+    float specular[3] = {0.0f, 0.0f, 0.0f};
   };
 
 class ObjLoader{
@@ -20,7 +20,11 @@ class ObjLoader{
   //static std::optional<ObjLoader> load(std::string path, std::string filename);
   static std::optional<ObjLoader> load(std::string filename, std::string base_path = "");
 
-  std::vector<float> getVertices();
+  const std::vector<float>& getVertices();
+  const std::vector<float>& getNormals();
+  const std::vector<float>& getColors();
+  const std::vector<float>& getTexCoords();
+  const Material_info& getMaterialInfo();
 
 
   private:

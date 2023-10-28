@@ -91,4 +91,25 @@ ObjLoader::ObjLoader(std::vector<float> v, std::vector<float> v_w, std::vector<f
 
 }
 
+const std::vector<float>& ObjLoader::getVertices(){
+  return m_vertex;
+}
+
+const std::vector<float>& ObjLoader::getNormals(){
+  return m_normals;
+}
+
+const std::vector<float>& ObjLoader::getColors(){
+  return m_colors;
+}
+
+const std::vector<float>& ObjLoader::getTexCoords(){
+  return m_texcoords;
+}
+
+const Material_info& ObjLoader::getMaterialInfo(){
+  return m_mat_info;
+}
+
+
 }
