@@ -131,6 +131,16 @@ int main(int argc, char** argv){
 
   And::Triangle tri{ver};
 
+
+  ComponentManager com_manager{};
+
+
+  size_t entity1 = com_manager.new_entity();
+  size_t entity2 = com_manager.new_entity();
+  size_t entity3 = com_manager.new_entity();
+  Transform* trans = com_manager.get_component<Transform>(entity1);
+
+
   float speed = 0.01f;
   while (window->is_open()){
     window->update();
