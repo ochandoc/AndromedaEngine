@@ -61,8 +61,7 @@ void print_value(int i, int a, int b)
 
 
 int main(int argc, char** argv){
-  ComponentManager c_manager;
-  c_manager.get_component(1);
+
   And::Engine e;
 
   And::JobSystem js;
@@ -131,6 +130,20 @@ int main(int argc, char** argv){
   };
 
   And::Triangle tri{ver};
+
+
+  ComponentManager com_manager{};
+
+
+  size_t entity1 = com_manager.new_entity();
+
+  com_manager.add_component<Transform>(entity1);
+
+
+  size_t entity2 = com_manager.new_entity();
+  size_t entity3 = com_manager.new_entity();
+  Transform* trans = com_manager.get_component<Transform>(entity1);
+
 
   float speed = 0.01f;
   while (window->is_open()){
