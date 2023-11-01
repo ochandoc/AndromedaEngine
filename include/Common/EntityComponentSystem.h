@@ -1,12 +1,13 @@
 #pragma once
-#include<vector>
-#include<optional>
-#include<cassert>
-#include<memory>
-#include<tuple>
-#include<unordered_map>
-#include<typeinfo>
-#include<stdexcept>
+#include <vector>
+#include <optional>
+#include <cassert>
+#include <memory>
+#include <tuple>
+#include <unordered_map>
+#include <typeinfo>
+#include <stdexcept>
+#include <stdio.h>
 
 
 struct Transform {
@@ -20,6 +21,7 @@ struct Physics{
 struct component_base{
   virtual void grow() = 0;
   virtual size_t size() = 0;
+  virtual void remove_all(size_t e) = 0;
 };
 
 template <typename T>
@@ -34,24 +36,27 @@ struct component_list : component_base {
     components_.emplace_back();
   }
 
+  virtual void remove_all(size_t e){
+    components_.at(e) = std::nullopt;
+  }
+
   template <typename T>
   void add_component();
-
-
 
   virtual size_t size(){
     return components_.size();
   }
+
+
 };
 
 
 class ComponentManager{
 
   public:
-  // Unorderer map (clave : valor) de component base. La clave es el hash del nombre del componente
+  // Unorderer map (clave : valor) de component base. La clave es el hash del nombre del componente y el valor es el vector de cada componente
   std::unordered_map<std::size_t, std::unique_ptr<component_base>> component_classes_;
-  //std::unordered_map<id, indice>;
-
+  std::vector<size_t> component_empty_; 
 
   // Añadimos al umap todos los componentes que tenemos
   ComponentManager(){
@@ -60,14 +65,13 @@ class ComponentManager{
     add_component_class<Physics>();
   }
 
-
   // Añadimos un componente del tipo que sea
   template <typename T>
   void add_component_class(){
     // Metemos en el unordered map de clave el hash del nombre de la estructura del componente, y como valor un puntero al componente
     component_classes_.emplace(typeid(T).hash_code(), std::make_unique<component_list<T>>());
   }
-
+  
   template <typename T>
   T* get_component(size_t e);
 
@@ -76,6 +80,8 @@ class ComponentManager{
 
   template <typename T>
   void remove_component(size_t e);
+
+  void remove_entity(size_t e);
 
   size_t new_entity();
   
@@ -158,14 +164,33 @@ void ComponentManager::remove_component(size_t e){
 
 }
 
+// Eliminamos todos sus componentes y los dejamos en nullopt
+void ComponentManager::remove_entity(size_t e){
+  for(auto& pair : component_classes_){
+    //auto& comp_list = *static_cast<component_list<Transform>*>(pair->second.get());
+    auto& comp = pair.second;
+    comp->remove_all(e-1);
+  }
+
+  // Metemos en el vector de vacios la posicion que hemos dejado libre
+  component_empty_.push_back(e);
+
+}
+
 size_t ComponentManager::new_entity(){
   size_t size;
 
-  // Recorremos el umap de vectores
-  // A cada vector de componentes le sumamos un nuevo elemento
-  for(auto& [key, value] : component_classes_){
-    value->grow();
-    size = value->size();
+  // Si hay algo en el vector de vacios devolvemos esa posicion que ya esa libre
+  if(component_empty_.size() == 0){
+    // Recorremos el umap de vectores
+    // A cada vector de componentes le sumamos un nuevo elemento
+    for(auto& [key, value] : component_classes_){
+      value->grow();
+      size = value->size();
+    }
+  }else{
+    size = component_empty_.front();
+    component_empty_.erase(component_empty_.begin());
   }
 
   return size;

@@ -134,17 +134,23 @@ int main(int argc, char** argv){
 
   ComponentManager com_manager{};
 
+  size_t entities[4];
+  for(int i = 0; i < 4; i++){
+    entities[i] = com_manager.new_entity();
+    com_manager.add_component<Transform>(entities[i]);
+    com_manager.add_component<Physics>(entities[i]);
+  }
 
-  size_t entity1 = com_manager.new_entity();
-  com_manager.add_component<Transform>(entity1);
-  Transform* trans = com_manager.get_component<Transform>(entity1);
-  com_manager.remove_component<Transform>(entity1);
-  trans = com_manager.get_component<Transform>(entity1);
+  //Transform* trans = com_manager.get_component<Transform>(entities[3]);
+  //Physics* phy = com_manager.get_component<Physics>(entities[3]);
   
+  //com_manager.remove_component<Transform>(entities[3]);
+  //trans = com_manager.get_component<Transform>(entities[3]);
 
 
-  size_t entity2 = com_manager.new_entity();
-  size_t entity3 = com_manager.new_entity();
+  com_manager.remove_entity(entities[1]);
+  entities[1] = com_manager.new_entity();
+  
 
 
   float speed = 0.01f;
