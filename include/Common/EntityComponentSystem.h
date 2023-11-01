@@ -148,6 +148,13 @@ void ComponentManager::remove_component(size_t e){
   // Primero sacamos el hash
   auto hash_code = typeid(T).hash_code();
 
+  auto component_list_it = component_classes_.find(hash_code);
+
+  auto& comp_list = *static_cast<component_list<T>*>(component_list_it->second.get());
+  auto& component_opt = comp_list.components_.at(e-1);
+  if(component_opt.has_value()){
+    component_opt = std::nullopt;
+  }
 
 }
 

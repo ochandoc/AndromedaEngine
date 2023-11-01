@@ -136,13 +136,15 @@ int main(int argc, char** argv){
 
 
   size_t entity1 = com_manager.new_entity();
-
   com_manager.add_component<Transform>(entity1);
+  Transform* trans = com_manager.get_component<Transform>(entity1);
+  com_manager.remove_component<Transform>(entity1);
+  trans = com_manager.get_component<Transform>(entity1);
+  
 
 
   size_t entity2 = com_manager.new_entity();
   size_t entity3 = com_manager.new_entity();
-  Transform* trans = com_manager.get_component<Transform>(entity1);
 
 
   float speed = 0.01f;
