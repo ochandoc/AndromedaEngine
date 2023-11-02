@@ -30,6 +30,8 @@
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
 #include "Common/EntityComponentSystem.h"
+#include "Common/EntityComponentSystemAdvanced.h"
+#include "Common/Entity.h"
 
 #include "Common/JobSystem.h"
 
@@ -132,13 +134,13 @@ int main(int argc, char** argv){
   And::Triangle tri{ver};
 
 
-  ComponentManager com_manager{};
+  And::internal::ComponentManagerAdvanced com_manager{};
 
-  size_t entities[4];
+  And::Entity entities[4];
   for(int i = 0; i < 4; i++){
     entities[i] = com_manager.new_entity();
-    com_manager.add_component<Transform>(entities[i]);
-    com_manager.add_component<Physics>(entities[i]);
+    //com_manager.add_component<Transform>(entities[i]);
+    //com_manager.add_component<Physics>(entities[i]);
   }
 
   //Transform* trans = com_manager.get_component<Transform>(entities[3]);
@@ -148,8 +150,8 @@ int main(int argc, char** argv){
   //trans = com_manager.get_component<Transform>(entities[3]);
 
 
-  com_manager.remove_entity(entities[1]);
-  entities[1] = com_manager.new_entity();
+  //com_manager.remove_entity(entities[1]);
+  //entities[1] = com_manager.new_entity();
   
 
 
