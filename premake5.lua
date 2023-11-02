@@ -133,6 +133,7 @@ group ""
 group "Examples"
   include "examples/Sandbox"
   include "examples/EntityComponentSystem"
+  include "examples/Window"
 group ""
 
 newoption

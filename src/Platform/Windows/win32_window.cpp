@@ -250,6 +250,11 @@ namespace And
     glfwPollEvents();
   }
 
+  void Window::swap_buffers()
+  {
+    glfwSwapBuffers(m_Data->glfw.handle);
+  }
+
   std::shared_ptr<GraphicsContext> Window::get_context() const
   {
     return m_Data->m_Context;
@@ -299,8 +304,6 @@ namespace And
       ImGui::RenderPlatformWindowsDefault();
       glfwMakeContextCurrent(backup_current_context);
     }
-
-    glfwSwapBuffers(m_Data->glfw.handle);
   }
 
 }
