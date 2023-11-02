@@ -7,9 +7,6 @@
 
 namespace And
 {
-	template<typename T>
-	class component_iterator;
-
 	namespace internal
 	{
 		template<typename T>
@@ -24,11 +21,41 @@ namespace And
 			}
 		};
 
+		template<typename T>
+		class component_list_iterator
+		{
+		public:
+			component_list_iterator(T* ptr) : m_Ptr(ptr) {}
+			component_list_iterator(const component_list_iterator& other) { m_Ptr = other.m_Ptr; }
+			component_list_iterator(component_list_iterator&& other) { m_Ptr = other.m_Ptr; }
+
+			~component_list_iterator() {}
+
+			component_list_iterator& operator =(const component_list_iterator& other) { if (this != &other) { m_Ptr = other.m_Ptr; } return *this; }
+			component_list_iterator& operator =(component_list_iterator&& other) { if (this != &other) { std::swap(m_Ptr, other.m_Ptr); } return *this; }
+
+			T& operator *() { return *m_Ptr; }
+			const T& operator *() const { return *m_Ptr; }
+
+			T* operator ->() { return m_Ptr; }
+			const T* operator ->() const { return m_Ptr; }
+
+			component_list_iterator& operator++() { m_Ptr++; return *this; }
+			component_list_iterator operator++(int) { component_list_iterator tmp = *this; ++(*this); return tmp; }
+
+			bool operator ==(const component_list_iterator& other) { return m_Ptr == other.m_Ptr; }
+			bool operator !=(const component_list_iterator& other) { return m_Ptr != other.m_Ptr; }
+
+		private:
+			T* m_Ptr;
+		};
+
 		struct component_list_base 
 		{
 			virtual void add_empty(uint64 id) = 0;
 			virtual void remove(uint64 id) = 0;
 			virtual size_t size() = 0;
+			virtual void sort() = 0;
 		};
 
 		template<typename T>
@@ -50,49 +77,25 @@ namespace And
 				return m_Components.size();
 			}
 
-			component_iterator<component<T>> begin()
+			virtual void sort() override
 			{
-				return component_iterator<component<T>>(m_Components.data());
+				std::sort(m_Components.begin(), m_Components.end(), [](const component<T>& c1, const component<T>& c2) { return c1.id.get() < c2.id.get(); });
 			}
 
-			component_iterator<component<T>> end()
+			component_list_iterator<component<T>> begin()
 			{
-				return component_iterator<component<T>>(m_Components.data() + m_Components.size());
+				return component_list_iterator<component<T>>(m_Components.data());
+			}
+
+			component_list_iterator<component<T>> end()
+			{
+				return component_list_iterator<component<T>>(m_Components.data() + m_Components.size());
 			}
 
 			std::vector<component<T>> m_Components;
 		};
 
 	}
-
-	template<typename T>
-	class component_iterator
-	{
-	public:
-		component_iterator(T* ptr) : m_Ptr(ptr) {}
-		component_iterator(const component_iterator& other) { m_Ptr = other.m_Ptr; }
-		component_iterator(component_iterator&& other) { m_Ptr = other.m_Ptr; }
-			
-		~component_iterator() {}
-
-		component_iterator& operator =(const component_iterator& other) { if (this != &other) { m_Ptr = other.m_Ptr; } return *this; }
-		component_iterator& operator =(component_iterator&& other) { if (this != &other) { std::swap(m_Ptr, other.m_Ptr); } return *this; }
-
-		T& operator *() { return *m_Ptr; }
-		const T& operator *() const { return *m_Ptr; }
-
-		T* operator ->() { return m_Ptr; }
-		const T* operator ->() const { return m_Ptr; }
-			
-		component_iterator& operator++() { m_Ptr++; return *this; }
-		component_iterator operator++(int) { component_iterator tmp = *this; ++(*this); return tmp; }
-
-		bool operator ==(const component_iterator& other) { return m_Ptr == other.m_Ptr; }
-		bool operator !=(const component_iterator& other) { return m_Ptr != other.m_Ptr; }
-
-	private:
-		T* m_Ptr;
-	};
 
 	class EntityComponentSystem
 	{
@@ -118,7 +121,7 @@ namespace And
 		}
 
 		template<typename... comps_t>
-		void get_component_iterator()
+		void get_component_list_iterator()
 		{
 
 		}
