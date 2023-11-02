@@ -2,40 +2,97 @@
 
 #include "base.h"
 
+#include "Common/ID.h"
 #include "Common/Entity.h"
 
 namespace And
 {
+	template<typename T>
+	class component_iterator;
+
 	namespace internal
 	{
+		template<typename T>
+		struct component
+		{
+			ID id;
+			T value;
+
+			bool operator ==(const component& other)
+			{
+				return id == other.id;
+			}
+		};
+
 		struct component_list_base 
 		{
-			virtual void add_empty() = 0;
-			virtual void clear_at_index(size_t indes) = 0;
+			virtual void add_empty(uint64 id) = 0;
+			virtual void remove(uint64 id) = 0;
 			virtual size_t size() = 0;
 		};
 
 		template<typename T>
 		struct component_list_imp : public component_list_base
 		{
-			virtual void add_empty() override
+			virtual void add_empty(uint64 id) override
 			{
-				m_Coponents.push_back(std::nullopt);
+				m_Components.push_back(component<T>{id, T()});
 			}
 
-			virtual void clear_at_index(size_t index)
+			virtual void remove(uint64 id) override
 			{
-				m_Coponents[index] = std::nullopt;
+				//TODO: remove the component with the given id
+				
 			}
 
 			virtual size_t size() override
 			{
-				return m_Coponents.size();
+				return m_Components.size();
 			}
 
-			std::vector<std::optional<T>> m_Coponents;
+			component_iterator<component<T>> begin()
+			{
+				return component_iterator<component<T>>(m_Components.data());
+			}
+
+			component_iterator<component<T>> end()
+			{
+				return component_iterator<component<T>>(m_Components.data() + m_Components.size());
+			}
+
+			std::vector<component<T>> m_Components;
 		};
+
 	}
+
+	template<typename T>
+	class component_iterator
+	{
+	public:
+		component_iterator(T* ptr) : m_Ptr(ptr) {}
+		component_iterator(const component_iterator& other) { m_Ptr = other.m_Ptr; }
+		component_iterator(component_iterator&& other) { m_Ptr = other.m_Ptr; }
+			
+		~component_iterator() {}
+
+		component_iterator& operator =(const component_iterator& other) { if (this != &other) { m_Ptr = other.m_Ptr; } return *this; }
+		component_iterator& operator =(component_iterator&& other) { if (this != &other) { std::swap(m_Ptr, other.m_Ptr); } return *this; }
+
+		T& operator *() { return *m_Ptr; }
+		const T& operator *() const { return *m_Ptr; }
+
+		T* operator ->() { return m_Ptr; }
+		const T* operator ->() const { return m_Ptr; }
+			
+		component_iterator& operator++() { m_Ptr++; return *this; }
+		component_iterator operator++(int) { component_iterator tmp = *this; ++(*this); return tmp; }
+
+		bool operator ==(const component_iterator& other) { return m_Ptr == other.m_Ptr; }
+		bool operator !=(const component_iterator& other) { return m_Ptr != other.m_Ptr; }
+
+	private:
+		T* m_Ptr;
+	};
 
 	class EntityComponentSystem
 	{
@@ -56,88 +113,38 @@ namespace And
 		template<typename... comps_t>
 		Entity new_entity(comps_t... comps)
 		{
-			m_CurrentId++;
-			Entity new_e = m_CurrentId;
-			size_t index;
-			if (m_EnitiesDeleted.size())
-			{
-				index = m_EnitiesDeleted.front();
-				m_EnitiesDeleted.pop();
-			}
-			else
-			{
-				index = m_Components.begin()->second->size();
-
-				for (auto& comp : m_Components)
-				{
-					comp.second->add_empty();
-				}
-			}
-
-
-			(insert_comp(comps, index), ...);
-
-			m_Entities.insert({new_e, index });
+			Entity new_e;
 			return new_e;
+		}
+
+		template<typename... comps_t>
+		void get_component_iterator()
+		{
+
 		}
 
 		void remove_entity(Entity e)
 		{
-			if (m_Entities.contains(e))
-			{
-				size_t index = m_Entities[e];
-				m_Entities.erase(e);
-				for (auto& comp : m_Components)
-				{
-					comp.second->clear_at_index(index);
-				}
-				m_EnitiesDeleted.push(index);
-			}
+			
 		}
 
 		template<typename comp_t>
 		comp_t* get_entity_component(Entity e)
 		{
-			if (!e) return nullptr;
 			
-			size_t type_id = typeid(comp_t).hash_code();
-			if (m_Components.contains(type_id))
-			{
-				internal::component_list_imp<comp_t>* list = CAST_PTR(internal::component_list_imp<comp_t>, m_Components[type_id].get());
-				size_t index = m_Entities[e];
-				std::optional<comp_t>& opt = list->m_Coponents[index];
-				if (opt.has_value())
-				{
-					return &opt.value();
-				}
-			}
 			return nullptr;
 		}
 
 		template<typename comp_t>
 		void add_entity_component(Entity e, comp_t& comp)
 		{
-			size_t type_id = typeid(comp_t).hash_code();
-			if (m_Components.contains(type_id))
-			{
-				internal::component_list_imp<comp_t>* list = CAST_PTR(internal::component_list_imp<comp_t>, m_Components[type_id].get());
-				size_t index = m_Entities[e];
-				std::optional<comp_t>& opt = list->m_Coponents[index];
-				opt = comp;
-			}
+			
 		}
 
 		template<typename comp_t>
 		void remove_entity_component(Entity e)
 		{
-			size_t type_id = typeid(comp_t).hash_code();
-			if (m_Components.contains(type_id))
-			{
-				internal::component_list_imp<comp_t>* list = CAST_PTR(internal::component_list_imp<comp_t>, m_Components[type_id].get());
-				size_t index = m_Entities[e];
-				std::optional<comp_t>& opt = list->m_Coponents[index];
-				opt = std::nullopt;
-			}
+			
 		}
 
 	private:
@@ -145,18 +152,10 @@ namespace And
 		template<typename comp_t>
 		void insert_comp(comp_t& comp, size_t index)
 		{
-			size_t type_id = typeid(comp_t).hash_code();
-			if (m_Components.contains(type_id))
-			{
-				internal::component_list_imp<comp_t>* list = CAST_PTR(internal::component_list_imp<comp_t>, m_Components[type_id].get());
-
-				list->m_Coponents[index] = comp;
-			}
+			
 		}
 
 		std::unordered_map<size_t, std::unique_ptr<internal::component_list_base>> m_Components;
-		std::unordered_map<Entity, size_t> m_Entities;
-		std::queue<size_t> m_EnitiesDeleted;
 		uint64 m_CurrentId = 0;
 	};
 
