@@ -20,6 +20,7 @@
 #include <vector>
 #include <queue>
 #include <unordered_map>
+#include <stack>
 #include <tuple>
 
 #include <thread>

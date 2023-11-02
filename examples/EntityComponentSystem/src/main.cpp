@@ -18,9 +18,11 @@
 #include <optional>
 #include <vector>
 #include <unordered_map>
+#include <queue>
+#include <stack>
 #include <tuple>
 
-
+#include "Common/ID.h"
 #include "Common/EntityComponentSystem.h"
 
 struct int_comp
@@ -33,20 +35,28 @@ struct int_comp
 int main(int argc, char** argv){
   And::EntityComponentSystem ecs;
 
-  ecs.add_component_class<int_comp>();
+  And::internal::component_list_imp<int_comp> v;
 
-  int_comp c = { 10 };
-  And::Entity a = ecs.new_entity(c);
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
+  v.add_empty(And::ID());
 
-  int_comp* comp = ecs.get_entity_component<int_comp>(a);
-  if (comp)
+  for (auto val : v)
   {
-    std::cout << comp->value << std::endl;
+    std::cout << "Id: " << val.id.get() << std::endl;
   }
-  else
-  {
-    std::cout << "No component added!" << std::endl;
-  }
-  
+
   return 0;
 }
