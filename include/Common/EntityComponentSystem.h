@@ -114,7 +114,7 @@ namespace And
 				{
 					m_Components.erase(first);
 				}
-				m_Sorted = false;
+				//m_Sorted = false;
 			}
 
 			virtual size_t size() override
@@ -147,24 +147,115 @@ namespace And
 
 			iterator begin()
 			{
+				sort();
 				return iterator(m_Components.data());
 			}
 
 			iterator end()
 			{
+				sort();
 				return iterator(m_Components.data() + m_Components.size());
 			}
 
+			template<typename...>
+			friend class tuple_iterator;
+			friend class EntityComponentSystem;
+		private:
 			std::vector<component<T>> m_Components;
 			bool m_Sorted;
 		};
 
+		template<typename... comps_t>
+		class tuple_iterator
+		{
+		public:
+			tuple_iterator(component_list_imp<comps_t>&... comps_lists) : m_IteratorBegin(comps_lists.begin()...), m_IteratorEnd(comps_lists.end()...)	
+			{
+			}
+			tuple_iterator(const tuple_iterator& other) : m_IteratorBegin(other.m_IteratorBegin), m_IteratorEnd(other.m_IteratorEnd) {}
+			tuple_iterator(tuple_iterator&& other) : m_IteratorBegin(other.m_IteratorBegin), m_IteratorEnd(other.m_IteratorEnd) {}
+
+			~tuple_iterator() = default;
+
+			tuple_iterator& operator =(const tuple_iterator& other) { if (this != &other) { m_IteratorBegin = other.m_IteratorBegin; m_IteratorEnd = other.m_IteratorEnd; } return *this; }
+			tuple_iterator& operator =(tuple_iterator&& other) { if (this != &other) { std::swap(m_IteratorBegin, other.m_IteratorBegin); std::swap(m_IteratorEnd, other.m_IteratorEnd); } return *this; }
+
+			tuple_iterator& operator++()
+			{
+				auto& it = std::get<0>(m_IteratorBegin);
+				++it;
+				next_result_fold result{it->id, true, false};
+				do
+				{
+					result = next_all(std::make_integer_sequence<int, sizeof...(comps_t)>{}, result.max);
+
+				} while (!result.equal && !result.finished);
+				return *this;
+			}
+
+		private:
+
+			struct next_result_fold
+			{
+				uint64 max;
+				bool equal;
+				bool finished;
+
+				next_result_fold operator +(uint64 value)
+				{
+					if (finished) return *this;
+					if (value == 0) return { 0, false, true };
+					if (max)
+					{
+						if (equal && value != max)
+						{
+							equal = false;
+						}
+						if (value > max)
+						{
+							max = value;
+						}
+					}
+					else
+					{
+						max = value;
+					}
+					return *this;
+				}
+			};
+
+			template<int... ints>
+			next_result_fold next_all(std::integer_sequence<int, ints...> int_seq, uint64 id)
+			{
+				next_result_fold initial{0, true, false};
+				(initial + ... + (next(std::get<ints>(m_IteratorBegin), std::get<ints>(m_IteratorEnd), id)));
+				return initial;
+			}
+
+			template<typename T>
+			uint64 next(component_list_iterator<T>& first, component_list_iterator<T>& end, uint64 id)
+			{
+				while (first != end && first->id.get() < id)
+				{
+					first++;
+				}
+				if (first == end)
+				{
+					return 0;
+				}
+				return first->id;
+			}
+
+			std::tuple<component_list_iterator<comps_t>...> m_IteratorBegin;
+			std::tuple<component_list_iterator<comps_t>...> m_IteratorEnd;
+		};
+		/*
 		template<typename T, typename... comps_t>
 		class tuple_iterator
 		{
 		public:
 			tuple_iterator(component<T>* less_comp) : m_Ptr(less_comp) {}
-			tuple_iterator(component<T>* less_comp, component_list_imp<comps_t>&... comps_lists) : m_Ptr(less_comp), m_CompsList(comps_lists...), m_ValidComps(nullptr) 
+			tuple_iterator(component_list_imp<T>& less_comp, component_list_imp<comps_t>&... comps_lists) : m_Ptr(less_comp.m_Components.data()), m_CompsList(comps_lists...), m_ValidComps(nullptr)
 			{ 
 				bool ok = true;
 				do
@@ -176,13 +267,13 @@ namespace And
 					}
 				} while (!ok);
 			}
-			tuple_iterator(const tuple_iterator& other) : m_Ptr(other.m_Ptr) {}
-			tuple_iterator(tuple_iterator&& other) : m_Ptr(other.m_Ptr) {}
+			tuple_iterator(const tuple_iterator& other) : m_Ptr(other.m_Ptr), m_CompsList(other.m_CompsList), m_ValidComps(other.m_ValidComps) {}
+			tuple_iterator(tuple_iterator&& other) : m_Ptr(other.m_Ptr), m_CompsList(other.m_CompsList), m_ValidComps(other.m_ValidComps) {}
 
 			~tuple_iterator() = default;
 
-			tuple_iterator& operator =(const tuple_iterator& other) { if (this != &other) { m_Ptr = other.m_Ptr; } return *this; }
-			tuple_iterator& operator =(tuple_iterator&& other) { if (this != &other) { std::swap(m_Ptr, other.m_Ptr); } return *this; }
+			tuple_iterator& operator =(const tuple_iterator& other) { if (this != &other) { m_Ptr = other.m_Ptr; m_CompsList = other.m_CompsList; m_ValidComps = other.m_ValidComps; } return *this; }
+			tuple_iterator& operator =(tuple_iterator&& other) { if (this != &other) { std::swap(m_Ptr, other.m_Ptr); std::swap(m_CompsList, other.m_CompsList); std::swap(m_ValidComps, other.m_ValidComps); } return *this; }
 
 			// TODO do something
 			tuple_iterator& operator ++()
@@ -228,7 +319,7 @@ namespace And
 			std::tuple<component_list_imp<comps_t>&...> m_CompsList;
 			std::tuple<comps_t*...> m_ValidComps;
 		};
-
+		*/
 	}
 
 	class EntityComponentSystem

@@ -80,27 +80,9 @@ int main(int argc, char** argv)
     v.add_empty(id);
   }
 
-  And::internal::tuple_iterator<int_comp, float_comp> ti(v.m_Components.data(), v2);
+  And::internal::tuple_iterator<int_comp, float_comp> ti(v, v2);
 
-  {
-    auto& [c1, c2] = *ti;
-
-    ++ti;
-  }
-
-  {
-    auto& [c1, c2] = *ti;
-
-    ++ti;
-  }
-
-  {
-    auto& [c1, c2] = *ti;
-
-    ++ti;
-  }
-
-  
+  ++ti;
 
   /*
   ecs.add_component_class<int_comp>();
