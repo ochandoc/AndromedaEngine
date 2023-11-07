@@ -10,7 +10,7 @@ namespace And
   public:
     Entity();
     Entity(const Entity& other);
-    Entity(Entity&&);
+    Entity(Entity&& other);
 
     ~Entity();
 
