@@ -293,7 +293,7 @@ namespace And
 		template<typename func_t, typename... comps_t>
 		void execute_system(func_t system)
 		{
-			internal::tuple_iterator<comps_t...> it;
+			internal::tuple_iterator<comps_t...> it();
 
 
 		}
