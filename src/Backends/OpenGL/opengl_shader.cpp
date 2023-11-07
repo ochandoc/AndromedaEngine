@@ -122,6 +122,10 @@ namespace And{
     return std::optional<Shader>(std::move(s));
   }
 
+  void Shader::setMat4(std::string name, const float matrix[16]){ 
+    glUniformMatrix4fv(glGetUniformLocation(m_Data->id, name.c_str()), 1, GL_FALSE, matrix);
+  }
+
 
   Shader::Shader() : m_Data(new ShaderData){
 
