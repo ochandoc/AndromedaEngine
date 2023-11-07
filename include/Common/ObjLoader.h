@@ -27,6 +27,7 @@ class ObjLoader{
   const std::vector<float>& getNormals();
   const std::vector<float>& getColors();
   const std::vector<float>& getTexCoords();
+  const std::vector<unsigned int>& getIndices();
   const Material_info& getMaterialInfo();
 
   void set_VAO(unsigned int v){m_VAO = v;};
@@ -37,13 +38,15 @@ class ObjLoader{
 
   private:
 
-  ObjLoader(std::vector<float> vertices,  std::vector<float> vertices_weights, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, Material_info mat);
+  ObjLoader(std::vector<float> vertices,  std::vector<float> vertices_weights, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, std::vector<unsigned int> indices, Material_info mat);
 
   std::vector<float> m_vertex;            // 'v (x, y, z)
   std::vector<float> m_vertex_weights;    // 'v'(w)
   std::vector<float> m_normals;           // 'vn'
   std::vector<float> m_colors;
   std::vector<float> m_texcoords;
+
+  std::vector<unsigned int> m_indices;
 
   Material_info m_mat_info;
 

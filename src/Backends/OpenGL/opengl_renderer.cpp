@@ -148,16 +148,17 @@ void Renderer::init_obj(ObjLoader* obj){
     glGenBuffers(1, &VBO);
     obj->set_VBO(VBO);
 
-
     glBindVertexArray(obj->get_vao());
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     
     std::vector<float> vertices = obj->getVertices();  
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
 
+    
     // Posiciones x y z
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    
 
 
     // Desbindeamos el vao
@@ -169,14 +170,6 @@ void Renderer::init_obj(ObjLoader* obj){
 }
 
 void Renderer::draw_obj(ObjLoader obj, Shader* s){
-
-  if(s){
-    s->use();
-  }
-
-  unsigned int VBO, VAO;
-  VAO = obj.get_vao();
-  VBO = obj.get_vbo();
 
   float cameraTarget[3] = {0.0f, 0.0f, 0.0f};
 
@@ -251,13 +244,38 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s){
   glm::mat4 viewMatrix = glm::lookAt(cameraPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   */
   //glEnable(GL_CULL_FACE);
-  //glCullFace(GL_CCW);
+  //glEnable(GL_FRONT_AND_BACK);
+  //glCullFace(GL_CW);
+
+  unsigned int VBO, VAO;
+  VAO = obj.get_vao();
+  VBO = obj.get_vbo();
+
+  glDisable(GL_CULL_FACE);
 
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+  GLenum err;
+  if ((err = glGetError()) != GL_NO_ERROR) {
+      printf("Error\n");
+  }
+
+  if(s){
+    s->use();
+  }
+
   std::vector<float> vertices = obj.getVertices();  
-  glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 3);
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+  //glDrawArrays(GL_TRIANGLES, vertices[0], vertices.size() / 3);
+
+  //glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 3);
+
+  std::vector<unsigned int> indices = obj.getIndices();
+  glDrawElements(GL_TRIANGLES, indices.size() / 3, GL_UNSIGNED_INT, indices.data());
 
   glBindVertexArray(0);
 

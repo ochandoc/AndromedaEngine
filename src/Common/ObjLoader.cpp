@@ -1,5 +1,6 @@
 #include "Common/ObjLoader.h"
 #include "tiny_obj_loader.h"
+#include <iostream>
 
 namespace And{
 
@@ -19,6 +20,7 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
   std::vector<float> colors;
   std::vector<float> normals;
   std::vector<float> tex_coords;
+  std::vector<unsigned int> indices;
 
   Material_info mat;
 
@@ -39,6 +41,13 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
     normals = attrib.normals;
     tex_coords = attrib.texcoords;
     colors = attrib.colors;
+    std::vector<tinyobj::index_t> indices_tmp = shapes[0].mesh.indices;
+
+    for(auto& element : indices_tmp){
+      std::cout << element.vertex_index << " ";
+      indices.push_back((unsigned int)element.vertex_index);
+    }
+
 
     /*if(material_name.length() != 0){
 
@@ -82,12 +91,12 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
 
 
 
-  ObjLoader obj{vertices, vertices_wheights, normals, tex_coords, colors, mat };
+  ObjLoader obj{vertices, vertices_wheights, normals, tex_coords, colors, indices, mat};
   return std::optional<ObjLoader>(std::move(obj));
 }
 
-ObjLoader::ObjLoader(std::vector<float> v, std::vector<float> v_w, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, Material_info mat) :
- m_vertex(v), m_vertex_weights(v_w), m_normals(normals), m_texcoords(tex_coords), m_colors(colors), m_mat_info(mat){
+ObjLoader::ObjLoader(std::vector<float> v, std::vector<float> v_w, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, std::vector<unsigned int> indices, Material_info mat) :
+ m_vertex(v), m_vertex_weights(v_w), m_normals(normals), m_texcoords(tex_coords), m_colors(colors), m_mat_info(mat), m_indices(indices){
 
 }
 
@@ -109,6 +118,10 @@ const std::vector<float>& ObjLoader::getTexCoords(){
 
 const Material_info& ObjLoader::getMaterialInfo(){
   return m_mat_info;
+}
+
+const std::vector<unsigned int>& ObjLoader::getIndices(){
+  return m_indices;
 }
 
 
