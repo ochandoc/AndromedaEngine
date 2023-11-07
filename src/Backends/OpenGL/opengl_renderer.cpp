@@ -16,6 +16,21 @@ namespace And
 Renderer::Renderer(Window& window) : m_Window(window) 
 {
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
+  m_camera_pos[0] = 0.0f;
+  m_camera_pos[1] = 7.0f;
+  m_camera_pos[2] = -10.0f;
+  m_fov = 45.0f;
+
+  GLFWwindow *window_tmp = (GLFWwindow*) m_Window.get_native_window();
+  int width, height;
+  glfwGetWindowSize(window_tmp, &width, &height);
+  m_aspectRatio = width/height;
+
+  m_near = 0.1f;
+  m_far = 100.0f;
+
+
+
   set_clear_color(default_color);
   window.imgui_start();
   ImGui_ImplOpenGL3_Init("#version 430");
@@ -162,6 +177,81 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s){
   unsigned int VBO, VAO;
   VAO = obj.get_vao();
   VBO = obj.get_vbo();
+
+  float cameraTarget[3] = {0.0f, 0.0f, 0.0f};
+
+  // Configura la matriz de vista manualmente
+  GLfloat viewMatrix[16]; // Una matriz de 4x4
+
+  // Calcula la dirección hacia la que mira la cámara (un vector en la dirección opuesta a cameraTarget)
+  GLfloat direction[3] = {m_camera_pos[0] - cameraTarget[0], m_camera_pos[1] - cameraTarget[1], m_camera_pos[2] - cameraTarget[2]};
+  GLfloat up[3] = {0.0f, 1.0f, 0.0f}; // Vector hacia arriba
+
+  // Normaliza la dirección
+  GLfloat directionLength = sqrt(direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2]);
+  direction[0] /= directionLength;
+  direction[1] /= directionLength;
+  direction[2] /= directionLength;
+
+  // Calcula el vector derecho (cross product entre up y dirección)
+  GLfloat right[3];
+  right[0] = up[1] * direction[2] - up[2] * direction[1];
+  right[1] = up[2] * direction[0] - up[0] * direction[2];
+  right[2] = up[0] * direction[1] - up[1] * direction[0];
+
+  // Normaliza el vector derecho
+  GLfloat rightLength = sqrt(right[0] * right[0] + right[1] * right[1] + right[2] * right[2]);
+  right[0] /= rightLength;
+  right[1] /= rightLength;
+  right[2] /= rightLength;
+
+  // Calcula el nuevo vector hacia arriba (cross product entre dirección y derecho)
+  up[0] = direction[1] * right[2] - direction[2] * right[1];
+  up[1] = direction[2] * right[0] - direction[0] * right[2];
+  up[2] = direction[0] * right[1] - direction[1] * right[0];
+
+  // Construye la matriz de vista
+  viewMatrix[0] = right[0];
+  viewMatrix[1] = up[0];
+  viewMatrix[2] = direction[0];
+  viewMatrix[3] = 0.0f;
+
+  viewMatrix[4] = right[1];
+  viewMatrix[5] = up[1];
+  viewMatrix[6] = direction[1];
+  viewMatrix[7] = 0.0f;
+
+  viewMatrix[8] = right[2];
+  viewMatrix[9] = up[2];
+  viewMatrix[10] = direction[2];
+  viewMatrix[11] = 0.0f;
+
+  viewMatrix[12] = -right[0] * m_camera_pos[0] - right[1] * m_camera_pos[1] - right[2] * m_camera_pos[2];
+  viewMatrix[13] = -up[0] * m_camera_pos[0] - up[1] * m_camera_pos[1] - up[2] * m_camera_pos[2];
+  viewMatrix[14] = -direction[0] * m_camera_pos[0] - direction[1] * m_camera_pos[1] - direction[2] * m_camera_pos[2];
+  viewMatrix[15] = 1.0f;
+
+  s->setMat4("view", viewMatrix);
+
+  float f = 1.0f / tan(m_fov * 0.5f * (dPI / 180.0f));
+
+  // Perspectiva
+  float projectionMatrix[16] = {
+    f / m_aspectRatio, 0.0f, 0.0f, 0.0f,
+    0.0f, f, 0.0f, 0.0f,
+    0.0f, 0.0f, (m_far + m_near) / (m_near - m_far), -1.0f,
+    0.0f, 0.0f, (2.0f * m_far * m_near) / (m_near - m_far), 0.0f
+  };
+
+  s->setMat4("projection", projectionMatrix);
+
+  /*
+  glm::vec3 cameraPosition{m_camera_pos[0], m_camera_pos[1], m_camera_pos[2]};
+
+  glm::mat4 viewMatrix = glm::lookAt(cameraPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+  */
+  //glEnable(GL_CULL_FACE);
+  //glCullFace(GL_CCW);
 
   glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);

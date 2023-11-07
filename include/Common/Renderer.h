@@ -36,6 +36,14 @@ public:
 
 protected:
   Window& m_Window;
+
+private:
+
+float m_camera_pos[3];
+float m_fov;
+float m_aspectRatio;
+float m_near;
+float m_far;
 };
 
 }
