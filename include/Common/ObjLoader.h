@@ -4,7 +4,10 @@
 #include <string>
 
 
+
 namespace And{
+
+
 
   struct Material_info{
     float ambient[3] = {0.0f, 0.0f, 0.0f};
@@ -26,6 +29,11 @@ class ObjLoader{
   const std::vector<float>& getTexCoords();
   const Material_info& getMaterialInfo();
 
+  void set_VAO(unsigned int v){m_VAO = v;};
+  const unsigned int get_vao(){ return m_VAO;};
+  
+  void set_VBO(unsigned int v){m_VBO = v;};
+  const unsigned int get_vbo(){ return m_VBO;};
 
   private:
 
@@ -38,6 +46,10 @@ class ObjLoader{
   std::vector<float> m_texcoords;
 
   Material_info m_mat_info;
+
+  unsigned int m_VAO = 0;
+  unsigned int m_VBO = 0;
+  //Shader m_shader;
 
 };
 }

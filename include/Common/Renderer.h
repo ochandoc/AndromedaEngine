@@ -7,6 +7,7 @@ namespace And
 class Window;
 class Shader;
 class Triangle;
+class ObjLoader;
 struct ShaderInfo;
 
 
@@ -29,6 +30,9 @@ public:
   void showDemo();
 
   void draw_triangle(Triangle *t);
+
+  void init_obj(ObjLoader* obj);
+  void draw_obj(ObjLoader obj, Shader* s);
 
 protected:
   Window& m_Window;

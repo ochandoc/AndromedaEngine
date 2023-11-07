@@ -8,6 +8,7 @@
 
 #include "Common/Shader.h"
 #include "Common/Triangle.h"
+#include "Common/ObjLoader.h"
 
 namespace And
 {
@@ -117,6 +118,62 @@ void Renderer::draw_triangle(Triangle *t){
   //glDeleteBuffers(1, &VBO);
 
   
+}
+
+void Renderer::init_obj(ObjLoader* obj){
+
+  if(obj->get_vao() == 0){
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    obj->set_VAO(VAO);
+  }
+
+  if(obj->get_vbo() == 0){
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    obj->set_VBO(VBO);
+
+
+    glBindVertexArray(obj->get_vao());
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    
+    std::vector<float> vertices = obj->getVertices();  
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+
+    // Posiciones x y z
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+
+    // Desbindeamos el vao
+    glBindVertexArray(0);
+
+
+  }
+
+}
+
+void Renderer::draw_obj(ObjLoader obj, Shader* s){
+
+  if(s){
+    s->use();
+  }
+
+  unsigned int VBO, VAO;
+  VAO = obj.get_vao();
+  VBO = obj.get_vbo();
+
+  glBindVertexArray(VAO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+  std::vector<float> vertices = obj.getVertices();  
+  glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 3);
+
+  glBindVertexArray(0);
+
+  //glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
 }
 
 void Renderer::showDemo(){
