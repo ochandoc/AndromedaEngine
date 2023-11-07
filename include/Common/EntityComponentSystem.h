@@ -114,7 +114,6 @@ namespace And
 				{
 					m_Components.erase(first);
 				}
-				//m_Sorted = false;
 			}
 
 			virtual size_t size() override
@@ -157,8 +156,6 @@ namespace And
 				return iterator(m_Components.data() + m_Components.size());
 			}
 
-			template<typename...>
-			friend class tuple_iterator;
 			friend class EntityComponentSystem;
 		private:
 			std::vector<component<T>> m_Components;
@@ -171,6 +168,11 @@ namespace And
 		public:
 			tuple_iterator(component_list_imp<comps_t>&... comps_lists) : m_IteratorBegin(comps_lists.begin()...), m_IteratorEnd(comps_lists.end()...)	
 			{
+				next_result_fold result{0, true, false};
+				do
+				{
+					result = next_all(std::make_integer_sequence<int, sizeof...(comps_t)>{}, std::get<0>(m_IteratorBegin)->id);
+				} while (!result.equal && !result.finished);
 			}
 			tuple_iterator(const tuple_iterator& other) : m_IteratorBegin(other.m_IteratorBegin), m_IteratorEnd(other.m_IteratorEnd) {}
 			tuple_iterator(tuple_iterator&& other) : m_IteratorBegin(other.m_IteratorBegin), m_IteratorEnd(other.m_IteratorEnd) {}
@@ -193,6 +195,18 @@ namespace And
 				return *this;
 			}
 
+			tuple_iterator operator++(int)
+			{
+				tuple_iterator tmp = *this;
+				++(*this);
+				return tmp;
+			}
+
+			const std::tuple<comps_t*...> operator *()
+			{
+				return get_tuple(std::make_integer_sequence<int, sizeof...(comps_t)>{});
+			}
+
 		private:
 
 			struct next_result_fold
@@ -204,7 +218,7 @@ namespace And
 				next_result_fold operator +(uint64 value)
 				{
 					if (finished) return *this;
-					if (value == 0) return { 0, false, true };
+					if (value == 0) return { 0, true, true };
 					if (max)
 					{
 						if (equal && value != max)
@@ -228,7 +242,7 @@ namespace And
 			next_result_fold next_all(std::integer_sequence<int, ints...> int_seq, uint64 id)
 			{
 				next_result_fold initial{0, true, false};
-				(initial + ... + (next(std::get<ints>(m_IteratorBegin), std::get<ints>(m_IteratorEnd), id)));
+				initial = (initial + ... + (next(std::get<ints>(m_IteratorBegin), std::get<ints>(m_IteratorEnd), id)));
 				return initial;
 			}
 
@@ -246,80 +260,15 @@ namespace And
 				return first->id;
 			}
 
+			template<int... ints>
+			const std::tuple<comps_t*...> get_tuple(std::integer_sequence<int, ints...> int_seq)
+			{
+				return std::make_tuple((&std::get<ints>(m_IteratorBegin)->value)...);
+			}
+
 			std::tuple<component_list_iterator<comps_t>...> m_IteratorBegin;
 			std::tuple<component_list_iterator<comps_t>...> m_IteratorEnd;
 		};
-		/*
-		template<typename T, typename... comps_t>
-		class tuple_iterator
-		{
-		public:
-			tuple_iterator(component<T>* less_comp) : m_Ptr(less_comp) {}
-			tuple_iterator(component_list_imp<T>& less_comp, component_list_imp<comps_t>&... comps_lists) : m_Ptr(less_comp.m_Components.data()), m_CompsList(comps_lists...), m_ValidComps(nullptr)
-			{ 
-				bool ok = true;
-				do
-				{
-					ok = get_components(std::make_integer_sequence<int, sizeof...(comps_t)>{}, m_Ptr->id);
-					if (!ok)
-					{
-						m_Ptr++;
-					}
-				} while (!ok);
-			}
-			tuple_iterator(const tuple_iterator& other) : m_Ptr(other.m_Ptr), m_CompsList(other.m_CompsList), m_ValidComps(other.m_ValidComps) {}
-			tuple_iterator(tuple_iterator&& other) : m_Ptr(other.m_Ptr), m_CompsList(other.m_CompsList), m_ValidComps(other.m_ValidComps) {}
-
-			~tuple_iterator() = default;
-
-			tuple_iterator& operator =(const tuple_iterator& other) { if (this != &other) { m_Ptr = other.m_Ptr; m_CompsList = other.m_CompsList; m_ValidComps = other.m_ValidComps; } return *this; }
-			tuple_iterator& operator =(tuple_iterator&& other) { if (this != &other) { std::swap(m_Ptr, other.m_Ptr); std::swap(m_CompsList, other.m_CompsList); std::swap(m_ValidComps, other.m_ValidComps); } return *this; }
-
-			// TODO do something
-			tuple_iterator& operator ++()
-			{
-				bool ok = true;
-				do
-				{
-					m_Ptr++;
-					ok = get_components(std::make_integer_sequence<int, sizeof...(comps_t)>{}, m_Ptr->id);
-				} while (!ok);
-				return *this;
-			}
-
-			tuple_iterator operator ++(int)
-			{
-				tuple_iterator tmp = *this; ++(*this); return tmp;
-			}
-
-			const std::tuple<T*, comps_t*...> operator *() const
-			{
-				return get_tuple(std::make_integer_sequence<int, sizeof...(comps_t)>{});
-			}
-
-			bool operator ==(const tuple_iterator& other) { return m_Ptr == other.m_Ptr; }
-			bool operator !=(const tuple_iterator& other) { return m_Ptr != other.m_Ptr; }
-
-		private:
-
-			template<int... ints>
-			const std::tuple<T*, comps_t*...> get_tuple(std::integer_sequence<int, ints...> int_seq) const
-			{
-				return { &m_Ptr->value, ((std::get<ints>(m_ValidComps)), ...) };
-			}
-
-			template<int... ints>
-			bool get_components(std::integer_sequence<int, ints...> int_seq, ID id)
-			{
-				((std::get<ints>(m_ValidComps) = std::get<ints>(m_CompsList).get_component(id)), ...);
-				return ((std::get<ints>(m_ValidComps) != nullptr) && ...);
-			}
-
-			component<T>* m_Ptr;
-			std::tuple<component_list_imp<comps_t>&...> m_CompsList;
-			std::tuple<comps_t*...> m_ValidComps;
-		};
-		*/
 	}
 
 	class EntityComponentSystem
@@ -384,9 +333,7 @@ namespace And
 		template<typename func_t, typename... comps_t>
 		void execute_system(func_t system)
 		{
-			internal::tuple_iterator<comps_t...> it();
-
-
+			
 		}
 
 	private:
