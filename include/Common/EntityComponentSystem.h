@@ -349,6 +349,19 @@ namespace And
 			}
 		}
 
+		template<typename... comps_t>
+		void execute_system(std::function<void(comps_t*...)> system)
+		{
+			assert((m_Components.contains(typeid(comps_t).hash_code()) && ...) && "Component class not registered!");
+			internal::tuple_iterator<comps_t...> it((*CAST_PTR(internal::component_list_imp<comps_t>, m_Components[typeid(comps_t).hash_code()].get()))...);
+			while (!it.finished())
+			{
+				std::tuple<comps_t*...> tuple = *it;
+				call_system(system, tuple, std::make_integer_sequence<int, sizeof...(comps_t)>{});
+				++it;
+			}
+		}
+
 	private:
 
 		template<typename func_t, typename tuple_t, int... ints>
