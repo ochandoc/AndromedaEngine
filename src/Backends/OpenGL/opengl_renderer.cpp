@@ -299,13 +299,13 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s){
 
   glm::mat4 viewMatrix = glm::lookAt(cameraPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   */
-  //glEnable(GL_CULL_FACE);
   //glEnable(GL_FRONT_AND_BACK);
-  //glCullFace(GL_CW);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  //glDisable(GL_CULL_FACE);
 
   CheckError(); // Aqui tiene invalid operation
 
-  glDisable(GL_CULL_FACE);
 
   CheckError();
 
@@ -327,12 +327,15 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s){
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
+
+/*
   std::vector<float> normals = obj.getNormals();
   glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), &normals[0], GL_STATIC_DRAW);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1,3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  s->setVec3("normals", normals.data());
 
+  s->setVec3("normals", normals.data());
+*/
   CheckError();
 
 
@@ -342,7 +345,6 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s){
   //glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 3);
 
   std::vector<unsigned int> indices = obj.getIndices();
-
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
 
   CheckError();

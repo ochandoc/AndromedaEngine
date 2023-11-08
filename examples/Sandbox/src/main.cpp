@@ -48,8 +48,8 @@ int main(int argc, char** argv){
   std::optional<And::Shader> g_shader = And::Shader::make(s_info);
   //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/boat/boat.obj", "../../data/boat/");
   //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/cube/cube.obj", "../../data/cube/");
-  std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/cloud/cloud.obj", "../../data/cloud/");
-  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/teapot/teapot.obj", "../../data/teapot/");
+  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/cloud/cloud.obj", "../../data/cloud/");
+  std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/teapot/teapot.obj", "../../data/teapot/");
   
   if(obj_loaded.has_value()){
     g_renderer.init_obj(&obj_loaded.value());
