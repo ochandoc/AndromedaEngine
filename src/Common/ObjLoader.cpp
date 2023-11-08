@@ -22,6 +22,9 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
   std::vector<float> tex_coords;
   std::vector<unsigned int> indices;
 
+  std::vector<Vertex_info> vertices_info;
+
+
   Material_info mat;
 
   // Si le pasamos la ruta y luego el nombre, cogera los .mtl del directorio
@@ -43,19 +46,35 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
     colors = attrib.colors;
 
 
+
+    int i = 0;
     for (const auto& shape : shapes) {
         for (const auto& index : shape.mesh.indices) {
             vertices.push_back(attrib.vertices[3 * index.vertex_index + 0]);
             vertices.push_back(attrib.vertices[3 * index.vertex_index + 1]);
             vertices.push_back(attrib.vertices[3 * index.vertex_index + 2]);
 
+            Vertex_info v_info;
+
+            v_info.position[0] = attrib.vertices[3 * index.vertex_index + 0];
+            v_info.position[1] = attrib.vertices[3 * index.vertex_index + 1];
+            v_info.position[2] = attrib.vertices[3 * index.vertex_index + 2];
+
             if (attrib.normals.size() > 0) {
                 normals.push_back(attrib.normals[3 * index.normal_index + 0]);
                 normals.push_back(attrib.normals[3 * index.normal_index + 1]);
                 normals.push_back(attrib.normals[3 * index.normal_index + 2]);
+
+                v_info.normal[0] = attrib.normals[3 * index.normal_index + 0];
+                v_info.normal[1] = attrib.normals[3 * index.normal_index + 1];
+                v_info.normal[2] = attrib.normals[3 * index.normal_index + 2];
+
             }
 
             indices.push_back(static_cast<unsigned int>(indices.size()));
+
+            vertices_info.push_back(v_info);
+            i++;
         }
     }
 
@@ -114,12 +133,12 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
 
 
 
-  ObjLoader obj{vertices, vertices_wheights, normals, tex_coords, colors, indices, mat};
+  ObjLoader obj{vertices, vertices_wheights, normals, tex_coords, colors, indices, vertices_info, mat};
   return std::optional<ObjLoader>(std::move(obj));
 }
 
-ObjLoader::ObjLoader(std::vector<float> v, std::vector<float> v_w, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, std::vector<unsigned int> indices, Material_info mat) :
- m_vertex(v), m_vertex_weights(v_w), m_normals(normals), m_texcoords(tex_coords), m_colors(colors), m_mat_info(mat), m_indices(indices){
+ObjLoader::ObjLoader(std::vector<float> v, std::vector<float> v_w, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, std::vector<unsigned int> indices, std::vector<Vertex_info> v_info, Material_info mat) :
+ m_vertex(v), m_vertex_weights(v_w), m_normals(normals), m_texcoords(tex_coords), m_colors(colors), m_mat_info(mat), m_indices(indices), m_vertex_info(v_info){
 
 }
 

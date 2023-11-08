@@ -160,11 +160,17 @@ void Renderer::init_obj(ObjLoader* obj){
     glBindVertexArray(obj->get_vao());
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     
-    std::vector<float> vertices = obj->getVertices();  
+    //std::vector<float> vertices = obj->getVertices();
+    std::vector<Vertex_info> vertices = obj->get_vertex_info();
+
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
     // Posiciones x y z
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), 0);
+
+    // Normales x,y,z
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info),(const void*) (3 * sizeof(float)));
     
 
 
@@ -300,9 +306,9 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s){
   glm::mat4 viewMatrix = glm::lookAt(cameraPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
   */
   //glEnable(GL_FRONT_AND_BACK);
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-  //glDisable(GL_CULL_FACE);
+  //glEnable(GL_CULL_FACE);
+  //glCullFace(GL_FRONT);
+  glDisable(GL_CULL_FACE);
 
   CheckError(); // Aqui tiene invalid operation
 
@@ -320,12 +326,27 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s){
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
 
+
   CheckError();
 
-  std::vector<float> vertices = obj.getVertices();  
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+  std::vector<Vertex_info> vertices = obj.get_vertex_info();
+
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+
+  
+  // Posiciones x y z
+  glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+
+  CheckError();
+
+  // Normales x,y,z
+  glVertexAttribPointer(1, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (const void*) (3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
+    
+  CheckError();
+
 
 
 /*
