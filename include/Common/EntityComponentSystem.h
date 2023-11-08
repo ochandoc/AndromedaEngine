@@ -336,9 +336,10 @@ namespace And
 			list->remove(e.get_id());
 		}
 
-		template<typename... comps_t>
-		void execute_system(std::function<void(comps_t*...)> system)
+		template<typename func_t, typename... comps_t>
+		void execute_system(func_t system(comps_t*...))
 		{
+			assert((m_Components.contains(typeid(comps_t).hash_code()) && ...) && "Component class not registered!");
 			internal::tuple_iterator<comps_t...> it((*CAST_PTR(internal::component_list_imp<comps_t>, m_Components[typeid(comps_t).hash_code()].get()))...);
 			while (!it.finished())
 			{
@@ -349,6 +350,7 @@ namespace And
 		}
 
 	private:
+
 		template<typename func_t, typename tuple_t, int... ints>
 		void call_system(func_t system, tuple_t& tuple, std::integer_sequence<int, ints...> int_seq)
 		{

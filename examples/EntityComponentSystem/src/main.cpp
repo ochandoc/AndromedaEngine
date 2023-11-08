@@ -48,6 +48,12 @@ void manolo(int_comp* c1, float_comp* c2)
   test_V.push_back(c1->num);
 }
 
+void manolo2(int_comp* c1)
+{
+  c1->num += c1->num;
+  test_V.push_back(c1->num);
+}
+
 LARGE_INTEGER StartTime;
 LARGE_INTEGER Freq;
 
@@ -75,7 +81,7 @@ int main(int argc, char** argv)
   And::Entity e;
 
   ResetTimer();
-  for (int i = 0; i < 2000000; i++)
+  for (int i = 0; i < 100000; i++)
   {
     if ((i % 2) == 0)
     {
@@ -88,22 +94,22 @@ int main(int argc, char** argv)
   }
   CheckTimer("Insertions");
 
-  std::function<void(int_comp*, float_comp*)> s = manolo;
-  ResetTimer();
-  ecs.execute_system(s);
-  CheckTimer("System");
-
-  test_V.clear();
-
-  ResetTimer();
-  ecs.execute_system(s);
-  CheckTimer("System");
-
-  printf("Size: %zu\n", test_V.size());
-  /*for (auto i : test_V)
+  for (int i = 0; i < 10; i++)
   {
-    printf("Num: %d\n", i);
-  }*/
+    ResetTimer();
+    ecs.execute_system(manolo2);
+    CheckTimer("System");
+
+    printf("Size: %zu\n", test_V.size());
+    test_V.clear();
+
+    ResetTimer();
+    ecs.execute_system(manolo);
+    CheckTimer("System");
+
+    printf("Size: %zu\n", test_V.size());
+    test_V.clear();
+  }
 
   return 0;
 }
