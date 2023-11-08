@@ -129,7 +129,16 @@ int main(int argc, char** argv){
   
   };
 
+
+
   And::Triangle tri{ver};
+
+  And::EntityComponentSystem entity_comp;
+
+  entity_comp.add_component_class<And::Triangle>();
+  entity_comp.new_entity(And::Triangle{ver});
+  
+
 
   float speed = 0.01f;
   while (window->is_open()){
