@@ -166,13 +166,14 @@ namespace And
 		class tuple_iterator
 		{
 		public:
-			tuple_iterator(component_list_imp<comps_t>&... comps_lists) : m_IteratorBegin(comps_lists.begin()...), m_IteratorEnd(comps_lists.end()...)	
+			tuple_iterator(component_list_imp<comps_t>&... comps_lists) : m_IteratorBegin(comps_lists.begin()...), m_IteratorEnd(comps_lists.end()...), m_Finished(false)
 			{
-				next_result_fold result{0, true, false};
+				next_result_fold result{ std::get<0>(m_IteratorBegin)->id, true, false};
 				do
 				{
-					result = next_all(std::make_integer_sequence<int, sizeof...(comps_t)>{}, std::get<0>(m_IteratorBegin)->id);
+					result = next_all(std::make_integer_sequence<int, sizeof...(comps_t)>{}, result.max);
 				} while (!result.equal && !result.finished);
+				m_Finished = result.finished;
 			}
 			tuple_iterator(const tuple_iterator& other) : m_IteratorBegin(other.m_IteratorBegin), m_IteratorEnd(other.m_IteratorEnd) {}
 			tuple_iterator(tuple_iterator&& other) : m_IteratorBegin(other.m_IteratorBegin), m_IteratorEnd(other.m_IteratorEnd) {}
@@ -181,6 +182,8 @@ namespace And
 
 			tuple_iterator& operator =(const tuple_iterator& other) { if (this != &other) { m_IteratorBegin = other.m_IteratorBegin; m_IteratorEnd = other.m_IteratorEnd; } return *this; }
 			tuple_iterator& operator =(tuple_iterator&& other) { if (this != &other) { std::swap(m_IteratorBegin, other.m_IteratorBegin); std::swap(m_IteratorEnd, other.m_IteratorEnd); } return *this; }
+
+			bool finished() const { return m_Finished; }
 
 			tuple_iterator& operator++()
 			{
@@ -192,6 +195,7 @@ namespace And
 					result = next_all(std::make_integer_sequence<int, sizeof...(comps_t)>{}, result.max);
 
 				} while (!result.equal && !result.finished);
+				m_Finished = result.finished;
 				return *this;
 			}
 
@@ -266,6 +270,7 @@ namespace And
 				return std::make_tuple((&std::get<ints>(m_IteratorBegin)->value)...);
 			}
 
+			bool m_Finished;
 			std::tuple<component_list_iterator<comps_t>...> m_IteratorBegin;
 			std::tuple<component_list_iterator<comps_t>...> m_IteratorEnd;
 		};
@@ -283,6 +288,7 @@ namespace And
 		template<typename comp_t>
 		void add_component_class()
 		{
+			assert(!m_Components.contains(typeid(comp_t).hash_code()) && "Component class already inserted!");
 			m_Components.insert({typeid(comp_t).hash_code(), std::make_unique<internal::component_list_imp<comp_t>>()});
 		}
 
@@ -330,15 +336,26 @@ namespace And
 			list->remove(e.get_id());
 		}
 
-		template<typename func_t, typename... comps_t>
-		void execute_system(func_t system)
+		template<typename... comps_t>
+		void execute_system(std::function<void(comps_t*...)> system)
 		{
-			
+			internal::tuple_iterator<comps_t...> it((*CAST_PTR(internal::component_list_imp<comps_t>, m_Components[typeid(comps_t).hash_code()].get()))...);
+			while (!it.finished())
+			{
+				std::tuple<comps_t*...> tuple = *it;
+				call_system(system, tuple, std::make_integer_sequence<int, sizeof...(comps_t)>{});
+				++it;
+			}
 		}
 
 	private:
+		template<typename func_t, typename tuple_t, int... ints>
+		void call_system(func_t system, tuple_t& tuple, std::integer_sequence<int, ints...> int_seq)
+		{
+			system((std::get<ints>(tuple))...);
+		}
+
 		std::unordered_map<size_t, std::unique_ptr<internal::component_list_abs>> m_Components;
-		uint64 m_CurrentId = 0;
 	};
 
 }

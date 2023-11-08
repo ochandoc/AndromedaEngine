@@ -29,6 +29,8 @@
 
 #define NUM_ENTITIES 100000
 
+std::vector<int> test_V;
+
 struct int_comp
 {
   int num;
@@ -39,11 +41,11 @@ struct float_comp
   float fnum;
 };
 
-int system(int_comp* c1, int_comp* c2)
+void manolo(int_comp* c1, float_comp* c2)
 {
-  c2->num++;
-  c1->num += c2->num;
-  return c1->num;
+  c2->fnum++;
+  c1->num += (int)c2->fnum;
+  test_V.push_back(c1->num);
 }
 
 LARGE_INTEGER StartTime;
@@ -67,39 +69,41 @@ int main(int argc, char** argv)
   QueryPerformanceFrequency(&Freq);
   And::EntityComponentSystem ecs;
 
-  And::internal::component_list_imp<int_comp> v;
-  And::internal::component_list_imp<float_comp> v2;
+  ecs.add_component_class<int_comp>();
+  ecs.add_component_class<float_comp>();
 
-  for (int i = 0; i < 4; i++)
+  And::Entity e;
+
+  ResetTimer();
+  for (int i = 0; i < 2000000; i++)
   {
-    And::ID id;
-    //std::cout << "ID: " << id.get() << " Num: " << i << std::endl;
     if ((i % 2) == 0)
     {
-      v2.add(id, float_comp{(float)i});
+      e = ecs.new_entity(int_comp{ i }, float_comp{ (float)i });
     }
-    v.add(id, int_comp{i});
+    else
+    {
+      ecs.new_entity(int_comp{ i });
+    }
   }
+  CheckTimer("Insertions");
 
-  std::cout << "int_comp" << std::endl;
-  for (auto& a : v)
+  std::function<void(int_comp*, float_comp*)> s = manolo;
+  ResetTimer();
+  ecs.execute_system(s);
+  CheckTimer("System");
+
+  test_V.clear();
+
+  ResetTimer();
+  ecs.execute_system(s);
+  CheckTimer("System");
+
+  printf("Size: %zu\n", test_V.size());
+  /*for (auto i : test_V)
   {
-    std::cout << "ID: " << a.id << " Num: " << a.value.num << std::endl;
-  }
-
-  std::cout << "float_comp" << std::endl;
-  for (auto& a : v2)
-  {
-    std::cout << "ID: " << a.id << " Num: " << a.value.fnum << std::endl;
-  }
-
-  And::internal::tuple_iterator<int_comp, float_comp> ti(v, v2);
-  for (int i = 0; i < 4; i++)
-  {
-    auto& [c1, c2] = *ti;
-    ++ti;
-
-  }
+    printf("Num: %d\n", i);
+  }*/
 
   return 0;
 }
