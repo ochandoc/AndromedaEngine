@@ -19,6 +19,10 @@ Renderer::Renderer(Window& window) : m_Window(window)
   m_camera_pos[0] = 0.0f;
   m_camera_pos[1] = 7.0f;
   m_camera_pos[2] = -10.0f;
+
+  m_camera_target[0] = 0.0f;
+  m_camera_target[1] = 0.0f;
+  m_camera_target[2] = 0.0f;
   m_fov = 45.0f;
 
   GLFWwindow *window_tmp = (GLFWwindow*) m_Window.get_native_window();
@@ -81,7 +85,12 @@ void Renderer::new_frame()
 
 void Renderer::end_frame()
 {
-  ImGui::ShowDemoWindow();
+  //ImGui::ShowDemoWindow();
+  if(ImGui::CollapsingHeader("Camera")){
+    ImGui::DragFloat3("Camera position", m_camera_pos);
+    ImGui::DragFloat3("Camera target", m_camera_target);
+    ImGui::DragFloat("FOV", &m_fov);
+  }
 
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -153,8 +162,6 @@ void Renderer::init_obj(ObjLoader* obj){
     
     std::vector<float> vertices = obj->getVertices();  
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-
-    
     // Posiciones x y z
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
@@ -169,15 +176,52 @@ void Renderer::init_obj(ObjLoader* obj){
 
 }
 
+void CheckError(){
+  GLenum error = glGetError();
+  switch (error) {
+    case GL_NO_ERROR:
+        // No se ha producido ningún error.
+        break;
+    case GL_INVALID_ENUM:
+        // Manejar el error de enumerador no válido.
+        printf("Invalid enum\n");
+        break;
+    case GL_INVALID_VALUE:
+        // Manejar el error de valor no válido.
+        printf("Invalid value\n");
+        break;
+    case GL_INVALID_OPERATION:
+        // Manejar el error de operación no válida.
+        printf("Invalid operation\n");
+        break;
+    case GL_OUT_OF_MEMORY:
+        // Manejar el error de falta de memoria.
+        printf("Out of memory\n");
+        break;
+    case GL_STACK_OVERFLOW:
+        // Manejar el error de desbordamiento de la pila.
+        printf("Stack overflow\n");
+        break;
+    case GL_STACK_UNDERFLOW:
+        // Manejar el error de subdesbordamiento de la pila.
+        printf("Stack underflow\n");
+        break;
+    // Puedes agregar más casos para otros errores si es necesario.
+    default:
+        // Manejar cualquier otro error no reconocido.
+        break;
+}
+}
+
 void Renderer::draw_obj(ObjLoader obj, Shader* s){
 
-  float cameraTarget[3] = {0.0f, 0.0f, 0.0f};
+  CheckError();
 
   // Configura la matriz de vista manualmente
   GLfloat viewMatrix[16]; // Una matriz de 4x4
 
   // Calcula la dirección hacia la que mira la cámara (un vector en la dirección opuesta a cameraTarget)
-  GLfloat direction[3] = {m_camera_pos[0] - cameraTarget[0], m_camera_pos[1] - cameraTarget[1], m_camera_pos[2] - cameraTarget[2]};
+  GLfloat direction[3] = {m_camera_pos[0] - m_camera_target[0], m_camera_pos[1] - m_camera_target[1], m_camera_pos[2] - m_camera_target[2]};
   GLfloat up[3] = {0.0f, 1.0f, 0.0f}; // Vector hacia arriba
 
   // Normaliza la dirección
@@ -224,7 +268,10 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s){
   viewMatrix[14] = -direction[0] * m_camera_pos[0] - direction[1] * m_camera_pos[1] - direction[2] * m_camera_pos[2];
   viewMatrix[15] = 1.0f;
 
-  s->setMat4("view", viewMatrix);
+  if(s){
+    s->use();
+  }
+
 
   float f = 1.0f / tan(m_fov * 0.5f * (dPI / 180.0f));
 
@@ -236,8 +283,17 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s){
     0.0f, 0.0f, (2.0f * m_far * m_near) / (m_near - m_far), 0.0f
   };
 
-  s->setMat4("projection", projectionMatrix);
+   CheckError();
+  s->setMat4("view", viewMatrix);
+  CheckError();
+  
 
+  CheckError();
+  s->setMat4("projection", projectionMatrix);
+  CheckError();
+
+  //s->setVec3("normals", &normals[0]);
+  //CheckError();
   /*
   glm::vec3 cameraPosition{m_camera_pos[0], m_camera_pos[1], m_camera_pos[2]};
 
@@ -247,36 +303,49 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s){
   //glEnable(GL_FRONT_AND_BACK);
   //glCullFace(GL_CW);
 
+  CheckError(); // Aqui tiene invalid operation
+
+  glDisable(GL_CULL_FACE);
+
+  CheckError();
+
+  
+  CheckError();
+
   unsigned int VBO, VAO;
   VAO = obj.get_vao();
   VBO = obj.get_vbo();
 
-  glDisable(GL_CULL_FACE);
 
-  glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBindVertexArray(VAO);
 
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-  GLenum err;
-  if ((err = glGetError()) != GL_NO_ERROR) {
-      printf("Error\n");
-  }
-
-  if(s){
-    s->use();
-  }
+  CheckError();
 
   std::vector<float> vertices = obj.getVertices();  
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+  std::vector<float> normals = obj.getNormals();
+  glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), &normals[0], GL_STATIC_DRAW);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1,3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  s->setVec3("normals", normals.data());
+
+  CheckError();
+
+
+ 
   //glDrawArrays(GL_TRIANGLES, vertices[0], vertices.size() / 3);
 
   //glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 3);
 
   std::vector<unsigned int> indices = obj.getIndices();
-  glDrawElements(GL_TRIANGLES, indices.size() / 3, GL_UNSIGNED_INT, indices.data());
 
+  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
+
+  CheckError();
   glBindVertexArray(0);
 
   //glBindBuffer(GL_ARRAY_BUFFER, 0);

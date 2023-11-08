@@ -18,6 +18,7 @@ namespace And
     PLATFORM_WINDOW_DATA glfw;
     KeyboardState* keyboard;
     std::shared_ptr<GraphicsContext> m_Context;
+    // Camera cam;
   };
 
   static void close_window_callback(GLFWwindow* window)

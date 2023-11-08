@@ -26,7 +26,7 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
 
   // Si le pasamos la ruta y luego el nombre, cogera los .mtl del directorio
   //bool error = tinyobj::LoadObj(&attrib, &shapes, &materials_obj, &warn, &err, filename.c_str(), base_path.c_str());
-  bool error = tinyobj::LoadObj(&attrib, &shapes, &materials_obj, &warn, &err, filename.c_str(), base_path.c_str());
+  bool error = tinyobj::LoadObj(&attrib, &shapes, &materials_obj, &warn, &err, filename.c_str(), base_path.c_str(), true);
 
   if (!err.empty()) {
     //m_obj_info.replace(0, err.length(), err.c_str());
@@ -36,17 +36,40 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
     printf("Obj loaded correctly\n");
 
     // Guardar vertices en vector de floats
-    vertices = attrib.GetVertices();
+    //vertices = attrib.GetVertices();
     vertices_wheights = attrib.GetVertexWeights();
-    normals = attrib.normals;
+    //normals = attrib.normals;
     tex_coords = attrib.texcoords;
     colors = attrib.colors;
-    std::vector<tinyobj::index_t> indices_tmp = shapes[0].mesh.indices;
 
-    for(auto& element : indices_tmp){
-      std::cout << element.vertex_index << " ";
-      indices.push_back((unsigned int)element.vertex_index);
+
+    for (const auto& shape : shapes) {
+        for (const auto& index : shape.mesh.indices) {
+            vertices.push_back(attrib.vertices[3 * index.vertex_index + 0]);
+            vertices.push_back(attrib.vertices[3 * index.vertex_index + 1]);
+            vertices.push_back(attrib.vertices[3 * index.vertex_index + 2]);
+
+            if (attrib.normals.size() > 0) {
+                normals.push_back(attrib.normals[3 * index.normal_index + 0]);
+                normals.push_back(attrib.normals[3 * index.normal_index + 1]);
+                normals.push_back(attrib.normals[3 * index.normal_index + 2]);
+            }
+
+            indices.push_back(static_cast<unsigned int>(indices.size()));
+        }
     }
+
+    /*for(const auto& shape : shapes){
+      for(const auto& index : shape.mesh.indices){
+
+        std::cout << index.vertex_index -1 << " ";
+
+        //indices.push_back(static_cast<unsigned int>(indices.size()));
+        if(index.vertex_index -1 >= 0){
+          indices.push_back((unsigned int)index.vertex_index -1 );
+        }
+      }
+    }*/
 
 
     /*if(material_name.length() != 0){

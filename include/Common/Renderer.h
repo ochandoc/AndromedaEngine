@@ -40,6 +40,7 @@ protected:
 private:
 
 float m_camera_pos[3];
+float m_camera_target[3];
 float m_fov;
 float m_aspectRatio;
 float m_near;

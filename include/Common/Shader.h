@@ -32,6 +32,7 @@ namespace And{
     Shader& operator=(Shader&& other);
 
     void setMat4(std::string name, const float matrix[16]);
+    void setVec3(std::string name, const float vector[9]);
     
     void use();
 
