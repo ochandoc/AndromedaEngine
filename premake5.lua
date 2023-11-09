@@ -74,6 +74,7 @@ project "Andromeda"
   {
     "include",
     "src",
+    "deps/soloud/include",
   }
   
   pchheader "andpch.hpp"
@@ -87,6 +88,7 @@ project "Andromeda"
     "include/**.hpp",
     "src/Common/**.*",
     "src/Graphics/**.*",
+    "deps/soloud/include/**.h",
     "include/andpch.hpp",
     "src/andpch.cpp",
     "premake5.lua"
@@ -135,6 +137,7 @@ group "Examples"
   include "examples/EntityComponentSystem"
   include "examples/Window"
   include "examples/Triangles"
+  include "examples/Audio"
 group ""
 
 newoption
