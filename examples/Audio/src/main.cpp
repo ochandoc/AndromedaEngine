@@ -110,14 +110,6 @@ int main(int argc, char** argv){
   g_context->create_info();
 
 
-  // Creamos el shader
-  And::ShaderInfo s_info;
-  s_info.path_fragment = "../../data/fshader.fs";
-  s_info.path_vertex = "../../data/vshader.vs";
-
-   std::optional<And::Shader> g_shader = And::Shader::make(s_info);
-
-
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
 
@@ -129,50 +121,6 @@ int main(int argc, char** argv){
   double mouseX = -1.0f, mouseY = -1.0f;
   double mouseXx = -1.0f, mouseYy = -1.0f;
 
-
-  And::EntityComponentSystem entity_comp;
-  entity_comp.add_component_class<And::Triangle>();
-  float triangle_width = 0.01f;
-  float triangle_height = 0.01f;
-
-
-  for(int i = 0; i < 500; i++){
-
-    int randomx = (rand()%2001);
-    int randomy = (rand()%2001);
-    float initial_posx = (((float) (randomx - 1000)) / 1000.0f);
-    float initial_posy = (((float) (randomy - 1000)) / 1000.0f);
-    And::Vertex ver[3] = {
-      {
-        // {-0.5f, -0.5f, 0.0f},
-        {initial_posx, initial_posy, 0.0f},
-        {0.0f, 0.0f, 0.0f},
-        {1.0f, 0.0f, 0.0f, 1.0f},
-        {2, 1, 0}
-      },
-      {
-
-        {initial_posx + (triangle_width * 0.5), initial_posy + triangle_height, 0.0f},
-        {0.0f, 0.0f, 0.0f},
-        {1.0f, 0.0f, 0.0f, 1.0f},
-        {2, 1, 0},
-      },
-      {
-        {initial_posx + triangle_width, initial_posy, 0.0f},
-        {0.0f, 0.0f, 0.0f},
-        {1.0f, 0.0f, 0.0f, 1.0f},
-        {2, 1, 0},
-      }
-    
-    };
-
-    And::Triangle tri{ver};
-
-
-    
-    entity_comp.new_entity(And::Triangle{ver});
-
-  }
 
 
   And::AudioManager audio_manager;
@@ -189,60 +137,7 @@ int main(int argc, char** argv){
     window->update();
     g_renderer.new_frame();
     
-    if (input.check_action(jump)){
-      printf("Jummpinggggg!!!\n");
-    }
-
-    //And::Vertex *vertices = tri.get_vertex();
-
-    /*if (input.IsKeyDown(And::KeyCode::W) || input.IsKeyPressed(And::KeyCode::W)){
-      for(int i = 0; i < 3; i++){
-        vertices[i].position[1] += speed;
-      }
-    }
-    if (input.IsKeyDown(And::KeyCode::S) || input.IsKeyPressed(And::KeyCode::S)){
-      for(int i = 0; i < 3; i++){
-        vertices[i].position[1] -= speed;
-      }
-    }
     
-    if (input.IsKeyDown(And::KeyCode::A) || input.IsKeyPressed(And::KeyCode::A)){
-      for(int i = 0; i < 3; i++){
-        vertices[i].position[0] -= speed;
-      }
-    }
-    if (input.IsKeyDown(And::KeyCode::D) || input.IsKeyPressed(And::KeyCode::D)){
-      for(int i = 0; i < 3; i++){
-        vertices[i].position[0] += speed;
-      }
-    }
-
-    if (input.IsKeyPressed(And::KeyCode::Space)){
-
-      printf("Space pressed!\n");
-    }
-
-    if (input.IsKeyRelease(And::KeyCode::Space)){
-      printf("Space released!\n");
-    }*/
-
-    if(g_shader.has_value()){
-      g_shader->use();
-    }
-    
-    //g_renderer.showDemo();
-    //g_renderer.draw_triangle(&tri);
-
-    std::function<void(And::Triangle* tri)> f = [&g_renderer](And::Triangle* tri){
-      DrawTriangle(g_renderer, tri);
-    };
-
-
-    ResetTimer();
-    entity_comp.execute_system(f);
-    CheckTimer("System");
-
-
     //input.update_input();
     g_renderer.end_frame();
     window->swap_buffers();

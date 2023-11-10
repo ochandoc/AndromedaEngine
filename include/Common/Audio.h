@@ -1,7 +1,9 @@
 #pragma once
 
-#include "soloud.h"
-#include "soloud_wav.h"
+
+namespace SoLoud{
+  class Wav;
+}
 
 namespace And{
 
@@ -15,9 +17,12 @@ class Audio{
     ~Audio();
 
     void load(const char* path);
-    SoLoud::Wav m_sample;
+
+    SoLoud::Wav* get_sample();
+
 
   private:
+    std::shared_ptr<SoLoud::Wav> m_sample;
 }; 
 
 }

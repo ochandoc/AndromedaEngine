@@ -20,6 +20,8 @@ project "Audio"
   {
     "src/**.cpp",
     "src/**.h",
+    "../../deps/soloud/include/**.h",
+    "../../deps/soloud/src/**.cpp",
     "premake5.lua"
   }
 
@@ -27,6 +29,7 @@ project "Audio"
   {
     "../../include",
     "../../deps/soloud/include",
+    "../../deps/soloud/src",
   }
 
   links

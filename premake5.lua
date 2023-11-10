@@ -63,18 +63,26 @@ project "Andromeda"
   -- Carpeta donde van a ir los obj generados
   objdir "build/%{prj.name}/%{cfg.buildcfg}"
 
+  dependson "Soloud"
+
+  links{
+    "deps/soloud/bin/Soloud.lib"
+  }
+
   defines
   {
     "_CRT_SECURE_NO_WARNINGS",
     "AND_BUILD_LIB",
+    ""
   }
+
 
   -- Directorios donde estan los include
   includedirs
   {
     "include",
     "src",
-    "deps/soloud/include",
+    "deps/soloud/soloud/include",
   }
   
   pchheader "andpch.hpp"
@@ -88,7 +96,8 @@ project "Andromeda"
     "include/**.hpp",
     "src/Common/**.*",
     "src/Graphics/**.*",
-    "deps/soloud/include/**.h",
+    "deps/soloud/soloud/include/**.h",
+    --"deps/soloud/src/**.cpp",
     "include/andpch.hpp",
     "src/andpch.cpp",
     "premake5.lua"
@@ -138,6 +147,10 @@ group "Examples"
   include "examples/Window"
   include "examples/Triangles"
   include "examples/Audio"
+group ""
+
+group "Dependences"
+    include "deps/soloud"
 group ""
 
 newoption
