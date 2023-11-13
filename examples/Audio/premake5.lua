@@ -13,24 +13,38 @@ project "Audio"
 
   defines
   {
-    "_CRT_SECURE_NO_WARNINGS"
+    "_CRT_SECURE_NO_WARNINGS",
+    "WITH_WINMM"
   }
 
   files
   {
     "src/**.cpp",
     "src/**.h",
-    "../../deps/soloud/include/**.h",
-    "../../deps/soloud/src/**.cpp",
+    "../../deps/Soloud/soloud/include/**.h",
+    "../../deps/Soloud/soloud/src/audiosource/**.cpp",        -- Archivos fuente de la carpeta audiosource
+    "../../deps/Soloud/soloud/src/filter/**.cpp",             -- Archivos fuente de la carpeta filter
+    "../../deps/Soloud/soloud/src/core/**.cpp",                 -- Archivos fuente de la carpeta core
+    "../../deps/Soloud/soloud/src/backend/winmm/**.*",        -- Archivos fuente específicos para la plataforma Windows Multimedia (si es necesario)
+    --"../../deps/soloud/src/**.cpp",
     "premake5.lua"
   }
 
   includedirs
   {
     "../../include",
-    "../../deps/soloud/include",
-    "../../deps/soloud/src",
+    "../../deps/Soloud/soloud/include",
+    "../../deps/Soloud/soloud/src/audiosource/**.cpp",        -- Archivos fuente de la carpeta audiosource
+    "../../deps/Soloud/soloud/src/filter/**.cpp",             -- Archivos fuente de la carpeta filter
+    "../../deps/Soloud/soloud/src/core/**.cpp",                 -- Archivos fuente de la carpeta core
+    "../../deps/Soloud/soloud/src/backend/winmm/**.*",        -- Archivos fuente específicos para la plataforma Windows Multimedia (si es necesario)
+    -- "../../deps/soloud/src",
   }
+
+  
+  
+  
+
 
   links
   {

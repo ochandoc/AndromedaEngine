@@ -33,6 +33,8 @@
 #include "Common/AudioManager.h"
 #include "Common/Audio.h"
 
+
+
 #include "Common/JobSystem.h"
 
 #include <Windows.h>
@@ -125,11 +127,9 @@ int main(int argc, char** argv){
 
   And::AudioManager audio_manager;
   And::Audio audio;
-  audio.load("../../data/");
+  //audio.load("../../data/");
 
-  audio_manager.play(&audio);
-
-  
+  //audio_manager.play(audio);
 
 
   float speed = 0.01f;
