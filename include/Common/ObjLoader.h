@@ -7,11 +7,6 @@
 
 namespace And{
 
-  struct Vertex_info{
-    float position[3];
-    float normal[3];
-  };
-
   struct Material_info{
     float ambient[3] = {0.0f, 0.0f, 0.0f};
     float diffuse[3] = {0.0f, 0.0f, 0.0f};
@@ -66,8 +61,6 @@ class ObjLoader{
   std::vector<Vertex_info> m_vertex_info;
   Material_info m_mat_info;
 
-
-  std::vector<Vertex_info> m_vertex_info;
 
   unsigned int m_VAO = 0;
   unsigned int m_VBO = 0;
