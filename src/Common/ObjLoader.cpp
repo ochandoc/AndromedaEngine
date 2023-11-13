@@ -23,6 +23,9 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
   std::vector<unsigned int> indices;
   std::vector<Vertex_info> vertex_info;
 
+  std::vector<Vertex_info> vertices_info;
+
+
   Material_info mat;
 
   // Si le pasamos la ruta y luego el nombre, cogera los .mtl del directorio
@@ -44,6 +47,8 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
     colors = attrib.colors;
 
 
+
+    int i = 0;
     for (const auto& shape : shapes) {
         for (const auto& index : shape.mesh.indices) {
             vertices.push_back(attrib.vertices[3 * index.vertex_index + 0]);
@@ -55,7 +60,6 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
             v_info.position[0] = attrib.vertices[3 * index.vertex_index + 0];
             v_info.position[1] = attrib.vertices[3 * index.vertex_index + 1];
             v_info.position[2] = attrib.vertices[3 * index.vertex_index + 2];
-
 
             if (attrib.normals.size() > 0) {
                 normals.push_back(attrib.normals[3 * index.normal_index + 0]);
@@ -69,6 +73,9 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
 
             vertex_info.push_back(v_info);
             indices.push_back(static_cast<unsigned int>(indices.size()));
+
+            vertices_info.push_back(v_info);
+            i++;
         }
     }
 
