@@ -7,7 +7,10 @@
 
 namespace And{
 
-
+  struct Vertex_info{
+    float position[3];
+    float normal[3];
+  };
 
   struct Material_info{
     float ambient[3] = {0.0f, 0.0f, 0.0f};
@@ -29,6 +32,7 @@ class ObjLoader{
   const std::vector<float>& getTexCoords();
   const std::vector<unsigned int>& getIndices();
   const Material_info& getMaterialInfo();
+  const std::vector<Vertex_info>& getVertexInfo();
 
   void set_VAO(unsigned int v){m_VAO = v;};
   const unsigned int get_vao(){ return m_VAO;};
@@ -38,7 +42,7 @@ class ObjLoader{
 
   private:
 
-  ObjLoader(std::vector<float> vertices,  std::vector<float> vertices_weights, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, std::vector<unsigned int> indices, Material_info mat);
+  ObjLoader(std::vector<float> vertices,  std::vector<float> vertices_weights, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, std::vector<unsigned int> indices, std::vector<Vertex_info> vertex_info, Material_info mat);
 
   std::vector<float> m_vertex;            // 'v (x, y, z)
   std::vector<float> m_vertex_weights;    // 'v'(w)
@@ -48,6 +52,7 @@ class ObjLoader{
 
   std::vector<unsigned int> m_indices;
 
+  std::vector<Vertex_info> m_vertex_info;
   Material_info m_mat_info;
 
   unsigned int m_VAO = 0;

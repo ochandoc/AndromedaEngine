@@ -3,6 +3,9 @@
 
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
+#include "glm/glm.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "imgui_impl_opengl3.h"
 
@@ -146,6 +149,8 @@ void Renderer::draw_triangle(Triangle *t){
 
 void Renderer::init_obj(ObjLoader* obj){
 
+  printf("Init obj\n");
+
   if(obj->get_vao() == 0){
     unsigned int VAO;
     glGenVertexArrays(1, &VAO);
@@ -160,11 +165,17 @@ void Renderer::init_obj(ObjLoader* obj){
     glBindVertexArray(obj->get_vao());
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     
-    std::vector<float> vertices = obj->getVertices();  
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), vertices.data(), GL_STATIC_DRAW);
-    // Posiciones x y z
+    std::vector<Vertex_info> vertices = obj->getVertexInfo();  
+    //std::vector<float> normals = obj.getNormals();
+
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
+
+
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*) (3 * sizeof(float)));
     
 
 
@@ -213,143 +224,59 @@ void CheckError(){
 }
 }
 
-void Renderer::draw_obj(ObjLoader obj, Shader* s){
-
-  CheckError();
-
-  // Configura la matriz de vista manualmente
-  GLfloat viewMatrix[16]; // Una matriz de 4x4
-
-  // Calcula la dirección hacia la que mira la cámara (un vector en la dirección opuesta a cameraTarget)
-  GLfloat direction[3] = {m_camera_pos[0] - m_camera_target[0], m_camera_pos[1] - m_camera_target[1], m_camera_pos[2] - m_camera_target[2]};
-  GLfloat up[3] = {0.0f, 1.0f, 0.0f}; // Vector hacia arriba
-
-  // Normaliza la dirección
-  GLfloat directionLength = sqrt(direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2]);
-  direction[0] /= directionLength;
-  direction[1] /= directionLength;
-  direction[2] /= directionLength;
-
-  // Calcula el vector derecho (cross product entre up y dirección)
-  GLfloat right[3];
-  right[0] = up[1] * direction[2] - up[2] * direction[1];
-  right[1] = up[2] * direction[0] - up[0] * direction[2];
-  right[2] = up[0] * direction[1] - up[1] * direction[0];
-
-  // Normaliza el vector derecho
-  GLfloat rightLength = sqrt(right[0] * right[0] + right[1] * right[1] + right[2] * right[2]);
-  right[0] /= rightLength;
-  right[1] /= rightLength;
-  right[2] /= rightLength;
-
-  // Calcula el nuevo vector hacia arriba (cross product entre dirección y derecho)
-  up[0] = direction[1] * right[2] - direction[2] * right[1];
-  up[1] = direction[2] * right[0] - direction[0] * right[2];
-  up[2] = direction[0] * right[1] - direction[1] * right[0];
-
-  // Construye la matriz de vista
-  viewMatrix[0] = right[0];
-  viewMatrix[1] = up[0];
-  viewMatrix[2] = direction[0];
-  viewMatrix[3] = 0.0f;
-
-  viewMatrix[4] = right[1];
-  viewMatrix[5] = up[1];
-  viewMatrix[6] = direction[1];
-  viewMatrix[7] = 0.0f;
-
-  viewMatrix[8] = right[2];
-  viewMatrix[9] = up[2];
-  viewMatrix[10] = direction[2];
-  viewMatrix[11] = 0.0f;
-
-  viewMatrix[12] = -right[0] * m_camera_pos[0] - right[1] * m_camera_pos[1] - right[2] * m_camera_pos[2];
-  viewMatrix[13] = -up[0] * m_camera_pos[0] - up[1] * m_camera_pos[1] - up[2] * m_camera_pos[2];
-  viewMatrix[14] = -direction[0] * m_camera_pos[0] - direction[1] * m_camera_pos[1] - direction[2] * m_camera_pos[2];
-  viewMatrix[15] = 1.0f;
+void Renderer::draw_obj(ObjLoader obj, Shader* s) {
 
   if(s){
     s->use();
   }
 
-
-  float f = 1.0f / tan(m_fov * 0.5f * (dPI / 180.0f));
-
-  // Perspectiva
-  float projectionMatrix[16] = {
-    f / m_aspectRatio, 0.0f, 0.0f, 0.0f,
-    0.0f, f, 0.0f, 0.0f,
-    0.0f, 0.0f, (m_far + m_near) / (m_near - m_far), -1.0f,
-    0.0f, 0.0f, (2.0f * m_far * m_near) / (m_near - m_far), 0.0f
-  };
-
-   CheckError();
-  s->setMat4("view", viewMatrix);
-  CheckError();
-  
-
-  CheckError();
-  s->setMat4("projection", projectionMatrix);
-  CheckError();
-
-  //s->setVec3("normals", &normals[0]);
-  //CheckError();
-  /*
-  glm::vec3 cameraPosition{m_camera_pos[0], m_camera_pos[1], m_camera_pos[2]};
-
-  glm::mat4 viewMatrix = glm::lookAt(cameraPosition, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-  */
-  //glEnable(GL_CULL_FACE);
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
   //glEnable(GL_FRONT_AND_BACK);
-  //glCullFace(GL_CW);
 
-  CheckError(); // Aqui tiene invalid operation
+  //glDisable(GL_CULL_FACE)
 
-  glDisable(GL_CULL_FACE);
+  glm::vec3 cameraPosition(m_camera_pos[0], m_camera_pos[1], m_camera_pos[2]);
+  glm::vec3 cameraTarget(m_camera_target[0], m_camera_target[1], m_camera_target[2]);
+  glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
 
-  CheckError();
+  glm::mat4 viewMatrix = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+  glm::mat4 projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_near, m_far);
 
-  
-  CheckError();
+  glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-  unsigned int VBO, VAO;
-  VAO = obj.get_vao();
-  VBO = obj.get_vbo();
+  glm::vec3 objectPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::vec3 objectScale = glm::vec3(1.0f, 1.0f, 1.0f);
+  float rotationAngle = 0.0f;
+  glm::vec3 objectRotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
 
+  modelMatrix = glm::translate(modelMatrix, objectPosition);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::scale(modelMatrix, objectScale);
+
+  s->setMat4("view", glm::value_ptr(viewMatrix));
+  s->setMat4("projection", glm::value_ptr(projectionMatrix));
+  s->setMat4("model", glm::value_ptr(modelMatrix));
+
+  unsigned int VAO = obj.get_vao();
+  unsigned int VBO = obj.get_vbo();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
 
-  CheckError();
 
-  std::vector<float> vertices = obj.getVertices();  
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(float), &vertices[0], GL_STATIC_DRAW);
+  std::vector<Vertex_info> vertices = obj.getVertexInfo();  
+
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
+
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
 
-  std::vector<float> normals = obj.getNormals();
-  glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(float), &normals[0], GL_STATIC_DRAW);
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1,3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  s->setVec3("normals", normals.data());
-
-  CheckError();
-
-
- 
-  //glDrawArrays(GL_TRIANGLES, vertices[0], vertices.size() / 3);
-
-  //glDrawArrays(GL_TRIANGLES, 0, vertices.size() / 3);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
 
   std::vector<unsigned int> indices = obj.getIndices();
-
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
-
-  CheckError();
-  glBindVertexArray(0);
-
-  //glBindBuffer(GL_ARRAY_BUFFER, 0);
-
 
 }
 
