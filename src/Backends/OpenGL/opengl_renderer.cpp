@@ -232,6 +232,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s) {
 
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
+  //glCullFace(GL_CW);
   //glEnable(GL_FRONT_AND_BACK);
 
   //glDisable(GL_CULL_FACE)
