@@ -43,7 +43,8 @@ workspace "AndromedEngine"
   
   flags
   {
-    "MultiProcessorCompile"
+    "MultiProcessorCompile",
+    --"FatalWarnings",
   }
 
 group "Core"
