@@ -65,16 +65,11 @@ project "Andromeda"
 
   dependson "Soloud"
 
-  links{
-    "deps/Soloud/bin/Soloud.lib"
-  }
 
   defines
   {
     "_CRT_SECURE_NO_WARNINGS",
     "AND_BUILD_LIB",
-    "WITH_WINMM",
-    ""
   }
 
 
@@ -83,10 +78,6 @@ project "Andromeda"
   {
     "include",
     "src",
-    "deps/Soloud/soloud/include",
-    "deps/Soloud/soloud/src/core",
-    "deps/Soloud/soloud/src/backend",
-    "deps/Soloud/soloud/src/audiosource",
   }
   
   pchheader "andpch.hpp"
@@ -100,8 +91,6 @@ project "Andromeda"
     "include/**.hpp",
     "src/Common/**.*",
     "src/Graphics/**.*",
-    "deps/Soloud/soloud/include/**.h",
-    --"deps/Soloud/soloud/src/**.cpp",
     "include/andpch.hpp",
     "src/andpch.cpp",
     "premake5.lua"
@@ -151,10 +140,6 @@ group "Examples"
   include "examples/Window"
   include "examples/Triangles"
   include "examples/Audio"
-group ""
-
-group "Dependences"
-    include "deps/Soloud"
 group ""
 
 newoption

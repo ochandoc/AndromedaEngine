@@ -1,6 +1,6 @@
 #include "Common/AudioManager.h"
-#include "soloud.h"
-#include "soloud_wav.h"
+#include <AL/al.h>
+#include <AL/alc.h>
 #include <memory>
 
 
@@ -8,9 +8,19 @@
 
 namespace And{
 
+ALCdevice* device;
+ALCcontext* context;
+
 // : m_soloud(std::make_unique<SoLoud::Soloud>())
 AudioManager::AudioManager(){
-  SoLoud::Soloud soloud_engine;
+  //SoLoud::Soloud soloud_engine;
+  device = alcOpenDevice(nullptr);  // nullptr para el dispositivo predeterminado
+  context = alcCreateContext(device, nullptr);
+  alcMakeContextCurrent(context);
+
+  if(!device || !context){
+    printf("\nError\n");
+  }
   init();
 }
 

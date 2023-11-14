@@ -23,8 +23,8 @@ class AudioManager{
 
   private:
     void init();
-    //std::unique_ptr<SoLoud::Soloud> m_soloud;
-    //SoLoud::Soloud m_soloud; // Engine core
+    //ALCdevice* m_device;
+    //ALCcontext* m_context;
 
 
 

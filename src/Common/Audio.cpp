@@ -1,9 +1,6 @@
 #include "Common/Audio.h"
-#include "soloud.h"
-#include "soloud_wav.h"
-
-
-SoLoud::Wav* wav;
+#include <AL/al.h>
+#include <AL/alc.h>
 
 namespace And{
 
