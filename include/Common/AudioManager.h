@@ -1,11 +1,11 @@
 #pragma once
 #include "Audio.h"
 
-//namespace SoLoud{
-  //class Soloud;
-//}
 
 namespace And{
+
+struct AudioContext;
+
 
 class AudioManager{
 
@@ -23,11 +23,8 @@ class AudioManager{
 
   private:
     void init();
-    //ALCdevice* m_device;
-    //ALCcontext* m_context;
-
-
-
+    AudioContext* m_audio_data;
+ 
 };
 
 }

@@ -4,32 +4,52 @@
 #include <memory>
 
 
-//std::unique_ptr<SoLoud::Soloud> soloud_engine;
-
 namespace And{
 
-ALCdevice* device;
-ALCcontext* context;
+struct AudioContext{
+  ALCdevice* device;
+  ALCcontext* context;
+  ALuint source;
+  ALuint buffer;
+};
 
-// : m_soloud(std::make_unique<SoLoud::Soloud>())
-AudioManager::AudioManager(){
-  //SoLoud::Soloud soloud_engine;
-  device = alcOpenDevice(nullptr);  // nullptr para el dispositivo predeterminado
-  context = alcCreateContext(device, nullptr);
-  alcMakeContextCurrent(context);
+// RAII
+AudioManager::AudioManager() : m_audio_data(new AudioContext){
 
-  if(!device || !context){
+  const char * devicename = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
+  m_audio_data->device = alcOpenDevice(devicename);
+  m_audio_data->context = alcCreateContext(m_audio_data->device, nullptr);
+  alcMakeContextCurrent(m_audio_data->context);
+
+  if(!m_audio_data->device || !m_audio_data->context){
     printf("\nError\n");
   }
+
+  // Creamos la fuente
+  alGenSources(1, &(m_audio_data->source));
+  
+  // Creamos el buffer
+  alGenBuffers(1, &(m_audio_data->buffer)); 
+
+  // Asociamos la fuente al buffer
+  alSourcei(m_audio_data->source, AL_BUFFER, m_audio_data->buffer);
+
+  // Reproducimos la fuente
+  alSourcePlay(m_audio_data->source);
+
+
   init();
 }
 
 AudioManager::~AudioManager(){
- // m_soloud->deinit();
+  alcMakeContextCurrent(nullptr);
+  alcDestroyContext(m_audio_data->context);
+  alcCloseDevice(m_audio_data->device);
+  delete m_audio_data;
 }
 
 void AudioManager::init(){
-  //m_soloud->init();
+
 }
 
 void AudioManager::play(Audio audio){

@@ -125,8 +125,8 @@ int main(int argc, char** argv){
 
 
 
-  //And::AudioManager audio_manager;
-  //And::Audio audio;
+  And::AudioManager audio_manager;
+  And::Audio audio;
   //audio.load("../../data/");
 
   //audio_manager.play(audio);

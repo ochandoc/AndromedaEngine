@@ -4,21 +4,38 @@
 
 namespace And{
 
-// : m_sample(std::make_shared<SoLoud::Wav>())
-Audio::Audio() {
-  //m_sample->createInstance();
+
+  struct AudioData{
+    ALuint buffer;
+    ALenum format;
+    ALvoid* data;
+    ALsizei size;
+    ALsizei frequency;
+    ALboolean loop;
+  }
+
+
+Audio::Audio() : m_audio_data(new AudioData){
+
 }
 
-Audio::~Audio(){}
+Audio::~Audio(){
+  
+  alDeleteBuffers(1, &(m_audio_data->buffer));
+  free(m_audio_data->data);
+  delete m_audio_data;
+}
 
-//SoLoud::Wav* Audio::get_sample(){
-  //return m_sample.get();
-  //return nullptr;
-//}
 
 void Audio::load(const char* path){
   if(path){
-    //m_sample->load(path);
+    if (loadWAVFile(path, &(m_audio_data->format), &(m_audio_data->data),&( m_audio_data->size), &(m_audio_data->frequency), &(m_audio_data->loop))) {
+
+      alGenBuffers(1, &(m_audio_data->buffer));
+      alBufferData(&(m_audio_data->buffer), &(m_audio_data->format), &(m_audio_data->data), &(m_audio_data->size), &(m_audio_data->frequency));
+
+    }
+    
   }
 
 }
