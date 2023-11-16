@@ -129,9 +129,11 @@ int main(int argc, char** argv){
   And::Audio pepe_stereo;
   And::Audio pepe_mono;
   And::Audio door;
+  And::Audio buscan_casa;
   pepe_stereo.load("../../data/audio/pepe_stereo.wav", "Pepe stereo");
   pepe_mono.load("../../data/audio/pepe_mono.wav", "Pepe mono");
   door.load("../../data/audio/door.wav", "Door");
+  buscan_casa.load("../../data/audio/buscan_casa.wav", "Fin y Jake");
 
 
   //audio.load("../../data/");
@@ -147,6 +149,7 @@ int main(int argc, char** argv){
     audio_manager.show_imgui(pepe_stereo);
     audio_manager.show_imgui(pepe_mono);
     audio_manager.show_imgui(door);
+    audio_manager.show_imgui(buscan_casa);
   
     
     //input.update_input();

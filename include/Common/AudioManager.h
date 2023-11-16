@@ -22,7 +22,6 @@ class AudioManager{
     void stop(Audio& audio);
 
     void show_imgui(Audio& audio);
-
     bool isPlaying(Audio& audio);
 
 
