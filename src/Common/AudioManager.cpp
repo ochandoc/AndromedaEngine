@@ -27,35 +27,18 @@ AudioManager::AudioManager() : m_audio_data(new AudioContext){
 
   // Creamos la fuente
   alGenSources(1, &(m_audio_data->source));
-  
-  // Creamos el buffer
-  //alGenBuffers(1, &(m_audio_data->buffer)); 
-
-  // Asociamos la fuente al buffer
-  //alSourcei(m_audio_data->source, AL_BUFFER, m_audio_data->buffer);
-
-  // Reproducimos la fuente
-  //alSourcePlay(m_audio_data->source);
-
-
-  init();
 }
 
 AudioManager::~AudioManager(){
-  printf("*** Audio manager destructor *** \n");
   alcMakeContextCurrent(nullptr);
   alcDestroyContext(m_audio_data->context);
   alcCloseDevice(m_audio_data->device);
   delete m_audio_data;
 }
 
-void AudioManager::init(){
-
-}
 
 // El audio contiene el buffer a reproducir
 void AudioManager::play(Audio& audio){
-
 
 
   alSourcei(m_audio_data->source, AL_BUFFER, audio.get_buffer());

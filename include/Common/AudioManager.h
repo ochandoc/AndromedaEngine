@@ -22,7 +22,6 @@ class AudioManager{
 
 
   private:
-    void init();
     AudioContext* m_audio_data;
  
 };

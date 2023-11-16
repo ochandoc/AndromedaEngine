@@ -130,23 +130,14 @@ bool LoadWavFile(const std::string filename, ALuint* buffer, ALsizei* size, ALsi
 
 
 
-void Audio::load(const char* path){
+bool Audio::load(const char* path){
   if(path){
 
     m_audio_data->filename = path;
     
     bool succes = LoadWavFile(m_audio_data->filename, &(m_audio_data->buffer), &(m_audio_data->size), &(m_audio_data->frequency), &(m_audio_data->format));
 
-    //if (loadWAV(path, &(m_audio_data->format), &(m_audio_data->data),&( m_audio_data->size), &(m_audio_data->frequency), &(m_audio_data->loop))) {
-
-      //alGenBuffers(1, &(m_audio_data->buffer));
-      //alBufferData(&(m_audio_data->buffer), &(m_audio_data->format), &(m_audio_data->data), &(m_audio_data->size), &(m_audio_data->frequency));
-
-    //}
-    if (succes) {
-        printf("ole los caracoles\n");
-
-    }
+    return succes;
     
   }
 

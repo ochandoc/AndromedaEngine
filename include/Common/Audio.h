@@ -47,7 +47,7 @@ class Audio{
 
     ~Audio();
 
-    void load(const char* path);
+    bool load(const char* path);
 
     unsigned int get_buffer();
 
