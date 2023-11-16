@@ -2,6 +2,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <memory>
+#include "imgui.h"
 
 
 namespace And{
@@ -26,7 +27,7 @@ AudioManager::AudioManager() : m_audio_data(new AudioContext){
   }
 
   // Creamos la fuente
-  alGenSources(1, &(m_audio_data->source));
+  //alGenSources(1, &(m_audio_data->source));
 }
 
 AudioManager::~AudioManager(){
@@ -36,22 +37,54 @@ AudioManager::~AudioManager(){
   delete m_audio_data;
 }
 
+bool AudioManager::isPlaying(Audio& audio){
+  ALuint source = audio.get_source();
+  ALint source_state;
+  alGetSourcei(source, AL_SOURCE_STATE, &source_state);
+  return (source_state == AL_PLAYING);
+}
 
 // El audio contiene el buffer a reproducir
 void AudioManager::play(Audio& audio){
+  ALuint src = audio.get_source();
 
-
-  alSourcei(m_audio_data->source, AL_BUFFER, audio.get_buffer());
-  alSourcePlay(m_audio_data->source);
-
-  
+  if(!isPlaying(audio)){
+    alSourcei(src, AL_BUFFER, audio.get_buffer());
+    alSourcePlay(src);
+  }
 }
 
 void AudioManager::pause(Audio& audio){
+  alSourcePause(audio.get_source());
+}
 
+void AudioManager::resume(Audio& audio){
+  alSourcePlay(audio.get_source());
 }
 
 void AudioManager::stop(Audio& audio){
+  alSourceStop(audio.get_source());
+}
 
+
+void AudioManager::show_imgui(Audio& audio){
+
+  if(ImGui::CollapsingHeader(audio.get_name())){
+    if(ImGui::Button("Play")){
+      play(audio);
+    }
+    
+    if(ImGui::Button("Pause")){
+      pause(audio);
+    }
+   
+    if(ImGui::Button("Resume")){
+      resume(audio);
+    }
+    
+    if(ImGui::Button("Stop")){
+      stop(audio);
+    }
+  }
 }
 }
