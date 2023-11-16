@@ -7,10 +7,12 @@ namespace And{
 
   struct AudioData{
     std::string filename;
+    const char* name;
     ALuint buffer;
     ALsizei size;
     ALsizei frequency; 
     ALenum format;
+    ALuint source;
   };
 
 
@@ -19,7 +21,8 @@ Audio::Audio() : m_audio_data(new AudioData){
 }
 
 Audio::~Audio(){
-  printf("*** Audio destructor *** \n");
+  alSourceStop(m_audio_data->source);
+  alDeleteSources(1, &(m_audio_data->source));
   alDeleteBuffers(1, &(m_audio_data->buffer));
   delete m_audio_data;
 }
@@ -130,13 +133,25 @@ bool LoadWavFile(const std::string filename, ALuint* buffer, ALsizei* size, ALsi
 
 
 
-bool Audio::load(const char* path){
+bool Audio::load(const char* path, const char* name){
   if(path){
 
     m_audio_data->filename = path;
     
     bool succes = LoadWavFile(m_audio_data->filename, &(m_audio_data->buffer), &(m_audio_data->size), &(m_audio_data->frequency), &(m_audio_data->format));
 
+    if(!succes){
+      printf("\n*** Error loading WAV file ***\n");
+    
+    }else{
+      // Creamos la fuente
+      alGenSources(1, &(m_audio_data->source));
+      if(name){
+        m_audio_data->name = name;
+      }else{
+        m_audio_data->name = {"Unnamed"};
+      }
+    }
     return succes;
     
   }
@@ -147,6 +162,17 @@ bool Audio::load(const char* path){
 unsigned int Audio::get_buffer(){
 
   return m_audio_data->buffer;
+}
+
+unsigned int Audio::get_source(){
+
+  return m_audio_data->source;
+}
+
+
+const char* Audio::get_name(){
+
+  return m_audio_data->name;
 }
 
 }

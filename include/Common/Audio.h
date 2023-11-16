@@ -1,6 +1,8 @@
 #pragma once
 
 
+
+
 namespace And{
 
 struct AudioData;
@@ -47,9 +49,13 @@ class Audio{
 
     ~Audio();
 
-    bool load(const char* path);
+    bool load(const char* path, const char* name = nullptr);
 
     unsigned int get_buffer();
+    unsigned int get_source();
+
+    const char* get_name();
+
 
   private:
 
