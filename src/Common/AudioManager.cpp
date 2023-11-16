@@ -29,19 +29,20 @@ AudioManager::AudioManager() : m_audio_data(new AudioContext){
   alGenSources(1, &(m_audio_data->source));
   
   // Creamos el buffer
-  alGenBuffers(1, &(m_audio_data->buffer)); 
+  //alGenBuffers(1, &(m_audio_data->buffer)); 
 
   // Asociamos la fuente al buffer
-  alSourcei(m_audio_data->source, AL_BUFFER, m_audio_data->buffer);
+  //alSourcei(m_audio_data->source, AL_BUFFER, m_audio_data->buffer);
 
   // Reproducimos la fuente
-  alSourcePlay(m_audio_data->source);
+  //alSourcePlay(m_audio_data->source);
 
 
   init();
 }
 
 AudioManager::~AudioManager(){
+  printf("*** Audio manager destructor *** \n");
   alcMakeContextCurrent(nullptr);
   alcDestroyContext(m_audio_data->context);
   alcCloseDevice(m_audio_data->device);
@@ -52,20 +53,22 @@ void AudioManager::init(){
 
 }
 
-void AudioManager::play(Audio audio){
-  //if(audio){
+// El audio contiene el buffer a reproducir
+void AudioManager::play(Audio& audio){
 
-    //auto audioSource = m_soloud->play(std::move(*audio->get_sample()));
 
-    //m_soloud->play(audio->get_sample());
-  //}
+
+  alSourcei(m_audio_data->source, AL_BUFFER, audio.get_buffer());
+  alSourcePlay(m_audio_data->source);
+
+  
 }
 
-void AudioManager::pause(Audio* audio){
+void AudioManager::pause(Audio& audio){
 
 }
 
-void AudioManager::stop(Audio* audio){
+void AudioManager::stop(Audio& audio){
 
 }
 }

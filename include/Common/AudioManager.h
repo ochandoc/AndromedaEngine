@@ -16,9 +16,9 @@ class AudioManager{
 
     ~AudioManager();
 
-    void play(Audio audio);
-    void pause(Audio* audio);
-    void stop(Audio* audio);
+    void play(Audio& audio);
+    void pause(Audio& audio);
+    void stop(Audio& audio);
 
 
   private:
