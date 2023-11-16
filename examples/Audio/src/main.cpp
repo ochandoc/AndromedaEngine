@@ -126,10 +126,14 @@ int main(int argc, char** argv){
 
 
   And::AudioManager audio_manager;
-  And::Audio audio;
-  audio.load("../../data/audio/pepe_mono.wav");
+  And::Audio pepe_stereo;
+  And::Audio pepe_mono;
+  And::Audio door;
+  pepe_stereo.load("../../data/audio/pepe_stereo.wav", "Pepe stereo");
+  pepe_mono.load("../../data/audio/pepe_mono.wav", "Pepe mono");
+  door.load("../../data/audio/door.wav", "Door");
 
-  audio_manager.play(audio);
+
   //audio.load("../../data/");
 
   //audio_manager.play(audio);
@@ -139,7 +143,11 @@ int main(int argc, char** argv){
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
-    
+
+    audio_manager.show_imgui(pepe_stereo);
+    audio_manager.show_imgui(pepe_mono);
+    audio_manager.show_imgui(door);
+  
     
     //input.update_input();
     g_renderer.end_frame();
