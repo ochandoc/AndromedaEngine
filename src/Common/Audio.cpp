@@ -16,6 +16,16 @@ namespace And{
   };
 
 
+  struct AudioEffect{
+    ALfloat source_pos[3];
+    ALfloat source_vel[3];
+
+    float pitch;
+    float gain;
+    unsigned int looping;
+  };
+
+
 Audio::Audio() : m_audio_data(new AudioData){
 
 }

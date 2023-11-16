@@ -40,6 +40,9 @@ struct WAVE_Data {
 	long subChunk2Size;  //Stores the size of the data block
 };
 
+
+struct AudioEffect;
+
 class Audio{
 
   public:
@@ -60,6 +63,7 @@ class Audio{
   private:
 
    AudioData* m_audio_data;
+   AudioEffect* m_audio_effect;
 }; 
 
 }
