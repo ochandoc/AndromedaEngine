@@ -31,7 +31,7 @@ AudioManager::AudioManager() : m_audio_data(new AudioContext){
 }
 
 AudioManager::~AudioManager(){
-  alcMakeContextCurrent(nullptr);
+  alcMakeContextCurrent(nullptr); 
   alcDestroyContext(m_audio_data->context);
   alcCloseDevice(m_audio_data->device);
   delete m_audio_data;
