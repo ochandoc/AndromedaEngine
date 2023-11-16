@@ -70,20 +70,45 @@ void AudioManager::stop(Audio& audio){
 void AudioManager::show_imgui(Audio& audio){
 
   if(ImGui::CollapsingHeader(audio.get_name())){
-    if(ImGui::Button("Play")){
-      play(audio);
-    }
+
+      {
+        std::string ButtonName = "Play";
+        ButtonName += "##";
+        ButtonName += audio.get_name();
+        if(ImGui::Button(ButtonName.c_str())){
+          play(audio);
+        }
+      }
+
+    ImGui::SameLine();
     
-    if(ImGui::Button("Pause")){
-      pause(audio);
+    {
+        std::string ButtonName = "Pause";
+        ButtonName += "##";
+        ButtonName += audio.get_name();
+        if(ImGui::Button(ButtonName.c_str())){
+          pause(audio);
+        }
     }
+    ImGui::SameLine();
    
-    if(ImGui::Button("Resume")){
-      resume(audio);
+    {
+        std::string ButtonName = "Resume";
+        ButtonName += "##";
+        ButtonName += audio.get_name();
+        if(ImGui::Button(ButtonName.c_str())){
+          resume(audio);
+        }
     }
+    ImGui::SameLine();
     
-    if(ImGui::Button("Stop")){
-      stop(audio);
+    {
+        std::string ButtonName = "Stop";
+        ButtonName += "##";
+        ButtonName += audio.get_name();
+        if(ImGui::Button(ButtonName.c_str())){
+          stop(audio);
+        }
     }
   }
 }
