@@ -65,11 +65,6 @@ int main(int argc, char** argv){
 
   And::Engine e;
 
-  And::Logger::GetInstane()->Log(And::LogLevel::Trace, "Trace");
-  And::Logger::GetInstane()->Log(And::LogLevel::Info, "Info");
-  And::Logger::GetInstane()->Log(And::LogLevel::Error, "Error");
-  And::Logger::GetInstane()->Log(And::LogLevel::Critical, "Critical");
-
   And::JobSystem js;
 
   And::future<int> f{ 10 };
