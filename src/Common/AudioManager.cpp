@@ -1,7 +1,7 @@
 #include "Common/AudioManager.h"
+#include "Common/Audio.h"
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <memory>
 #include "imgui.h"
 
 
@@ -49,6 +49,7 @@ void AudioManager::play(Audio& audio){
   ALuint src = audio.get_source();
 
   if(!isPlaying(audio)){
+    audio.ApplyEffects();
     alSourcei(src, AL_BUFFER, audio.get_buffer());
     alSourcePlay(src);
   }
@@ -101,7 +102,6 @@ void AudioManager::show_imgui(Audio& audio){
         }
     }
     ImGui::SameLine();
-    
     {
         std::string ButtonName = "Stop";
         ButtonName += "##";
@@ -110,6 +110,76 @@ void AudioManager::show_imgui(Audio& audio){
           stop(audio);
         }
     }
+
+    ImGui::SameLine();
+
+    if (ImGui::CollapsingHeader("Effects")) {
+
+
+        {
+            std::string ButtonName = "Pitch";
+            ButtonName += "##";
+            ButtonName += audio.get_name();
+            float pitch = audio.GetPitch();
+            ImGui::DragFloat(ButtonName.c_str(), &pitch, 0.1f, 0.5f, 2.0f);
+            audio.SetPitch(pitch);
+            audio.ApplyEffects();
+            
+        }
+        
+        {
+            std::string ButtonName = "Gain";
+            ButtonName += "##";
+            ButtonName += audio.get_name();
+            float value = audio.GetGain();
+            ImGui::DragFloat(ButtonName.c_str(), &value, 0.1f, 0.0f);
+            audio.SetGain(value);
+            audio.ApplyEffects();
+            
+        }
+        {
+            std::string ButtonName = "Position";
+            ButtonName += "##";
+            ButtonName += audio.get_name();
+
+            float position[3];
+            audio.GetPosition(position[0], position[1], position[2]);
+            ImGui::DragFloat3(ButtonName.c_str(), position, 0.1f, 0.0f);
+            audio.SetPosition(position);
+            audio.ApplyEffects();
+
+        }
+        
+        {
+            std::string ButtonName = "Velocity";
+            ButtonName += "##";
+            ButtonName += audio.get_name();
+
+            float v[3];
+            audio.GetVelocity(v[0], v[1], v[2]);
+            ImGui::DragFloat3(ButtonName.c_str(), v, 0.1f, 0.0f);
+            audio.SetVelocity(v);
+            audio.ApplyEffects();
+
+        }
+        
+        {
+            std::string ButtonName = "Looping";
+            ButtonName += "##";
+            ButtonName += audio.get_name();
+            bool value = audio.GetLooping();
+            ImGui::Checkbox(ButtonName.c_str(),&value);
+            audio.SetLooping(value);
+            audio.ApplyEffects();
+            
+        }
+
+
+
+
+        
+    }
+    
   }
 }
 }
