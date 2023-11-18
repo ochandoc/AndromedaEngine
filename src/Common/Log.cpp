@@ -39,7 +39,7 @@ namespace And
   {
     static std::vector<internal::LogCategoryInfo> s_Categories;
 
-    LogCategoryBase::LogCategoryBase(const char* name, LogLevel DefaultCategoryLevel) : m_CategoryName(name), m_DefaultLevel(DefaultCategoryLevel)
+    LogCategoryBase::LogCategoryBase(const char* name, LogLevel DefaultCategoryLevel, bool ConsoleLog) : m_CategoryName(name), m_DefaultLevel(DefaultCategoryLevel)
     {
       m_Id = GetNextId();
       m_Logger = std::make_shared<Logger>(name);
@@ -80,7 +80,7 @@ namespace And
       static_cast<ImGuiSink*>(ImSink.get())->m_LogCategoriesIds.insert({name, m_Id});
 
       m_Logger->sinks().push_back(ImSink);
-      m_Logger->sinks().push_back(sink);
+      if (ConsoleLog) m_Logger->sinks().push_back(sink);
       m_Logger->sinks().push_back(FileSink);
       m_Logger->set_level(spdlog::level::trace);
 
@@ -101,13 +101,13 @@ namespace And
       }
     }
 
-    uint64 LogCategoryBase::GetNextId()
+    uint32 LogCategoryBase::GetNextId()
     {
       static uint8 CurrentId = 0;
-      uint64 id = 0;
+      uint32 id = 0;
       if (CurrentId <= 64)
       {
-        id = 1 << CurrentId;
+        id = 1ll << CurrentId;
         CurrentId++;
       }
       return id;
@@ -119,7 +119,7 @@ namespace And
   {
     static char SearchText[1024];
     static bool EnableAutoScrolling = true;
-    static uint64 LogCategoryId = -1;
+    static uint32 LogCategoryId = -1;
     static bool bTrace = false;
     static bool bDebug = false;
     static bool bInfo = true;
@@ -149,9 +149,9 @@ namespace And
           {
             ImGui::CheckboxFlags("Show All", (int*)&LogCategoryId, -1);
             ImGui::Separator();
-            for (internal::LogCategoryInfo& CategoryInfo : internal::s_Categories)
+            for (const internal::LogCategoryInfo& CategoryInfo : internal::s_Categories)
             {
-              ImGui::CheckboxFlags(CategoryInfo.Name.c_str(), (int*)&LogCategoryId, CategoryInfo.Id);
+              ImGui::CheckboxFlags(CategoryInfo.Name.c_str(), &LogCategoryId, CategoryInfo.Id);
             }
             ImGui::EndMenu();
           }
@@ -191,7 +191,7 @@ namespace And
         if (ImGui::BeginChild("ConsoleLogView", ImVec2(0, 0), false, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_AlwaysHorizontalScrollbar))
         {
 
-          for (SinkLineContent& LineContent : ImGuiSink::LogData)
+          for (const SinkLineContent& LineContent : ImGuiSink::LogData)
           {
             if (LineContent.CategoryId & LogCategoryId)
             {

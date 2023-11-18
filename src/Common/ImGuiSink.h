@@ -14,16 +14,8 @@ namespace And
   {
     uint8 Level;
     std::string Text;
-    uint64 CategoryId;
+    uint32 CategoryId;
     const ImVec4* Color;
-    /*struct ColorDataRanges
-    {
-      uint32_t SubStringBegin : 12;
-      uint32_t SubStringEnd : 12;
-      uint32_t FormatTag : 8;
-    };
-
-    ImVector<ColorDataRanges> FormattedStringRanges;*/
   };
 
   class ImGuiSink : public spdlog::sinks::base_sink<std::mutex>
@@ -34,7 +26,7 @@ namespace And
 
     virtual ~ImGuiSink();
 
-    std::unordered_map<std::string, uint64> m_LogCategoriesIds;
+    std::unordered_map<std::string, uint32> m_LogCategoriesIds;
   protected:
     virtual void sink_it_(const spdlog::details::log_msg& msg) override;
     virtual void flush_() override;

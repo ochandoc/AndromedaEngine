@@ -27,26 +27,26 @@ namespace And
     struct LogCategoryInfo
     {
       std::string Name;
-      uint64 Id;
+      uint32 Id;
     };
 
     struct LogCategoryBase
     {
       using Logger = class spdlog::logger;
 
-      LogCategoryBase(const char* name, LogLevel DefaultCategoryLevel);
+      LogCategoryBase(const char* name, LogLevel DefaultCategoryLevel, bool ConsoleLog);
 
       void log(LogLevel Level, const char* Message);
 
       friend class LogWindow;
 
     private:
-      static uint64 GetNextId();
+      static uint32 GetNextId();
 
     private:
       LogLevel m_DefaultLevel;
       const std::string m_CategoryName;
-      uint64 m_Id;
+      uint32 m_Id;
       std::shared_ptr<Logger> m_Logger;
       bool Registered = false;
     };
@@ -54,14 +54,15 @@ namespace And
     
   }
 
-  template<LogLevel InCategoryLevel>
+  template<LogLevel InCategoryLevel, bool InConsoleLog>
   struct LogCategory : public internal::LogCategoryBase
   {
     static constexpr LogLevel CategoryLevel = InCategoryLevel;
+    static constexpr bool ConsoleLog = InConsoleLog;
 
     inline constexpr LogLevel GetCategoryLevel() const { return CategoryLevel; }
 
-    inline LogCategory(const char* CategoryName) : LogCategoryBase(CategoryName, InCategoryLevel) {}
+    inline LogCategory(const char* CategoryName) : LogCategoryBase(CategoryName, InCategoryLevel, InConsoleLog) {}
   };
 
   class LogWindow
@@ -78,8 +79,8 @@ namespace And
   };
 }
 
-#define DECLARE_LOG_CATEGORY(CategoryName, DefaultLevel) \
-  extern struct LogCategory##CategoryName : public ::And::LogCategory<::And::DefaultLevel> \
+#define DECLARE_LOG_CATEGORY(CategoryName, DefaultLevel, LogInConsole) \
+  extern struct LogCategory##CategoryName : public ::And::LogCategory<::And::DefaultLevel, LogInConsole> \
   { \
     inline LogCategory##CategoryName() : LogCategory(#CategoryName) {} \
   } CategoryName;
