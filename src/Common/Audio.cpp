@@ -19,14 +19,24 @@ namespace And{
   struct AudioEffect{
     ALfloat source_pos[3];
     ALfloat source_vel[3];
-
     float pitch;
     float gain;
     unsigned int looping;
   };
 
 
-Audio::Audio() : m_audio_data(new AudioData){
+Audio::Audio() : m_audio_data(new AudioData), m_audio_effect(new AudioEffect){
+    m_audio_effect->pitch = 1.0f;
+    m_audio_effect->gain = 1.0f;
+    m_audio_effect->looping = 0;
+
+    m_audio_effect->source_pos[0] = 0.0f;
+    m_audio_effect->source_pos[1] = 0.0f;
+    m_audio_effect->source_pos[2] = 0.0f;
+
+    m_audio_effect->source_vel[0] = 0.0f;
+    m_audio_effect->source_vel[1] = 0.0f;
+    m_audio_effect->source_vel[2] = 0.0f;
 
 }
 
@@ -169,6 +179,59 @@ bool Audio::load(const char* path, const char* name){
 }
 
 
+void Audio::ApplyEffects() {
+    
+    alSourcef(m_audio_data->source, AL_PITCH, m_audio_effect->pitch);
+    alSourcef(m_audio_data->source, AL_GAIN, m_audio_effect->gain);
+    alSourcefv(m_audio_data->source, AL_POSITION, m_audio_effect->source_pos);
+    alSourcefv(m_audio_data->source, AL_VELOCITY, m_audio_effect->source_vel);
+    alSourcei(m_audio_data->source, AL_LOOPING, m_audio_effect->looping);
+}
+
+
+void Audio::SetPitch(float pitch){
+    if (pitch > 2.5f)pitch = 2.5f;
+    if (pitch < 0.5f) pitch = 0.5f;
+
+    m_audio_effect->pitch = pitch;
+}
+void Audio::SetGain(float gain) {
+    if (gain < 0.0f) gain = 0.0f;
+    m_audio_effect->gain = gain;
+}
+
+void Audio::SetPosition(float x, float y, float z){
+    m_audio_effect->source_pos[0] = x;
+    m_audio_effect->source_pos[1] = y;
+    m_audio_effect->source_pos[2] = z;
+}
+
+void Audio::SetPosition(float p[3]) {
+    m_audio_effect->source_pos[0] = p[0];
+    m_audio_effect->source_pos[1] = p[1];
+    m_audio_effect->source_pos[2] = p[2];
+}
+
+void Audio::SetVelocity(float x, float y, float z){
+    m_audio_effect->source_vel[0] = x;
+    m_audio_effect->source_vel[1] = y;
+    m_audio_effect->source_vel[2] = z;
+}
+
+void Audio::SetVelocity(float v[3]) {
+    m_audio_effect->source_vel[0] = v[0];
+    m_audio_effect->source_vel[1] = v[1];
+    m_audio_effect->source_vel[2] = v[2];
+}
+void Audio::SetLooping(bool loop){
+
+    if (loop) {
+        m_audio_effect->looping = 1;
+    }else {
+        m_audio_effect->looping = 0;
+    }
+}
+
 unsigned int Audio::get_buffer(){
 
   return m_audio_data->buffer;
@@ -183,6 +246,29 @@ unsigned int Audio::get_source(){
 const char* Audio::get_name(){
 
   return m_audio_data->name;
+}
+
+float Audio::GetPitch() {
+    return m_audio_effect->pitch;
+}
+
+float Audio::GetGain() {
+    return m_audio_effect->gain;
+}
+
+void Audio::GetPosition(float& x, float& y, float& z) {
+    x = m_audio_effect->source_pos[0];
+    y = m_audio_effect->source_pos[1];
+    z = m_audio_effect->source_pos[2];
+}
+
+void Audio::GetVelocity(float& x, float& y, float& z) {
+    x = m_audio_effect->source_vel[0];
+    y = m_audio_effect->source_vel[1];
+    z = m_audio_effect->source_vel[2];
+}
+bool Audio::GetLooping(){
+    return m_audio_effect->looping;
 }
 
 }

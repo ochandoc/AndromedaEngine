@@ -2,10 +2,12 @@
 
 
 
-
 namespace And{
+class AudioManager;
+
 
 struct AudioData;
+struct AudioEffect;
 
 /*
 * Struct that holds the RIFF data of the Wave file.
@@ -41,9 +43,11 @@ struct WAVE_Data {
 };
 
 
-struct AudioEffect;
+
 
 class Audio{
+
+
 
   public:
     Audio();
@@ -56,14 +60,41 @@ class Audio{
 
     unsigned int get_buffer();
     unsigned int get_source();
+	
+	
+	// Must be 0.0f to 1.0f
+	void SetPitch(float pitch);
+
+	// Must be 0.0f to 1.0f
+	void SetGain(float gain);
+	
+	void SetPosition(float x, float y, float z);
+	void SetPosition(float position[3]);
+
+	void SetVelocity(float x, float y, float z);
+	void SetVelocity(float velocity[3]);
+
+	void SetLooping(bool loop);
+	
+	float GetPitch();
+	float GetGain();
+	void GetPosition(float& x, float& y, float& z);
+	void GetVelocity(float& x, float& y, float& z);
+	bool GetLooping();
+
 
     const char* get_name();
 
+	friend class AudioManager;
+
+protected:
+	void ApplyEffects();
+	AudioEffect* m_audio_effect;
+	AudioData* m_audio_data;
 
   private:
 
-   AudioData* m_audio_data;
-   AudioEffect* m_audio_effect;
+
 }; 
 
 }

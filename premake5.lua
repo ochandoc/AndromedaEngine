@@ -63,9 +63,6 @@ project "Andromeda"
   -- Carpeta donde van a ir los obj generados
   objdir "build/%{prj.name}/%{cfg.buildcfg}"
 
-  dependson "Soloud"
-
-
   defines
   {
     "_CRT_SECURE_NO_WARNINGS",

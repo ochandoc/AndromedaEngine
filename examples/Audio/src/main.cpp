@@ -124,8 +124,8 @@ int main(int argc, char** argv){
   double mouseXx = -1.0f, mouseYy = -1.0f;
 
 
-
   And::AudioManager audio_manager;
+
   And::Audio pepe_stereo;
   And::Audio pepe_mono;
   And::Audio door;
@@ -134,6 +134,10 @@ int main(int argc, char** argv){
   pepe_mono.load("../../data/audio/pepe_mono.wav", "Pepe mono");
   door.load("../../data/audio/door.wav", "Door");
   buscan_casa.load("../../data/audio/buscan_casa.wav", "Fin y Jake");
+
+  buscan_casa.SetPitch(1.0f);
+
+
 
 
   //audio.load("../../data/");
@@ -146,10 +150,12 @@ int main(int argc, char** argv){
     window->update();
     g_renderer.new_frame();
 
+  
     audio_manager.show_imgui(pepe_stereo);
     audio_manager.show_imgui(pepe_mono);
     audio_manager.show_imgui(door);
     audio_manager.show_imgui(buscan_casa);
+  
   
     
     //input.update_input();
