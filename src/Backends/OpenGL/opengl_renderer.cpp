@@ -65,8 +65,6 @@ void Renderer::new_frame()
 
 void Renderer::end_frame()
 {
-  ImGui::ShowDemoWindow();
-
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	m_Window.end_frame();
@@ -158,6 +156,11 @@ void Renderer::showDemo(){
   //glDeleteBuffers(1, &VAO);
   //glDeleteBuffers(1, &VBO);
 
+}
+
+void Renderer::showImGuiDemoWindow()
+{
+  ImGui::ShowDemoWindow();
 }
 
 

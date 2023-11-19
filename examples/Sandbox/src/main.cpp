@@ -32,6 +32,7 @@
 #include "Common/EntityComponentSystem.h"
 
 #include "Common/JobSystem.h"
+#include "Common/Logger.h"
 
 int select_num(int i)
 {

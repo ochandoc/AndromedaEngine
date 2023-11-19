@@ -136,6 +136,7 @@ group "Examples"
   include "examples/EntityComponentSystem"
   include "examples/Window"
   include "examples/Triangles"
+  include "examples/Logger"
 group ""
 
 newoption
