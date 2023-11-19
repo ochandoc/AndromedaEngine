@@ -32,6 +32,7 @@
 #include "Common/EntityComponentSystem.h"
 #include "Common/AudioManager.h"
 #include "Common/Audio.h"
+#include "Common/Timer.h"
 
 
 
@@ -136,6 +137,7 @@ int main(int argc, char** argv){
   buscan_casa.load("../../data/audio/buscan_casa.wav", "Fin y Jake");
 
   buscan_casa.SetPitch(1.0f);
+  buscan_casa.SetPosition(1.0f, 0.0f, 0.0f);
 
 
 
@@ -146,19 +148,44 @@ int main(int argc, char** argv){
 
 
   float speed = 0.01f;
+
+  Timer timer;
+
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
+    audio_manager.Update();
+
+    float dt = timer.GetDeltaTime();
 
   
     audio_manager.show_imgui(pepe_stereo);
     audio_manager.show_imgui(pepe_mono);
     audio_manager.show_imgui(door);
     audio_manager.show_imgui(buscan_casa);
+
+    if (audio_manager.isPlaying(pepe_mono)) {
+        float pepe_mono_position[3];
+        float pepe_mono_velocity[3];
+
+        pepe_mono.GetPosition(pepe_mono_position);
+        pepe_mono.GetVelocity(pepe_mono_velocity);
+
+        pepe_mono_position[0] += pepe_mono_velocity[0] * dt;
+        pepe_mono_position[1] += pepe_mono_velocity[1] * dt;
+        pepe_mono_position[2] += pepe_mono_velocity[2] * dt;
+
+        pepe_mono.SetPosition(pepe_mono_position);
+    }
+
+    
+
+
   
   
     
     //input.update_input();
+    
     g_renderer.end_frame();
     window->swap_buffers();
   }
