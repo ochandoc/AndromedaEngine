@@ -2,8 +2,16 @@
 #include "Common/Audio.h"
 #include <AL/al.h>
 #include <AL/alc.h>
+#include <AL/alext.h>
+#include <AL/alext.h>
 #include "imgui.h"
 
+
+
+// Definiciones de funciones de EFX
+//AL_API ALvoid AL_APIENTRY alGenEffects(ALsizei n, ALuint* effects);
+//AL_API ALvoid AL_APIENTRY alDeleteEffects(ALsizei n, const ALuint* effects);
+//AL_API ALboolean AL_APIENTRY alIsEffect(ALuint effect);
 
 namespace And{
 
@@ -13,6 +21,9 @@ struct AudioContext{
   ALuint source;
   ALuint buffer;
 };
+
+
+
 
 // RAII
 AudioManager::AudioManager() : m_audio_data(new AudioContext){
@@ -26,8 +37,32 @@ AudioManager::AudioManager() : m_audio_data(new AudioContext){
     printf("\nError\n");
   }
 
-  // Creamos la fuente
-  //alGenSources(1, &(m_audio_data->source));
+
+  // Check version para los efectos
+  ALCint major, minor;
+  alcGetIntegerv(m_audio_data->device, ALC_MAJOR_VERSION, sizeof(ALint), &major);
+  alcGetIntegerv(m_audio_data->device, ALC_MINOR_VERSION, sizeof(ALint), &minor);
+  if (major == 0 && minor == 0) {
+      printf("*** No es compatible ***\n");
+  }
+  else {
+      printf("*** Es compatible **\n");
+  }
+
+
+
+  if (alcIsExtensionPresent(m_audio_data->device, "ALC_EXT_EFX") == AL_TRUE) {
+      m_efx_available_ = true;
+      printf("ALC_EXT_EFX found\n");
+      //ALuint effect;
+      //alGenEffects(1, &effect);
+
+  }
+  else {
+      m_efx_available_ = false;
+  }
+
+
 }
 
 AudioManager::~AudioManager(){
@@ -35,6 +70,10 @@ AudioManager::~AudioManager(){
   alcDestroyContext(m_audio_data->context);
   alcCloseDevice(m_audio_data->device);
   delete m_audio_data;
+}
+
+void AudioManager::Update() {
+    alcProcessContext(m_audio_data->context);
 }
 
 bool AudioManager::isPlaying(Audio& audio){
@@ -121,9 +160,9 @@ void AudioManager::show_imgui(Audio& audio){
             ButtonName += "##";
             ButtonName += audio.get_name();
             float pitch = audio.GetPitch();
-            ImGui::DragFloat(ButtonName.c_str(), &pitch, 0.1f, 0.5f, 2.0f);
+            ImGui::DragFloat(ButtonName.c_str(), &pitch, 0.05f, 0.5f, 2.0f);
             audio.SetPitch(pitch);
-            audio.ApplyEffects();
+            //audio.ApplyEffects();
             
         }
         
@@ -134,7 +173,7 @@ void AudioManager::show_imgui(Audio& audio){
             float value = audio.GetGain();
             ImGui::DragFloat(ButtonName.c_str(), &value, 0.1f, 0.0f);
             audio.SetGain(value);
-            audio.ApplyEffects();
+            //audio.ApplyEffects();
             
         }
         {
@@ -146,7 +185,7 @@ void AudioManager::show_imgui(Audio& audio){
             audio.GetPosition(position[0], position[1], position[2]);
             ImGui::DragFloat3(ButtonName.c_str(), position, 0.1f, 0.0f);
             audio.SetPosition(position);
-            audio.ApplyEffects();
+            //audio.ApplyEffects();
 
         }
         
@@ -159,7 +198,7 @@ void AudioManager::show_imgui(Audio& audio){
             audio.GetVelocity(v[0], v[1], v[2]);
             ImGui::DragFloat3(ButtonName.c_str(), v, 0.1f, 0.0f);
             audio.SetVelocity(v);
-            audio.ApplyEffects();
+            //audio.ApplyEffects();
 
         }
         
@@ -170,7 +209,37 @@ void AudioManager::show_imgui(Audio& audio){
             bool value = audio.GetLooping();
             ImGui::Checkbox(ButtonName.c_str(),&value);
             audio.SetLooping(value);
-            audio.ApplyEffects();
+            //audio.ApplyEffects();
+            
+        }
+
+        if (ImGui::CollapsingHeader("Doppler")) {
+            {
+                std::string ButtonName = "Enabled";
+                ButtonName += "##";
+                ButtonName += audio.get_name();
+                bool value = audio.GetDopplerEnabled();
+                ImGui::Checkbox(ButtonName.c_str(), &value);
+                audio.SetDoppler(value);
+                //audio.ApplyEffects();
+
+            }
+
+            
+
+            if (audio.GetDopplerEnabled()) {
+                ImGui::SameLine();
+                std::string ButtonName = "Doppler Factor";
+                ButtonName += "##";
+                ButtonName += audio.get_name();
+                float value = audio.GetDopplerFactor();
+                ImGui::DragFloat(ButtonName.c_str(), &value, 0.1f, 0.0f);
+                audio.SetDopplerFactor(value);
+                //audio.ApplyEffects();
+
+               
+            }
+
             
         }
 
@@ -181,5 +250,7 @@ void AudioManager::show_imgui(Audio& audio){
     }
     
   }
+
+  audio.ApplyEffects();
 }
 }

@@ -1,6 +1,7 @@
 #include "Common/Audio.h"
 #include <AL/al.h>
 #include <AL/alc.h>
+#include <AL/alext.h>
 
 namespace And{
 
@@ -22,6 +23,18 @@ namespace And{
     float pitch;
     float gain;
     unsigned int looping;
+
+    bool doppler_enabled;
+    float doppler_factor;
+    ALfloat listener_vel[3];
+    
+    // EFX extension
+    float reverberation;
+    float delay;
+    float low_high;
+    float distorsion;
+    ALuint effect;
+
   };
 
 
@@ -30,13 +43,21 @@ Audio::Audio() : m_audio_data(new AudioData), m_audio_effect(new AudioEffect){
     m_audio_effect->gain = 1.0f;
     m_audio_effect->looping = 0;
 
-    m_audio_effect->source_pos[0] = 0.0f;
+    m_audio_effect->source_pos[0] = 50.0f; // A la derecha
     m_audio_effect->source_pos[1] = 0.0f;
     m_audio_effect->source_pos[2] = 0.0f;
 
-    m_audio_effect->source_vel[0] = 0.0f;
+    m_audio_effect->source_vel[0] = -20.0f; // Se mueve hacia la izquierda
     m_audio_effect->source_vel[1] = 0.0f;
     m_audio_effect->source_vel[2] = 0.0f;
+
+    m_audio_effect->doppler_enabled = false;
+    m_audio_effect->doppler_factor = 1.0f;
+    m_audio_effect->listener_vel[0] = 0.0f;
+    m_audio_effect->listener_vel[1] = 0.0f;
+    m_audio_effect->listener_vel[2] = 0.0f;
+
+
 
 }
 
@@ -178,16 +199,53 @@ bool Audio::load(const char* path, const char* name){
 
 }
 
-
+// Called every frame for imgui
 void Audio::ApplyEffects() {
     
     alSourcef(m_audio_data->source, AL_PITCH, m_audio_effect->pitch);
     alSourcef(m_audio_data->source, AL_GAIN, m_audio_effect->gain);
     alSourcefv(m_audio_data->source, AL_POSITION, m_audio_effect->source_pos);
-    alSourcefv(m_audio_data->source, AL_VELOCITY, m_audio_effect->source_vel);
     alSourcei(m_audio_data->source, AL_LOOPING, m_audio_effect->looping);
+    //alSourcefv(m_audio_data->source, AL_);
+
+
+    if (m_audio_effect->doppler_enabled) {
+        //printf("Aplicando doppler");
+
+        alSourcefv(m_audio_data->source, AL_VELOCITY, m_audio_effect->source_vel);
+        //alSource3f(m_audio_data->source, AL_VELOCITY, m_audio_effect->source_vel[0], m_audio_effect->source_vel[1], m_audio_effect->source_vel[2]);
+
+        // 0.0f by default
+        alListener3f(AL_VELOCITY, m_audio_effect->listener_vel[0], m_audio_effect->listener_vel[1], m_audio_effect->listener_vel[2]);
+
+        // Apply doppler
+        alDopplerFactor(m_audio_effect->doppler_factor);
+        alDopplerVelocity(m_speedOfSound);
+
+        alSource3f(m_audio_data->source, AL_POSITION, m_audio_effect->source_pos[0], m_audio_effect->source_pos[1], m_audio_effect->source_pos[2]);
+
+    }
+
+
+    
+    
 }
 
+void Audio::UpdateSourcePosition(float x, float y, float z) {
+    m_audio_effect->source_pos[0] = x;
+    m_audio_effect->source_pos[1] = y;
+    m_audio_effect->source_pos[2] = z;
+
+    //alSource3f(m_audio_data->source, AL_POSITION, m_audio_effect->source_pos[0], m_audio_effect->source_pos[1], m_audio_effect->source_pos[2]);
+}
+
+void Audio::UpdateSourcePosition(float p[3]) {
+    m_audio_effect->source_pos[0] = p[0];
+    m_audio_effect->source_pos[1] = p[1];
+    m_audio_effect->source_pos[2] = p[2];
+
+    //alSource3f(m_audio_data->source, AL_POSITION, m_audio_effect->source_pos[0], m_audio_effect->source_pos[1], m_audio_effect->source_pos[2]);
+}
 
 void Audio::SetPitch(float pitch){
     if (pitch > 2.5f)pitch = 2.5f;
@@ -195,6 +253,7 @@ void Audio::SetPitch(float pitch){
 
     m_audio_effect->pitch = pitch;
 }
+
 void Audio::SetGain(float gain) {
     if (gain < 0.0f) gain = 0.0f;
     m_audio_effect->gain = gain;
@@ -223,6 +282,7 @@ void Audio::SetVelocity(float v[3]) {
     m_audio_effect->source_vel[1] = v[1];
     m_audio_effect->source_vel[2] = v[2];
 }
+
 void Audio::SetLooping(bool loop){
 
     if (loop) {
@@ -230,6 +290,18 @@ void Audio::SetLooping(bool loop){
     }else {
         m_audio_effect->looping = 0;
     }
+}
+
+void Audio::SetDoppler(bool active) {
+    m_audio_effect->doppler_enabled = active;
+}
+
+void Audio::SetDopplerFactor(float factor) {
+
+    if (factor > 10.0f) factor = 10.0f;
+    if (factor < 0.0f) factor = 0.0f;
+
+    m_audio_effect->doppler_factor = factor;
 }
 
 unsigned int Audio::get_buffer(){
@@ -241,7 +313,6 @@ unsigned int Audio::get_source(){
 
   return m_audio_data->source;
 }
-
 
 const char* Audio::get_name(){
 
@@ -262,13 +333,41 @@ void Audio::GetPosition(float& x, float& y, float& z) {
     z = m_audio_effect->source_pos[2];
 }
 
+void Audio::GetPosition(float pos[3]) {
+    pos[0] = m_audio_effect->source_pos[0];
+    pos[1] = m_audio_effect->source_pos[1];
+    pos[2] = m_audio_effect->source_pos[2];
+}
+
 void Audio::GetVelocity(float& x, float& y, float& z) {
     x = m_audio_effect->source_vel[0];
     y = m_audio_effect->source_vel[1];
     z = m_audio_effect->source_vel[2];
 }
+
+void Audio::GetVelocity(float pos[3]) {
+    pos[0] = m_audio_effect->source_vel[0];
+    pos[1] = m_audio_effect->source_vel[1];
+    pos[2] = m_audio_effect->source_vel[2];
+}
+
 bool Audio::GetLooping(){
     return m_audio_effect->looping;
+}
+
+bool Audio::GetDopplerEnabled() {
+    return m_audio_effect->doppler_enabled;
+}
+
+float Audio::GetDopplerFactor(){
+    return m_audio_effect->doppler_factor;
+}
+
+void Audio::GetSourcePosition(float& x, float& y, float& z){
+
+    x = m_audio_effect->source_pos[0];
+    y = m_audio_effect->source_pos[1];
+    z = m_audio_effect->source_pos[2];
 }
 
 }

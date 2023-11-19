@@ -60,6 +60,8 @@ class Audio{
 
     unsigned int get_buffer();
     unsigned int get_source();
+
+	const float m_speedOfSound = 343.3f;
 	
 	
 	// Must be 0.0f to 1.0f
@@ -75,13 +77,28 @@ class Audio{
 	void SetVelocity(float velocity[3]);
 
 	void SetLooping(bool loop);
-	
+
+	void SetDoppler(bool active);
+
+	// Must be 0 - 10.0f. 1.0f to neutral
+	void SetDopplerFactor(float factor);
+
+
+	void UpdateSourcePosition(float x, float y, float z);
+	void UpdateSourcePosition(float pos[3]);
+
+
 	float GetPitch();
 	float GetGain();
 	void GetPosition(float& x, float& y, float& z);
+	void GetPosition(float pos[3]);
 	void GetVelocity(float& x, float& y, float& z);
+	void GetVelocity(float pos[3]);
 	bool GetLooping();
 
+	bool GetDopplerEnabled();
+	float GetDopplerFactor();
+	void GetSourcePosition(float& x, float& y, float& z);
 
     const char* get_name();
 

@@ -24,7 +24,9 @@ class AudioManager{
     void show_imgui(Audio& audio);
     bool isPlaying(Audio& audio);
 
+    bool m_efx_available_;
 
+    void Update();
   private:
     AudioContext* m_audio_data;
  
