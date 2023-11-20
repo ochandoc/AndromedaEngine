@@ -75,7 +75,7 @@ namespace And
     inline void Open() { bOpen = true; }
     inline void Close() { bOpen = false; }
   private:
-    bool bOpen;
+    bool bOpen = true;
   };
 }
 
