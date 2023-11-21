@@ -175,13 +175,15 @@ int main(int argc, char** argv){
 
 
   
-
+  And::LogWindow logWindow;
 
   float speed = 0.01f;
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
     
+    logWindow.Draw();
+
     if (input.check_action(jump)){
       printf("Jummpinggggg!!!\n");
     }
