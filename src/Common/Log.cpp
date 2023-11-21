@@ -45,7 +45,10 @@ namespace And
       m_Logger = std::make_shared<Logger>(name);
 
       auto sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-      sink->set_level(GetSpdlogLevel(DefaultCategoryLevel));
+      if (ConsoleLog)
+        sink->set_level(GetSpdlogLevel(DefaultCategoryLevel));
+      else
+        sink->set_level(spdlog::level::err);
       sink->set_pattern("%^%n: %l: %v%$");
 
       auto FileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("Andromeda.log");
@@ -80,7 +83,7 @@ namespace And
       static_cast<ImGuiSink*>(ImSink.get())->m_LogCategoriesIds.insert({name, m_Id});
 
       m_Logger->sinks().push_back(ImSink);
-      if (ConsoleLog) m_Logger->sinks().push_back(sink);
+      m_Logger->sinks().push_back(sink);
       m_Logger->sinks().push_back(FileSink);
       m_Logger->set_level(spdlog::level::trace);
 
