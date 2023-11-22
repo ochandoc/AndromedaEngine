@@ -30,6 +30,9 @@ class Triangle{
   unsigned int m_vao;
   unsigned int m_vbo;
 
+  bool Load();
+  bool Save();
+
   private:
 
   Vertex m_vertex[3];

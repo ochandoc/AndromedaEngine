@@ -33,6 +33,7 @@
 
 #include "Common/JobSystem.h"
 #include "Common/Log.h"
+#include "Common/Save.h"
 
 int select_num(int i)
 {
@@ -139,6 +140,8 @@ int main(int argc, char** argv){
   entity_comp.add_component_class<And::Triangle>();
   entity_comp.new_entity(And::Triangle{ver});
   
+
+  And::Save<And::Triangle> save;
 
 
   float speed = 0.01f;

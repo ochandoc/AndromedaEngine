@@ -28,4 +28,14 @@ const Vertex* Triangle::get_vertex() const{
   return m_vertex;
 }
 
+
+bool Triangle::Load(){
+  return true;
+}
+
+bool Triangle::Save(){
+
+  return true;
+}
+
 }

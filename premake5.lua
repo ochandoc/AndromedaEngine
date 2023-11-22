@@ -137,6 +137,7 @@ group "Examples"
   include "examples/Window"
   include "examples/Triangles"
   include "examples/Logger"
+  include "examples/Memory"
 group ""
 
 newoption
