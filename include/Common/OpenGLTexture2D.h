@@ -2,6 +2,8 @@
 
 #include "base.h"
 
+#include "ResourceGenerator.h"
+
 namespace And
 {
 	class ResourceManager;
@@ -52,6 +54,7 @@ public:
 	void draw_in_imgui();
 
 	friend class And::ResourceManager;
+	friend class TextureGenerator;
 private:
 	bool m_IsLoaded;
 	uint32 m_Id;
@@ -60,4 +63,36 @@ private:
 	uint32 m_Channels;
 	TextureCreationInfo m_Info;
 	std::string m_Path;
+};
+
+class TextureGenerator : public And::ResourceGenerator<OpenGLTexture2D>
+{
+public:
+	TextureGenerator()
+	{
+		m_Default = std::make_shared<OpenGLTexture2D>("missing_texture.png");
+	}
+
+	virtual ~TextureGenerator()
+	{
+
+	}
+
+	virtual std::shared_ptr<OpenGLTexture2D> operator()(const std::string& Path) override
+	{
+		//std::this_thread::sleep_for(std::chrono::seconds(5));
+		return std::shared_ptr<OpenGLTexture2D>(new OpenGLTexture2D(Path));
+	}
+
+	virtual uint64 GenerateId(const std::string& Path) override
+	{
+		return std::hash<std::string>{}(Path);
+	}
+
+	virtual std::shared_ptr<OpenGLTexture2D> GetDefault() override
+	{
+		return m_Default;
+	}
+private:
+	std::shared_ptr<OpenGLTexture2D> m_Default;
 };

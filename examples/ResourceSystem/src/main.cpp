@@ -41,19 +41,30 @@ int main(int argc, char** argv){
 
   And::ResourceManager rm(*window, js);
 
-  And::resource<OpenGLTexture2D> tex = rm.new_texture2D("./test.png");
+  rm.add_resource_generator<TextureGenerator>();
+  std::string Path = "./jou.jpg";
+  And::resource<OpenGLTexture2D> tex = rm.new_resource<OpenGLTexture2D>(Path);
+  And::resource<OpenGLTexture2D> tex2 = rm.new_resource<OpenGLTexture2D>(Path);
 
+  And::resource<OpenGLTexture2D> tex3 = rm.new_resource<OpenGLTexture2D>("./test.png");
+
+  And::LogWindow log_window;
+  //Hola ochi -- TE VEO DESDE LAS SOMBRAS
   while (window->is_open()) {
     window->update();
     g_renderer.new_frame();
 
+    log_window.Draw();
+    // CUIDADO CON TU CODIGO -.-
+
     //...
-    tex->draw_in_imgui();
+    tex2->draw_in_imgui();
     
 
     g_renderer.end_frame();
     window->swap_buffers();
   }
 
+  //ESTAS AVISADO PINCHE PENDEJO!
   return 0;
 }

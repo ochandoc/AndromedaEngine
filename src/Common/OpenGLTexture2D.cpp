@@ -37,10 +37,10 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 		glGenerateMipmap(GL_TEXTURE_2D);
 		m_Info.mipmaps = true;
 		//ISDEV_LOG();
-		printf("Image %s loaded", path.c_str());
+		printf("Image %s loaded\n", path.c_str());
 	}
 	else {
-		printf("Failed to load texture %s", path.c_str());
+		printf("Failed to load texture %s\n", path.c_str());
 		//LOG_ERROR();
 	}
 

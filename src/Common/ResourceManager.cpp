@@ -63,22 +63,4 @@ namespace And
     glfwDestroyWindow(m_Data->window);
   }
 
-  resource<OpenGLTexture2D> ResourceManager::new_texture2D(std::string path)
-  {
-    resource<OpenGLTexture2D> r;
-    std::shared_ptr<internal::resource_value<OpenGLTexture2D>> value = std::make_shared<internal::resource_value<OpenGLTexture2D>>();
-    r.m_Resource = value;
-    r.m_Resource->m_Value = std::shared_ptr<OpenGLTexture2D>(new OpenGLTexture2D);
-    r.m_Resource->m_Value->m_Id = 0;
-    future<std::string> f_path(path);
-    future<std::shared_ptr<OpenGLTexture2D>> f = add_resource([](std::string path) {std::this_thread::sleep_for(std::chrono::seconds(5)); return std::shared_ptr<OpenGLTexture2D>(new OpenGLTexture2D(path)); }, f_path);
-    m_ThreadsData->m_ResourceCondition.notify_one();
-
-    std::function<void()> swap_f = [f, value]() { value->m_Value = f.get(); };
-
-    m_SwapMap.insert({f.get_id(), swap_f});
-
-    return r;
-  }
-
 }
