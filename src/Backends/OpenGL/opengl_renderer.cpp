@@ -230,8 +230,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s) {
     s->use();
   }
 
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
+  
   //glCullFace(GL_CW);
   //glEnable(GL_FRONT_AND_BACK);
 
@@ -259,8 +258,8 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s) {
   s->setMat4("projection", glm::value_ptr(projectionMatrix));
   s->setMat4("model", glm::value_ptr(modelMatrix));
 
-  unsigned int VAO = obj.get_vao();
   unsigned int VBO = obj.get_vbo();
+  unsigned int VAO = obj.get_vao();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
@@ -272,9 +271,13 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s) {
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+
+
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glEnable(GL_DEPTH_TEST);
 
   std::vector<unsigned int> indices = obj.getIndices();
   glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
