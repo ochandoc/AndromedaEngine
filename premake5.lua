@@ -43,7 +43,8 @@ workspace "AndromedEngine"
   
   flags
   {
-    "MultiProcessorCompile"
+    "MultiProcessorCompile",
+    --"FatalWarnings",
   }
 
 group "Core"
@@ -132,8 +133,11 @@ group ""
 
 group "Examples"
   include "examples/Sandbox"
+  include "examples/EntityComponentSystem"
   include "examples/Window"
   include "examples/ResourceSystem"
+  include "examples/Triangles"
+  include "examples/Logger"
 group ""
 
 newoption

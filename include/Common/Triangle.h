@@ -15,18 +15,25 @@ class Triangle{
 
 
   Triangle(Vertex v[3]);
-  Triangle(const Triangle&) = delete;
-  Triangle(Triangle&&) = delete;
+  Triangle(){};
+  Triangle(const Triangle&) = default;
+  Triangle(Triangle&&) = default;
   ~Triangle();
+
+
+  Triangle& operator=(const Triangle& other) = default;
 
   Vertex* get_vertex();
 
   const Vertex* get_vertex() const;
 
+  unsigned int m_vao;
+  unsigned int m_vbo;
 
   private:
 
   Vertex m_vertex[3];
+
 
 };
 }

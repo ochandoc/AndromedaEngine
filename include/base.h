@@ -17,3 +17,8 @@
 #define CAST_PTR(type, var) static_cast<type*>(var)
 
 #define TRY_CAST_PTR(type, var) dynamic_cast<type*>(var)
+
+#define NODISCARD [[nodiscard]]
+#define LIKELY [[likely]]
+#define UNLIKELY [[unlikely]]
+#define FORCEINLINE __forceinline	
