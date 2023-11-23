@@ -32,6 +32,7 @@
 #include "Common/EntityComponentSystem.h"
 #include "Common/AudioManager.h"
 #include "Common/Audio.h"
+#include "Common/Song.h"
 #include "Common/Timer.h"
 
 
@@ -136,8 +137,24 @@ int main(int argc, char** argv){
   door.load("../../data/audio/door.wav", "Door");
   buscan_casa.load("../../data/audio/buscan_casa.wav", "Fin y Jake");
 
-  buscan_casa.SetPitch(1.0f);
-  buscan_casa.SetPosition(1.0f, 0.0f, 0.0f);
+
+
+  std::vector<And::Audio*> eye_of_tiger;
+  And::Audio drums;
+  And::Audio guitar;
+  And::Audio rytm;
+  And::Audio song;
+  drums.load("../../data/eye_of_tiger/drums.wav", "Drums");
+  guitar.load("../../data/eye_of_tiger/guitar.wav", "Guitar");
+  rytm.load("../../data/eye_of_tiger/rhythm.wav", "Rhythm");
+  song.load("../../data/eye_of_tiger/song.wav", "Vocal");
+  eye_of_tiger.push_back(&drums);
+  eye_of_tiger.push_back(&guitar);
+  eye_of_tiger.push_back(&rytm);
+  eye_of_tiger.push_back(&song);
+
+  And::Song rocky{eye_of_tiger, &audio_manager, "Eye Of The Tigger"};
+
 
 
 
@@ -178,12 +195,9 @@ int main(int argc, char** argv){
         pepe_mono.SetPosition(pepe_mono_position);
     }
 
-    
+    rocky.show_imgui();
+    //rocky.play();
 
-
-  
-  
-    
     //input.update_input();
     
     g_renderer.end_frame();

@@ -4,6 +4,7 @@
 
 namespace And{
 class AudioManager;
+class Song;
 
 
 struct AudioData;
@@ -103,11 +104,13 @@ class Audio{
     const char* get_name();
 
 	friend class AudioManager;
+	friend class Song;
 
 protected:
 	void ApplyEffects();
 	AudioEffect* m_audio_effect;
 	AudioData* m_audio_data;
+	bool m_muted = false;
 
   private:
 
