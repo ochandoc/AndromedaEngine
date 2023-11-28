@@ -32,6 +32,7 @@ namespace And
 				std::future<ret_t> std_f = m_Task.get_future();
 				std::shared_ptr<future_imp<ret_t>> f(new future_imp<ret_t>(std_f));
 				m_Future.m_Future = f;
+				m_Future.m_Id = (size_t)f.get();
 			}
 			virtual ~job_imp() = default;
 

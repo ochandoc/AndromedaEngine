@@ -37,7 +37,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 		glGenerateMipmap(GL_TEXTURE_2D);
 		m_Info.mipmaps = true;
 		//ISDEV_LOG();
-		printf("Image %s loaded\n", path.c_str());
+		printf("Image %s loaded %u\n", path.c_str(), m_Id);
 	}
 	else {
 		printf("Failed to load texture %s\n", path.c_str());
@@ -51,6 +51,7 @@ OpenGLTexture2D::~OpenGLTexture2D()
 {
 	if (m_Id)
 	{
+		printf("Texture destroyed %u\n", m_Id);
 		glDeleteTextures(1, &m_Id);
 	}
 }
@@ -91,10 +92,11 @@ const std::string& OpenGLTexture2D::get_path() const
 	return m_Path;
 }
 
-void OpenGLTexture2D::draw_in_imgui()
+void OpenGLTexture2D::draw_in_imgui(int id)
 {
-	if (ImGui::Begin("Texture"))
+	if (ImGui::Begin(("Texture(" + std::to_string(id) + ")").c_str()))
 	{
+		ImGui::Text((m_Path + " (" + std::to_string(m_Id) + ")").c_str());
 		ImGui::Image((void*)(intptr_t)m_Id, ImGui::GetWindowSize());
 	}
 	ImGui::End();

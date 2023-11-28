@@ -51,7 +51,7 @@ public:
 
 	const std::string& get_path() const;
 
-	void draw_in_imgui();
+	void draw_in_imgui(int id);
 
 	friend class And::ResourceManager;
 	friend class TextureGenerator;
@@ -80,7 +80,7 @@ public:
 
 	virtual std::shared_ptr<OpenGLTexture2D> operator()(const std::string& Path) override
 	{
-		//std::this_thread::sleep_for(std::chrono::seconds(5));
+		std::this_thread::sleep_for(std::chrono::seconds(2));
 		return std::shared_ptr<OpenGLTexture2D>(new OpenGLTexture2D(Path));
 	}
 

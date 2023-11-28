@@ -34,21 +34,32 @@ namespace And
 
     m_Data->thread = std::make_unique<std::thread>([this]() {
       glfwMakeContextCurrent(m_Data->window);
-      internal::job j;
+      while (true)
       {
-        std::unique_lock<std::mutex> lock{ m_ThreadsData->m_ResourceQueueMutex};
-        m_ThreadsData->m_ResourceCondition.wait(lock, [this]() {return !m_ThreadsData->m_ResourceJobsQueue.empty() || m_Stop; });
-        if (m_ThreadsData->m_ResourceJobsQueue.empty() && m_Stop) return;
-        j = std::move(m_ThreadsData->m_ResourceJobsQueue.front());
-        m_ThreadsData->m_ResourceJobsQueue.pop();
+        internal::job j;
+        std::function<void()> swap;
+        {
+          std::unique_lock<std::mutex> lock{ m_ThreadsData->m_ResourceQueueMutex};
+          m_ThreadsData->m_ResourceCondition.wait(lock, [this]() {return !m_ThreadsData->m_ResourceJobsQueue.empty() || m_Stop; });
+          if (m_ThreadsData->m_ResourceJobsQueue.empty() && m_Stop) return;
+          j = std::move(m_ThreadsData->m_ResourceJobsQueue.front());
+          m_ThreadsData->m_ResourceJobsQueue.pop();
+          future_availability fa = j.get_future_availability();
+          swap = m_SwapMap[fa.get_id()];
+          m_SwapMap.erase(fa.get_id());
+        }
+        j();
+
+
+        try
+        {
+          swap();
+        }
+        catch (const std::exception& e)
+        {
+          std::cout << "Thread: " << e.what() << "\n";
+        }
       }
-      j();
-      future_availability fa = j.get_future_availability();
-
-      std::function<void()> swap = m_SwapMap[fa.get_id()];
-      m_SwapMap.erase(fa.get_id());
-
-      swap();
       });
   }
 
