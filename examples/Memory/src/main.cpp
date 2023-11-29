@@ -30,6 +30,7 @@
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
 #include "Common/EntityComponentSystem.h"
+#include "Common/Save.h"
 
 #include "Common/JobSystem.h"
 #include "Common/Log.h"
@@ -140,9 +141,19 @@ int main(int argc, char** argv){
   entity_comp.add_component_class<And::Triangle>();
   entity_comp.new_entity(And::Triangle{ver});
   
+  struct SPrueba{
+    int uno = 1;
+    float dos = 2.0f;
+  };
 
-  And::Save<And::Triangle> save;
+  SPrueba prueba;
+  
+  And::SavedObject<SPrueba> save_struct(prueba);
+  bool result = save_struct.save("Orochi");
 
+  if(result){
+    printf("Guardado de locos");
+  }
 
   float speed = 0.01f;
   while (window->is_open()){
