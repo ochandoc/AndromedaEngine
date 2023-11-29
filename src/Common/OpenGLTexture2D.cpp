@@ -6,56 +6,78 @@
 
 #include "imgui.h"
 
-OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
+#include "Common/ResourceManager.h"
+
+OpenGLTexture2D::OpenGLTexture2D()
 {
-	glGenTextures(1, &m_Id);
-	glBindTexture(GL_TEXTURE_2D, m_Id);
 
-	glTextureParameteri(m_Id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTextureParameteri(m_Id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glTextureParameteri(m_Id, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTextureParameteri(m_Id, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	uint8* pixels = stbi_load(path.c_str(), (int*)&m_Info.width, (int*)&m_Info.height, (int*)&m_Channels, STBI_default);
-
-	if (pixels) {
-		m_IsLoaded = true;
-		m_Path = path;
-		assert(m_Channels == 4 || m_Channels == 3 && "TODO: Handle texture extra channels");
-		if (m_Channels == 3) {
-			m_Info.format = TextureFormat_RGB8;
-			m_InternalFormat = GL_RGB8;
-			m_Format = GL_RGB;
-		}
-		if (m_Channels == 4) {
-			m_Info.format = TextureFormat_RGBA8;
-			m_InternalFormat = GL_RGBA8;
-			m_Format = GL_RGBA;
-		}
-		glTexImage2D(GL_TEXTURE_2D, 0, m_InternalFormat, m_Info.width, m_Info.height, 0, m_Format, GL_UNSIGNED_BYTE, pixels);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		m_Info.mipmaps = true;
-		//ISDEV_LOG();
-		printf("Image %s loaded %u\n", path.c_str(), m_Id);
-	}
-	else {
-		printf("Failed to load texture %s\n", path.c_str());
-		//LOG_ERROR();
-	}
-
-	stbi_image_free(pixels);
-
-	WAIT_GPU_LOAD();
 }
 
 OpenGLTexture2D::~OpenGLTexture2D()
 {
 	if (m_Id)
 	{
-		printf("Texture destroyed %u\n", m_Id);
+		AND_LOG(ResourceManagerLog, And::Info, "Texture {} destroyed", m_Path.c_str());
 		glDeleteTextures(1, &m_Id);
 	}
+}
+
+OpenGLTexture2D* OpenGLTexture2D::Make(const std::string& path)
+{
+	bool Loaded = false;
+	OpenGLTexture2D* Tex = new OpenGLTexture2D;
+	glGenTextures(1, &Tex->m_Id);
+	glBindTexture(GL_TEXTURE_2D, Tex->m_Id);
+
+	glTextureParameteri(Tex->m_Id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTextureParameteri(Tex->m_Id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTextureParameteri(Tex->m_Id, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTextureParameteri(Tex->m_Id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	uint8* pixels = stbi_load(path.c_str(), (int*)&Tex->m_Info.width, (int*)&Tex->m_Info.height, (int*)&Tex->m_Channels, STBI_default);
+
+	if (pixels)
+	{
+		Tex->m_IsLoaded = true;
+		Tex->m_Path = path;
+		assert(Tex->m_Channels == 4 || Tex->m_Channels == 3 && "TODO: Handle texture extra channels");
+		if (Tex->m_Channels == 3)
+		{
+			Tex->m_Info.format = TextureFormat_RGB8;
+			Tex->m_InternalFormat = GL_RGB8;
+			Tex->m_Format = GL_RGB;
+		}
+		if (Tex->m_Channels == 4)
+		{
+			Tex->m_Info.format = TextureFormat_RGBA8;
+			Tex->m_InternalFormat = GL_RGBA8;
+			Tex->m_Format = GL_RGBA;
+		}
+		glTexImage2D(GL_TEXTURE_2D, 0, Tex->m_InternalFormat, Tex->m_Info.width, Tex->m_Info.height, 0, Tex->m_Format, GL_UNSIGNED_BYTE, pixels);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		Tex->m_Info.mipmaps = true;
+		//ISDEV_LOG();
+
+		Loaded = true;
+		AND_LOG(ResourceManagerLog, And::Info, "Image {} loaded", path.c_str());
+	}
+	else
+	{
+		Loaded = false;
+		AND_LOG(ResourceManagerLog, And::Error, "Failed to load texture {}", path.c_str());
+	}
+
+	stbi_image_free(pixels);
+
+	WAIT_GPU_LOAD();
+	if (!Loaded)
+	{
+		delete Tex;
+		Tex = nullptr;
+	}
+
+	return Tex;
 }
 
 void OpenGLTexture2D::set_data(void* data, uint32 size)

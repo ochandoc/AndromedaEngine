@@ -55,6 +55,10 @@ namespace And
       FileSink->set_level(GetSpdlogLevel(DefaultCategoryLevel));
       FileSink->set_pattern("[%A %H:%M:%S] %n: %l: %v");
 
+      auto ErrorFileSink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("AndromedaError.log");
+      ErrorFileSink->set_level(GetSpdlogLevel(Warning));
+      ErrorFileSink->set_pattern("[%A %H:%M:%S] %n: %l: %v");
+
       spdlog::sink_ptr ImSink;
       bool have_sink = false;
       spdlog::details::registry::instance().apply_all([&have_sink, &ImSink](const std::shared_ptr<Logger> logger) {
@@ -85,6 +89,7 @@ namespace And
       m_Logger->sinks().push_back(ImSink);
       m_Logger->sinks().push_back(sink);
       m_Logger->sinks().push_back(FileSink);
+      m_Logger->sinks().push_back(ErrorFileSink);
       m_Logger->set_level(spdlog::level::trace);
 
       spdlog::register_logger(m_Logger);

@@ -28,6 +28,7 @@
 #include "Common/OpenGLTexture2D.h" 
 
 int main(int argc, char** argv){
+
   try
   {
     And::Engine e;

@@ -109,7 +109,7 @@ namespace And
 
 		case GL_DEBUG_SEVERITY_NOTIFICATION:
 			//_severity = "NOTIFICATION";
-			AND_LOG(GraphicsContextLog, Debug, "{}: {} , raised from {}: {}", id, type_, source_, message);
+			//AND_LOG(GraphicsContextLog, Debug, "{}: {} , raised from {}: {}", id, type_, source_, message);
 			break;
 
 		default:

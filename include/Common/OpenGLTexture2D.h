@@ -26,10 +26,9 @@ struct TextureCreationInfo
 class OpenGLTexture2D
 {
 private:
-	OpenGLTexture2D() = default;
+	OpenGLTexture2D();
 
 public:
-	OpenGLTexture2D(const std::string& path);
 	OpenGLTexture2D(const OpenGLTexture2D& other) = delete;
 	OpenGLTexture2D(OpenGLTexture2D&& other) { m_Id = other.m_Id; other.m_Id = 0; };
 
@@ -37,6 +36,8 @@ public:
 
 	OpenGLTexture2D& operator =(const OpenGLTexture2D&) = delete;
 	OpenGLTexture2D& operator =(OpenGLTexture2D&& other) { if (this != &other) { std::swap(m_Id, other.m_Id); } return *this; }
+
+	static OpenGLTexture2D* Make(const std::string& path);
 
 	void set_data(void* data, uint32 size);
 
@@ -70,7 +71,7 @@ class TextureGenerator : public And::ResourceGenerator<OpenGLTexture2D>
 public:
 	TextureGenerator()	
 	{
-		m_Default = std::make_shared<OpenGLTexture2D>("missing_texture.png");
+		m_Default = std::shared_ptr<OpenGLTexture2D>(OpenGLTexture2D::Make("missing_texture.png"));
 	}
 
 	virtual ~TextureGenerator()
@@ -80,8 +81,12 @@ public:
 
 	virtual std::shared_ptr<OpenGLTexture2D> operator()(const std::string& Path) override
 	{
-		std::this_thread::sleep_for(std::chrono::seconds(2));
-		return std::shared_ptr<OpenGLTexture2D>(new OpenGLTexture2D(Path));
+		OpenGLTexture2D* Tex = OpenGLTexture2D::Make(Path);
+		if (Tex)
+		{
+			return std::shared_ptr<OpenGLTexture2D>(Tex);
+		}
+		return m_Default;
 	}
 
 	virtual uint64 GenerateId(const std::string& Path) override

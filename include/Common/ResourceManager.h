@@ -3,8 +3,11 @@
 #include "resource.h"
 #include "ResourceGenerator.h"
 #include "JobSystem.h"
+#include "Log.h"
 
 #include "Common/OpenGLTexture2D.h"
+
+DECLARE_LOG_CATEGORY(ResourceManagerLog, Trace, true)
 
 namespace And
 {
