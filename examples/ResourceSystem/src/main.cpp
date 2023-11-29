@@ -46,8 +46,9 @@ int main(int argc, char** argv){
     rm.add_resource_generator<TextureGenerator>();
     std::string Path = "./jou.jpg";
     And::resource<OpenGLTexture2D> tex = rm.new_resource<OpenGLTexture2D>(Path);
-    //And::resource<OpenGLTexture2D> tex2 = rm.new_resource<OpenGLTexture2D>(Path);
-    //And::resource<OpenGLTexture2D> tex3 = rm.new_resource<OpenGLTexture2D>("./test.png");
+    And::resource<OpenGLTexture2D> tex2 = rm.new_resource<OpenGLTexture2D>(Path);
+    And::resource<OpenGLTexture2D> tex3 = rm.new_resource<OpenGLTexture2D>("./test.png");
+    And::resource<OpenGLTexture2D> tex4 = rm.new_resource<OpenGLTexture2D>("./esat_team.jpg");
 
     And::LogWindow log_window;
     while (window->is_open())
@@ -59,8 +60,9 @@ int main(int argc, char** argv){
 
       //...
       tex->draw_in_imgui(0);
-      //tex2->draw_in_imgui(1);
-      //tex3->draw_in_imgui(2);
+      tex2->draw_in_imgui(1);
+      tex3->draw_in_imgui(2);
+      tex4->draw_in_imgui(3);
 
 
       g_renderer.end_frame();

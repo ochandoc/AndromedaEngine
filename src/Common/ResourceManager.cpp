@@ -31,7 +31,6 @@ namespace And
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Perfil de OpenGL
 #endif
     m_Data->window = glfwCreateWindow(100, 100, "OpenGL", nullptr, main_window);
-
     m_Data->thread = std::make_unique<std::thread>([this]() {
       glfwMakeContextCurrent(m_Data->window);
       while (true)
@@ -50,15 +49,7 @@ namespace And
         }
         j();
 
-
-        try
-        {
-          swap();
-        }
-        catch (const std::exception& e)
-        {
-          std::cout << "Thread: " << e.what() << "\n";
-        }
+        swap();
       }
       });
   }

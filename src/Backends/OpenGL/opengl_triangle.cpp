@@ -1,5 +1,5 @@
 #include "Common/Triangle.h"
-#include "GL/glew.h"
+#include "Backends/OpenGL/OpenGL.h"
 #include "GLFW/glfw3.h"
 
 namespace And{

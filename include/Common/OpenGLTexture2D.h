@@ -68,7 +68,7 @@ private:
 class TextureGenerator : public And::ResourceGenerator<OpenGLTexture2D>
 {
 public:
-	TextureGenerator()
+	TextureGenerator()	
 	{
 		m_Default = std::make_shared<OpenGLTexture2D>("missing_texture.png");
 	}

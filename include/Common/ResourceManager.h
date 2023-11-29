@@ -92,8 +92,6 @@ namespace And
 
 			future<ret_t> f = ji->get_future();
 
-			std::cout << "[Main] Future Id: " << f.get_id() << "\n";
-
 			j.m_Job = ji;
 			j.m_Id = (size_t)j.m_Job.get();
 

@@ -1,6 +1,6 @@
 #include "Common/OpenGLTexture2D.h"
 
-#include "GL/glew.h"
+#include "Backends/OpenGL/OpenGL.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -45,6 +45,8 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string& path)
 	}
 
 	stbi_image_free(pixels);
+
+	WAIT_GPU_LOAD();
 }
 
 OpenGLTexture2D::~OpenGLTexture2D()
