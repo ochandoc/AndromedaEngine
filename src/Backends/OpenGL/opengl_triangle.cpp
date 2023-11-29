@@ -1,6 +1,9 @@
 #include "Common/Triangle.h"
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
+#include <string>
+#include <iostream>
+#include <sstream>
 
 namespace And{
 
@@ -26,16 +29,6 @@ Vertex* Triangle::get_vertex(){
 
 const Vertex* Triangle::get_vertex() const{
   return m_vertex;
-}
-
-
-bool Triangle::Load(){
-  return true;
-}
-
-bool Triangle::Save(){
-
-  return true;
 }
 
 }
