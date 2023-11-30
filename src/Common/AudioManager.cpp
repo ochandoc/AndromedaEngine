@@ -106,7 +106,6 @@ void AudioManager::stop(Audio& audio){
   alSourceStop(audio.get_source());
 }
 
-
 void AudioManager::show_imgui(Audio& audio){
 
   if(ImGui::CollapsingHeader(audio.get_name())){
