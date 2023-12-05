@@ -27,6 +27,8 @@
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
 #include "Common/Triangle.h"
+#include "Common/ObjLoader.h"
+
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
 #include "Common/EntityComponentSystem.h"
@@ -90,7 +92,15 @@ int main(int argc, char** argv){
   s_info.path_fragment = "../../data/fshader.fs";
   s_info.path_vertex = "../../data/vshader.vs";
 
-   std::optional<And::Shader> g_shader = And::Shader::make(s_info);
+  std::optional<And::Shader> g_shader = And::Shader::make(s_info);
+  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/boat/boat.obj", "../../data/boat/");
+  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/cube/cube.obj", "../../data/cube/");
+  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/cloud/cloud.obj", "../../data/cloud/");
+  std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/teapot/teapot.obj", "../../data/teapot/");
+  
+  if(obj_loaded.has_value()){
+    g_renderer.init_obj(&obj_loaded.value());
+  }
 
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -142,6 +152,11 @@ int main(int argc, char** argv){
 
 
   float speed = 0.01f;
+
+  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/faro/faro.obj"); 
+ 
+
+
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
@@ -183,13 +198,15 @@ int main(int argc, char** argv){
       printf("Space released!\n");
     }
 
-    if(g_shader.has_value()){
+    /*if(g_shader.has_value()){
       g_shader->use();
-    }
+    }*/
     
     //g_renderer.showDemo();
-    g_renderer.draw_triangle(&tri);
-    
+    //g_renderer.draw_triangle(&tri);
+    g_renderer.draw_obj(obj_loaded.value(), &g_shader.value());
+
+
     //input.update_input();
     g_renderer.end_frame();
     window->swap_buffers();

@@ -3,6 +3,7 @@ glfw/3.3.8
 glew/2.2.0
 imgui/cci.20230105+1.89.2.docking
 tinyobjloader/2.0.0-rc10
+glm/0.9.9.8
 spdlog/1.12.0
 
 [generators]
