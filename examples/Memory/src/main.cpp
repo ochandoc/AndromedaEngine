@@ -27,14 +27,14 @@
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
 #include "Common/Triangle.h"
-#include "Common/ObjLoader.h"
-
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
 #include "Common/EntityComponentSystem.h"
+#include "Common/Save.h"
 
 #include "Common/JobSystem.h"
 #include "Common/Log.h"
+#include "Common/Save.h"
 
 int select_num(int i)
 {
@@ -92,15 +92,7 @@ int main(int argc, char** argv){
   s_info.path_fragment = "../../data/fshader.fs";
   s_info.path_vertex = "../../data/vshader.vs";
 
-  std::optional<And::Shader> g_shader = And::Shader::make(s_info);
-  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/boat/boat.obj", "../../data/boat/");
-  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/cube/cube.obj", "../../data/cube/");
-  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/cloud/cloud.obj", "../../data/cloud/");
-  std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/teapot/teapot.obj", "../../data/teapot/");
-  
-  if(obj_loaded.has_value()){
-    g_renderer.init_obj(&obj_loaded.value());
-  }
+   std::optional<And::Shader> g_shader = And::Shader::make(s_info);
 
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -149,14 +141,25 @@ int main(int argc, char** argv){
   entity_comp.add_component_class<And::Triangle>();
   entity_comp.new_entity(And::Triangle{ver});
   
+  struct SPrueba{
+    int uno = 1;
+    float dos = 2.0f;
+  };
 
+  SPrueba prueba;
+  prueba.uno = 3;
+  prueba.dos = 3.0f;
+
+  And::SavedObject<SPrueba> save_struct(prueba);
+  //bool result = save_struct.save("Orochi");
+  save_struct.load("Orochi.and", prueba);
+
+
+ // if(result){
+  //printf("Guardado de locos");
+  //}
 
   float speed = 0.01f;
-
-  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/faro/faro.obj"); 
- 
-
-
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
@@ -198,15 +201,13 @@ int main(int argc, char** argv){
       printf("Space released!\n");
     }
 
-    /*if(g_shader.has_value()){
+    if(g_shader.has_value()){
       g_shader->use();
-    }*/
+    }
     
     //g_renderer.showDemo();
-    //g_renderer.draw_triangle(&tri);
-    g_renderer.draw_obj(obj_loaded.value(), &g_shader.value());
-
-
+    g_renderer.draw_triangle(&tri);
+    
     //input.update_input();
     g_renderer.end_frame();
     window->swap_buffers();
