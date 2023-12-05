@@ -45,6 +45,19 @@ class SavedObject{
     return true;
   }
 
+  bool load(std::string name, T& obj){
+    Slurp slurp{name.c_str()};
+
+    if(slurp.size() == sizeof(T)){
+      obj = *reinterpret_cast<T*>(slurp.data());
+    }else{
+      printf("El tipo de dato no coincide");
+      return false;
+    }
+
+    return true;
+  }
+
  private:
 
   T m_obj;

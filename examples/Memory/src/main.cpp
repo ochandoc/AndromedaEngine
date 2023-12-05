@@ -147,13 +147,17 @@ int main(int argc, char** argv){
   };
 
   SPrueba prueba;
-  
-  And::SavedObject<SPrueba> save_struct(prueba);
-  bool result = save_struct.save("Orochi");
+  prueba.uno = 3;
+  prueba.dos = 3.0f;
 
-  if(result){
-    printf("Guardado de locos");
-  }
+  And::SavedObject<SPrueba> save_struct(prueba);
+  //bool result = save_struct.save("Orochi");
+  save_struct.load("Orochi.and", prueba);
+
+
+ // if(result){
+  //printf("Guardado de locos");
+  //}
 
   float speed = 0.01f;
   while (window->is_open()){
