@@ -38,6 +38,55 @@
 LARGE_INTEGER StartTime;
 LARGE_INTEGER Freq;
 
+
+class InputComponent{
+  public:
+
+    InputComponent(And::Input* input){
+      m_input = input;
+    }
+    InputComponent(){
+     
+    }
+    InputComponent(const InputComponent&) = default;
+    InputComponent(InputComponent&&) = default;
+    ~InputComponent(){}
+
+    InputComponent& operator=(const InputComponent& other){
+      if(this != &other){
+        m_input = other.m_input;
+      }
+      return *this;
+    }
+
+    void get_input(And::Vertex* vertex, float& speed){
+      if (m_input->IsKeyDown(And::KeyCode::W) || m_input->IsKeyPressed(And::KeyCode::W)){
+        for(int i = 0; i < 3; i++){
+          vertex[i].position[1] += speed;
+        }
+      }
+      if (m_input->IsKeyDown(And::KeyCode::S) || m_input->IsKeyPressed(And::KeyCode::S)){
+        for(int i = 0; i < 3; i++){
+          vertex[i].position[1] -= speed;
+        }
+      }
+      
+      if (m_input->IsKeyDown(And::KeyCode::A) || m_input->IsKeyPressed(And::KeyCode::A)){
+        for(int i = 0; i < 3; i++){
+          vertex[i].position[0] -= speed;
+        }
+      }
+      if (m_input->IsKeyDown(And::KeyCode::D) || m_input->IsKeyPressed(And::KeyCode::D)){
+        for(int i = 0; i < 3; i++){
+          vertex[i].position[0] += speed;
+        }
+      }
+    }
+    
+  private:
+    And::Input* m_input;
+};
+
 void ResetTimer()
 {
     QueryPerformanceCounter(&StartTime);
@@ -80,7 +129,6 @@ void print_value(int i, int a, int b)
 void DrawTriangle(And::Renderer& r, And::Triangle* tri){
   r.draw_triangle(tri);
 }
-
 
 
 int main(int argc, char** argv){
@@ -130,11 +178,13 @@ int main(int argc, char** argv){
 
   And::EntityComponentSystem entity_comp;
   entity_comp.add_component_class<And::Triangle>();
+  entity_comp.add_component_class<InputComponent>();
   float triangle_width = 0.01f;
   float triangle_height = 0.01f;
 
 
-  for(int i = 0; i < 50000; i++){
+
+  for(int i = 0; i < 5000; i++){
 
     int randomx = (rand()%2001);
     int randomy = (rand()%2001);
@@ -164,13 +214,44 @@ int main(int argc, char** argv){
     
     };
 
-    And::Triangle tri{ver};
+    //And::Triangle tri{ver};
 
 
     
     entity_comp.new_entity(And::Triangle{ver});
 
   }
+
+  And::Vertex vertices[3] = {
+      {
+        // {-0.5f, -0.5f, 0.0f},
+        { -0.5f,-0.5f, 0.0f},
+        {0.0f, 0.0f, 0.0f},
+        {1.0f, 0.0f, 0.0f, 1.0f},
+        {2, 1, 0}
+      },
+      {
+
+        {0.0f,0.5f, 0.0f},
+        {0.0f, 0.0f, 0.0f},
+        {1.0f, 0.0f, 0.0f, 1.0f},
+        {2, 1, 0},
+      },
+      {
+        { 0.5f,-0.5f, 0.0f},
+        {0.0f, 0.0f, 0.0f},
+        {1.0f, 0.0f, 0.0f, 1.0f},
+        {2, 1, 0},
+      }
+    
+    };
+
+    InputComponent input_comp{&input};
+  
+    And::Entity ent = entity_comp.new_entity(And::Triangle{vertices});
+    entity_comp.add_entity_component(ent, input_comp);
+    And::Triangle* triangle = entity_comp.get_entity_component<And::Triangle>(ent);
+    And::Vertex* vertex = triangle->get_vertex();
 
 
 
@@ -188,30 +269,6 @@ int main(int argc, char** argv){
       printf("Jummpinggggg!!!\n");
     }
 
-    //And::Vertex *vertices = tri.get_vertex();
-
-    /*if (input.IsKeyDown(And::KeyCode::W) || input.IsKeyPressed(And::KeyCode::W)){
-      for(int i = 0; i < 3; i++){
-        vertices[i].position[1] += speed;
-      }
-    }
-    if (input.IsKeyDown(And::KeyCode::S) || input.IsKeyPressed(And::KeyCode::S)){
-      for(int i = 0; i < 3; i++){
-        vertices[i].position[1] -= speed;
-      }
-    }
-    
-    if (input.IsKeyDown(And::KeyCode::A) || input.IsKeyPressed(And::KeyCode::A)){
-      for(int i = 0; i < 3; i++){
-        vertices[i].position[0] -= speed;
-      }
-    }
-    if (input.IsKeyDown(And::KeyCode::D) || input.IsKeyPressed(And::KeyCode::D)){
-      for(int i = 0; i < 3; i++){
-        vertices[i].position[0] += speed;
-      }
-    }
-
     if (input.IsKeyPressed(And::KeyCode::Space)){
 
       printf("Space pressed!\n");
@@ -219,7 +276,7 @@ int main(int argc, char** argv){
 
     if (input.IsKeyRelease(And::KeyCode::Space)){
       printf("Space released!\n");
-    }*/
+    }
 
     if(g_shader.has_value()){
       g_shader->use();
@@ -227,15 +284,22 @@ int main(int argc, char** argv){
     
     //g_renderer.showDemo();
     //g_renderer.draw_triangle(&tri);
-
-    std::function<void(And::Triangle* tri)> f = [&g_renderer](And::Triangle* tri){
+    int count = 0;
+    std::function<void(And::Triangle* tri)> f = [&g_renderer, &count](And::Triangle* tri){
       DrawTriangle(g_renderer, tri);
+      count++;
+    };
+
+
+    std::function<void(InputComponent* input_comp)> input_system = [&vertex, &speed](InputComponent* input_comp){
+      input_comp->get_input(vertex, speed);
     };
 
 
     ResetTimer();
     entity_comp.execute_system(f);
-    CheckTimer("System");
+    entity_comp.execute_system(input_system);
+    //CheckTimer("System");
 
 
     //input.update_input();
