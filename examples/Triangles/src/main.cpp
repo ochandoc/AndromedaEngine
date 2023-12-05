@@ -27,14 +27,29 @@
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
 #include "Common/Triangle.h"
-#include "Common/ObjLoader.h"
-
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
 #include "Common/EntityComponentSystem.h"
 
 #include "Common/JobSystem.h"
-#include "Common/Logger.h"
+
+#include <Windows.h>
+
+LARGE_INTEGER StartTime;
+LARGE_INTEGER Freq;
+
+void ResetTimer()
+{
+    QueryPerformanceCounter(&StartTime);
+}
+
+void CheckTimer(const char* Name)
+{
+    static LARGE_INTEGER CurrentTime;
+    QueryPerformanceCounter(&CurrentTime);
+
+    printf("%s: %fms\n", Name, (((float)(CurrentTime.QuadPart - StartTime.QuadPart) / (float)Freq.QuadPart) * 1000.0f));
+}
 
 int select_num(int i)
 {
@@ -62,9 +77,15 @@ void print_value(int i, int a, int b)
 }
 
 
+void DrawTriangle(And::Renderer& r, And::Triangle* tri){
+  r.draw_triangle(tri);
+}
+
+
 
 int main(int argc, char** argv){
-
+  QueryPerformanceFrequency(&Freq);
+  srand(time(NULL));
   And::Engine e;
 
   And::JobSystem js;
@@ -92,15 +113,7 @@ int main(int argc, char** argv){
   s_info.path_fragment = "../../data/fshader.fs";
   s_info.path_vertex = "../../data/vshader.vs";
 
-  std::optional<And::Shader> g_shader = And::Shader::make(s_info);
-  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/boat/boat.obj", "../../data/boat/");
-  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/cube/cube.obj", "../../data/cube/");
-  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/cloud/cloud.obj", "../../data/cloud/");
-  std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/teapot/teapot.obj", "../../data/teapot/");
-  
-  if(obj_loaded.has_value()){
-    g_renderer.init_obj(&obj_loaded.value());
-  }
+   std::optional<And::Shader> g_shader = And::Shader::make(s_info);
 
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -114,60 +127,70 @@ int main(int argc, char** argv){
   double mouseX = -1.0f, mouseY = -1.0f;
   double mouseXx = -1.0f, mouseYy = -1.0f;
 
-  
-    
-
-  And::Vertex ver[3] = {
-    {
-      {-0.5f, -0.5f, 0.0f},
-      {0.0f, 0.0f, 0.0f},
-      {1.0f, 0.0f, 0.0f, 1.0f},
-      {2, 1, 0}
-    },
-    {
-
-      {0.0f, 0.5f, 0.0f},
-      {0.0f, 0.0f, 0.0f},
-      {1.0f, 0.0f, 0.0f, 1.0f},
-      {2, 1, 0},
-    },
-    {
-      {0.5f, -0.5f, 0.0f},
-      {0.0f, 0.0f, 0.0f},
-      {1.0f, 0.0f, 0.0f, 1.0f},
-      {2, 1, 0},
-    }
-  
-  };
-
-
-
-  And::Triangle tri{ver};
 
   And::EntityComponentSystem entity_comp;
-
   entity_comp.add_component_class<And::Triangle>();
-  entity_comp.new_entity(And::Triangle{ver});
-  
+  float triangle_width = 0.01f;
+  float triangle_height = 0.01f;
 
+
+  for(int i = 0; i < 50000; i++){
+
+    int randomx = (rand()%2001);
+    int randomy = (rand()%2001);
+    float initial_posx = (((float) (randomx - 1000)) / 1000.0f);
+    float initial_posy = (((float) (randomy - 1000)) / 1000.0f);
+    And::Vertex ver[3] = {
+      {
+        // {-0.5f, -0.5f, 0.0f},
+        {initial_posx, initial_posy, 0.0f},
+        {0.0f, 0.0f, 0.0f},
+        {1.0f, 0.0f, 0.0f, 1.0f},
+        {2, 1, 0}
+      },
+      {
+
+        {initial_posx + (triangle_width * 0.5), initial_posy + triangle_height, 0.0f},
+        {0.0f, 0.0f, 0.0f},
+        {1.0f, 0.0f, 0.0f, 1.0f},
+        {2, 1, 0},
+      },
+      {
+        {initial_posx + triangle_width, initial_posy, 0.0f},
+        {0.0f, 0.0f, 0.0f},
+        {1.0f, 0.0f, 0.0f, 1.0f},
+        {2, 1, 0},
+      }
+    
+    };
+
+    And::Triangle tri{ver};
+
+
+    
+    entity_comp.new_entity(And::Triangle{ver});
+
+  }
+
+
+
+  
+  And::LogWindow logWindow;
 
   float speed = 0.01f;
-
-  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/faro/faro.obj"); 
- 
-
-
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
     
+    logWindow.Draw();
+
     if (input.check_action(jump)){
       printf("Jummpinggggg!!!\n");
     }
 
-    And::Vertex *vertices = tri.get_vertex();
+    //And::Vertex *vertices = tri.get_vertex();
 
-    if (input.IsKeyDown(And::KeyCode::W) || input.IsKeyPressed(And::KeyCode::W)){
+    /*if (input.IsKeyDown(And::KeyCode::W) || input.IsKeyPressed(And::KeyCode::W)){
       for(int i = 0; i < 3; i++){
         vertices[i].position[1] += speed;
       }
@@ -196,15 +219,23 @@ int main(int argc, char** argv){
 
     if (input.IsKeyRelease(And::KeyCode::Space)){
       printf("Space released!\n");
-    }
-
-    /*if(g_shader.has_value()){
-      g_shader->use();
     }*/
+
+    if(g_shader.has_value()){
+      g_shader->use();
+    }
     
     //g_renderer.showDemo();
     //g_renderer.draw_triangle(&tri);
-    g_renderer.draw_obj(obj_loaded.value(), &g_shader.value());
+
+    std::function<void(And::Triangle* tri)> f = [&g_renderer](And::Triangle* tri){
+      DrawTriangle(g_renderer, tri);
+    };
+
+
+    ResetTimer();
+    entity_comp.execute_system(f);
+    CheckTimer("System");
 
 
     //input.update_input();

@@ -120,12 +120,14 @@ void Renderer::draw_triangle(Triangle *t){
     };
 
   
-  unsigned int VAO;
-  glGenVertexArrays(1, &VAO);
+  unsigned int VAO = t->m_vao;
+  unsigned int VBO = t->m_vbo;
+  
+  //glGenVertexArrays(1, &VAO);
+  //glGenBuffers(1, &VBO);
+  
   glBindVertexArray(VAO);
 
-  unsigned int VBO;
-  glGenBuffers(1, &VBO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
@@ -321,6 +323,11 @@ void Renderer::showDemo(){
   //glDeleteBuffers(1, &VAO);
   //glDeleteBuffers(1, &VBO);
 
+}
+
+void Renderer::showImGuiDemoWindow()
+{
+  ImGui::ShowDemoWindow();
 }
 
 

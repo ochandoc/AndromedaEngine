@@ -30,6 +30,7 @@ public:
 	void* get_native_window();
 
 	void update();
+	void swap_buffers();
 
 	std::shared_ptr<GraphicsContext> get_context() const;
 

@@ -28,6 +28,7 @@ public:
   void set_clear_color(float* color);
 
   void showDemo();
+  void showImGuiDemoWindow();
 
   void draw_triangle(Triangle *t);
 
