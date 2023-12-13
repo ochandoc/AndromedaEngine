@@ -27,6 +27,9 @@ class Song{
      * 
      */
     void play();
+    void stop();
+    void pause();
+    void resume();
 
     /**
      * @brief Show imgui UI with all options available
