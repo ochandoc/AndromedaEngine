@@ -10,13 +10,28 @@ class Song{
 
   public:
 
+    /**
+     * @brief Construct a new Song object
+     * 
+     * @param vector audio objects of the song 
+     * @param AudioManager* 
+     * @param char* name of the sound 
+     */
     Song(std::vector<Audio*> audios, AudioManager* manager, const char* name);
     Song(const Song&) = delete;
     Song(Song&&) = default;
     ~Song();
 
-
+    /**
+     * @brief Play all audios of the sound at same time
+     * 
+     */
     void play();
+
+    /**
+     * @brief Show imgui UI with all options available
+     * 
+     */
     void show_imgui();
 
   private:
