@@ -31,6 +31,12 @@ class Song{
     void pause();
     void resume();
 
+    void update(float speed, float dt);
+
+    bool m_change_to_explore = false;
+    bool m_change_to_exited = false;
+    bool m_change_to_fight = false;
+
     /**
      * @brief Show imgui UI with all options available
      * 

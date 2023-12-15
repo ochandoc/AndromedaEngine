@@ -195,6 +195,8 @@ int main(int argc, char** argv){
         pepe_mono.SetPosition(pepe_mono_position);
     }
 
+    rocky.update(0.5f, dt);
+
     rocky.show_imgui();
     //rocky.play();
 

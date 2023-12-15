@@ -53,6 +53,64 @@ void Song::resume(){
   }
 
 }
+
+void Song::update(float speed, float dt) {
+    if (m_change_to_exited) {
+        float value1 = m_audios[0]->GetGain();
+        m_audios[0]->SetGain(value1 + (speed * dt));
+        
+        float value2 = m_audios[1]->GetGain();
+        m_audios[1]->SetGain(value2 + (speed * dt));
+        
+        float value3 = m_audios[2]->GetGain();
+        m_audios[2]->SetGain(value3 + (speed * dt));
+        
+        float value4 = m_audios[3]->GetGain();
+        m_audios[3]->SetGain(value4 - (speed * dt));
+
+        if (value1 >= 1.0f && value2 >= 1.0f && value3 >= 1.0f && value4 <= 0.0f) {
+            m_change_to_exited = false;
+        }
+    }
+    
+    if (m_change_to_explore) {
+        float value1 = m_audios[0]->GetGain();
+        m_audios[0]->SetGain(value1 - (speed * dt));
+        
+        float value2 = m_audios[1]->GetGain();
+        m_audios[1]->SetGain(value2 + (speed * dt));
+        
+        float value3 = m_audios[2]->GetGain();
+        m_audios[2]->SetGain(value3 - (speed * dt));
+        
+        float value4 = m_audios[3]->GetGain();
+        m_audios[3]->SetGain(value4 - (speed * dt));
+
+        if (value1 <= 0.0f && value2 >= 1.0f && value3 <= 0.0f && value4 <= 0.0f) {
+            m_change_to_explore = false;
+        }
+    }
+
+    if (m_change_to_fight) {
+        float value1 = m_audios[0]->GetGain();
+        m_audios[0]->SetGain(value1 + (speed * dt));
+
+        float value2 = m_audios[1]->GetGain();
+        m_audios[1]->SetGain(value2 + (speed * dt));
+
+        float value3 = m_audios[2]->GetGain();
+        m_audios[2]->SetGain(value3 + (speed * dt));
+
+        float value4 = m_audios[3]->GetGain();
+        m_audios[3]->SetGain(value4 + (speed * dt));
+
+        if (value1 >= 1.0f && value2 >= 1.0f && value3 >= 1.0f && value4 >= 1.0f) {
+            m_change_to_fight = false;
+        }
+    }
+}
+
+
 // Drums, Guitar, Rytm, Vocal
 void Song::show_imgui(){
   if(ImGui::CollapsingHeader(m_name)){
@@ -74,25 +132,29 @@ void Song::show_imgui(){
 
     // Explore mode plays rythm song
     if(ImGui::Button("Explore mode")){
-      m_audios[2]->SetGain(1.0f);
-      m_audios[0]->SetGain(0.0f);
-      m_audios[1]->SetGain(0.0f);
-      m_audios[3]->SetGain(0.0f);
+      //m_audios[1]->SetGain(1.0f);
+      //m_audios[0]->SetGain(0.0f);
+      //m_audios[2]->SetGain(0.0f);
+      //m_audios[3]->SetGain(0.0f)
+        m_change_to_explore = true;
     }
 
     // Exited mode plays all excep vocal
     if(ImGui::Button("Exited mode")){
-     m_audios[0]->SetGain(1.0f); 
-     m_audios[1]->SetGain(1.0f); 
-     m_audios[2]->SetGain(1.0f); 
-     m_audios[3]->SetGain(0.0f); 
+     //m_audios[0]->SetGain(1.0f); 
+     //m_audios[1]->SetGain(1.0f); 
+     //m_audios[2]->SetGain(1.0f); 
+     //m_audios[3]->SetGain(0.0f); 
+
+        m_change_to_exited = true;
     }
 
     // Fight mode plays all songs
     if(ImGui::Button("Fight mode")){
-      for(auto& audio : m_audios){
-        audio->SetGain(1.0f);
-      }
+        m_change_to_fight = true;
+      //for(auto& audio : m_audios){
+        //audio->SetGain(1.0f);
+      //}
     }
 
     for(auto& audio : m_audios){
@@ -153,7 +215,7 @@ void Song::show_imgui(){
             ButtonName += "##";
             ButtonName += audio->get_name();
             float value = audio->GetGain();
-            ImGui::DragFloat(ButtonName.c_str(), &value, 0.1f, 0.0f);
+            ImGui::DragFloat(ButtonName.c_str(), &value, 0.05f, 0.0f);
             audio->SetGain(value);
         }
 

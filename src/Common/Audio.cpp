@@ -256,6 +256,7 @@ void Audio::SetPitch(float pitch){
 
 void Audio::SetGain(float gain) {
     if (gain < 0.0f) gain = 0.0f;
+    if (gain > 1.0f) gain = 1.0f;
     m_audio_effect->gain = gain;
 }
 
