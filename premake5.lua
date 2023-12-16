@@ -138,6 +138,7 @@ group "Examples"
   include "examples/ResourceSystem"
   include "examples/Triangles"
   include "examples/Logger"
+  include "examples/Memory"
 group ""
 
 newoption

@@ -3,11 +3,15 @@
 
 #include "Backends/OpenGL/OpenGL.h"
 #include "GLFW/glfw3.h"
+#include "glm/glm.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "imgui_impl_opengl3.h"
 
 #include "Common/Shader.h"
 #include "Common/Triangle.h"
+#include "Common/ObjLoader.h"
 
 namespace And
 {
@@ -15,6 +19,25 @@ namespace And
 Renderer::Renderer(Window& window) : m_Window(window) 
 {
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
+  m_camera_pos[0] = 0.0f;
+  m_camera_pos[1] = 7.0f;
+  m_camera_pos[2] = -10.0f;
+
+  m_camera_target[0] = 0.0f;
+  m_camera_target[1] = 0.0f;
+  m_camera_target[2] = 0.0f;
+  m_fov = 45.0f;
+
+  GLFWwindow *window_tmp = (GLFWwindow*) m_Window.get_native_window();
+  int width, height;
+  glfwGetWindowSize(window_tmp, &width, &height);
+  m_aspectRatio = width/height;
+
+  m_near = 0.1f;
+  m_far = 100.0f;
+
+
+
   set_clear_color(default_color);
   window.imgui_start();
   ImGui_ImplOpenGL3_Init("#version 430");
@@ -65,6 +88,13 @@ void Renderer::new_frame()
 
 void Renderer::end_frame()
 {
+  //ImGui::ShowDemoWindow();
+  if(ImGui::CollapsingHeader("Camera")){
+    ImGui::DragFloat3("Camera position", m_camera_pos);
+    ImGui::DragFloat3("Camera target", m_camera_target);
+    ImGui::DragFloat("FOV", &m_fov);
+  }
+
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	m_Window.end_frame();
@@ -117,6 +147,143 @@ void Renderer::draw_triangle(Triangle *t){
   //glDeleteBuffers(1, &VBO);
 
   
+}
+
+void Renderer::init_obj(ObjLoader* obj){
+
+  printf("Init obj\n");
+
+  if(obj->get_vao() == 0){
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    obj->set_VAO(VAO);
+  }
+
+  if(obj->get_vbo() == 0){
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    obj->set_VBO(VBO);
+
+    glBindVertexArray(obj->get_vao());
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    
+    std::vector<Vertex_info> vertices = obj->getVertexInfo();  
+    //std::vector<float> normals = obj.getNormals();
+
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
+
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*) (3 * sizeof(float)));
+    
+
+
+    // Desbindeamos el vao
+    glBindVertexArray(0);
+
+
+  }
+
+}
+
+void CheckError(){
+  GLenum error = glGetError();
+  switch (error) {
+    case GL_NO_ERROR:
+        // No se ha producido ningún error.
+        break;
+    case GL_INVALID_ENUM:
+        // Manejar el error de enumerador no válido.
+        printf("Invalid enum\n");
+        break;
+    case GL_INVALID_VALUE:
+        // Manejar el error de valor no válido.
+        printf("Invalid value\n");
+        break;
+    case GL_INVALID_OPERATION:
+        // Manejar el error de operación no válida.
+        printf("Invalid operation\n");
+        break;
+    case GL_OUT_OF_MEMORY:
+        // Manejar el error de falta de memoria.
+        printf("Out of memory\n");
+        break;
+    case GL_STACK_OVERFLOW:
+        // Manejar el error de desbordamiento de la pila.
+        printf("Stack overflow\n");
+        break;
+    case GL_STACK_UNDERFLOW:
+        // Manejar el error de subdesbordamiento de la pila.
+        printf("Stack underflow\n");
+        break;
+    // Puedes agregar más casos para otros errores si es necesario.
+    default:
+        // Manejar cualquier otro error no reconocido.
+        break;
+}
+}
+
+void Renderer::draw_obj(ObjLoader obj, Shader* s) {
+
+  if(s){
+    s->use();
+  }
+
+  
+  //glCullFace(GL_CW);
+  //glEnable(GL_FRONT_AND_BACK);
+
+  //glDisable(GL_CULL_FACE)
+
+  glm::vec3 cameraPosition(m_camera_pos[0], m_camera_pos[1], m_camera_pos[2]);
+  glm::vec3 cameraTarget(m_camera_target[0], m_camera_target[1], m_camera_target[2]);
+  glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
+
+  glm::mat4 viewMatrix = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+  glm::mat4 projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_near, m_far);
+
+  glm::mat4 modelMatrix = glm::mat4(1.0f);
+
+  glm::vec3 objectPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+  glm::vec3 objectScale = glm::vec3(1.0f, 1.0f, 1.0f);
+  float rotationAngle = 0.0f;
+  glm::vec3 objectRotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+
+  modelMatrix = glm::translate(modelMatrix, objectPosition);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::scale(modelMatrix, objectScale);
+
+  s->setMat4("view", glm::value_ptr(viewMatrix));
+  s->setMat4("projection", glm::value_ptr(projectionMatrix));
+  s->setMat4("model", glm::value_ptr(modelMatrix));
+
+  unsigned int VBO = obj.get_vbo();
+  unsigned int VAO = obj.get_vao();
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBindVertexArray(VAO);
+
+
+  std::vector<Vertex_info> vertices = obj.getVertexInfo();  
+
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+
+
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glEnable(GL_DEPTH_TEST);
+
+  std::vector<unsigned int> indices = obj.getIndices();
+  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
+
 }
 
 void Renderer::showDemo(){
