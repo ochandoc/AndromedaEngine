@@ -28,6 +28,7 @@
 #include "Common/Shader.h"
 #include "Common/Triangle.h"
 #include "Common/ObjLoader.h"
+#include "Common/ObjGenerator.h"
 
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
@@ -69,7 +70,9 @@ int main(int argc, char** argv){
 
   And::Engine e;
 
-  And::JobSystem js;
+  And::JobSystem js{e};
+
+
 
   And::future<int> f{ 10 };
   And::future<int> f1{ 20 };
@@ -85,6 +88,10 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
 
+  And::ResourceManager r_manager{*window, js};
+  r_manager.add_resource_generator<And::ObjGenerator>();
+  And::resource<And::ObjLoader> obj_teapot = r_manager.new_resource<And::ObjLoader>("teapot.obj");
+
   // Show pc info
   g_context->create_info();
 
@@ -96,13 +103,13 @@ int main(int argc, char** argv){
 
   std::optional<And::Shader> g_shader = And::Shader::make(s_info);
   //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/boat/boat.obj", "../../data/boat/");
-  //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/cube/cube.obj", "../../data/cube/");
+  //std::shared_ptr<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/cube/cube.obj", "../../data/cube/");
   //std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/cloud/cloud.obj", "../../data/cloud/");
-  std::optional<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/teapot/teapot.obj", "../../data/teapot/");
+  //std::shared_ptr<And::ObjLoader> obj_loaded = And::ObjLoader::load("../../data/teapot/teapot.obj", "../../data/teapot/");
   
-  if(obj_loaded.has_value()){
-    g_renderer.init_obj(&obj_loaded.value());
-  }
+  //if(obj_loaded){
+    //g_renderer.init_obj(obj_loaded.get());
+  //}
 
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -206,7 +213,8 @@ int main(int argc, char** argv){
     
     //g_renderer.showDemo();
     //g_renderer.draw_triangle(&tri);
-    g_renderer.draw_obj(obj_loaded.value(), &g_shader.value());
+    //g_renderer.draw_obj(*obj_loaded, &g_shader.value());
+    g_renderer.draw_obj(*obj_teapot, &g_shader.value());
 
 
     //input.update_input();

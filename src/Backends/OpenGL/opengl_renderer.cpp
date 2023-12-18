@@ -149,45 +149,6 @@ void Renderer::draw_triangle(Triangle *t){
   
 }
 
-void Renderer::init_obj(ObjLoader* obj){
-
-  printf("Init obj\n");
-
-  if(obj->get_vao() == 0){
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    obj->set_VAO(VAO);
-  }
-
-  if(obj->get_vbo() == 0){
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    obj->set_VBO(VBO);
-
-    glBindVertexArray(obj->get_vao());
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    
-    std::vector<Vertex_info> vertices = obj->getVertexInfo();  
-    //std::vector<float> normals = obj.getNormals();
-
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
-
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*) (3 * sizeof(float)));
-    
-
-
-    // Desbindeamos el vao
-    glBindVertexArray(0);
-
-
-  }
-
-}
 
 void CheckError(){
   GLenum error = glGetError();
