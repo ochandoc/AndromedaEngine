@@ -14,7 +14,10 @@ namespace And
 
 		bool is_initialized() const;
 
+		friend class ResourceManager;
+		friend class JobSystem;
 	private:
 		bool m_Initialized;
+		std::shared_ptr<struct ThreadsData> m_ThreadsData;
 	};
 }

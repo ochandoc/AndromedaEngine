@@ -3,7 +3,7 @@
 #include "Common/Renderer.h"
 #include "Common/Window.h"
 
-#include "GL/glew.h"
+#include "Backends/OpenGL/OpenGL.h"
 #include "GLFW/glfw3.h"
 
 DEFINE_LOG_CATEGORY(GraphicsContextLog)
@@ -109,7 +109,7 @@ namespace And
 
 		case GL_DEBUG_SEVERITY_NOTIFICATION:
 			//_severity = "NOTIFICATION";
-			AND_LOG(GraphicsContextLog, Debug, "{}: {} , raised from {}: {}", id, type_, source_, message);
+			//AND_LOG(GraphicsContextLog, Debug, "{}: {} , raised from {}: {}", id, type_, source_, message);
 			break;
 
 		default:
