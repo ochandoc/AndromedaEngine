@@ -1,11 +1,12 @@
 #include "Common/ObjLoader.h"
 #include "tiny_obj_loader.h"
+#include "Backends/OpenGL/OpenGL.h"
 #include <iostream>
 
 namespace And{
 
 
-std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_path){
+std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string base_path){
 
   std::cout << "Loading obj... " << filename << std::endl;
 
@@ -22,7 +23,6 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
   std::vector<float> tex_coords;
   std::vector<unsigned int> indices;
   std::vector<Vertex_info> vertex_info;
-
   std::vector<Vertex_info> vertices_info;
 
 
@@ -35,7 +35,7 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
   if (!err.empty()) {
     //m_obj_info.replace(0, err.length(), err.c_str());
     printf("Obj not loaded correctly %s\n", err.c_str());
-    return std::nullopt;
+    return nullptr;
   }else{
     printf("Obj loaded correctly\n");
 
@@ -131,11 +131,40 @@ std::optional<ObjLoader> ObjLoader::load(std::string filename, std::string base_
 
 
   }
-
-
-
   ObjLoader obj{vertices, vertices_wheights, normals, tex_coords, colors, indices, vertex_info, mat};
-  return std::optional<ObjLoader>(std::move(obj));
+
+  printf("Init obj\n");
+
+  unsigned int VAO;
+  glGenVertexArrays(1, &VAO);
+  obj.set_VAO(VAO);
+  
+
+  unsigned int VBO;
+  glGenBuffers(1, &VBO);
+  obj.set_VBO(VBO);
+
+  glBindVertexArray(obj.get_vao());
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  
+  //std::vector<Vertex_info> vertices = obj.getVertexInfo();  
+  //std::vector<float> normals = obj.getNormals();
+
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
+
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*) (3 * sizeof(float)));
+  
+
+  // Desbindeamos el vao
+  glBindVertexArray(0);  
+
+  WAIT_GPU_LOAD()
+  return std::make_shared<ObjLoader>(obj);
 }
 
 ObjLoader::ObjLoader(std::vector<float> v, std::vector<float> v_w, std::vector<float> normals, std::vector<float> tex_coords, std::vector<float> colors, std::vector<unsigned int> indices, std::vector<Vertex_info> vertex_info, Material_info mat) :

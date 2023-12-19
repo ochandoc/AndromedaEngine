@@ -2,6 +2,7 @@
 #include <optional>
 #include <vector>
 #include <string>
+#include <memory>
 
 
 
@@ -19,6 +20,12 @@ namespace And{
     float normal[3];  
   };
 
+  struct Transform{
+    float position[3];
+    float rotation[3];
+    float scale[3];
+  };
+
 
 class ObjLoader{
   public:
@@ -26,7 +33,7 @@ class ObjLoader{
   ObjLoader(ObjLoader&&) = default;
 
   //static std::optional<ObjLoader> load(std::string path, std::string filename);
-  static std::optional<ObjLoader> load(std::string filename, std::string base_path = "");
+  static std::shared_ptr<ObjLoader> load(std::string filename, std::string base_path = "");
 
   const std::vector<float>& getVertices();
   const std::vector<float>& getNormals();

@@ -21,7 +21,7 @@ Renderer::Renderer(Window& window) : m_Window(window)
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
   m_camera_pos[0] = 0.0f;
   m_camera_pos[1] = 7.0f;
-  m_camera_pos[2] = -10.0f;
+  m_camera_pos[2] = -60.0f;
 
   m_camera_target[0] = 0.0f;
   m_camera_target[1] = 0.0f;
@@ -31,7 +31,7 @@ Renderer::Renderer(Window& window) : m_Window(window)
   GLFWwindow *window_tmp = (GLFWwindow*) m_Window.get_native_window();
   int width, height;
   glfwGetWindowSize(window_tmp, &width, &height);
-  m_aspectRatio = width/height;
+  m_aspectRatio = (float)(width/height);
 
   m_near = 0.1f;
   m_far = 100.0f;
@@ -149,45 +149,6 @@ void Renderer::draw_triangle(Triangle *t){
   
 }
 
-void Renderer::init_obj(ObjLoader* obj){
-
-  printf("Init obj\n");
-
-  if(obj->get_vao() == 0){
-    unsigned int VAO;
-    glGenVertexArrays(1, &VAO);
-    obj->set_VAO(VAO);
-  }
-
-  if(obj->get_vbo() == 0){
-    unsigned int VBO;
-    glGenBuffers(1, &VBO);
-    obj->set_VBO(VBO);
-
-    glBindVertexArray(obj->get_vao());
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    
-    std::vector<Vertex_info> vertices = obj->getVertexInfo();  
-    //std::vector<float> normals = obj.getNormals();
-
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
-
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*) (3 * sizeof(float)));
-    
-
-
-    // Desbindeamos el vao
-    glBindVertexArray(0);
-
-
-  }
-
-}
 
 void CheckError(){
   GLenum error = glGetError();
@@ -226,7 +187,7 @@ void CheckError(){
 }
 }
 
-void Renderer::draw_obj(ObjLoader obj, Shader* s) {
+void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
 
   if(s){
     s->use();
@@ -247,10 +208,10 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s) {
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-  glm::vec3 objectPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-  glm::vec3 objectScale = glm::vec3(1.0f, 1.0f, 1.0f);
+  glm::vec3 objectPosition = glm::vec3(tran.position[0], tran.position[1], tran.position[2]);
+  glm::vec3 objectScale = glm::vec3(tran.scale[0], tran.scale[1], tran.scale[2]);
   float rotationAngle = 0.0f;
-  glm::vec3 objectRotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+  glm::vec3 objectRotationAxis = glm::vec3(tran.rotation[0], tran.rotation[1], tran.rotation[2]);
 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
@@ -282,7 +243,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s) {
   glEnable(GL_DEPTH_TEST);
 
   std::vector<unsigned int> indices = obj.getIndices();
-  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
+  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
 
 }
 
