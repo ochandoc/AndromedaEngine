@@ -136,7 +136,7 @@ int main(int argc, char** argv){
   srand(time(NULL));
   And::Engine e;
 
-  And::JobSystem js;
+  And::JobSystem js{e};
 
   And::future<int> f{ 10 };
   And::future<int> f1{ 20 };

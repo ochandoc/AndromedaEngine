@@ -33,6 +33,9 @@ project "Triangles"
     "../../bin/%{cfg.buildcfg}/Andromeda",
   }
 
+  conan_config = get_conan_config()
+  setup_dependencies_exe(conan_config)
+
   filter "configurations:Debug"
     defines { "DEBUG" }
     runtime "Debug"

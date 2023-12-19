@@ -17,17 +17,24 @@ function get_conan_config()
   return configurations
 end
 
-function setup_dependencies(conan_config)
+function setup_dependencies_lib(conan_config)
   for i,build_cfg in ipairs(build_configurations) do
     local cfg = conan_config[build_cfg]
     filter("configurations:"..build_cfg)
       includedirs{ cfg["includedirs"] }
       libdirs{ cfg["libdirs"] }
       links{ cfg["libs"] }
-      links{ cfg["system_libs"] }
       links{ cfg["frameworks"] }
       defines{ cfg["defines"] }
       bindirs{ cfg["bindirs"] }
+  end
+end
+
+function setup_dependencies_exe(conan_config)
+  for i,build_cfg in ipairs(build_configurations) do
+    local cfg = conan_config[build_cfg]
+    filter("configurations:"..build_cfg)
+      links{ cfg["system_libs"] }
   end
 end
 
@@ -94,7 +101,7 @@ project "Andromeda"
   }
   
   conan_cfg = get_conan_config()
-  setup_dependencies(conan_cfg)
+  setup_dependencies_lib(conan_cfg)
 
   filter "system:windows"
     files 
