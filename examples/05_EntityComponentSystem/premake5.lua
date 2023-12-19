@@ -1,4 +1,4 @@
-project "01_Window"
+project "05_EntityComponentSystem"
   kind "ConsoleApp"
   language "C++"
   cppdialect "C++20"

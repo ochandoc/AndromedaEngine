@@ -1,13 +1,13 @@
-project "Triangles"
+project "07_ResourceSystem"
   kind "ConsoleApp"
   language "C++"
   cppdialect "C++20"
   staticruntime "Off"
 
-  location "build/%{prj.name}"
+  location "build"
 
   targetdir "bin/%{cfg.buildcfg}"
-  objdir "build/%{cfg.buildcfg}"
+  objdir "build/obj/%{cfg.buildcfg}"
 
   dependson "Andromeda"
 
