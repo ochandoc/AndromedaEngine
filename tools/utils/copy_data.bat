@@ -1,2 +1,2 @@
 @echo off
-xcopy /s /e /v /q ..\..\data .\build
+xcopy /s /e /v /y /q ..\..\data .\build
