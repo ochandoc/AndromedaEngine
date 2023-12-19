@@ -65,23 +65,6 @@ void print_value(int i, int a, int b)
 }
 
 
-class ObjComponent{
-
-  public:
-  ObjComponent(){
-
-  }
-  ~ObjComponent(){}
-
-
-  And::resource<And::ObjLoader> m_resource;
-  private:
-
-
-};
-
-
-
 int main(int argc, char** argv){
 
   And::Engine e;
@@ -176,12 +159,25 @@ int main(int argc, char** argv){
 
 
 
-  And::resource<And::ObjLoader> obj_teapot = r_manager.new_resource<And::ObjLoader>("teapot.obj");
 
   entity_comp.add_component_class<And::resource<And::ObjLoader>>();
-  entity_comp.add_component_class<And::Transform>();
-  And::Transform tran = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
-  And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
+  entity_comp.add_component_class<And::Transform>();  
+
+  int num_obj = 10;
+  float pos_x = 0.0f;
+  float pos_y = -5.0f;
+
+  for(int i = -5; i < (int)(num_obj / 2); i++){
+    And::resource<And::ObjLoader> obj_teapot = r_manager.new_resource<And::ObjLoader>("teapot.obj");
+    And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
+    And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
+  }
+  pos_y = 5.0f;
+  for(int i = -5; i < (int)(num_obj / 2); i++){
+    And::resource<And::ObjLoader> obj_teapot = r_manager.new_resource<And::ObjLoader>("teapot.obj");
+    And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
+    And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
+  }
 
 
 
@@ -240,14 +236,14 @@ int main(int argc, char** argv){
     //g_renderer.draw_triangle(&tri);
     //g_renderer.draw_obj(*obj_loaded, &g_shader.value());
 
-    std::function<void(And::Transform* trans, And::resource<And::ObjLoader>* resource)> obj_draw = 
-      [&g_renderer, &g_shader](And::Transform* trans, And::resource<And::ObjLoader>* resource){
+    std::function<void(And::Transform* trans, And::resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::resource<And::ObjLoader>* resource){
+
       g_renderer.draw_obj(*(*resource), &g_shader.value(), *trans);
     };
 
     entity_comp.execute_system(obj_draw);
 
-    g_renderer.draw_obj(*obj_teapot, &g_shader.value(), tran);
+    //g_renderer.draw_obj(*obj_teapot, &g_shader.value(), tran);
 
 
     //input.update_input();

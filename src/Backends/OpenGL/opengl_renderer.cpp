@@ -21,7 +21,7 @@ Renderer::Renderer(Window& window) : m_Window(window)
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
   m_camera_pos[0] = 0.0f;
   m_camera_pos[1] = 7.0f;
-  m_camera_pos[2] = -10.0f;
+  m_camera_pos[2] = -60.0f;
 
   m_camera_target[0] = 0.0f;
   m_camera_target[1] = 0.0f;
@@ -208,10 +208,10 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-  glm::vec3 objectPosition = glm::vec3(0.0f, 0.0f, 0.0f);
-  glm::vec3 objectScale = glm::vec3(1.0f, 1.0f, 1.0f);
+  glm::vec3 objectPosition = glm::vec3(tran.position[0], tran.position[1], tran.position[2]);
+  glm::vec3 objectScale = glm::vec3(tran.scale[0], tran.scale[1], tran.scale[2]);
   float rotationAngle = 0.0f;
-  glm::vec3 objectRotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+  glm::vec3 objectRotationAxis = glm::vec3(tran.rotation[0], tran.rotation[1], tran.rotation[2]);
 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
