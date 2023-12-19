@@ -65,6 +65,22 @@ void print_value(int i, int a, int b)
 }
 
 
+class ObjComponent{
+
+  public:
+  ObjComponent(){
+
+  }
+  ~ObjComponent(){}
+
+
+  And::resource<And::ObjLoader> m_resource;
+  private:
+
+
+};
+
+
 
 int main(int argc, char** argv){
 
@@ -90,7 +106,7 @@ int main(int argc, char** argv){
 
   And::ResourceManager r_manager{*window, js};
   r_manager.add_resource_generator<And::ObjGenerator>();
-  And::resource<And::ObjLoader> obj_teapot = r_manager.new_resource<And::ObjLoader>("teapot.obj");
+  
 
   // Show pc info
   g_context->create_info();
@@ -157,7 +173,16 @@ int main(int argc, char** argv){
 
   entity_comp.add_component_class<And::Triangle>();
   entity_comp.new_entity(And::Triangle{ver});
-  
+
+
+
+  And::resource<And::ObjLoader> obj_teapot = r_manager.new_resource<And::ObjLoader>("teapot.obj");
+
+  entity_comp.add_component_class<And::resource<And::ObjLoader>>();
+  entity_comp.add_component_class<And::Transform>();
+  And::Transform tran = {{0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
+  And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
+
 
 
   float speed = 0.01f;
@@ -214,7 +239,15 @@ int main(int argc, char** argv){
     //g_renderer.showDemo();
     //g_renderer.draw_triangle(&tri);
     //g_renderer.draw_obj(*obj_loaded, &g_shader.value());
-    g_renderer.draw_obj(*obj_teapot, &g_shader.value());
+
+    std::function<void(And::Transform* trans, And::resource<And::ObjLoader>* resource)> obj_draw = 
+      [&g_renderer, &g_shader](And::Transform* trans, And::resource<And::ObjLoader>* resource){
+      g_renderer.draw_obj(*(*resource), &g_shader.value(), *trans);
+    };
+
+    entity_comp.execute_system(obj_draw);
+
+    g_renderer.draw_obj(*obj_teapot, &g_shader.value(), tran);
 
 
     //input.update_input();

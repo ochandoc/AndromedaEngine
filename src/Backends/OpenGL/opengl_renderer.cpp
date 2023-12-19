@@ -187,7 +187,7 @@ void CheckError(){
 }
 }
 
-void Renderer::draw_obj(ObjLoader obj, Shader* s) {
+void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
 
   if(s){
     s->use();

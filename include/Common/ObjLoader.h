@@ -20,6 +20,12 @@ namespace And{
     float normal[3];  
   };
 
+  struct Transform{
+    float position[3];
+    float rotation[3];
+    float scale[3];
+  };
+
 
 class ObjLoader{
   public:

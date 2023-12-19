@@ -1,6 +1,7 @@
 #pragma once
 
 #include "base.h"
+#include "ObjLoader.h"
 
 namespace And
 {
@@ -32,7 +33,7 @@ public:
 
   void draw_triangle(Triangle *t);
 
-  void draw_obj(ObjLoader obj, Shader* s);
+  void draw_obj(ObjLoader obj, Shader* s, Transform trans);
 
 protected:
   Window& m_Window;
