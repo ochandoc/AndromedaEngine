@@ -33,6 +33,14 @@ project "06_Triangles"
     "../../bin/%{cfg.buildcfg}/Andromeda",
   }
 
+  postbuildcommands 
+  {
+    [[
+      cd %{wks.location}examples\%{prj.name}\
+      copy_data.bat
+    ]]
+  }
+
   conan_config = get_conan_config()
   setup_dependencies_exe(conan_config)
 

@@ -48,4 +48,6 @@ deps/Soloud
 examples/**/bin
 examples/**/build
 
+examples/**/*.bat
+
 tools/scripts/__pycache__
