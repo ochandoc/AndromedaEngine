@@ -31,7 +31,7 @@ Renderer::Renderer(Window& window) : m_Window(window)
   GLFWwindow *window_tmp = (GLFWwindow*) m_Window.get_native_window();
   int width, height;
   glfwGetWindowSize(window_tmp, &width, &height);
-  m_aspectRatio = width/height;
+  m_aspectRatio = (float)(width/height);
 
   m_near = 0.1f;
   m_far = 100.0f;
@@ -243,7 +243,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
   glEnable(GL_DEPTH_TEST);
 
   std::vector<unsigned int> indices = obj.getIndices();
-  glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, indices.data());
+  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
 
 }
 
