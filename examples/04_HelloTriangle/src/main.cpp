@@ -54,7 +54,7 @@ int main(int argc, char** argv){
   // Creamos el shader
   And::ShaderInfo s_info;
   s_info.path_fragment = "fshader.fs";
-  s_info.path_vertex = "vshader.vs";
+  s_info.path_vertex = "vshader_tri.vs";
 
    std::optional<And::Shader> g_shader = And::Shader::make(s_info);
 
