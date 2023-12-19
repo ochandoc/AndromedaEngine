@@ -1,10 +1,10 @@
-project "Window"
+project "01_Window"
   kind "ConsoleApp"
   language "C++"
   cppdialect "C++20"
   staticruntime "Off"
 
-  location "build/%{prj.name}"
+  location "build"
 
   targetdir "bin/%{cfg.buildcfg}"
   objdir "build/%{cfg.buildcfg}"
