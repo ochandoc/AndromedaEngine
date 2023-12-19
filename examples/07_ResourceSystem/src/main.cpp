@@ -45,10 +45,9 @@ int main(int argc, char** argv){
     And::ResourceManager rm(*window, js);
 
     rm.add_resource_generator<TextureGenerator>();
-    std::string Path = "./jou.jpg";
-    And::resource<OpenGLTexture2D> tex = rm.new_resource<OpenGLTexture2D>(Path);
-    And::resource<OpenGLTexture2D> tex2 = rm.new_resource<OpenGLTexture2D>(Path);
-    And::resource<OpenGLTexture2D> tex3 = rm.new_resource<OpenGLTexture2D>("./test.png");
+    And::resource<OpenGLTexture2D> tex = rm.new_resource<OpenGLTexture2D>("./jou.jpg");
+    And::resource<OpenGLTexture2D> tex2 = rm.new_resource<OpenGLTexture2D>("vm_esat.png");
+    And::resource<OpenGLTexture2D> tex3 = rm.new_resource<OpenGLTexture2D>("./test.jpg");
     And::resource<OpenGLTexture2D> tex4 = rm.new_resource<OpenGLTexture2D>("./esat_team.jpg");
 
     And::LogWindow log_window;

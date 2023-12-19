@@ -36,48 +36,12 @@
 #include "Common/Log.h"
 #include "Common/Save.h"
 
-int select_num(int i)
-{
-  printf("Num selected\n");
-  return i;
-}
-
-int select_num1(int i)
-{
-  std::this_thread::sleep_for(std::chrono::seconds(2));
-  printf("Num selected 1\n");
-  return i;
-}
-
-int select_num2(int i)
-{
-  std::this_thread::sleep_for(std::chrono::seconds(5));
-  printf("Num selected 2\n");
-  return i;
-}
-
-void print_value(int i, int a, int b)
-{
-  printf("Num: %d\n", i + a + b);
-}
-
-
 
 int main(int argc, char** argv){
 
   And::Engine e;
 
   And::JobSystem js{ e };
-
-  And::future<int> f{ 10 };
-  And::future<int> f1{ 20 };
-  And::future<int> f2{ 30 };
-
-  And::future<int> future1 = js.add_job(select_num, f);
-  And::future<int> future2 = js.add_job(select_num1, f1);
-  And::future<int> future3 = js.add_job(select_num2, f2);
-
-  js.add_job(print_value, future1, future2, future3);
 
   std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
@@ -89,8 +53,8 @@ int main(int argc, char** argv){
 
   // Creamos el shader
   And::ShaderInfo s_info;
-  s_info.path_fragment = "../../data/fshader.fs";
-  s_info.path_vertex = "../../data/vshader.vs";
+  s_info.path_fragment = "fshader.fs";
+  s_info.path_vertex = "vshader.vs";
 
    std::optional<And::Shader> g_shader = And::Shader::make(s_info);
 
@@ -140,33 +104,12 @@ int main(int argc, char** argv){
 
   entity_comp.add_component_class<And::Triangle>();
   entity_comp.new_entity(And::Triangle{ver});
-  
-  struct SPrueba{
-    int uno = 1;
-    float dos = 2.0f;
-  };
 
-  SPrueba prueba;
-  prueba.uno = 3;
-  prueba.dos = 3.0f;
-
-  And::SavedObject<SPrueba> save_struct(prueba);
-  //bool result = save_struct.save("Orochi");
-  save_struct.load("Orochi.and", prueba);
-
-
- // if(result){
-  //printf("Guardado de locos");
-  //}
 
   float speed = 0.01f;
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
-    
-    if (input.check_action(jump)){
-      printf("Jummpinggggg!!!\n");
-    }
 
     And::Vertex *vertices = tri.get_vertex();
 
@@ -192,23 +135,12 @@ int main(int argc, char** argv){
       }
     }
 
-    if (input.IsKeyPressed(And::KeyCode::Space)){
-
-      printf("Space pressed!\n");
-    }
-
-    if (input.IsKeyRelease(And::KeyCode::Space)){
-      printf("Space released!\n");
-    }
-
     if(g_shader.has_value()){
       g_shader->use();
     }
     
-    //g_renderer.showDemo();
     g_renderer.draw_triangle(&tri);
     
-    //input.update_input();
     g_renderer.end_frame();
     window->swap_buffers();
   }

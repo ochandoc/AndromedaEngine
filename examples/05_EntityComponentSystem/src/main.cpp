@@ -54,33 +54,15 @@ void manolo2(int_comp* c1)
   test_V.push_back(c1->num);
 }
 
-LARGE_INTEGER StartTime;
-LARGE_INTEGER Freq;
-
-void ResetTimer()
-{
-  QueryPerformanceCounter(&StartTime);
-}
-
-void CheckTimer(const char* Name)
-{
-  static LARGE_INTEGER CurrentTime;
-  QueryPerformanceCounter(&CurrentTime);
-
-  printf("%s: %fms\n", Name, (((float)(CurrentTime.QuadPart - StartTime.QuadPart) / (float)Freq.QuadPart) * 1000.0f));
-}
-
 int main(int argc, char** argv)
 {
-  QueryPerformanceFrequency(&Freq);
+  And::Entity e;
+
   And::EntityComponentSystem ecs;
 
   ecs.add_component_class<int_comp>();
   ecs.add_component_class<float_comp>();
 
-  And::Entity e;
-
-  ResetTimer();
   for (int i = 0; i < 100000; i++)
   {
     if ((i % 2) == 0)
@@ -92,20 +74,14 @@ int main(int argc, char** argv)
       ecs.new_entity(int_comp{ i });
     }
   }
-  CheckTimer("Insertions");
 
   for (int i = 0; i < 10; i++)
   {
-    ResetTimer();
     ecs.execute_system(manolo2);
-    CheckTimer("System");
-
     printf("Size: %zu\n", test_V.size());
     test_V.clear();
 
-    ResetTimer();
     ecs.execute_system(manolo);
-    CheckTimer("System");
 
     printf("Size: %zu\n", test_V.size());
     test_V.clear();

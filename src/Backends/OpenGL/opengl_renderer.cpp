@@ -34,7 +34,7 @@ Renderer::Renderer(Window& window) : m_Window(window)
   m_aspectRatio = (float)(width/height);
 
   m_near = 0.1f;
-  m_far = 100.0f;
+  m_far = 10000.0f;
 
 
 
