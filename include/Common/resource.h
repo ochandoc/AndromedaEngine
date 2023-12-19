@@ -32,10 +32,8 @@ namespace And
   template<typename T>
   class resource
   {
-  private:
-    resource() = default;
-
   public:
+    resource() = default;
     resource(const resource& other) { m_Resource = other.m_Resource; }
     resource(resource&& other) { m_Resource = std::move(other.m_Resource); }
 
