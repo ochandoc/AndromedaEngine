@@ -6,6 +6,11 @@ __Authors__
 - Jose Maria Maestre
 - Hector Ochando 
 
+## Dependences
+- Python 3.11
+- Conan < 2 
+- Cmake
+
 ## Set up instructions
 
 ``` 
