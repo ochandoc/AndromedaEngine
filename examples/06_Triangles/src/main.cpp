@@ -33,11 +33,6 @@
 
 #include "Common/JobSystem.h"
 
-#include <Windows.h>
-
-LARGE_INTEGER StartTime;
-LARGE_INTEGER Freq;
-
 
 class InputComponent {
 public:
@@ -87,44 +82,6 @@ private:
   And::Input* m_input;
 };
 
-void ResetTimer()
-{
-  QueryPerformanceCounter(&StartTime);
-}
-
-void CheckTimer(const char* Name)
-{
-  static LARGE_INTEGER CurrentTime;
-  QueryPerformanceCounter(&CurrentTime);
-
-  printf("%s: %fms\n", Name, (((float)(CurrentTime.QuadPart - StartTime.QuadPart) / (float)Freq.QuadPart) * 1000.0f));
-}
-
-int select_num(int i)
-{
-  printf("Num selected\n");
-  return i;
-}
-
-int select_num1(int i)
-{
-  std::this_thread::sleep_for(std::chrono::seconds(2));
-  printf("Num selected 1\n");
-  return i;
-}
-
-int select_num2(int i)
-{
-  std::this_thread::sleep_for(std::chrono::seconds(5));
-  printf("Num selected 2\n");
-  return i;
-}
-
-void print_value(int i, int a, int b)
-{
-  printf("Num: %d\n", i + a + b);
-}
-
 
 void DrawTriangle(And::Renderer& r, And::Triangle* tri) {
   r.draw_triangle(tri);
@@ -132,21 +89,10 @@ void DrawTriangle(And::Renderer& r, And::Triangle* tri) {
 
 
 int main(int argc, char** argv) {
-  QueryPerformanceFrequency(&Freq);
-  srand(time(NULL));
+  srand((unsigned int)time(NULL));
   And::Engine e;
 
   And::JobSystem js{ e };
-
-  And::future<int> f{ 10 };
-  And::future<int> f1{ 20 };
-  And::future<int> f2{ 30 };
-
-  And::future<int> future1 = js.add_job(select_num, f);
-  And::future<int> future2 = js.add_job(select_num1, f1);
-  And::future<int> future3 = js.add_job(select_num2, f2);
-
-  js.add_job(print_value, future1, future2, future3);
 
   std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
@@ -200,7 +146,7 @@ int main(int argc, char** argv) {
       },
       {
 
-        {initial_posx + (triangle_width * 0.5), initial_posy + triangle_height, 0.0f},
+        {initial_posx + (triangle_width * 0.5f), initial_posy + triangle_height, 0.0f},
         {0.0f, 0.0f, 0.0f},
         {1.0f, 0.0f, 0.0f, 1.0f},
         {2, 1, 0},
@@ -295,14 +241,9 @@ int main(int argc, char** argv) {
       input_comp->get_input(vertex, speed);
       };
 
-
-    ResetTimer();
     entity_comp.execute_system(f);
     entity_comp.execute_system(input_system);
-    //CheckTimer("System");
 
-
-    //input.update_input();
     g_renderer.end_frame();
     window->swap_buffers();
   }
