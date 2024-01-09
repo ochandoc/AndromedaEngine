@@ -61,6 +61,29 @@ namespace And{
     return false;
   }
 
+  std::shared_ptr<Shader> Shader::make(const std::string& path){
+    unsigned int id_program = glCreateProgram();
+    // Error
+    if(id_program == 0){
+        //return std::nullopt;
+      return nullptr;
+    }
+
+   //const char* paths[4] = {s_info.path_vertex, s_info.path_fragment, s_info.path_geometry, s_info.path_teselation};
+
+    Slurp file{path.c_str()};
+    std::string shaders{file.data(), file.size()};
+
+    int vertex_pos = shaders.find("#type Vertex");
+    int fragment_pos = shaders.find("#type Fragment");
+
+    //std::string vertex = 
+
+
+    printf("Shader content %s\n", shaders.c_str());
+
+  }
+
   std::shared_ptr<Shader> Shader::make(ShaderInfo s_info){
 
     unsigned int id_program = glCreateProgram();
