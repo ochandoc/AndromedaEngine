@@ -20,11 +20,7 @@ Triangle::Triangle(Vertex v[3]){
 
 }
 
-Triangle::~Triangle(){
-  // delete buffers
-  glDeleteBuffers(1, &m_VAO);
-  glDeleteBuffers(1, &m_VBO);
-}
+Triangle::~Triangle(){}
 
 
 Vertex* Triangle::get_vertex(){
@@ -34,20 +30,5 @@ Vertex* Triangle::get_vertex(){
 const Vertex* Triangle::get_vertex() const{
   return m_vertex;
 }
-
-void Triangle::set_buffers(unsigned int vao, unsigned int vbo){
-  m_VAO = vao;
-  m_VBO = vbo;
-  buffers_created = true;
-}
-
-const unsigned int Triangle::get_vao(){
-  return m_VAO;
-}
-
-const unsigned int Triangle::get_vbo(){
-  return m_VBO;
-}
-
 
 }
