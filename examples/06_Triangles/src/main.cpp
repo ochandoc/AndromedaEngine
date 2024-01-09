@@ -106,8 +106,9 @@ int main(int argc, char** argv) {
   And::ShaderInfo s_info;
   s_info.path_fragment = "fshader.fs";
   s_info.path_vertex = "vshader_tri.vs";
+  
 
-  std::optional<And::Shader> g_shader = And::Shader::make(s_info);
+  std::shared_ptr<And::Shader> g_shader = And::Shader::make(s_info);
 
 
   float clear_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -224,7 +225,7 @@ int main(int argc, char** argv) {
       printf("Space released!\n");
     }
 
-    if (g_shader.has_value()) {
+    if (g_shader) {
       g_shader->use();
     }
 

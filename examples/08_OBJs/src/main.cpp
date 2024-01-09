@@ -62,7 +62,7 @@ int main(int argc, char** argv){
   s_info.path_fragment = "fshader.fs";
   s_info.path_vertex = "vshader.vs";
 
-  std::optional<And::Shader> g_shader = And::Shader::make(s_info);
+  std::shared_ptr<And::Shader> g_shader = And::Shader::make(s_info);
   
 
 
@@ -99,7 +99,7 @@ int main(int argc, char** argv){
 
     std::function<void(And::Transform* trans, And::resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::resource<And::ObjLoader>* resource){
 
-      g_renderer.draw_obj(*(*resource), &g_shader.value(), *trans);
+      g_renderer.draw_obj(*(*resource), g_shader.get(), *trans);
     };
 
     entity_comp.execute_system(obj_draw);
