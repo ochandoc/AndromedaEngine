@@ -15,26 +15,27 @@ class Triangle{
 
 
   Triangle(Vertex v[3]);
-  Triangle(const Triangle&) = delete;
-  Triangle(Triangle&&) = delete;
+  Triangle(){};
+  Triangle(const Triangle&) = default;
+  Triangle(Triangle&&) = default;
   ~Triangle();
+
+
+  Triangle& operator=(const Triangle& other) = default;
 
   Vertex* get_vertex();
 
   const Vertex* get_vertex() const;
 
-  bool buffers_created = false;
-
-  void set_buffers(unsigned int vao, unsigned int vbo);
-  
-  const unsigned int get_vao();
-  const unsigned int get_vbo();
+  unsigned int m_vao;
+  unsigned int m_vbo;
 
   private:
 
   Vertex m_vertex[3];
   unsigned int m_VAO;
   unsigned int m_VBO;
+
 
 };
 }

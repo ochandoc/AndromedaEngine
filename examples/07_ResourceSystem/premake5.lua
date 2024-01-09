@@ -1,13 +1,13 @@
-project "Sandbox"
+project "07_ResourceSystem"
   kind "ConsoleApp"
   language "C++"
   cppdialect "C++20"
   staticruntime "Off"
 
-  location "build/%{prj.name}"
+  location "build"
 
   targetdir "bin/%{cfg.buildcfg}"
-  objdir "build/%{cfg.buildcfg}"
+  objdir "build/obj/%{cfg.buildcfg}"
 
   dependson "Andromeda"
 
@@ -32,6 +32,17 @@ project "Sandbox"
   {
     "../../bin/%{cfg.buildcfg}/Andromeda",
   }
+
+  postbuildcommands 
+  {
+    [[
+      cd %{wks.location}examples\%{prj.name}\
+      copy_data.bat
+    ]]
+  }
+
+  conan_config = get_conan_config()
+  setup_dependencies_exe(conan_config)
 
   filter "configurations:Debug"
     defines { "DEBUG" }

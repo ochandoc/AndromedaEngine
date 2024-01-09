@@ -18,6 +18,7 @@ namespace And
     PLATFORM_WINDOW_DATA glfw;
     KeyboardState* keyboard;
     std::shared_ptr<GraphicsContext> m_Context;
+    // Camera cam;
   };
 
   static void close_window_callback(GLFWwindow* window)
@@ -250,6 +251,11 @@ namespace And
     glfwPollEvents();
   }
 
+  void Window::swap_buffers()
+  {
+    glfwSwapBuffers(m_Data->glfw.handle);
+  }
+
   std::shared_ptr<GraphicsContext> Window::get_context() const
   {
     return m_Data->m_Context;
@@ -299,8 +305,6 @@ namespace And
       ImGui::RenderPlatformWindowsDefault();
       glfwMakeContextCurrent(backup_current_context);
     }
-
-    glfwSwapBuffers(m_Data->glfw.handle);
   }
 
 }
