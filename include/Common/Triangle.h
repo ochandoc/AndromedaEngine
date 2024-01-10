@@ -33,8 +33,6 @@ class Triangle{
   private:
 
   Vertex m_vertex[3];
-  unsigned int m_VAO;
-  unsigned int m_VBO;
 
 
 };

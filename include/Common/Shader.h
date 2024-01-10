@@ -22,7 +22,8 @@ namespace And{
   {
   public:
 
-    static std::optional<Shader> make(ShaderInfo s_info);
+    static std::shared_ptr<Shader> make(ShaderInfo s_info);
+    static std::shared_ptr<Shader> make(const std::string& path);
     Shader(const Shader& other) = delete;
     Shader(Shader&& other);
     ~Shader();
