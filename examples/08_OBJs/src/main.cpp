@@ -79,7 +79,7 @@ int main(int argc, char** argv){
   entity_comp.add_component_class<And::Transform>();  
 
 
-  And::resource<And::Shader> g_shader = r_manager.new_resource<And::Shader>("default/deafult_shader_red.shader");
+  And::resource<And::Shader> g_shader = r_manager.new_resource<And::Shader>("default/default_shader_normals.shader");
 
   int num_obj = 10;
   float pos_x = 0.0f;
