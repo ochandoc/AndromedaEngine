@@ -3,6 +3,7 @@
 
 #include "TextEditor.h"
 #include "Common/Threw.h"
+#include "Common/Slurp.h"
 
 struct ShaderInfo
 {
@@ -26,18 +27,48 @@ struct ShaderTextEditorData
 
 ShaderTextEditor::ShaderTextEditor(const char* Path) : m_Data(new ShaderTextEditorData)
 {
+
+  std::string vertex_shader = "Blank";
+  std::string fragment_shader = "Blank";
+
+  And::Slurp shader_file{Path};
+  if(shader_file.size() >= 0 ){
+    // Ya existe el archivo
+    std::string shaders{shader_file.data(), shader_file.size()};
+
+    int vertex_pos = shaders.find("#type Vertex");
+    int fragment_pos = shaders.find("#type Fragment");
+
+    
+
+    if(vertex_pos != std::string::npos && fragment_pos != std::string::npos){
+      vertex_shader = shaders.substr(vertex_pos, fragment_pos);
+      fragment_shader = shaders.substr(fragment_pos, shaders.size() - 1);
+
+      std::string vertex_title = "#type Vertex";
+      std::string fragment_title = "#type Fragment";
+
+      vertex_shader.erase(0, vertex_title.size());
+      fragment_shader.erase(0, fragment_title.size());
+
+      printf("Vertex content %s\n Fragment content %s\n", vertex_shader.c_str(), fragment_shader.c_str());
+    }
+
+  }
+
   m_Data->bOpen = true;
   m_Data->Path = Path;
+
   {
     ShaderInfo info;
     info.Type = "Vertex";
-    info.shaderEditor.SetText("Hola");
+    info.shaderEditor.SetText(vertex_shader.c_str());
     m_Data->shaderEditors.push_back(info);
   }
   {
     ShaderInfo info;
     info.Type = "Fragment";
-    info.shaderEditor.SetText("Adios");
+    info.shaderEditor.SetText(fragment_shader.c_str());
     m_Data->shaderEditors.push_back(info);
   }
 }

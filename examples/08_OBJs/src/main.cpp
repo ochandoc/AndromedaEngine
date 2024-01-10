@@ -34,6 +34,7 @@
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
 #include "Common/EntityComponentSystem.h"
+#include "Common/ShaderTextEditor.h"
 
 #include "Common/JobSystem.h"
 #include "Common/Log.h"
@@ -97,10 +98,14 @@ int main(int argc, char** argv){
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   }
 
+  ShaderTextEditor editor_teapot("content/teapot_shader.ashader");
+
  
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
+
+    editor_teapot.do_something();
 
 
     std::function<void(And::Transform* trans, And::resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::resource<And::ObjLoader>* resource){
@@ -114,5 +119,6 @@ int main(int argc, char** argv){
     window->swap_buffers();
   }
 
+  
   return 0;
 }
