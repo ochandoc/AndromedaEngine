@@ -71,14 +71,24 @@ namespace And
   {
   public:
 
-    LogWindow(std::string title);
-    LogWindow();
+    LogWindow(const std::string& Title);
     void Show() override;
 
     void ClearLog();
 
     inline void Open() { m_is_open = true; }
     inline void Close() { m_is_open = false; }
+  private:
+    char SearchText[1024];
+    bool EnableAutoScrolling = true;
+    uint32 LogCategoryId = -1;
+    bool bTrace = false;
+    bool bDebug = false;
+    bool bInfo = true;
+    bool bWarning = true;
+    bool bError = true;
+    bool bCritical = false;
+    bool bGoDown;
   };
 }
 
