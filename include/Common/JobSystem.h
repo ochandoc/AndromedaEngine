@@ -2,6 +2,7 @@
 
 #include "base.h"
 
+#include "Engine.h"
 #include "future.h"
 
 namespace And
@@ -31,6 +32,7 @@ namespace And
 				std::future<ret_t> std_f = m_Task.get_future();
 				std::shared_ptr<future_imp<ret_t>> f(new future_imp<ret_t>(std_f));
 				m_Future.m_Future = f;
+				m_Future.m_Id = (size_t)f.get();
 			}
 			virtual ~job_imp() = default;
 
@@ -76,16 +78,16 @@ namespace And
 		class job
 		{
 		private:
-			job() = default;
+			job(bool resource = false) { m_Resource = resource; };
 
 		public:
-			job(const job& other) { m_Job = other.m_Job; m_Id = other.m_Id; }
-			job(job&& other) { m_Job = std::move(other.m_Job); std::swap(m_Id, other.m_Id); }
+			job(const job& other) { m_Job = other.m_Job; m_Id = other.m_Id; m_Resource = other.m_Resource; }
+			job(job&& other) { m_Job = std::move(other.m_Job); std::swap(m_Id, other.m_Id); std::swap(m_Resource, other.m_Resource); }
 
 			~job() = default;
 
-			job& operator =(const job& other) { if (this != &other) { m_Job = other.m_Job; } return *this; }
-			job& operator =(job& other) { if (this != &other) { m_Job = std::move(other.m_Job); std::swap(m_Id, other.m_Id); } return *this; }
+			job& operator =(const job& other) { if (this != &other) { m_Job = other.m_Job; m_Id = other.m_Id; m_Resource = other.m_Resource; } return *this; }
+			job& operator =(job& other) { if (this != &other) { m_Job = std::move(other.m_Job); std::swap(m_Id, other.m_Id); std::swap(m_Resource, other.m_Resource); } return *this; }
 
 			size_t get_id() const
 			{
@@ -107,21 +109,41 @@ namespace And
 				return m_Job->get_future_availability();
 			}
 
-			friend class And::JobSystem;
+			bool is_resource() const
+			{
+				return m_Resource;
+			}
+
+			friend class ResourceManager;
+			friend class JobSystem;
 		private:
 			std::shared_ptr<job_base> m_Job;
 			size_t m_Id = 0;
+			bool m_Resource;
 		};
 	}
+
+	struct ThreadsData
+	{
+		std::mutex m_MapMutex;
+		std::mutex m_QueueMutex;
+		std::mutex m_ResourceQueueMutex;
+		std::condition_variable m_Condition;
+		std::condition_variable m_ResourceCondition;
+		std::queue<internal::job> m_JobsQueue;
+		std::queue<internal::job> m_ResourceJobsQueue;
+		std::unordered_map<size_t, std::vector<internal::job>> m_FutureJobUnion;
+	};
 
 	class JobSystem
 	{
 	public:
 		NON_COPYABLE_CLASS(JobSystem)
-			NON_MOVABLE_CLASS(JobSystem)
+		NON_MOVABLE_CLASS(JobSystem)
 	public:
-		JobSystem() : m_Stop(false)
+		JobSystem(Engine& e) : m_Stop(false)
 		{
+			m_ThreadsData = e.m_ThreadsData;
 			int num_threads = std::thread::hardware_concurrency();
 			for (int i = 0; i < num_threads; i++)
 			{
@@ -130,11 +152,11 @@ namespace And
 						{
 							internal::job j;
 							{
-								std::unique_lock<std::mutex> lock{m_QueueMutex};
-								m_Condition.wait(lock, [this]() {return !m_JobsQueue.empty() || m_Stop; });
-								if (m_JobsQueue.empty() && m_Stop) return;
-								j = std::move(m_JobsQueue.front());
-								m_JobsQueue.pop();
+								std::unique_lock<std::mutex> lock{ m_ThreadsData->m_QueueMutex};
+								m_ThreadsData->m_Condition.wait(lock, [this]() {return !m_ThreadsData->m_JobsQueue.empty() || m_Stop; });
+								if (m_ThreadsData->m_JobsQueue.empty() && m_Stop) return;
+								j = std::move(m_ThreadsData->m_JobsQueue.front());
+								m_ThreadsData->m_JobsQueue.pop();
 							}
 							j();
 							future_availability fa = j.get_future_availability();
@@ -147,7 +169,7 @@ namespace And
 		~JobSystem()
 		{
 			m_Stop = true;
-			m_Condition.notify_all();
+			m_ThreadsData->m_Condition.notify_all();
 			for (std::thread& thread : m_Threads)
 			{
 				if (thread.joinable())
@@ -172,7 +194,7 @@ namespace And
 
 			if (j.is_available())
 			{
-				m_JobsQueue.push(j);
+				m_ThreadsData->m_JobsQueue.push(j);
 			}
 			else
 			{
@@ -182,23 +204,32 @@ namespace And
 			return f;
 		}
 
+		friend class ResourceManager;
 	private:
 
 		void check_job_blocked(size_t future_id)
 		{
-			std::lock_guard<std::mutex> lock{ m_MapMutex };
-			if (m_FutureJobUnion.contains(future_id))
+			std::lock_guard<std::mutex> lock{ m_ThreadsData->m_MapMutex };
+			if (m_ThreadsData->m_FutureJobUnion.contains(future_id))
 			{
-				int num_jobs = m_FutureJobUnion[future_id].size();
-				std::vector<internal::job>& jobs = m_FutureJobUnion[future_id];
+				int num_jobs = (int)m_ThreadsData->m_FutureJobUnion[future_id].size();
+				std::vector<internal::job>& jobs = m_ThreadsData->m_FutureJobUnion[future_id];
 				for (int i = 0; i < num_jobs; i++)
 				{
 					if (jobs[i].is_available())
 					{
 						internal::job j = jobs[i];
 						jobs.erase(jobs.begin() + i);
-						m_JobsQueue.push(j);
-						m_Condition.notify_one();
+						if (j.is_resource())
+						{
+							m_ThreadsData->m_ResourceJobsQueue.push(j);
+							m_ThreadsData->m_ResourceCondition.notify_one();
+						}
+						else
+						{
+							m_ThreadsData->m_JobsQueue.push(j);
+							m_ThreadsData->m_Condition.notify_one();
+						}
 					}
 				}
 			}
@@ -206,23 +237,19 @@ namespace And
 
 		void add_job_blocked_to_union(size_t future_id, internal::job& j)
 		{
-			std::lock_guard<std::mutex> lock{ m_MapMutex };
-			if (m_FutureJobUnion.contains(future_id))
+			std::lock_guard<std::mutex> lock{ m_ThreadsData->m_MapMutex };
+			if (m_ThreadsData->m_FutureJobUnion.contains(future_id))
 			{
-				m_FutureJobUnion[future_id].push_back(j);
+				m_ThreadsData->m_FutureJobUnion[future_id].push_back(j);
 			}
 			else
 			{
-				m_FutureJobUnion.insert({ future_id, {j} });
+				m_ThreadsData->m_FutureJobUnion.insert({ future_id, {j} });
 			}
 		}
 
 		bool m_Stop;
+		std::shared_ptr<ThreadsData> m_ThreadsData;
 		std::vector<std::thread> m_Threads;
-		std::mutex m_MapMutex;
-		std::mutex m_QueueMutex;
-		std::condition_variable m_Condition;
-		std::queue<internal::job> m_JobsQueue;
-		std::unordered_map<size_t, std::vector<internal::job>> m_FutureJobUnion;
 	};
 }

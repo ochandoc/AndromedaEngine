@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Log.h"
+
+DECLARE_LOG_CATEGORY(GraphicsContextLog, Trace, false)
+
 namespace And
 {
 class Window;

@@ -2,7 +2,7 @@
 
 #include "Common/Slurp.h"
 
-#include "GL/glew.h"
+#include "Backends/OpenGL/OpenGL.h"
 #include "andpch.hpp"
 
 
@@ -120,6 +120,19 @@ namespace And{
     s.m_Data->id = id_program;
     s.m_Data->shader_info = s_info;
     return std::optional<Shader>(std::move(s));
+  }
+
+  void Shader::setMat4(std::string name, const float matrix[16]){ 
+
+    /*for(int i = 0; i < 16; i++){
+      printf("%f ", matrix[i]);
+    }*/
+    glUniformMatrix4fv(glGetUniformLocation(m_Data->id, name.c_str()), 1, GL_FALSE, &matrix[0]);
+  }
+
+  void Shader::setVec3(std::string name, const float vector[9]){
+
+    glUniform3fv(glGetUniformLocation(m_Data->id, name.c_str()),1, &vector[0]);
   }
 
 

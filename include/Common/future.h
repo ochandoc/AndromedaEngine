@@ -96,7 +96,7 @@ namespace And
 
 		bool operator ==(const future& other) { return (m_Id == other.m_Id); }
 
-		T get()
+		T get() const
 		{
 			return m_Future->get();
 		}
