@@ -57,12 +57,8 @@ int main(int argc, char** argv){
 
   And::ResourceManager r_manager{*window, js};
   r_manager.add_resource_generator<And::ObjGenerator>();
-<<<<<<< HEAD
 
   And::Editor editor;
-=======
-  r_manager.add_resource_generator<And::ShaderGenerator>();
->>>>>>> ba24e31776529b0a89ed793749e4d6b18ea3fa32
   
 
   // Show pc info
