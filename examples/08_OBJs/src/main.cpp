@@ -29,11 +29,16 @@
 #include "Common/Triangle.h"
 #include "Common/ObjLoader.h"
 #include "Common/ObjGenerator.h"
+#include "Common/ShaderGenerator.h"
 
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
 #include "Common/EntityComponentSystem.h"
+<<<<<<< HEAD
 #include "Common/Editor/Editor.h"
+=======
+#include "Common/ShaderTextEditor.h"
+>>>>>>> ba24e31776529b0a89ed793749e4d6b18ea3fa32
 
 #include "Common/JobSystem.h"
 #include "Common/Log.h"
@@ -52,8 +57,12 @@ int main(int argc, char** argv){
 
   And::ResourceManager r_manager{*window, js};
   r_manager.add_resource_generator<And::ObjGenerator>();
+<<<<<<< HEAD
 
   And::Editor editor;
+=======
+  r_manager.add_resource_generator<And::ShaderGenerator>();
+>>>>>>> ba24e31776529b0a89ed793749e4d6b18ea3fa32
   
 
   // Show pc info
@@ -61,11 +70,11 @@ int main(int argc, char** argv){
 
 
   // Creamos el shader
-  And::ShaderInfo s_info;
-  s_info.path_fragment = "fshader.fs";
-  s_info.path_vertex = "vshader.vs";
+  //And::ShaderInfo s_info;
+  //s_info.path_fragment = "fshader.fs";
+  //s_info.path_vertex = "vshader.vs";
 
-  std::optional<And::Shader> g_shader = And::Shader::make(s_info);
+  //std::shared_ptr<And::Shader> g_shader = And::Shader::make("default/deafult_shader.shader");
   
 
 
@@ -76,7 +85,11 @@ int main(int argc, char** argv){
   And::EntityComponentSystem entity_comp;
     
   entity_comp.add_component_class<And::resource<And::ObjLoader>>();
+  entity_comp.add_component_class<And::resource<And::Shader>>();
   entity_comp.add_component_class<And::Transform>();  
+
+
+  And::resource<And::Shader> g_shader = r_manager.new_resource<And::Shader>("default/default_shader_normals.shader");
 
   int num_obj = 10;
   float pos_x = 0.0f;
@@ -94,6 +107,8 @@ int main(int argc, char** argv){
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   }
 
+  ShaderTextEditor editor_teapot("content/teapot_shader.ashader");
+
  
   while (window->is_open()){
     window->update();
@@ -104,7 +119,7 @@ int main(int argc, char** argv){
 
     std::function<void(And::Transform* trans, And::resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::resource<And::ObjLoader>* resource){
 
-      g_renderer.draw_obj(*(*resource), &g_shader.value(), *trans);
+      g_renderer.draw_obj(*(*resource), &(*g_shader), *trans);
     };
 
     entity_comp.execute_system(obj_draw);
@@ -113,5 +128,6 @@ int main(int argc, char** argv){
     window->swap_buffers();
   }
 
+  
   return 0;
 }
