@@ -34,11 +34,8 @@
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
 #include "Common/EntityComponentSystem.h"
-<<<<<<< HEAD
 #include "Common/Editor/Editor.h"
-=======
 #include "Common/ShaderTextEditor.h"
->>>>>>> ba24e31776529b0a89ed793749e4d6b18ea3fa32
 
 #include "Common/JobSystem.h"
 #include "Common/Log.h"
