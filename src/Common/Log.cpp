@@ -6,6 +6,7 @@
 
 #include "Common/ImGuiSink.h"
 
+
 static inline spdlog::level::level_enum GetSpdlogLevel(And::LogLevel level)
 {
   switch (level)
@@ -123,6 +124,14 @@ namespace And
 
   }
 
+  LogWindow::LogWindow(std::string title){
+    m_title = title;
+  }
+
+  LogWindow::LogWindow(){
+    m_title = "no title";
+  }
+
   void LogWindow::Show()
   {
     static char SearchText[1024];
@@ -136,9 +145,9 @@ namespace And
     static bool bCritical = false;
     static bool bGoDown;
 
-    if (bOpen)
+    if (m_is_open)
     {
-      if (ImGui::Begin("Console Log", &bOpen))
+      if (ImGui::Begin("Console Log", &m_is_open))
       {
         ImGui::InputText("##ConsoleLogSearchText", SearchText, sizeof(SearchText));
         ImGui::SameLine();

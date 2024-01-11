@@ -7,7 +7,6 @@ namespace And{
 
 EditorWindow::EditorWindow(){
   m_is_open = true;
-
 }
 
 EditorWindow::~EditorWindow(){

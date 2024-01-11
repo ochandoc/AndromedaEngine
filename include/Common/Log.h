@@ -3,6 +3,7 @@
 #include "andpch.hpp"
 #include "base.h"
 #include "Editor/EditorWindow.h"
+#include <string>
 
 namespace spdlog
 {
@@ -69,14 +70,15 @@ namespace And
   class LogWindow : public EditorWindow
   {
   public:
+
+    LogWindow(std::string title);
+    LogWindow();
     void Show() override;
 
     void ClearLog();
 
-    inline void Open() { bOpen = true; }
-    inline void Close() { bOpen = false; }
-  private:
-    bool bOpen = true;
+    inline void Open() { m_is_open = true; }
+    inline void Close() { m_is_open = false; }
   };
 }
 

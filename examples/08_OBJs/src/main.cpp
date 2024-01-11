@@ -33,6 +33,7 @@
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
 #include "Common/EntityComponentSystem.h"
+#include "Common/Editor/Editor.h"
 
 #include "Common/JobSystem.h"
 #include "Common/Log.h"
@@ -51,6 +52,8 @@ int main(int argc, char** argv){
 
   And::ResourceManager r_manager{*window, js};
   r_manager.add_resource_generator<And::ObjGenerator>();
+
+  And::Editor editor;
   
 
   // Show pc info
@@ -95,6 +98,8 @@ int main(int argc, char** argv){
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
+
+    editor.ShowWindows();
 
 
     std::function<void(And::Transform* trans, And::resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::resource<And::ObjLoader>* resource){
