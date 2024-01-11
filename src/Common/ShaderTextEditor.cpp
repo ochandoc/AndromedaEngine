@@ -28,6 +28,7 @@ struct ShaderTextEditorData
 ShaderTextEditor::ShaderTextEditor(const char* Path) : m_Data(new ShaderTextEditorData)
 {
 
+  m_just_changed = false;
   std::string vertex_shader = "Blank";
   std::string fragment_shader = "Blank";
 
@@ -132,9 +133,21 @@ void ShaderTextEditor::do_something()
           fwrite(ShaderSource.c_str(), 1, ShaderSource.size(), f);
           fclose(f);
         }
+        m_just_changed = true;
         bSaveFile = false;
       }
     }
     ImGui::End();
   }
+}
+
+
+bool ShaderTextEditor::can_reload(){
+  
+  if(m_just_changed){
+    m_just_changed = false;
+    return true;
+  }
+
+  return false;
 }

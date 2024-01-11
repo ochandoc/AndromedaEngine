@@ -54,6 +54,7 @@ int main(int argc, char** argv){
 
   And::ResourceManager r_manager{*window, js};
   r_manager.add_resource_generator<And::ObjGenerator>();
+  r_manager.add_resource_generator<And::ShaderGenerator>();
 
   And::Editor editor;
   
@@ -82,7 +83,7 @@ int main(int argc, char** argv){
   entity_comp.add_component_class<And::Transform>();  
 
 
-  And::resource<And::Shader> g_shader = r_manager.new_resource<And::Shader>("default/default_shader_normals.shader");
+  And::resource<And::Shader> g_shader = r_manager.new_resource<And::Shader>("content/teapot_shader.ashader");
 
   int num_obj = 10;
   float pos_x = 0.0f;
@@ -108,6 +109,10 @@ int main(int argc, char** argv){
     g_renderer.new_frame();
 
     editor.ShowWindows();
+    editor_teapot.do_something();
+    if(editor_teapot.can_reload()){
+      g_shader->reload();
+    }
 
 
     std::function<void(And::Transform* trans, And::resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::resource<And::ObjLoader>* resource){

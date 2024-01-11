@@ -11,6 +11,7 @@ namespace And{
   struct ShaderData{
     unsigned int id;
     ShaderInfo shader_info;
+    std::string shader_path;
   };
 
 /*
@@ -131,6 +132,7 @@ namespace And{
     shader->m_Data->id = id_program;
     shader->m_Data->shader_info.path_vertex = vertex_shader.c_str();
     shader->m_Data->shader_info.path_fragment = fragment_shader.c_str();
+    shader->m_Data->shader_path = path;
 
     return shader;
     }
@@ -225,6 +227,14 @@ namespace And{
 
   Shader::~Shader(){
     glDeleteProgram(m_Data->id);
+  }
+
+
+  void Shader::reload(){
+    //glLinkProgram(m_Data->id);
+    glDeleteShader(m_Data->id);
+    std::shared_ptr<Shader> s = make(m_Data->shader_path);
+    m_Data->id = s->m_Data->id;
   }
 
   
