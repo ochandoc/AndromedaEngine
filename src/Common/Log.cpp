@@ -123,7 +123,7 @@ namespace And
 
   }
 
-  void LogWindow::Draw()
+  void LogWindow::Show()
   {
     static char SearchText[1024];
     static bool EnableAutoScrolling = true;

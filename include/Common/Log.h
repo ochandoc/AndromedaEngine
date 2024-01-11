@@ -2,6 +2,7 @@
 
 #include "andpch.hpp"
 #include "base.h"
+#include "Editor/EditorWindow.h"
 
 namespace spdlog
 {
@@ -65,10 +66,10 @@ namespace And
     inline LogCategory(const char* CategoryName) : LogCategoryBase(CategoryName, InCategoryLevel, InConsoleLog) {}
   };
 
-  class LogWindow
+  class LogWindow : public EditorWindow
   {
   public:
-    void Draw();
+    void Show() override;
 
     void ClearLog();
 
