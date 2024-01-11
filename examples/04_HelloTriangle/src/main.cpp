@@ -1,5 +1,9 @@
 #include <assert.h>
 
+#include <stdio.h>
+#include <iostream>
+#include <fstream>
+
 #include <functional>
 #include <algorithm>
 #include <utility>
@@ -9,27 +13,35 @@
 
 #include <string>
 #include <vector>
+#include <queue>
 
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <future>
+
+#include "Common/JobSystem.h"
 #include "Common/Engine.h"
 #include "Common/Window.h"
 #include "Common/GraphicsContext.h"
 #include "Common/Renderer.h"
 #include "Common/Shader.h"
 #include "Common/Triangle.h"
-
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
+#include "Common/EntityComponentSystem.h"
+#include "Common/Save.h"
 
-#include <windows.h>
-
-
-// que te parece si hacemos que la ventana tenga una instancia del input, es muy poarecido a lo que esta diciendo el
-// hacemos lo del input de mientras o que
-// espera porqie si nos ponemos focus no atendemos y esta diciendo cosas importantes
+#include "Common/JobSystem.h"
+#include "Common/Log.h"
+#include "Common/Save.h"
 
 
 int main(int argc, char** argv){
+
   And::Engine e;
+
+  And::JobSystem js{ e };
 
   std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
@@ -41,8 +53,8 @@ int main(int argc, char** argv){
 
   // Creamos el shader
   And::ShaderInfo s_info;
-  s_info.path_fragment = "../../data/fshader.fs";
-  s_info.path_vertex = "../../data/vshader.vs";
+  s_info.path_fragment = "fshader.fs";
+  s_info.path_vertex = "vshader_tri.vs";
 
    std::optional<And::Shader> g_shader = And::Shader::make(s_info);
 
@@ -84,16 +96,20 @@ int main(int argc, char** argv){
   
   };
 
+
+
   And::Triangle tri{ver};
+
+  And::EntityComponentSystem entity_comp;
+
+  entity_comp.add_component_class<And::Triangle>();
+  entity_comp.new_entity(And::Triangle{ver});
+
 
   float speed = 0.01f;
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
-    
-    if (input.check_action(jump)){
-      printf("Jummpinggggg!!!\n");
-    }
 
     And::Vertex *vertices = tri.get_vertex();
 
@@ -119,24 +135,14 @@ int main(int argc, char** argv){
       }
     }
 
-    if (input.IsKeyPressed(And::KeyCode::Space)){
-
-      printf("Space pressed!\n");
-    }
-
-    if (input.IsKeyRelease(And::KeyCode::Space)){
-      printf("Space released!\n");
-    }
-
     if(g_shader.has_value()){
       g_shader->use();
     }
     
-    //g_renderer.showDemo();
     g_renderer.draw_triangle(&tri);
     
-    //input.update_input();
     g_renderer.end_frame();
+    window->swap_buffers();
   }
 
 

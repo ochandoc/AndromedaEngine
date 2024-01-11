@@ -30,6 +30,9 @@ namespace And{
 
     Shader& operator=(const Shader& other) = delete;
     Shader& operator=(Shader&& other);
+
+    void setMat4(std::string name, const float matrix[16]);
+    void setVec3(std::string name, const float vector[9]);
     
     void use();
 
@@ -37,5 +40,6 @@ namespace And{
     Shader();
     std::unique_ptr<struct ShaderData> m_Data;
     char m_shader_error[1024] = {0};
+
   };
 }

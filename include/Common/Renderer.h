@@ -1,12 +1,14 @@
 #pragma once
 
 #include "base.h"
+#include "ObjLoader.h"
 
 namespace And
 {
 class Window;
 class Shader;
 class Triangle;
+class ObjLoader;
 struct ShaderInfo;
 
 
@@ -27,11 +29,23 @@ public:
   void set_clear_color(float* color);
 
   void showDemo();
+  void showImGuiDemoWindow();
 
   void draw_triangle(Triangle *t);
 
+  void draw_obj(ObjLoader obj, Shader* s, Transform trans);
+
 protected:
   Window& m_Window;
+
+private:
+
+float m_camera_pos[3];
+float m_camera_target[3];
+float m_fov;
+float m_aspectRatio;
+float m_near;
+float m_far;
 };
 
 }

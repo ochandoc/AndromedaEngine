@@ -14,14 +14,14 @@ def DownloadFile(url, filepath):
 
 def UnzipFile(filepath, deletezip=True):
   with ZipFile(filepath, 'r') as file:
-    file.extractall("../")
+    file.extract('premake5.exe', '../')
 
   if deletezip:
     os.remove(filepath)
 
 
 class Premake:
-  premake_version = "5.0.0-beta1"
+  premake_version = "5.0.0-beta2"
   premake_zip_urls = f"https://github.com/premake/premake-core/releases/download/v{premake_version}/premake-{premake_version}-windows.zip"
   premake_directory = "../"
 
