@@ -137,7 +137,7 @@ namespace And{
 
 
   Shader::Shader() : m_Data(new ShaderData){
-
+    
   }
 
   void Shader::use(){

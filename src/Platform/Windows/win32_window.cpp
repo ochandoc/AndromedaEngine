@@ -8,6 +8,7 @@
 #include "GLFW/glfw3.h"
 
 #include "imgui_impl_glfw.h"
+#include "Common/UI/Plot/implot.h"
 
 namespace And
 {
@@ -265,6 +266,7 @@ namespace And
   {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
 
@@ -286,6 +288,7 @@ namespace And
   void Window::imgui_end()
   {
     ImGui_ImplGlfw_Shutdown();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
   }
 

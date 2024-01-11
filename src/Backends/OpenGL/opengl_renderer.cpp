@@ -13,6 +13,8 @@
 #include "Common/Triangle.h"
 #include "Common/ObjLoader.h"
 
+#include "Common/UI/Plot/implot.h"
+
 namespace And
 {
 
@@ -57,6 +59,7 @@ void Renderer::new_frame()
 
 void Renderer::end_frame()
 {
+  ImPlot::ShowDemoWindow();
   //ImGui::ShowDemoWindow();
   if(ImGui::CollapsingHeader("Camera")){
     ImGui::DragFloat3("Camera position", m_camera_pos);

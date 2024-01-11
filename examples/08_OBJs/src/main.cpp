@@ -39,6 +39,7 @@
 #include "Common/Log.h"
 
 #include "Common/ResourceManager.h"
+#include "Common/ShaderTextEditor.h"
 
 int main(int argc, char** argv){
 
@@ -54,7 +55,8 @@ int main(int argc, char** argv){
   r_manager.add_resource_generator<And::ObjGenerator>();
 
   And::Editor editor;
-  
+
+  printf("Hola\n");
 
   // Show pc info
   g_context->create_info();
@@ -100,7 +102,6 @@ int main(int argc, char** argv){
     g_renderer.new_frame();
 
     editor.ShowWindows();
-
 
     std::function<void(And::Transform* trans, And::resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::resource<And::ObjLoader>* resource){
 

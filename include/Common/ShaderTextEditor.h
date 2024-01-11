@@ -1,14 +1,22 @@
 #pragma once
 
-class ShaderTextEditor
+#include "Common/Editor/EditorWindow.h"
+
+namespace And
 {
-public:
-  ShaderTextEditor(const char* Path);
+  class ShaderTextEditor : public EditorWindow
+  {
+  public:
+    ShaderTextEditor(const std::string& Title);
 
-  ~ShaderTextEditor();
+    ~ShaderTextEditor();
 
-  void do_something();
+    void Load(const std::string& Path);
+    void Save();
 
-private:
-  std::unique_ptr<struct ShaderTextEditorData> m_Data;
-};
+    void Show() override;
+
+  private:
+    std::unique_ptr<struct ShaderTextEditorData> m_Data;
+  };
+}
