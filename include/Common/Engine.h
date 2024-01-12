@@ -18,6 +18,5 @@ namespace And
 		friend class JobSystem;
 	private:
 		bool m_Initialized;
-		std::shared_ptr<struct ThreadsData> m_ThreadsData;
 	};
 }

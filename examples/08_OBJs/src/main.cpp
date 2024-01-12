@@ -20,7 +20,6 @@
 #include <condition_variable>
 #include <future>
 
-#include "Common/JobSystem.h"
 #include "Common/Engine.h"
 #include "Common/Window.h"
 #include "Common/GraphicsContext.h"
@@ -34,23 +33,23 @@
 #include "Common/ActionInput.h"
 #include "Common/EntityComponentSystem.h"
 
-#include "Common/JobSystem.h"
+#include "Common/TaskSystem/TaskSystem.h"
 #include "Common/Log.h"
 
-#include "Common/ResourceManager.h"
+#include "Common/Resources/ResourceManager.h"
 
 int main(int argc, char** argv){
 
   And::Engine e;
 
-  And::JobSystem js{e};
+  And::TaskSystem ts;
 
   std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
 
-  And::ResourceManager r_manager{*window, js};
-  r_manager.add_resource_generator<And::ObjGenerator>();
+  And::ResourceManager r_manager{*window, ts};
+  r_manager.AddGenerator<And::ObjGenerator>();
   
 
   // Show pc info
@@ -72,7 +71,7 @@ int main(int argc, char** argv){
   
   And::EntityComponentSystem entity_comp;
     
-  entity_comp.add_component_class<And::resource<And::ObjLoader>>();
+  entity_comp.add_component_class<And::Resource<And::ObjLoader>>();
   entity_comp.add_component_class<And::Transform>();  
 
   int num_obj = 10;
@@ -80,13 +79,13 @@ int main(int argc, char** argv){
   float pos_y = -5.0f;
 
   for(int i = -5; i < (int)(num_obj / 2); i++){
-    And::resource<And::ObjLoader> obj_teapot = r_manager.new_resource<And::ObjLoader>("teapot.obj");
+    And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("teapot.obj");
     And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   }
   pos_y = 5.0f;
   for(int i = -5; i < (int)(num_obj / 2); i++){
-    And::resource<And::ObjLoader> obj_teapot = r_manager.new_resource<And::ObjLoader>("teapot.obj");
+    And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("teapot.obj");
     And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   }
@@ -97,9 +96,9 @@ int main(int argc, char** argv){
     g_renderer.new_frame();
 
 
-    std::function<void(And::Transform* trans, And::resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::resource<And::ObjLoader>* resource){
+    std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* Resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::Resource<And::ObjLoader>* Resource){
 
-      g_renderer.draw_obj(*(*resource), &g_shader.value(), *trans);
+      g_renderer.draw_obj(*(*Resource), &g_shader.value(), *trans);
     };
 
     entity_comp.execute_system(obj_draw);

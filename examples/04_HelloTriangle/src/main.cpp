@@ -20,7 +20,6 @@
 #include <condition_variable>
 #include <future>
 
-#include "Common/JobSystem.h"
 #include "Common/Engine.h"
 #include "Common/Window.h"
 #include "Common/GraphicsContext.h"
@@ -32,7 +31,6 @@
 #include "Common/EntityComponentSystem.h"
 #include "Common/Save.h"
 
-#include "Common/JobSystem.h"
 #include "Common/Log.h"
 #include "Common/Save.h"
 
@@ -40,8 +38,6 @@
 int main(int argc, char** argv){
 
   And::Engine e;
-
-  And::JobSystem js{ e };
 
   std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();

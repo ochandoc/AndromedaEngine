@@ -2,7 +2,7 @@
 
 #include "base.h"
 
-#include "ResourceGenerator.h"
+#include "Common/Resources/ResourceGenerator.h"
 
 namespace And
 {

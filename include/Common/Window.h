@@ -4,6 +4,8 @@
 
 #include "Common/KeyCodes.h"
 
+#include "Common/TaskSystem/TaskSystem.h"
+
 namespace And
 {
 class Engine;
@@ -33,6 +35,8 @@ public:
 	void swap_buffers();
 
 	std::shared_ptr<GraphicsContext> get_context() const;
+
+	std::function<void(WorkerThreadData& Data)> get_worker_function();
 
 	friend class Renderer;
 	friend class Input;
