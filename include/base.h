@@ -4,13 +4,7 @@
 #include "platform.h"
 #include "types.h"
 
-#define NON_COPYABLE_CLASS(name)								\
-				name(const name&) = delete;							\
-				name& operator =(const name&) = delete;	\
-
-#define NON_MOVABLE_CLASS(name)							\
-				name(name&&) = delete;							\
-				name& operator =(name&&) = delete;	\
+#include "Common/Misc/CoreMiscDefines.h"
 
 #define C_PTR_CAST(type, var) ((type*)var)
 
