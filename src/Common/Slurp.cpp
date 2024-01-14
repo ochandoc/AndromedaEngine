@@ -5,7 +5,7 @@
 
 namespace And
 {
-  Slurp::Slurp(const char* filePath)
+  Slurp::Slurp(const char* filePath) : m_Size(0), m_Content(nullptr)
   {
     FILE *f;
     f = fopen(filePath, "rb");

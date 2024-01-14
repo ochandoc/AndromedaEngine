@@ -32,11 +32,13 @@
 #include "Common/Input.h"
 #include "Common/ActionInput.h"
 #include "Common/EntityComponentSystem.h"
+#include "Common/Editor/Editor.h"
 
 #include "Common/TaskSystem/TaskSystem.h"
 #include "Common/Log.h"
 
 #include "Common/Resources/ResourceManager.h"
+#include "Common/ShaderTextEditor.h"
 
 int main(int argc, char** argv){
 
@@ -51,6 +53,7 @@ int main(int argc, char** argv){
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();
   
+  And::Editor editor;
 
   // Show pc info
   g_context->create_info();
@@ -95,6 +98,7 @@ int main(int argc, char** argv){
     window->update();
     g_renderer.new_frame();
 
+    editor.ShowWindows();
 
     std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* Resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::Resource<And::ObjLoader>* Resource){
 
