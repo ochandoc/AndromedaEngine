@@ -28,7 +28,7 @@ namespace And
      * @param location Source code location where the task is created.
      * @param functionStr String representation of the function to be executed.
      */
-    explicit Task(size_t DesiredThreadId, std::source_location location, const std::string& functionStr);
+    explicit Task(size_t DesiredThreadId, std::source_location location, const std::string& functionStr, const std::string& name = "Unnamed");
 
   public:
     /**
@@ -117,5 +117,6 @@ namespace And
     std::shared_ptr<ITaskFunctionBase> m_TaskFunction; ///< Shared pointer to the task function.
     std::source_location m_SourceLocation; ///< Source code location where the task is created.
     std::string m_FunctionString; ///< String representation of the function to be executed.
+    std::string m_TaskName; ///< String representation of the name of the task.
   };
 }

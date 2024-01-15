@@ -1,3 +1,5 @@
+#include "Common/ID.h"
+
 namespace And
 {
   template<typename func_t, typename... args_t>
@@ -28,7 +30,7 @@ namespace And
 
     Future<ret_t> future = taskFunction->GetFuture();
     task.m_TaskFunction = std::move(taskFunction);
-    task.m_Id = (size_t)task.m_TaskFunction.get();
+    task.m_Id = ID().get();
 
     if (task.CanBeExecuted())
     {

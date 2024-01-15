@@ -5,24 +5,12 @@
 
 #include "Common/UI/Plot/implot.h"
 
-struct RollingBuffer {
-	float Span;
-	ImVector<ImVec2> Data;
-	RollingBuffer() {
-		Span = 10.0f;
-		Data.reserve(2000);
-	}
-	void AddPoint(float x, float y) {
-		float xmod = fmodf(x, Span);
-		if (!Data.empty() && xmod < Data.back().x)
-			Data.shrink(0);
-		Data.push_back(ImVec2(xmod, y));
-	}
-};
+
 
 namespace And{
 
-Editor::Editor(){
+Editor::Editor(Window& window) : m_MainWindow(window)
+{
 
   // Logger, shader editor, job system, content browser
 	m_Windows.insert({ "Console Log 1", std::shared_ptr<LogWindow>(new LogWindow("Console Log 1")) });
@@ -31,10 +19,23 @@ Editor::Editor(){
 	m_Windows.insert({ "Console Log 4", std::shared_ptr<LogWindow>(new LogWindow("Console Log 4")) });
 	m_Windows.insert({ "Shader Editor 1", std::shared_ptr<ShaderTextEditor>(new ShaderTextEditor("Shader Editor 1")) });
 	m_Windows.insert({ "Shader Editor 2", std::shared_ptr<ShaderTextEditor>(new ShaderTextEditor("Shader Editor 2")) });
+
+	for (auto& [name, window] : m_Windows)
+	{
+		window->m_Editor = this;
+		window->m_Window = &m_MainWindow;
+	}
 }
 
 Editor::~Editor(){
 
+}
+
+void Editor::AddWindow(std::shared_ptr<EditorWindow> window)
+{
+	window->m_Editor = this;
+	window->m_Window = &m_MainWindow;
+	m_Windows.insert({window->m_title, window});
 }
 
 void Editor::ShowWindows(){
@@ -94,6 +95,15 @@ void Editor::ShowWindows(){
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Profiling"))
+			{
+				if (m_Windows.contains("Task System Info"))
+				{
+					ImGui::MenuItem("Task System Info", nullptr, &m_Windows["Task System Info"]->m_is_open);
+				}
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();
@@ -103,26 +113,6 @@ void Editor::ShowWindows(){
 	{
 		window->Show();
 	}
-
-	static float history = 10.0f;
-	static RollingBuffer rb;
-	static float t = 0;
-
-	t += 0.0005f;
-	rb.AddPoint(t, 0.0f);
-	rb.Span = history;
-
-	if (ImGui::Begin("Plot"))
-	{
-		if (ImPlot::BeginPlot("##Rolling", ImVec2(-1, 150))) {
-			ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_NoTickLabels, ImPlotAxisFlags_NoTickLabels);
-			ImPlot::SetupAxisLimits(ImAxis_X1, 0, history, ImGuiCond_None);
-			ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 1);
-			ImPlot::PlotLine("Mouse X", &rb.Data[0].x, &rb.Data[0].y, rb.Data.size(), 0, 0, 2 * sizeof(float));
-			ImPlot::EndPlot();
-		}
-	}
-	ImGui::End();
   
 }
 }

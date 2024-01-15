@@ -19,6 +19,8 @@ namespace And
     PLATFORM_WINDOW_DATA glfw;
     KeyboardState* keyboard;
     std::shared_ptr<GraphicsContext> m_Context;
+    float LastTime;
+    float DeltaTime;
     // Camera cam;
   };
 
@@ -175,6 +177,7 @@ namespace And
   Window::Window() : m_Data(new WindowData) 
   {
     m_Data->class_instance = this;
+    m_Data->LastTime = 0.0f;
   }
 
   Window::~Window()
@@ -250,11 +253,19 @@ namespace And
       key = KeyState::Default;
     }
     glfwPollEvents();
+    float CurrentTime = static_cast<float>(glfwGetTime());
+    m_Data->DeltaTime = CurrentTime - m_Data->LastTime;
+    m_Data->LastTime = CurrentTime;
   }
 
   void Window::swap_buffers()
   {
     glfwSwapBuffers(m_Data->glfw.handle);
+  }
+
+  float Window::get_delta_time() const
+  {
+      return m_Data->DeltaTime;
   }
 
   std::shared_ptr<GraphicsContext> Window::get_context() const

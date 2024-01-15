@@ -40,11 +40,29 @@
 #include "Common/Resources/ResourceManager.h"
 #include "Common/ShaderTextEditor.h"
 
+int SlowTask()
+{
+  std::this_thread::sleep_for(std::chrono::seconds(5));
+  return 10;
+}
+
+void WaitTask(int num)
+{
+  printf("Num: %d\n", num);
+}
+
 int main(int argc, char** argv){
 
   And::Engine e;
 
   And::TaskSystem ts;
+
+  And::WorkerCreationInfo workerCreationInfo;
+  workerCreationInfo.Name = "Test";
+  workerCreationInfo.Function = And::GetGenericWorkerFunction();
+  workerCreationInfo.UserData = nullptr;
+
+  ts.AddWorker(workerCreationInfo);
 
   std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
@@ -53,11 +71,14 @@ int main(int argc, char** argv){
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();
   
-  And::Editor editor;
+  And::Editor editor{*window};
 
+  editor.AddWindow(ts.GetEditorWindow());
   // Show pc info
   g_context->create_info();
 
+  And::Future<int> fi = ts.AddTaskInThread("Resource Thread", SlowTask);
+  ts.AddTaskInThread("Test", WaitTask, fi);
 
   // Creamos el shader
   And::ShaderInfo s_info;

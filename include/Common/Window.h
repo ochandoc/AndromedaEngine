@@ -34,6 +34,8 @@ public:
 	void update();
 	void swap_buffers();
 
+	float get_delta_time() const;
+
 	std::shared_ptr<GraphicsContext> get_context() const;
 
 	std::function<void(WorkerThreadData& Data)> get_worker_function();

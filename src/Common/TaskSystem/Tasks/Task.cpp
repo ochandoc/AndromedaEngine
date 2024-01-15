@@ -2,12 +2,12 @@
 
 namespace And
 {
-  Task::Task(ENoInit) : m_DesiredThreadId(0), m_ExecutionThreadId(0)
+  Task::Task(ENoInit) : m_DesiredThreadId(0), m_ExecutionThreadId(0), m_Id(0), m_TaskName("Unnamed")
   {
 
   }
 
-  Task::Task(size_t DesiredThreadId, std::source_location location, const std::string& functionStr) : m_DesiredThreadId(DesiredThreadId), m_ExecutionThreadId(0), m_SourceLocation(location), m_FunctionString(functionStr)
+  Task::Task(size_t DesiredThreadId, std::source_location location, const std::string& functionStr, const std::string& Name) : m_DesiredThreadId(DesiredThreadId), m_ExecutionThreadId(0), m_SourceLocation(location), m_FunctionString(functionStr), m_TaskName(Name), m_Id(0)
   {
   }
 
@@ -19,6 +19,7 @@ namespace And
     m_SourceLocation = other.m_SourceLocation;
     m_FunctionString = other.m_FunctionString;
     m_Id = other.m_Id;
+    m_TaskName = other.m_TaskName;
   }
 
   Task::Task(Task&& other) : m_DesiredThreadId(0)
@@ -29,6 +30,7 @@ namespace And
     std::swap(m_Id, other.m_Id);
     std::swap(m_SourceLocation, other.m_SourceLocation);
     std::swap(m_FunctionString, other.m_FunctionString);
+    std::swap(m_TaskName, other.m_TaskName);
   }
 
   Task::~Task()
@@ -46,6 +48,7 @@ namespace And
       m_Id = other.m_Id;
       m_SourceLocation = other.m_SourceLocation;
       m_FunctionString = other.m_FunctionString;
+      m_TaskName = other.m_TaskName;
     }
     return *this;
   }
@@ -60,6 +63,7 @@ namespace And
       std::swap(m_Id, other.m_Id);
       std::swap(m_SourceLocation, other.m_SourceLocation);
       std::swap(m_FunctionString, other.m_FunctionString);
+      std::swap(m_TaskName, other.m_TaskName);
     }
     return *this;
   }

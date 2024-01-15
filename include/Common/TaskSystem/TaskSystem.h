@@ -3,6 +3,7 @@
 #include "Common/Misc/CoreMiscDefines.h"
 
 #include "Tasks/Task.h"
+#include "Common/Editor/EditorWindow.h"
 
 #include <mutex>
 #include <condition_variable>
@@ -97,11 +98,13 @@ namespace And
     auto AddTaskWithInfo(std::source_location location, const std::string& functionStr, size_t ThreadId, func_t function, args_t... args) -> Future<decltype(function((MakeFuture(args).Get())...))>;
 
     /**
-   * @brief Marks a task as resolved, providing an optional time parameter.
-   * @param task The task to be marked as resolved.
-   * @param time Optional duration time of the task resolution.
-   */
+     * @brief Marks a task as resolved, providing an optional time parameter.
+     * @param task The task to be marked as resolved.
+     * @param time Optional duration time of the task resolution.
+     */
     void MarkTaskAsResolved(const Task& task, float taskDurationTime = 0);
+
+    std::shared_ptr<EditorWindow> GetEditorWindow() const;
 
   private:
     /**
