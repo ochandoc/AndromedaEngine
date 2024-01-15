@@ -1,13 +1,13 @@
 #pragma once
 #include <vector>
 #include <string>
-
 #include "base.h"
 
 namespace And{
 
 class Editor;
 class Window;
+class ResourceManager;
 
   class EditorWindow 
   {
@@ -24,6 +24,7 @@ class Window;
     Editor* m_Editor;
     std::string m_title;
     Window* m_Window;
+    ResourceManager* m_resourceManager;
 
   private:
     void SetEditor(Editor*);

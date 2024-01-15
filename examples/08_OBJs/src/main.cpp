@@ -73,7 +73,7 @@ int main(int argc, char** argv){
   r_manager.AddGenerator<And::ObjGenerator>();
   r_manager.AddGenerator<And::ShaderGenerator>();
   
-  And::Editor editor{*window};
+  And::Editor editor{*window, &r_manager};
 
   editor.AddWindow(ts.GetEditorWindow());
   // Show pc info
@@ -116,6 +116,7 @@ int main(int argc, char** argv){
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   }
 
+  
  
   while (window->is_open()){
     window->update();

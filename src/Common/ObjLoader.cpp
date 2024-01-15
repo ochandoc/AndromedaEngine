@@ -150,18 +150,18 @@ std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string bas
   //std::vector<Vertex_info> vertices = obj.getVertexInfo();  
   //std::vector<float> normals = obj.getNormals();
 
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, vertex_info.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
 
 
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+  //glEnableVertexAttribArray(0);
+  //glVertexAttribPointer(0, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
 
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*) (3 * sizeof(float)));
+  //glEnableVertexAttribArray(1);
+  //glVertexAttribPointer(1, 3 ,GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*) (3 * sizeof(float)));
   
 
   // Desbindeamos el vao
-  glBindVertexArray(0);  
+  //glBindVertexArray(0);  
 
   WAIT_GPU_LOAD()
   return std::make_shared<ObjLoader>(obj);
