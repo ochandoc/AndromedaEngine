@@ -161,27 +161,6 @@ namespace And
           ImGui::EndPopup();
         }
 
-        if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-          ImGui::OpenPopup("OptionsRightClick");
-
-        if (ImGui::BeginPopup("OptionsRightClick"))
-        {
-          if (ImGui::MenuItem("Clear Log"))
-          {
-            ClearLog();
-          }
-          ImGui::Separator();
-          if (ImGui::MenuItem("AutoScroll", NULL, &EnableAutoScrolling))
-          {
-            bGoDown = EnableAutoScrolling;
-          }
-          if (ImGui::MenuItem("Go Down"))
-          {
-            bGoDown = true;
-          }
-          ImGui::EndPopup();
-        }
-
         uint8 Level = 0;
         if (bTrace) Level |= Trace;
         if (bDebug) Level |= Debug;
@@ -227,6 +206,27 @@ namespace And
 
         }
         ImGui::EndChild();
+
+        if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+          ImGui::OpenPopup("OptionsRightClick");
+
+        if (ImGui::BeginPopup("OptionsRightClick"))
+        {
+          if (ImGui::MenuItem("Clear Log"))
+          {
+            ClearLog();
+          }
+          ImGui::Separator();
+          if (ImGui::MenuItem("AutoScroll", NULL, &EnableAutoScrolling))
+          {
+            bGoDown = EnableAutoScrolling;
+          }
+          if (ImGui::MenuItem("Go Down"))
+          {
+            bGoDown = true;
+          }
+          ImGui::EndPopup();
+        }
 
 
       }
