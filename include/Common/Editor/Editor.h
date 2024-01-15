@@ -5,20 +5,20 @@
 
 namespace And{
 
-  class Editor{
+  class Editor
+  {
+  public:
 
-    public:
-
-    Editor();
+    Editor(Window& window);
     Editor(const Editor&) = delete;
     Editor(Editor&&) = delete;
     ~Editor();
 
-
+    void AddWindow(std::shared_ptr<EditorWindow> window);
     void ShowWindows();
 
-    private:
-    std::vector<std::shared_ptr<EditorWindow>> m_Windows;
-
+  private:
+    std::unordered_map<std::string, std::shared_ptr<EditorWindow>> m_Windows;
+    Window& m_MainWindow;
   };
 }

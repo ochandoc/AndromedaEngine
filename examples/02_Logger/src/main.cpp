@@ -27,7 +27,7 @@ int main(int argc, char** argv){
   std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
   And::Renderer renderer(*window);
 
-  And::LogWindow log_window;
+  And::LogWindow log_window("Logger window");
 
   AND_LOG(TestLogCategory1, And::Trace, "Some trace Message");
   AND_LOG(TestLogCategory1, And::Debug, "Some debug Message");
@@ -57,7 +57,7 @@ int main(int argc, char** argv){
 
     //AND_LOG(TestLogCategory1, And::Debug, "Some debug Message");
 
-    log_window.Draw();
+    log_window.Show();
 
     renderer.end_frame();
     window->swap_buffers();

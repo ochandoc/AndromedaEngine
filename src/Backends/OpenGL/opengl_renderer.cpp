@@ -13,6 +13,8 @@
 #include "Common/Triangle.h"
 #include "Common/ObjLoader.h"
 
+#include "Common/UI/Plot/implot.h"
+
 namespace And
 {
 
@@ -49,45 +51,15 @@ Renderer::~Renderer(){
 
 void Renderer::new_frame()
 {
-	static ImGuiID s_Dockspace;
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   ImGui_ImplOpenGL3_NewFrame(); 
 	m_Window.new_frame();
   ImGui::NewFrame();
-
-	ImGuiWindowFlags flags = ImGuiWindowFlags_None;
-	flags |= ImGuiWindowFlags_NoTitleBar;
-	flags |= ImGuiWindowFlags_NoResize;
-	flags |= ImGuiWindowFlags_NoMove;
-	flags |= ImGuiWindowFlags_NoScrollbar;
-	flags |= ImGuiWindowFlags_NoScrollWithMouse;
-	flags |= ImGuiWindowFlags_NoCollapse;
-	flags |= ImGuiWindowFlags_NoBackground;
-	flags |= ImGuiWindowFlags_NoSavedSettings;
-	flags |= ImGuiWindowFlags_NoDecoration;
-	flags |= ImGuiWindowFlags_NoInputs;
-	flags |= ImGuiWindowFlags_NoNav;
-	flags |= ImGuiWindowFlags_NoFocusOnAppearing;
-	flags |= ImGuiWindowFlags_NoBringToFrontOnFocus;
-
-	ImGuiViewport* viewport = ImGui::GetMainViewport();
-
-	ImGui::SetNextWindowPos(viewport->WorkPos);
-	ImGui::SetNextWindowSize(viewport->WorkSize);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(1.0f, 1.0f));
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-	if (ImGui::Begin("WindowDockspace", nullptr, flags))
-	{
-		s_Dockspace = ImGui::GetID("WindowDockspace");
-		ImGui::DockSpace(s_Dockspace, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_PassthruCentralNode);
-	}
-	ImGui::End();
-	ImGui::PopStyleVar(3);
 }
 
 void Renderer::end_frame()
 {
+  //ImPlot::ShowDemoWindow();
   //ImGui::ShowDemoWindow();
   if(ImGui::CollapsingHeader("Camera")){
     ImGui::DragFloat3("Camera position", m_camera_pos);

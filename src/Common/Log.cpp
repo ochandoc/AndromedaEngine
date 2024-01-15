@@ -124,30 +124,16 @@ namespace And
 
   }
 
-  LogWindow::LogWindow(std::string title){
-    m_title = title;
-  }
-
-  LogWindow::LogWindow(){
-    m_title = "no title";
+  LogWindow::LogWindow(const std::string& Title) : EditorWindow(Title)
+  {
+    memset(SearchText, 0, sizeof(SearchText));
   }
 
   void LogWindow::Show()
   {
-    static char SearchText[1024];
-    static bool EnableAutoScrolling = true;
-    static uint32 LogCategoryId = -1;
-    static bool bTrace = false;
-    static bool bDebug = false;
-    static bool bInfo = true;
-    static bool bWarning = true;
-    static bool bError = true;
-    static bool bCritical = false;
-    static bool bGoDown;
-
     if (m_is_open)
     {
-      if (ImGui::Begin("Console Log", &m_is_open))
+      if (ImGui::Begin(m_title.c_str(), &m_is_open))
       {
         ImGui::InputText("##ConsoleLogSearchText", SearchText, sizeof(SearchText));
         ImGui::SameLine();

@@ -1,153 +1,130 @@
 #include "Common/ShaderTextEditor.h"
 
-
 #include "TextEditor.h"
 #include "Common/Threw.h"
+
 #include "Common/Slurp.h"
 
-struct ShaderInfo
+namespace And
 {
-  ShaderInfo()
+
+  struct ShaderInfo
   {
-    shaderEditor.SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL());
-    shaderEditor.SetShowWhitespaces(false);
-    shaderEditor.SetTabSize(2);
-  }
-
-  std::string Type;
-  TextEditor shaderEditor;
-};
-
-struct ShaderTextEditorData
-{
-  std::vector<ShaderInfo> shaderEditors;
-  bool bOpen;
-  std::string Path;
-};
-
-ShaderTextEditor::ShaderTextEditor(const char* Path) : m_Data(new ShaderTextEditorData)
-{
-
-  m_just_changed = false;
-  std::string vertex_shader = "Blank";
-  std::string fragment_shader = "Blank";
-
-  And::Slurp shader_file{Path};
-  if(shader_file.size() >= 0 ){
-    // Ya existe el archivo
-    std::string shaders{shader_file.data(), shader_file.size()};
-
-    int vertex_pos = shaders.find("#type Vertex");
-    int fragment_pos = shaders.find("#type Fragment");
-
-    
-
-    if(vertex_pos != std::string::npos && fragment_pos != std::string::npos){
-      vertex_shader = shaders.substr(vertex_pos, fragment_pos);
-      fragment_shader = shaders.substr(fragment_pos, shaders.size() - 1);
-
-      std::string vertex_title = "#type Vertex";
-      std::string fragment_title = "#type Fragment";
-
-      vertex_shader.erase(0, vertex_title.size());
-      fragment_shader.erase(0, fragment_title.size());
-
-      printf("Vertex content %s\n Fragment content %s\n", vertex_shader.c_str(), fragment_shader.c_str());
-    }
-
-  }
-
-  m_Data->bOpen = true;
-  m_Data->Path = Path;
-
-  {
-    ShaderInfo info;
-    info.Type = "Vertex";
-    info.shaderEditor.SetText(vertex_shader.c_str());
-    m_Data->shaderEditors.push_back(info);
-  }
-  {
-    ShaderInfo info;
-    info.Type = "Fragment";
-    info.shaderEditor.SetText(fragment_shader.c_str());
-    m_Data->shaderEditors.push_back(info);
-  }
-}
-
-ShaderTextEditor::~ShaderTextEditor()
-{
-}
-
-void ShaderTextEditor::do_something()
-{
-  static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_MenuBar;
-
-  static bool bSaveFile = false;
-
-  if (m_Data->bOpen)
-  {
-    if (ImGui::Begin(m_Data->Path.c_str(), &m_Data->bOpen, windowFlags))
+    ShaderInfo(const std::string& type, const std::string& Source) : Type(type)
     {
-      if (ImGui::BeginMenuBar())
-      {
-        if (ImGui::BeginMenu("File"))
-        {
-          if (ImGui::MenuItem("Save"))
-            bSaveFile = true;
+      shaderEditor.SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL());
+      shaderEditor.SetShowWhitespaces(false);
+      shaderEditor.SetTabSize(2);
+      shaderEditor.SetText(Source);
+    }
 
-          ImGui::EndMenu();
+    std::string Type;
+    TextEditor shaderEditor;
+  };
+
+  struct ShaderTextEditorData
+  {
+    std::vector<ShaderInfo> shaderEditors;
+    std::string Path;
+  };
+
+  ShaderTextEditor::ShaderTextEditor(const std::string& Title) : EditorWindow(Title), m_Data(new ShaderTextEditorData)
+  {
+  }
+
+  ShaderTextEditor::~ShaderTextEditor()
+  {
+  }
+
+  void ShaderTextEditor::Load(const std::string& Path)
+  {
+    m_Data->shaderEditors.clear();
+    m_Data->Path = Path;
+
+    Slurp file(Path.c_str());
+
+    if (file.size() > 0)
+    {
+      bool bEnd = false;
+
+      std::string ShaderSource(file.data(), file.size());
+
+      while (!bEnd)
+      {
+        size_t ShaderStart = ShaderSource.find("#type");
+        size_t ShaderEnd = ShaderSource.find("#type", ShaderStart + 5);
+
+        if (ShaderEnd == std::string::npos)
+        {
+          bEnd = true;
+          ShaderEnd = ShaderSource.size();
         }
-        ImGui::EndMenuBar();
+
+        std::string Source = ShaderSource.substr(ShaderStart, ShaderEnd);
+        ShaderSource = ShaderSource.substr(ShaderEnd, ShaderSource.size());
+
+        size_t TypeEnd = Source.find("\n", 5);
+        m_Data->shaderEditors.emplace_back(Source.substr(ShaderStart + 6, TypeEnd - 5).c_str(), Source.substr(TypeEnd + 1, Source.size()));
       }
+      
+    }
+    m_is_open = true;
+  }
 
-      ImGui::BeginTabBar("Shaders");
+  void ShaderTextEditor::Save()
+  {
+    std::string ShaderSource;
+    for (auto& shader : m_Data->shaderEditors)
+    {
+      ShaderSource += "#type ";
+      ShaderSource += shader.Type + "\n";
+      ShaderSource += shader.shaderEditor.GetText();
+    }
 
-      for (ShaderInfo& shader : m_Data->shaderEditors)
+    FILE* f;
+
+    f = fopen(m_Data->Path.c_str(), "wb");
+
+    if (f != NULL) 
+    {
+      fwrite(ShaderSource.c_str(), 1, ShaderSource.size(), f);
+      fclose(f);
+    }
+  }
+
+  void ShaderTextEditor::Show()
+  {
+
+    if (m_is_open)
+    {
+      if (ImGui::Begin(m_title.c_str(), &m_is_open))
       {
-        if (ImGui::BeginTabItem(shader.Type.c_str()))
+        if (ImGui::BeginTabBar("Shaders"))
         {
-          shader.shaderEditor.Render(shader.Type.c_str());
-          ImGui::EndTabItem();
+          for (auto& shader : m_Data->shaderEditors)
+          {
+            if (ImGui::BeginTabItem(shader.Type.c_str()))
+            {
+              shader.shaderEditor.Render(shader.Type.c_str());
+              ImGui::EndTabItem();
+            }
+          }
+
+          if (ImGui::TabItemButton("+"))
+          {
+
+          }
+
+          ImGui::EndTabBar();
         }
+
       }
-
-      ImGui::EndTabBar();
-
-      if (bSaveFile)
+      ImGui::End();
+      if (!m_is_open)
       {
-        std::string ShaderSource;
-        for (ShaderInfo& shader : m_Data->shaderEditors)
-        {
-          ShaderSource += "#type ";
-          ShaderSource += shader.Type + "\n";
-          ShaderSource += shader.shaderEditor.GetText();
-        }
-        FILE* f;
-        f = fopen(m_Data->Path.c_str(), "wb");
-
-        if (f == NULL) {
-          printf("\n*** Error writing file ***\n");
-          //return false;
-        }
-        else {
-          fwrite(ShaderSource.c_str(), 1, ShaderSource.size(), f);
-          fclose(f);
-        }
-        m_just_changed = true;
-        bSaveFile = false;
+        m_Data->Path = "";
+        m_Data->shaderEditors.clear();
       }
     }
-    ImGui::End();
   }
-}
-
-
-bool ShaderTextEditor::can_reload(){
-  
-  if(m_just_changed){
-    m_just_changed = false;
-    return true;
-  }
-
-  return false;
 }

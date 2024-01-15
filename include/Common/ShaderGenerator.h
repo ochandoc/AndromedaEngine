@@ -1,5 +1,5 @@
 #pragma once
-#include "Common/ResourceGenerator.h"
+#include "Common/Resources/ResourceGenerator.h"
 #include "Common/Shader.h"
 
 
