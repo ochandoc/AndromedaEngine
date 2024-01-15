@@ -2,15 +2,16 @@
 
 #include "TextEditor.h"
 #include "Common/Threw.h"
-
+#include "Common/Resources/ResourceManager.h"
 #include "Common/Slurp.h"
+#include "Common/Shader.h"
 
 namespace And
 {
 
-  struct ShaderInfo
+  struct ShaderEditorInfo
   {
-    ShaderInfo(const std::string& type, const std::string& Source) : Type(type)
+    ShaderEditorInfo(const std::string& type, const std::string& Source) : Type(type)
     {
       shaderEditor.SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL());
       shaderEditor.SetShowWhitespaces(false);
@@ -24,7 +25,7 @@ namespace And
 
   struct ShaderTextEditorData
   {
-    std::vector<ShaderInfo> shaderEditors;
+    std::vector<ShaderEditorInfo> shaderEditors;
     std::string Path;
   };
 
@@ -97,8 +98,24 @@ namespace And
 
     if (m_is_open)
     {
-      if (ImGui::Begin(m_title.c_str(), &m_is_open))
+      
+      if (ImGui::Begin(m_title.c_str(), &m_is_open, ImGuiWindowFlags_MenuBar))
       {
+
+        if(ImGui::BeginMenuBar()){
+          if(ImGui::BeginMenu("File")){
+            if(ImGui::MenuItem("Save")){
+              printf("\n*** Reload shader ***\n");
+              Save();
+              // ReloadResource
+              if(m_resourceManager){
+                m_resourceManager->ReloadResource<Shader>(m_Data->Path);
+              }
+            }
+            ImGui::EndMenu();
+          }
+          ImGui::EndMenuBar();
+        }
         if (ImGui::BeginTabBar("Shaders"))
         {
           for (auto& shader : m_Data->shaderEditors)
