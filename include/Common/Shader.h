@@ -1,4 +1,5 @@
 #pragma once
+#include "Common/Lights.h"
 #include <optional>
 
 namespace And{
@@ -34,6 +35,8 @@ namespace And{
 
     void setMat4(std::string name, const float matrix[16]);
     void setVec3(std::string name, const float vector[9]);
+
+    void SetUniformBlock();
     
     void use();
 

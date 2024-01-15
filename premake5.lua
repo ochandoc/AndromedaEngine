@@ -147,6 +147,7 @@ group "Examples"
   include "examples/06_Triangles"
   include "examples/07_ResourceSystem"
   include "examples/08_OBJs"
+  include "examples/09_OBJs_Lights"
 group ""
 
 newoption

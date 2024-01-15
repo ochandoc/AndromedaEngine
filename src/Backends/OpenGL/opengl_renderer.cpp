@@ -189,6 +189,8 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
+  
+
   s->setMat4("view", glm::value_ptr(viewMatrix));
   s->setMat4("projection", glm::value_ptr(projectionMatrix));
   s->setMat4("model", glm::value_ptr(modelMatrix));
