@@ -1,5 +1,7 @@
 #include "Common/TaskSystem/TaskSystem.h"
 
+#include "Common/Editor/Windows/TaskSystemInfoWindow.h"
+
 namespace And
 {
   struct WorkerThreadInternalData
@@ -14,10 +16,12 @@ namespace And
     std::vector<std::unique_ptr<WorkerThreadInternalData>> Threads;
     std::vector<Task> WaitingTasks;
     std::mutex Mutex;
+    std::shared_ptr<TaskSystemInfoWindow> InfoWindow;
   };
 
   TaskSystem::TaskSystem() : m_Data(new TaskSystemData)
   {
+    m_Data->InfoWindow = std::make_shared<TaskSystemInfoWindow>();
   }
 
   TaskSystem::~TaskSystem()
@@ -60,12 +64,24 @@ namespace And
 
     threadCreationInfo.Function = threadFunction;
     internalData.Handle = std::make_unique<Thread>(threadCreationInfo, ForceStart);
+
+    m_Data->InfoWindow->AddWorker(threadCreationInfo.Name, internalData.Handle->GetId());
   }
 
   void TaskSystem::MarkTaskAsResolved(const Task& task, float time)
   {
     std::lock_guard<std::mutex> lock(m_Data->Mutex);
     size_t FutureId = task.GetFutureAvailability().GetId();
+    TaskDisplayInfo displayInfo;
+    displayInfo.Id = task.GetId();
+    displayInfo.ExecutionThread = task.m_ExecutionThreadId;
+    displayInfo.FunctionString = task.m_FunctionString;
+    displayInfo.SourceLocation = task.m_SourceLocation;
+    displayInfo.TaskName = task.m_TaskName;
+    displayInfo.Time = time;
+    m_Data->InfoWindow->AddTaskCompletedInfo(displayInfo);
+    m_Data->InfoWindow->RemoveTaskInProgressInfo(task.m_Id);
+    m_Data->InfoWindow->UpdateNumTasks(Thread::GetCurrentThreadId(), m_Data->InfoWindow->GetNumTasks(Thread::GetCurrentThreadId()) - 1);
     for (int i = 0; i < m_Data->WaitingTasks.size(); i++)
     {
       m_Data->WaitingTasks[i].CanBeExecuted();
@@ -81,15 +97,29 @@ namespace And
           if (DesiredThread == 0)
             DesiredThread = Thread::GetCurrentThreadId();
 
+          m_Data->InfoWindow->RemoveTaskWaitingInfo(waitingTask.m_Id);
           AddTaskToWorker(waitingTask, DesiredThread);
         }
       }
     }
   }
 
+  std::shared_ptr<EditorWindow> TaskSystem::GetEditorWindow() const
+  {
+    return std::static_pointer_cast<EditorWindow>(m_Data->InfoWindow);
+  }
+
   void TaskSystem::AddWaitTask(Task& task)
   {
     std::lock_guard<std::mutex> lock(m_Data->Mutex);
+    TaskDisplayInfo displayInfo;
+    displayInfo.Id = task.GetId();
+    displayInfo.ExecutionThread = task.m_ExecutionThreadId;
+    displayInfo.FunctionString = task.m_FunctionString;
+    displayInfo.SourceLocation = task.m_SourceLocation;
+    displayInfo.TaskName = task.m_TaskName;
+    displayInfo.Time = 0.0f;
+    m_Data->InfoWindow->AddTaskWaitingInfo(displayInfo);
     m_Data->WaitingTasks.push_back(task);
   }
 
@@ -105,7 +135,17 @@ namespace And
         {
           {
             std::lock_guard<std::mutex> lock(m_Data->Threads[i]->Data->QueueMutex);
+            TaskDisplayInfo displayInfo;
+            displayInfo.Id = task.GetId();
+            displayInfo.ExecutionThread = ThreadId;
+            displayInfo.FunctionString = task.m_FunctionString;
+            displayInfo.SourceLocation = task.m_SourceLocation;
+            displayInfo.TaskName = task.m_TaskName;
+            displayInfo.Time = 0.0f;
+            m_Data->InfoWindow->AddTaskInProgressInfo(displayInfo);
             m_Data->Threads[i]->Data->TasksQueue.push(std::move(task));
+            size_t threadId = m_Data->Threads[i]->Handle->GetId();
+            m_Data->InfoWindow->UpdateNumTasks(threadId, m_Data->InfoWindow->GetNumTasks(threadId) + 1);
           }
           m_Data->Threads[i]->Data->ConditionVariable.notify_all();
           bInserted = true;
@@ -128,10 +168,22 @@ namespace And
 
       {
         std::lock_guard<std::mutex> lock(m_Data->Threads[Index]->Data->QueueMutex);
+        TaskDisplayInfo displayInfo;
+        displayInfo.Id = task.GetId();
+        displayInfo.ExecutionThread = ThreadId;
+        displayInfo.FunctionString = task.m_FunctionString;
+        displayInfo.SourceLocation = task.m_SourceLocation;
+        displayInfo.TaskName = task.m_TaskName;
+        displayInfo.Time = 0.0f;
+        m_Data->InfoWindow->AddTaskInProgressInfo(displayInfo);
         m_Data->Threads[Index]->Data->TasksQueue.push(std::move(task));
+        size_t threadId = m_Data->Threads[Index]->Handle->GetId();
+        m_Data->InfoWindow->UpdateNumTasks(threadId, m_Data->InfoWindow->GetNumTasks(threadId) + 1);
       }
       m_Data->Threads[Index]->Data->ConditionVariable.notify_all();
     }
+    
+    
   }
 
   std::function<void(struct WorkerThreadData& Data)> GetGenericWorkerFunction()

@@ -35,9 +35,4 @@ EditorWindow::~EditorWindow()
 	file.save("./Editor.config");
 }
 
-
-void EditorWindow::SetEditor(Editor* e){
-  m_Editor = e;
-}
-
 }

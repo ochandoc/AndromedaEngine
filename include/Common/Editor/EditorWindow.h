@@ -7,6 +7,7 @@
 namespace And{
 
 class Editor;
+class Window;
 
   class EditorWindow 
   {
@@ -22,6 +23,7 @@ class Editor;
     bool m_is_open;
     Editor* m_Editor;
     std::string m_title;
+    Window* m_Window;
 
   private:
     void SetEditor(Editor*);

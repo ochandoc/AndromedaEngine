@@ -884,6 +884,7 @@ void Demo_RealtimePlots() {
     t += ImGui::GetIO().DeltaTime;
     sdata1.AddPoint(t, mouse.x * 0.0005f);
     rdata1.AddPoint(t, mouse.x * 0.0005f);
+
     sdata2.AddPoint(t, mouse.y * 0.0005f);
     rdata2.AddPoint(t, mouse.y * 0.0005f);
 
