@@ -150,7 +150,7 @@ std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string bas
   //std::vector<Vertex_info> vertices = obj.getVertexInfo();  
   //std::vector<float> normals = obj.getNormals();
 
-  glBufferData(GL_ARRAY_BUFFER, vertex_info.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, vertex_info.size() * sizeof(Vertex_info), &vertex_info[0], GL_STATIC_DRAW);
 
 
   //glEnableVertexAttribArray(0);
@@ -161,7 +161,7 @@ std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string bas
   
 
   // Desbindeamos el vao
-  //glBindVertexArray(0);  
+  glBindVertexArray(0);  
 
   WAIT_GPU_LOAD()
   return std::make_shared<ObjLoader>(obj);
