@@ -1,17 +1,22 @@
 #include "opengl_uniform_buffer.h"
 
-UniformBuffer::UniformBuffer(int block_index, int size){
+
+namespace And{
+
+
+UniformBuffer::UniformBuffer(unsigned int block_index, int size){
   unsigned int id;
   glGenBuffers(1, &id);
   glBindBuffer(GL_UNIFORM_BUFFER, id);
-  glBufferData(GL_UNIFORM_BUFFER, size, NULL, GL_STATIC_DRAW);
+  glBufferData(GL_UNIFORM_BUFFER, size, NULL, GL_DYNAMIC_DRAW);
   glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
   m_Id = id;
+  m_BlockIndex = block_index;
 }
 
 UniformBuffer::~UniformBuffer(){
-  glDeleteBuffers(m_Id);
+  glDeleteBuffers(m_Size, &m_Id);
 }
 
 void UniformBuffer::upload_data(const void* data, int size){
@@ -21,12 +26,14 @@ void UniformBuffer::upload_data(const void* data, int size){
 
 }
 
-void OpenGLUniformBuffer::bind() const{
+void UniformBuffer::bind() const{
   glBindBufferBase(GL_UNIFORM_BUFFER, m_BlockIndex, m_Id);
 }
 
-void OpenGLUniformBuffer::unbind() const{
+void UniformBuffer::unbind() const{
   
   glBindBufferBase(GL_UNIFORM_BUFFER, m_BlockIndex, 0);
   
+}
+
 }

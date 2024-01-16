@@ -1,5 +1,5 @@
 #pragma once
-#include "Common/Lights.h"
+#include "Common/Light.h"
 #include <optional>
 
 namespace And{
@@ -35,6 +35,8 @@ namespace And{
 
     void setMat4(std::string name, const float matrix[16]);
     void setVec3(std::string name, const float vector[9]);
+    void uploadAmbient(AmbientLight* light);
+    void setModelViewProj(const float model[16], const float view[16], const float projection[16]);
 
     void SetUniformBlock();
     

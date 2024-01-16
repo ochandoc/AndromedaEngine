@@ -1,17 +1,27 @@
 #include "Common/Shader.h"
 
 #include "Common/Slurp.h"
-
+#include "Backends/OpenGL/opengl_uniform_buffer.h"
 #include "Backends/OpenGL/OpenGL.h"
+
 #include "andpch.hpp"
 
 
 namespace And{
 
+
+  struct ModelViewProj{
+    float model[16];
+    float view[16];
+    float projection[16];
+  };
+
   struct ShaderData{
     unsigned int id;
     ShaderInfo shader_info;
     std::string shader_path;
+    std::unique_ptr<UniformBuffer> u_buffer;
+    std::unique_ptr<UniformBuffer> matrix;
   };
 
 /*
@@ -92,13 +102,13 @@ namespace And{
       vertex_shader.erase(0, vertex_title.size());
       fragment_shader.erase(0, fragment_title.size());
 
-      printf("Vertex content %s\n Fragment content %s\n", vertex_shader.c_str(), fragment_shader.c_str());
-
       unsigned int id_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
       unsigned int id_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
 
       const char* aux_v = vertex_shader.c_str();
       const char* aux_f = fragment_shader.c_str();
+
+      printf("Vertex %s\n", aux_v);
 
       glShaderSource(id_vertex_shader, 1, &aux_v, nullptr);
       glShaderSource(id_fragment_shader, 1, &aux_f, nullptr);
@@ -118,25 +128,40 @@ namespace And{
 
 
       // Cuando ya tenemos todos los shader compilados, linkamos el program
-    glLinkProgram(id_program);
-    glValidateProgram(id_program);
+      glLinkProgram(id_program);
+      glValidateProgram(id_program);
 
-    int succes;
-    glGetProgramiv(id_program, GL_VALIDATE_STATUS, &succes);
-    if(succes != GL_TRUE){
-      return nullptr;
+      int succes;
+      glGetProgramiv(id_program, GL_VALIDATE_STATUS, &succes);
+      if(succes != GL_TRUE){
+        return nullptr;
+      }
+
+      //unsigned int id_ambient_block = glGetUniformBlockIndex(id_program, "Ambient_light");
+      //int size = 0;
+      //glGetActiveUniformBlockiv(id_program, id_ambient_block, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+
+
+      unsigned int id_matrix = glGetUniformBlockIndex(id_program, "Matrix");
+      int size_matrix;
+      glGetActiveUniformBlockiv(id_program, id_matrix, GL_UNIFORM_BLOCK_DATA_SIZE, &size_matrix);
+
+      //printf("id-> %d size-> %d\n", id_ambient_block, size);
+
+
+      // Llegados hasta aqui, todo ha ido bien y creamos el shader
+      std::shared_ptr<Shader> shader = std::shared_ptr<Shader>(new Shader);
+      shader->m_Data->id = id_program;
+      shader->m_Data->shader_info.path_vertex = vertex_shader.c_str();
+      shader->m_Data->shader_info.path_fragment = fragment_shader.c_str();
+      shader->m_Data->shader_path = path;
+      //shader->m_Data->u_buffer = std::make_unique<UniformBuffer>(id_ambient_block, size);
+      shader->m_Data->matrix = std::make_unique<UniformBuffer>(id_matrix, size_matrix);
+
+      return shader;
     }
-
-    // Llegados hasta aqui, todo ha ido bien y creamos el shader
-    std::shared_ptr<Shader> shader = std::shared_ptr<Shader>(new Shader);
-    shader->m_Data->id = id_program;
-    shader->m_Data->shader_info.path_vertex = vertex_shader.c_str();
-    shader->m_Data->shader_info.path_fragment = fragment_shader.c_str();
-    shader->m_Data->shader_path = path;
-
-    return shader;
-    }
-  }
+    return nullptr;
+  } 
 
   std::shared_ptr<Shader> Shader::make(ShaderInfo s_info){
 
@@ -213,8 +238,23 @@ namespace And{
     glUniform3fv(glGetUniformLocation(m_Data->id, name.c_str()),1, &vector[0]);
   }
 
-  void Shader::SetUniformBlock(){
+  void Shader::uploadAmbient(AmbientLight* light){
+    m_Data->u_buffer->upload_data((void*)(light), sizeof(AmbientLight));
+  }
+
+
+  void Shader::setModelViewProj(const float model[16], const float view[16], const float projection[16]){
+    ModelViewProj tmp;
+
+    for(int i = 0; i < 16; i++){
+      tmp.model[i] = model[i];
+      tmp.view[i] = view[i];
+      tmp.projection[i] = projection[i];
+    }
     
+
+    m_Data->matrix->upload_data((void*)(&tmp), sizeof(ModelViewProj));
+
   }
 
   Shader::Shader() : m_Data(new ShaderData){

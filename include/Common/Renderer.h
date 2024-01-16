@@ -2,6 +2,7 @@
 
 #include "base.h"
 #include "ObjLoader.h"
+#include "Common/Light.h"
 
 namespace And
 {
@@ -33,7 +34,7 @@ public:
 
   void draw_triangle(Triangle *t);
 
-  void draw_obj(ObjLoader obj, Shader* s, Transform trans);
+  void draw_obj(ObjLoader obj, Shader* s, Transform trans, AmbientLight* ambient);
 
 protected:
   Window& m_Window;

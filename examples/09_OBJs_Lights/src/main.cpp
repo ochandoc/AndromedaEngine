@@ -34,6 +34,7 @@
 #include "Common/ActionInput.h"
 #include "Common/EntityComponentSystem.h"
 #include "Common/Editor/Editor.h"
+#include "Common/Light.h"
 
 #include "Common/TaskSystem/TaskSystem.h"
 #include "Common/Log.h"
@@ -87,9 +88,8 @@ int main(int argc, char** argv){
   s_info.path_fragment = "fshader.fs";
   s_info.path_vertex = "vshader.vs";
 
-  And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("content/teapot_shader.ashader");
+  And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
   
-
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
@@ -98,7 +98,7 @@ int main(int argc, char** argv){
   And::EntityComponentSystem entity_comp;
     
   entity_comp.add_component_class<And::Resource<And::ObjLoader>>();
-  entity_comp.add_component_class<And::Transform>();  
+  entity_comp.add_component_class<And::Transform>();
 
   int num_obj = 10;
   float pos_x = 0.0f;
@@ -116,7 +116,23 @@ int main(int argc, char** argv){
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   }
 
-  
+float active;
+  float direction[3];
+  float diffuse_color[3];
+  float specular_color[3];
+  float specular_strength;
+  float specular_shininess;
+
+  And::AmbientLight ambient;
+  ambient.active = 1.0f;
+  ambient.diffuse_color[0] = 1.0f;
+  ambient.diffuse_color[1] = 1.0f;
+  ambient.diffuse_color[2] = 1.0f;
+  ambient.specular_color[0] = 1.0f;
+  ambient.specular_color[1] = 1.0f;
+  ambient.specular_color[2] = 1.0f;
+  ambient.specular_strength = 1.0f;
+  ambient.specular_shininess = 1.0f;
  
   while (window->is_open()){
     window->update();
@@ -124,9 +140,8 @@ int main(int argc, char** argv){
 
     editor.ShowWindows();
 
-    std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
-
-      g_renderer.draw_obj(*(*resource), &(*g_shader), *trans);
+    std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader, &ambient] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
+      g_renderer.draw_obj(*(*resource), &(*g_shader), *trans, &ambient);
     };
 
     entity_comp.execute_system(obj_draw);

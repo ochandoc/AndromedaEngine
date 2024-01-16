@@ -12,6 +12,8 @@
 #include "Common/Shader.h"
 #include "Common/Triangle.h"
 #include "Common/ObjLoader.h"
+#include "Common/Light.h"
+#include "Backends/OpenGL/opengl_uniform_buffer.h"
 
 #include "Common/UI/Plot/implot.h"
 
@@ -159,7 +161,7 @@ void CheckError(){
 }
 }
 
-void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
+void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* ambient) {
 
   if(s){
     s->use();
@@ -189,11 +191,12 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
-  
+  //s->setMat4("view", glm::value_ptr(viewMatrix));
+  //s->setMat4("projection", glm::value_ptr(projectionMatrix));
+  //s->setMat4("model", glm::value_ptr(modelMatrix));
 
-  s->setMat4("view", glm::value_ptr(viewMatrix));
-  s->setMat4("projection", glm::value_ptr(projectionMatrix));
-  s->setMat4("model", glm::value_ptr(modelMatrix));
+  //s->uploadAmbient(ambient);
+  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
 
   unsigned int VBO = obj.get_vbo();
   unsigned int VAO = obj.get_vao();

@@ -1,6 +1,7 @@
 #pragma once
 
 
+namespace And{
 
 struct AmbientLight{
   float active;
@@ -9,7 +10,6 @@ struct AmbientLight{
   float specular_color[3];
   float specular_strength;
   float specular_shininess;
-
 };
 
 struct DirectionalLight{
@@ -47,3 +47,5 @@ struct SpotLight{
   float linear_att;
   float quadratic_att;
 };
+
+}
