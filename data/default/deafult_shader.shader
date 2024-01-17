@@ -11,21 +11,11 @@ layout (std140) uniform Matrix
   mat4 projection;
 };
 
-layout (std140) uniform Ambient_light
-{
-  float a;
-  vec3 direction;
-  vec3 diffuse_color;
-  vec3 specular_color;
-  float specular_strength;
-  float specular_shininess;
-};
 
 out vec3 blend_color;
 
 void main(){
   gl_Position = projection * view * model * vec4(position, 1.0f);
-  blend_color = vec3(model[0][0], model[0][1], model[0][2]);
 }
 
 
@@ -49,5 +39,4 @@ layout (std140) uniform Ambient_light
 void main(){
 
   FragColor = vec4(1.0, 0.0, 0.5, 1.0);
-  FragColor = vec4(blend_color, 1.0f);
 }

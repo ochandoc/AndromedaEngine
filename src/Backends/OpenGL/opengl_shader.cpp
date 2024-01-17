@@ -108,7 +108,7 @@ namespace And{
       const char* aux_v = vertex_shader.c_str();
       const char* aux_f = fragment_shader.c_str();
 
-      printf("Vertex %s\n", aux_v);
+      //printf("Vertex %s\n", aux_v);
 
       glShaderSource(id_vertex_shader, 1, &aux_v, nullptr);
       glShaderSource(id_fragment_shader, 1, &aux_f, nullptr);
@@ -146,6 +146,23 @@ namespace And{
       int size_matrix;
       glGetActiveUniformBlockiv(id_program, id_matrix, GL_UNIFORM_BLOCK_DATA_SIZE, &size_matrix);
 
+
+      // Debug
+      GLubyte* blockbuffer = (GLubyte*) malloc(size_matrix);
+      const GLchar* names[] = {"model", "view", "projection"};
+
+      GLuint indices[3];
+      GLint offset[4];
+
+      glGetUniformIndices(id_program, 3, names, indices);
+      glGetActiveUniformsiv(id_program, 3, indices, GL_UNIFORM_OFFSET, offset);
+      
+      for(int i = 0; i < 3; i++){
+        printf("Atribute: %s has index %d with offset %d\n",names[i], indices[i], offset[i]);
+      }
+      free(blockbuffer);
+      // End debug
+
       //printf("id-> %d size-> %d\n", id_ambient_block, size);
 
 
@@ -156,7 +173,7 @@ namespace And{
       shader->m_Data->shader_info.path_fragment = fragment_shader.c_str();
       shader->m_Data->shader_path = path;
       //shader->m_Data->u_buffer = std::make_unique<UniformBuffer>(id_ambient_block, size);
-      shader->m_Data->matrix = std::make_unique<UniformBuffer>(id_matrix, size_matrix);
+      shader->m_Data->matrix = std::make_unique<UniformBuffer>(id_matrix, (unsigned int)size_matrix);
 
       return shader;
     }
@@ -253,7 +270,7 @@ namespace And{
     }
     
 
-    m_Data->matrix->upload_data((void*)(&tmp), sizeof(ModelViewProj));
+    m_Data->matrix->upload_data((void*)(&tmp), (unsigned int)sizeof(ModelViewProj));
 
   }
 
@@ -263,6 +280,10 @@ namespace And{
 
   void Shader::use(){
     glUseProgram(m_Data->id);
+  }
+
+  void Shader::configure_shader(){
+    m_Data->matrix->bind();
   }
 
   Shader::~Shader(){

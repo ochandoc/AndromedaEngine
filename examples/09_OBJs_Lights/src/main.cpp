@@ -84,10 +84,6 @@ int main(int argc, char** argv){
   ts.AddTaskInThread("Test", WaitTask, fi);
 
   // Creamos el shader
-  And::ShaderInfo s_info;
-  s_info.path_fragment = "fshader.fs";
-  s_info.path_vertex = "vshader.vs";
-
   And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
   
 
@@ -104,7 +100,7 @@ int main(int argc, char** argv){
   float pos_x = 0.0f;
   float pos_y = -5.0f;
 
-  for(int i = -5; i < (int)(num_obj / 2); i++){
+  /*for(int i = -5; i < (int)(num_obj / 2); i++){
     And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("teapot.obj");
     And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
@@ -114,9 +110,13 @@ int main(int argc, char** argv){
     And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("teapot.obj");
     And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
-  }
+  }*/
 
-float active;
+  And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("teapot.obj");
+  And::Transform tran = {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
+  And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
+
+  float active;
   float direction[3];
   float diffuse_color[3];
   float specular_color[3];

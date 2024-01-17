@@ -41,6 +41,7 @@ namespace And{
     void SetUniformBlock();
     
     void use();
+    void configure_shader();
 
     void reload();
 

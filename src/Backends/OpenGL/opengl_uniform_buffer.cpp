@@ -4,7 +4,7 @@
 namespace And{
 
 
-UniformBuffer::UniformBuffer(unsigned int block_index, int size){
+UniformBuffer::UniformBuffer(unsigned int block_index, unsigned int size){
   unsigned int id;
   glGenBuffers(1, &id);
   glBindBuffer(GL_UNIFORM_BUFFER, id);
@@ -13,16 +13,18 @@ UniformBuffer::UniformBuffer(unsigned int block_index, int size){
 
   m_Id = id;
   m_BlockIndex = block_index;
+  m_Size = size;
 }
 
 UniformBuffer::~UniformBuffer(){
   glDeleteBuffers(m_Size, &m_Id);
 }
 
-void UniformBuffer::upload_data(const void* data, int size){
-  glBindBuffer(GL_UNIFORM_BUFFER, m_Id);
-  glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
-  glBindBuffer(GL_UNIFORM_BUFFER, 0);
+void UniformBuffer::upload_data(const void* data, unsigned int size){
+  //glBindBuffer(GL_UNIFORM_BUFFER, m_Id);
+  //glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
+  glNamedBufferSubData(m_Id, 0, size, data);
+  //glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 }
 
@@ -31,9 +33,7 @@ void UniformBuffer::bind() const{
 }
 
 void UniformBuffer::unbind() const{
-  
   glBindBufferBase(GL_UNIFORM_BUFFER, m_BlockIndex, 0);
-  
 }
 
 }

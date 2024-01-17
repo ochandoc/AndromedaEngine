@@ -197,6 +197,8 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
 
   //s->uploadAmbient(ambient);
   s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
+  s->configure_shader();
+  
 
   unsigned int VBO = obj.get_vbo();
   unsigned int VAO = obj.get_vao();
