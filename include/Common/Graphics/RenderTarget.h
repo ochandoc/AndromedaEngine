@@ -22,6 +22,12 @@ namespace And
     RenderTarget(const RenderTargetCreationInfo& InCreationInfo);
     ~RenderTarget();
 
+    void Bind();
+    void Unbind();
+    void Resize(uint32 width, uint32 height);
+
+    void Test();
+
   private:
     std::unique_ptr<struct RenderTargetData> m_Data;
   };

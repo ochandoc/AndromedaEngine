@@ -40,6 +40,7 @@
 
 #include "Common/Resources/ResourceManager.h"
 #include "Common/ShaderTextEditor.h"
+#include "Common/Graphics/RenderTarget.h"
 
 int SlowTask()
 {
@@ -116,20 +117,29 @@ int main(int argc, char** argv){
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   }
 
-  
+  And::RenderTargetCreationInfo rt_CreatioInfo;
+  rt_CreatioInfo.width = 1024;
+  rt_CreatioInfo.height = 720;
+  rt_CreatioInfo.format = And::ETextureFormat::RGBA8;
+  And::RenderTarget rt(rt_CreatioInfo);
  
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
 
-    editor.ShowWindows();
+    //editor.ShowWindows();
+
 
     std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
 
       g_renderer.draw_obj(*(*resource), &(*g_shader), *trans);
     };
 
+    rt.Bind();
     entity_comp.execute_system(obj_draw);
+    rt.Unbind();
+
+    rt.Test();
 
     g_renderer.end_frame();
     window->swap_buffers();

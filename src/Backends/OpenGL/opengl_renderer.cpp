@@ -61,7 +61,7 @@ void Renderer::end_frame()
 {
   //ImPlot::ShowDemoWindow();
   //ImGui::ShowDemoWindow();
-  if(ImGui::CollapsingHeader("Camera")){
+  if (ImGui::CollapsingHeader("Camera")) {
     ImGui::DragFloat3("Camera position", m_camera_pos);
     ImGui::DragFloat3("Camera target", m_camera_target);
     ImGui::DragFloat("FOV", &m_fov);
