@@ -19,7 +19,7 @@ class ShaderGenerator : public ResourceGenerator<Shader>{
   ~ShaderGenerator(){}
 
   virtual std::shared_ptr<Shader> operator()(const std::string& path) override{
-    //std::this_thread::sleep_for(std::chrono::seconds(2));
+    std::this_thread::sleep_for(std::chrono::seconds(2));
     std::shared_ptr<Shader> tmp = Shader::make(path);
     if(tmp)return tmp;
 

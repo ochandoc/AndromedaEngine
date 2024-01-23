@@ -14,8 +14,7 @@ layout (std140) uniform Matrix{
 
 
 void main(){
-  gl_Position = projection * view * model * vec4(position, 1.0f);
-  //gl_Position = vec4(position.x, position.y, position.z, 1.0);
+  gl_Position = projection * view * model * vec4(position, 1.0);
   blend_color = normals;
 }
 
@@ -25,8 +24,8 @@ void main(){
 out vec4 FragColor;
 in vec3 blend_color;
 
+
 void main(){
   //FragColor = vec4(0.0, 0.6, 0.0, 1.0);
   FragColor = vec4(blend_color, 1.0);
-  
 }
