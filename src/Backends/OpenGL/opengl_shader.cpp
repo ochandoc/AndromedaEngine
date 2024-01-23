@@ -145,6 +145,7 @@ namespace And{
       unsigned int id_matrix = glGetUniformBlockIndex(id_program, "Matrix");
       int size_matrix;
       glGetActiveUniformBlockiv(id_program, id_matrix, GL_UNIFORM_BLOCK_DATA_SIZE, &size_matrix);
+      //glUniformBlockBinding(id_program, id_matrix, 0);
 
 
       // Debug
@@ -274,9 +275,7 @@ namespace And{
 
   }
 
-  Shader::Shader() : m_Data(new ShaderData){
-    
-  }
+  Shader::Shader() : m_Data(new ShaderData){}
 
   void Shader::use(){
     glUseProgram(m_Data->id);

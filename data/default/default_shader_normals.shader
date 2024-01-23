@@ -6,9 +6,11 @@ layout(location = 1) in vec3 normals;
 
 out vec3 blend_color;
 
-uniform mat4 view;
-uniform mat4 projection;
-uniform mat4 model;
+layout (std140) uniform Matrix{
+  mat4 model;
+  mat4 view;
+  mat4 projection;
+};
 
 
 void main(){

@@ -44,7 +44,7 @@
 
 int SlowTask()
 {
-  std::this_thread::sleep_for(std::chrono::seconds(5));
+  std::this_thread::sleep_for(std::chrono::seconds(1));
   return 10;
 }
 
@@ -80,11 +80,11 @@ int main(int argc, char** argv){
   // Show pc info
   g_context->create_info();
 
-  And::Future<int> fi = ts.AddTaskInThread("Resource Thread", SlowTask);
-  ts.AddTaskInThread("Test", WaitTask, fi);
+  //And::Future<int> fi = ts.AddTaskInThread("Resource Thread", SlowTask);
+  //ts.AddTaskInThread("Test", WaitTask, fi);
 
   // Creamos el shader
-  And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
+  And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/default_shader_normals.shader");
   
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};

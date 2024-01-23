@@ -4,8 +4,8 @@
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normals;
 
-layout (std140) uniform Matrix
-{
+layout (std140) uniform Matrix{
+
   mat4 model;
   mat4 view;
   mat4 projection;
@@ -24,16 +24,6 @@ void main(){
 
 out vec4 FragColor;
 in vec3 blend_color;
-
-layout (std140) uniform Ambient_light
-{
-  float a;
-  vec3 direction;
-  vec3 diffuse_color;
-  vec3 specular_color;
-  float specular_strength;
-  float specular_shininess;
-};
 
 
 void main(){

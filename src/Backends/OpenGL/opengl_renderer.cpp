@@ -25,7 +25,7 @@ Renderer::Renderer(Window& window) : m_Window(window)
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
   m_camera_pos[0] = 0.0f;
   m_camera_pos[1] = 7.0f;
-  m_camera_pos[2] = -60.0f;
+  m_camera_pos[2] = 60.0f;
 
   m_camera_target[0] = 0.0f;
   m_camera_target[1] = 0.0f;

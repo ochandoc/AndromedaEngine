@@ -10,10 +10,6 @@ class ShaderGenerator : public ResourceGenerator<Shader>{
   public:
 
   ShaderGenerator(){
-    
-    ShaderInfo s_info;
-    s_info.path_fragment = "default/fshader_default.fs";
-    s_info.path_vertex = "default/vshader_default.vs";
 
     std::shared_ptr<Shader> shader = Shader::make("default/deafult_shader.shader");
     m_Default = shader;
