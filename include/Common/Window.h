@@ -5,6 +5,10 @@
 #include "Common/KeyCodes.h"
 
 #include "Common/TaskSystem/TaskSystem.h"
+#include "Common/Events/Events.h"
+
+DECLARE_MULTICAST_DELEGATE_TWO_PARAM(OnWindowResizeSignature, uint32, width, uint32, height)
+DECLARE_MULTICAST_DELEGATE(OnWindowCloseSignature)
 
 namespace And
 {
@@ -29,6 +33,8 @@ public:
 	void set_vsync(bool vsync);
 	bool is_vsync() const;
 
+	void set_size(uint32 width, uint32 height);
+
 	void* get_native_window();
 
 	void update();
@@ -39,6 +45,9 @@ public:
 	std::shared_ptr<GraphicsContext> get_context() const;
 
 	std::function<void(WorkerThreadData& Data)> get_worker_function();
+
+	OnWindowResizeSignature OnWindowResize;
+	OnWindowCloseSignature OnWindowClose;
 
 	friend class Renderer;
 	friend class Input;

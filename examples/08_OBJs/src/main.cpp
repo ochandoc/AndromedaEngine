@@ -52,6 +52,11 @@ void WaitTask(int num)
   printf("Num: %d\n", num);
 }
 
+void windodResized(uint32 width, uint32 height)
+{
+  printf("HOlaaaaaa %u, %u\n", width, height);
+}
+
 int main(int argc, char** argv){
 
   And::Engine e;
