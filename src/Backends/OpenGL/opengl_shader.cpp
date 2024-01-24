@@ -143,10 +143,14 @@ namespace And{
 
       // Debug
       //GLubyte* blockbuffer = (GLubyte*) malloc(size_block);
-      const GLchar* names[] = {"model", "view", "projection", "ambient", "directional", "point", "spot"};
+      /*const GLchar* names[] = {"model", "view", "projection", "ambient", "directional.enabled", "point", "spot"};
 
       GLuint indices[7];
       GLint offset[7];
+
+      int totalUniforms;
+      glGetProgramiv(id_program, GL_ACTIVE_UNIFORMS, &totalUniforms);
+      printf("Total uniforms in program: %d\n", totalUniforms);
 
       glGetUniformIndices(id_program, 7, names, indices);
       glGetActiveUniformsiv(id_program, 7, indices, GL_UNIFORM_OFFSET, offset);
@@ -156,6 +160,7 @@ namespace And{
       }
       //free(blockbuffer);
       // End debug
+      */
 
       //printf("id-> %d size-> %d\n", id_ambient_block, size);
 
@@ -212,7 +217,7 @@ namespace And{
   }
 
   void Shader::upload_data(){
-    m_Data->uniform_buffer->upload_data((void*)(m_uniform_block.get()), (unsigned int)sizeof(m_uniform_block));
+    m_Data->uniform_buffer->upload_data((void*)(m_uniform_block.get()), (unsigned int)sizeof(UniformBlockData));
   }
 
 
