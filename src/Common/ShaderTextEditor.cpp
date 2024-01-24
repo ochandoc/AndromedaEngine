@@ -1,10 +1,10 @@
-#include "Common/ShaderTextEditor.h"
+#include "Andromeda/Editor/ShaderTextEditor.h"
 
 #include "TextEditor.h"
-#include "Common/Threw.h"
-#include "Common/Resources/ResourceManager.h"
-#include "Common/Slurp.h"
-#include "Common/Shader.h"
+#include "Andromeda/Misc/Threw.h"
+#include "Andromeda/Resources/ResourceManager.h"
+#include "Andromeda/Misc/Slurp.h"
+#include "Andromeda/Graphics/Shader.h"
 
 namespace And
 {

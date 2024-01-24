@@ -1,4 +1,4 @@
-#include "Common/OpenGLTexture2D.h"
+#include "Andromeda/Graphics/OpenGLTexture2D.h"
 
 #include "Backends/OpenGL/OpenGL.h"
 #define STB_IMAGE_IMPLEMENTATION

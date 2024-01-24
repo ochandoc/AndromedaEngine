@@ -1,6 +1,6 @@
-#include "Common/Shader.h"
+#include "Andromeda/Graphics/Shader.h"
 
-#include "Common/Slurp.h"
+#include "Andromeda/Misc/Slurp.h"
 
 #include "Backends/OpenGL/OpenGL.h"
 #include "andpch.hpp"

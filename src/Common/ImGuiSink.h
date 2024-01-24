@@ -1,8 +1,9 @@
 #pragma once
 
-#include "base.h"
+#include "Andromeda/Misc/CoreMiscDefines.h"
+#include "Andromeda/HAL/Types.h"
 
-#include "Common/Log.h"
+#include "Andromeda/Debug/Log.h"
 
 #include "imgui.h"
 #include "spdlog/spdlog.h"

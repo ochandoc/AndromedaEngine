@@ -1,9 +1,9 @@
-#include "Common/Window.h"
+#include "Andromeda/HAL/Window.h"
 
-#include "Common/Engine.h"
-#include "Common/Renderer.h"
-#include "Common/GraphicsContext.h"
-#include "Common/KeyCodes.h"
+#include "Andromeda/Engine.h"
+#include "Andromeda/Graphics/Renderer.h"
+#include "Andromeda/Graphics/GraphicsContext.h"
+#include "Andromeda/HAL/KeyCodes.h"
 
 #include "GLFW/glfw3.h"
 
@@ -28,7 +28,7 @@ namespace And
 
   static void close_window_callback(GLFWwindow* window)
   {
-    WindowData* data = CAST_PTR(WindowData, glfwGetWindowUserPointer(window));
+    WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
     Window* w = data->class_instance;
     data->is_open = false;
     if (w->OnWindowClose.IsBounded())
@@ -37,7 +37,7 @@ namespace And
 
   static void resize_window_callback(GLFWwindow* window, int width, int height)
   {
-    WindowData* data = CAST_PTR(WindowData, glfwGetWindowUserPointer(window));
+    WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
     Window* w = data->class_instance;
     if (w->OnWindowResize.IsBounded())
       w->OnWindowResize.Broadcast(width, height);

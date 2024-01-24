@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Common/Editor/EditorWindow.h"
-#include "Common/Window.h"
+#include "Andromeda/Editor/EditorWindow.h"
+#include "Andromeda/HAL/Window.h"
 
 #include "imgui.h"
 

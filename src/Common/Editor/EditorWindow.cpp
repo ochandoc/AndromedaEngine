@@ -1,5 +1,5 @@
-#include "Common/Editor/EditorWindow.h"
-#include "Common/Editor/Editor.h"
+#include "Andromeda/Editor/EditorWindow.h"
+#include "Andromeda/Editor/Editor.h"
 
 #include "Common/inicpp.h"
 

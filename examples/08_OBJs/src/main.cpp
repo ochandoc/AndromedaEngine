@@ -20,26 +20,7 @@
 #include <condition_variable>
 #include <future>
 
-#include "Common/Engine.h"
-#include "Common/Window.h"
-#include "Common/GraphicsContext.h"
-#include "Common/Renderer.h"
-#include "Common/Shader.h"
-#include "Common/Triangle.h"
-#include "Common/ObjLoader.h"
-#include "Common/ObjGenerator.h"
-#include "Common/ShaderGenerator.h"
-
-#include "Common/Input.h"
-#include "Common/ActionInput.h"
-#include "Common/EntityComponentSystem.h"
-#include "Common/Editor/Editor.h"
-
-#include "Common/TaskSystem/TaskSystem.h"
-#include "Common/Log.h"
-
-#include "Common/Resources/ResourceManager.h"
-#include "Common/ShaderTextEditor.h"
+#include "Andromeda.h"
 
 int SlowTask()
 {

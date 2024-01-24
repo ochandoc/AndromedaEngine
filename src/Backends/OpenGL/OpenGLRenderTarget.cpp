@@ -1,12 +1,15 @@
-#include "Common/Graphics/RenderTarget.h"
+#include "Andromeda/Graphics/RenderTarget.h"
 
 #include "Backends/OpenGL/OpenGL.h"
 
-struct RenderTargetData
+namespace And
 {
-  uint32 Id;
-  uint32 Texture;
-};
+  struct RenderTargetData
+  {
+    uint32 Id;
+    uint32 Texture;
+  };
+}
 
 And::RenderTarget::RenderTarget(const RenderTargetCreationInfo& InCreationInfo) : m_Data(new RenderTargetData)
 {
@@ -19,7 +22,7 @@ And::RenderTarget::RenderTarget(const RenderTargetCreationInfo& InCreationInfo) 
   switch (InCreationInfo.format)
   {
   case ETextureFormat::Depth:
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_STENCIL, );
+    //glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_STENCIL, );
     break;
   case ETextureFormat::RGBA8:
     break;

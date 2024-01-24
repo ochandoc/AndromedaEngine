@@ -1,4 +1,4 @@
-#include "Common/Resources/ResourceManager.h"
+#include "Andromeda/Resources/ResourceManager.h"
 
 namespace And
 {

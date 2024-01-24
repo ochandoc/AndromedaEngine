@@ -1,4 +1,4 @@
-#include "Common/Log.h"
+#include "Andromeda/Debug/Log.h"
 
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"

@@ -1,7 +1,7 @@
-#include "Common/Editor/Editor.h"
-#include "Common/Log.h"
+#include "Andromeda/Editor/Editor.h"
+#include "Andromeda/Debug/Log.h"
 #include "Common/ImGuiSink.h"
-#include "Common/ShaderTextEditor.h"
+#include "Andromeda/Editor/ShaderTextEditor.h"
 
 #include "Common/UI/Plot/implot.h"
 
