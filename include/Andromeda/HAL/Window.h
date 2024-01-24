@@ -8,6 +8,7 @@
 #include "Andromeda/HAL/KeyCodes.h"
 
 #include "Andromeda/TaskSystem/TaskSystem.h"
+#include "Andromeda/Graphics/RenderTarget.h"
 
 DECLARE_MULTICAST_DELEGATE_TWO_PARAM(OnWindowResizeSignature, uint32, width, uint32, height)
 DECLARE_MULTICAST_DELEGATE(OnWindowCloseSignature)
@@ -36,6 +37,9 @@ public:
 	bool is_vsync() const;
 
 	void set_size(uint32 width, uint32 height);
+
+	uint32 get_width() const;
+	uint32 get_height() const;
 
 	void* get_native_window();
 

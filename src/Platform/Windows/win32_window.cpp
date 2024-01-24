@@ -9,6 +9,7 @@
 
 #include "imgui_impl_glfw.h"
 #include "Andromeda/UI/Plot/implot.h"
+#include "Andromeda/Graphics/RenderTarget.h"
 
 namespace And
 {
@@ -39,6 +40,8 @@ namespace And
   {
     WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
     Window* w = data->class_instance;
+    data->width = width;
+    data->height = height;
     if (w->OnWindowResize.IsBounded())
       w->OnWindowResize.Broadcast(width, height);
   }
@@ -257,6 +260,16 @@ namespace And
   void Window::set_size(uint32 width, uint32 height)
   {
     glfwSetWindowSize(m_Data->handle, (int)width, (int)height);
+  }
+
+  uint32 Window::get_width() const
+  {
+    return m_Data->width;
+  }
+
+  uint32 Window::get_height() const
+  {
+    return m_Data->height;
   }
 
   void* Window::get_native_window()

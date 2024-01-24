@@ -2,7 +2,6 @@
 #include "Andromeda/HAL/Window.h"
 
 #include "Backends/OpenGL/OpenGL.h"
-#include "GLFW/glfw3.h"
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -30,19 +29,26 @@ Renderer::Renderer(Window& window) : m_Window(window)
   m_camera_target[2] = 0.0f;
   m_fov = 45.0f;
 
-  GLFWwindow *window_tmp = (GLFWwindow*) m_Window.get_native_window();
-  int width, height;
-  glfwGetWindowSize(window_tmp, &width, &height);
+  int width = m_Window.get_width();
+  int height = m_Window.get_height();
   m_aspectRatio = (float)(width/height);
 
   m_near = 0.1f;
   m_far = 10000.0f;
 
-
-
   set_clear_color(default_color);
   window.imgui_start();
   ImGui_ImplOpenGL3_Init("#version 430 core");
+
+  {
+    RenderTargetCreationInfo CreationInfo = {};
+    CreationInfo.width = width;
+    CreationInfo.height = height;
+    CreationInfo.format = ETextureFormat::RGBA8;
+    m_RenderTarget = std::make_shared<RenderTarget>(CreationInfo);
+    m_Window.OnWindowResize.AddDynamic(m_RenderTarget.get(), &RenderTarget::Resize);
+    m_bDrawOnTexture = false;
+  }
 }
 
 Renderer::~Renderer(){
@@ -51,14 +57,22 @@ Renderer::~Renderer(){
 
 void Renderer::new_frame()
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   ImGui_ImplOpenGL3_NewFrame(); 
 	m_Window.new_frame();
   ImGui::NewFrame();
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  if (m_bDrawOnTexture)
+  {
+    m_RenderTarget->Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  }
+
 }
 
 void Renderer::end_frame()
 {
+  m_RenderTarget->Unbind();
   //ImPlot::ShowDemoWindow();
   //ImGui::ShowDemoWindow();
   if (ImGui::CollapsingHeader("Camera")) {
@@ -75,9 +89,19 @@ void Renderer::end_frame()
 void Renderer::set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height){
   glViewport(x, y, width, height);
 }
+
+void Renderer::set_draw_on_texture(bool value)
+{
+  m_bDrawOnTexture = value;
+}
   
 void Renderer::set_clear_color(float* color){
   glClearColor(color[0], color[1], color[2], color[3]);
+}
+
+std::shared_ptr<RenderTarget> Renderer::get_render_target() const
+{
+  return m_RenderTarget;
 }
 
 

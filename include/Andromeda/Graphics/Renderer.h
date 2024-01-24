@@ -3,14 +3,15 @@
 #include "Andromeda/Misc/CoreMiscDefines.h"
 #include "Andromeda/HAL/Types.h"
 #include "ObjLoader.h"
+#include "Andromeda/Graphics/RenderTarget.h"
 
 namespace And
 {
-class Window;
-class Shader;
-class Triangle;
-class ObjLoader;
-struct ShaderInfo;
+  class Window;
+  class Shader;
+  class Triangle;
+  class ObjLoader;
+  struct ShaderInfo;
 
 
 class Renderer
@@ -27,7 +28,11 @@ public:
 
   void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 
+  void set_draw_on_texture(bool value);
+
   void set_clear_color(float* color);
+
+  std::shared_ptr<RenderTarget> get_render_target() const;
 
   void showDemo();
   void showImGuiDemoWindow();
@@ -38,15 +43,17 @@ public:
 
 protected:
   Window& m_Window;
+  std::shared_ptr<RenderTarget> m_RenderTarget;
 
 private:
+  bool m_bDrawOnTexture;
 
-float m_camera_pos[3];
-float m_camera_target[3];
-float m_fov;
-float m_aspectRatio;
-float m_near;
-float m_far;
+  float m_camera_pos[3];
+  float m_camera_target[3];
+  float m_fov;
+  float m_aspectRatio;
+  float m_near;
+  float m_far;
 };
 
 }

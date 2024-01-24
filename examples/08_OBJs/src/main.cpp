@@ -33,14 +33,15 @@ void WaitTask(int num)
   printf("Num: %d\n", num);
 }
 
-void windodResized(uint32 width, uint32 height)
-{
-  printf("HOlaaaaaa %u, %u\n", width, height);
-}
-
 int main(int argc, char** argv){
 
   And::Engine e;
+
+  And::RenderTargetCreationInfo CreationInfo = {};
+  CreationInfo.width = 1024;
+  CreationInfo.height = 720;
+  CreationInfo.format = And::ETextureFormat::RGBA8;
+  And::RenderTarget rt(CreationInfo);
 
   And::TaskSystem ts;
 
@@ -54,9 +55,6 @@ int main(int argc, char** argv){
   std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
-
-  window->OnWindowResize.AddDynamic(windodResized);
-  window->set_size(1920, 1080);
 
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();
@@ -104,18 +102,12 @@ int main(int argc, char** argv){
     And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   }
-
-  And::RenderTargetCreationInfo rt_CreatioInfo;
-  rt_CreatioInfo.width = 1024;
-  rt_CreatioInfo.height = 720;
-  rt_CreatioInfo.format = And::ETextureFormat::RGBA8;
-  And::RenderTarget rt(rt_CreatioInfo);
- 
+  g_renderer.set_draw_on_texture(true);
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
 
-    //editor.ShowWindows();
+    editor.ShowWindows();
 
 
     std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
@@ -123,11 +115,10 @@ int main(int argc, char** argv){
       g_renderer.draw_obj(*(*resource), &(*g_shader), *trans);
     };
 
-    rt.Bind();
-    entity_comp.execute_system(obj_draw);
-    rt.Unbind();
 
-    rt.Test();
+    entity_comp.execute_system(obj_draw);
+
+    g_renderer.get_render_target()->Test();
 
     g_renderer.end_frame();
     window->swap_buffers();
