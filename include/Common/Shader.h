@@ -19,6 +19,16 @@ namespace And{
     const char* path_geometry = nullptr;
   };
 
+  struct UniformBlockData{
+    float model[16];
+    float view[16];
+    float projection[16];
+    AmbientLight light_ambient;
+    DirectionalLight light_directional;
+    PointLight light_point;
+    SpotLight light_spot;
+  };
+
   class Shader
   {
   public:
@@ -42,13 +52,17 @@ namespace And{
     
     void use();
     void configure_shader();
-
+    void un_configure_shader();
+    void set_light(AmbientLight* light);
+    void upload_data();
     void reload();
 
   private:
     Shader();
     std::unique_ptr<struct ShaderData> m_Data;
     char m_shader_error[1024] = {0};
+
+    std::shared_ptr<UniformBlockData> m_uniform_block;
 
   };
 }

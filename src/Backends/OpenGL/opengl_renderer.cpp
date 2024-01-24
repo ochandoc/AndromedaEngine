@@ -197,6 +197,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
 
   //s->uploadAmbient(ambient);
   s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
+  s->upload_data();
   s->configure_shader();
   
 
@@ -223,6 +224,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
 
   std::vector<unsigned int> indices = obj.getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+  s->un_configure_shader();
 
 }
 

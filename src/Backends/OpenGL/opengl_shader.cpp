@@ -9,19 +9,11 @@
 
 namespace And{
 
-
-  struct ModelViewProj{
-    float model[16];
-    float view[16];
-    float projection[16];
-  };
-
   struct ShaderData{
     unsigned int id;
     ShaderInfo shader_info;
     std::string shader_path;
-    std::unique_ptr<UniformBuffer> u_buffer;
-    std::unique_ptr<UniformBuffer> matrix;
+    std::unique_ptr<UniformBuffer> uniform_buffer;
   };
 
 /*
@@ -108,6 +100,8 @@ namespace And{
       const char* aux_v = vertex_shader.c_str();
       const char* aux_f = fragment_shader.c_str();
 
+      printf("%s\n", vertex_shader.c_str());
+
       //printf("Vertex %s\n", aux_v);
 
       glShaderSource(id_vertex_shader, 1, &aux_v, nullptr);
@@ -142,26 +136,25 @@ namespace And{
       //glGetActiveUniformBlockiv(id_program, id_ambient_block, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
 
 
-      unsigned int id_matrix = glGetUniformBlockIndex(id_program, "Matrix");
-      int size_matrix;
-      glGetActiveUniformBlockiv(id_program, id_matrix, GL_UNIFORM_BLOCK_DATA_SIZE, &size_matrix);
-      //glUniformBlockBinding(id_program, id_matrix, 0);
-
+      unsigned int id_block = glGetUniformBlockIndex(id_program, "UniformBlock");
+      int size_block;
+      glGetActiveUniformBlockiv(id_program, id_block, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block);
+      printf("Size in C++: %d size in gl: %d\n", sizeof(UniformBlockData), size_block);
 
       // Debug
-      GLubyte* blockbuffer = (GLubyte*) malloc(size_matrix);
-      const GLchar* names[] = {"model", "view", "projection"};
+      //GLubyte* blockbuffer = (GLubyte*) malloc(size_block);
+      const GLchar* names[] = {"model", "view", "projection", "ambient", "directional", "point", "spot"};
 
-      GLuint indices[3];
-      GLint offset[4];
+      GLuint indices[7];
+      GLint offset[7];
 
-      glGetUniformIndices(id_program, 3, names, indices);
-      glGetActiveUniformsiv(id_program, 3, indices, GL_UNIFORM_OFFSET, offset);
+      glGetUniformIndices(id_program, 7, names, indices);
+      glGetActiveUniformsiv(id_program, 7, indices, GL_UNIFORM_OFFSET, offset);
       
-      for(int i = 0; i < 3; i++){
+       for(int i = 0; i < 7; i++){
         printf("Atribute: %s has index %d with offset %d\n",names[i], indices[i], offset[i]);
       }
-      free(blockbuffer);
+      //free(blockbuffer);
       // End debug
 
       //printf("id-> %d size-> %d\n", id_ambient_block, size);
@@ -174,78 +167,14 @@ namespace And{
       shader->m_Data->shader_info.path_fragment = fragment_shader.c_str();
       shader->m_Data->shader_path = path;
       //shader->m_Data->u_buffer = std::make_unique<UniformBuffer>(id_ambient_block, size);
-      shader->m_Data->matrix = std::make_unique<UniformBuffer>(id_matrix, (unsigned int)size_matrix);
+      shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(id_block, (unsigned int)size_block);
+      shader->m_uniform_block = std::make_shared<UniformBlockData>();
 
       return shader;
     }
     return nullptr;
   } 
 
-  std::shared_ptr<Shader> Shader::make(ShaderInfo s_info){
-
-    unsigned int id_program = glCreateProgram();
-    // Error
-    if(id_program == 0){
-        //return std::nullopt;
-      return nullptr;
-    }
-
-    const char* paths[4] = {s_info.path_vertex, s_info.path_fragment, s_info.path_geometry, s_info.path_teselation};
-
-    for(int i = 0; i < 4; i++){
-
-      unsigned int id_shader;
-      // Compilamos fragment shader
-      if(paths[i] != nullptr){
-        switch(i){
-          case 0: id_shader = glCreateShader(GL_VERTEX_SHADER); break;
-          case 1: id_shader = glCreateShader(GL_FRAGMENT_SHADER); break;
-          case 2: id_shader = glCreateShader(GL_GEOMETRY_SHADER); break;
-          case 3: id_shader = glCreateShader(GL_TESS_CONTROL_SHADER); break;
-        }
-        
-        // Cargamos en memoria el archivo del shader
-        Slurp file{paths[i]};
-        char *shader_data = file.data();
-        glShaderSource(id_shader, 1, &shader_data, nullptr);
-
-        // Compilamos
-        glCompileShader(id_shader);
-
-        if(!GetShaderError(id_shader)){
-          // Si no hay error atachamos
-          glAttachShader(id_program, id_shader);
-        }else{
-          // Error
-          return nullptr;
-        }
-      }
-    }
-
-
-    // Cuando ya tenemos todos los shader compilados, linkamos el program
-    glLinkProgram(id_program);
-    glValidateProgram(id_program);
-
-    int succes;
-    glGetProgramiv(id_program, GL_VALIDATE_STATUS, &succes);
-    if(succes != GL_TRUE){
-      return nullptr;
-    }
-
-
-    // Llegados hasta aqui, todo ha ido bien y creamos el shader
-    //ShaderData data = {id_program};
-    //Shader s;
-    //s.m_Data->id = id_program;
-    //s.m_Data->shader_info = s_info;
-    
-    std::shared_ptr<Shader> shader = std::shared_ptr<Shader>(new Shader);
-    shader->m_Data->id = id_program;
-    shader->m_Data->shader_info = s_info;
-
-    return shader;
-  }
 
   void Shader::setMat4(std::string name, const float matrix[16]){ 
     glUniformMatrix4fv(glGetUniformLocation(m_Data->id, name.c_str()), 1, GL_FALSE, &matrix[0]);
@@ -256,24 +185,36 @@ namespace And{
     glUniform3fv(glGetUniformLocation(m_Data->id, name.c_str()),1, &vector[0]);
   }
 
-  void Shader::uploadAmbient(AmbientLight* light){
-    m_Data->u_buffer->upload_data((void*)(light), sizeof(AmbientLight));
+  void Shader::set_light(AmbientLight* light){
+    //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
+
+    m_uniform_block->light_ambient.active = light->active;
+    m_uniform_block->light_ambient.specular_strength = light->specular_strength;
+    m_uniform_block->light_ambient.specular_shininess = light->specular_shininess;
+
+    for(int i = 0; i < 3; i++){
+      m_uniform_block->light_ambient.direction[i] = light->direction[i];
+      m_uniform_block->light_ambient.diffuse_color[i] = light->diffuse_color[i];
+      m_uniform_block->light_ambient.specular_color[i] = light->specular_color[i];
+    }    
   }
 
 
   void Shader::setModelViewProj(const float model[16], const float view[16], const float projection[16]){
-    ModelViewProj tmp;
 
     for(int i = 0; i < 16; i++){
-      tmp.model[i] = model[i];
-      tmp.view[i] = view[i];
-      tmp.projection[i] = projection[i];
+      m_uniform_block->model[i] = model[i];
+      m_uniform_block->view[i] = view[i];
+      m_uniform_block->projection[i] = projection[i];
     }
     
-
-    m_Data->matrix->upload_data((void*)(&tmp), (unsigned int)sizeof(ModelViewProj));
-
+    //m_Data->uniform_buffer->upload_data((void*)(&tmp), (unsigned int)sizeof(ModelViewProj));
   }
+
+  void Shader::upload_data(){
+    m_Data->uniform_buffer->upload_data((void*)(m_uniform_block.get()), (unsigned int)sizeof(m_uniform_block));
+  }
+
 
   Shader::Shader() : m_Data(new ShaderData){}
 
@@ -282,13 +223,16 @@ namespace And{
   }
 
   void Shader::configure_shader(){
-    m_Data->matrix->bind();
+    m_Data->uniform_buffer->bind();
+  }
+
+  void Shader::un_configure_shader(){
+    m_Data->uniform_buffer->unbind();
   }
 
   Shader::~Shader(){
     glDeleteProgram(m_Data->id);
   }
-
 
   void Shader::reload(){
     //glLinkProgram(m_Data->id);
