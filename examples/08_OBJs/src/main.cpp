@@ -20,6 +20,7 @@
 #include <condition_variable>
 #include <future>
 
+<<<<<<< HEAD
 #include "Common/Engine.h"
 #include "Common/Window.h"
 #include "Common/GraphicsContext.h"
@@ -41,6 +42,9 @@
 #include "Common/Resources/ResourceManager.h"
 #include "Common/ShaderTextEditor.h"
 #include "Common/Graphics/RenderTarget.h"
+=======
+#include "Andromeda.h"
+>>>>>>> dc5a9dca2c52a61af44c96d81cf243302a59d037
 
 int SlowTask()
 {
@@ -51,6 +55,11 @@ int SlowTask()
 void WaitTask(int num)
 {
   printf("Num: %d\n", num);
+}
+
+void windodResized(uint32 width, uint32 height)
+{
+  printf("HOlaaaaaa %u, %u\n", width, height);
 }
 
 int main(int argc, char** argv){

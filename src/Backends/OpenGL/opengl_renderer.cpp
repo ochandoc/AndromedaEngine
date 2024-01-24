@@ -1,5 +1,5 @@
-#include "Common/Renderer.h"
-#include "Common/Window.h"
+#include "Andromeda/Graphics/Renderer.h"
+#include "Andromeda/HAL/Window.h"
 
 #include "Backends/OpenGL/OpenGL.h"
 #include "GLFW/glfw3.h"
@@ -9,9 +9,9 @@
 
 #include "imgui_impl_opengl3.h"
 
-#include "Common/Shader.h"
-#include "Common/Triangle.h"
-#include "Common/ObjLoader.h"
+#include "Andromeda/Graphics/Shader.h"
+#include "Andromeda/Graphics/Triangle.h"
+#include "Andromeda/Graphics/ObjLoader.h"
 
 #include "Common/UI/Plot/implot.h"
 

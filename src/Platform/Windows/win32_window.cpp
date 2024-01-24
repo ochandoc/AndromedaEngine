@@ -1,9 +1,9 @@
-#include "Common/Window.h"
+#include "Andromeda/HAL/Window.h"
 
-#include "Common/Engine.h"
-#include "Common/Renderer.h"
-#include "Common/GraphicsContext.h"
-#include "Common/KeyCodes.h"
+#include "Andromeda/Engine.h"
+#include "Andromeda/Graphics/Renderer.h"
+#include "Andromeda/Graphics/GraphicsContext.h"
+#include "Andromeda/HAL/KeyCodes.h"
 
 #include "GLFW/glfw3.h"
 
@@ -16,19 +16,31 @@ namespace And
   struct WindowData
   {
     Window* class_instance;
-    PLATFORM_WINDOW_DATA glfw;
+    GLFWwindow* handle;
+    uint32 width, height;
+    bool is_open;
+    bool is_vsync;
     KeyboardState* keyboard;
     std::shared_ptr<GraphicsContext> m_Context;
     float LastTime;
     float DeltaTime;
-    // Camera cam;
   };
 
   static void close_window_callback(GLFWwindow* window)
   {
-    WindowData* data = CAST_PTR(WindowData, glfwGetWindowUserPointer(window));
+    WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
     Window* w = data->class_instance;
-    data->glfw.is_open = false;
+    data->is_open = false;
+    if (w->OnWindowClose.IsBounded())
+      w->OnWindowClose.Broadcast();
+  }
+
+  static void resize_window_callback(GLFWwindow* window, int width, int height)
+  {
+    WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+    Window* w = data->class_instance;
+    if (w->OnWindowResize.IsBounded())
+      w->OnWindowResize.Broadcast(width, height);
   }
 
   static void PressedKey(GLFWwindow* window, int keyCode, int scancode, int action, int mods){
@@ -182,7 +194,7 @@ namespace And
 
   Window::~Window()
   {
-    glfwDestroyWindow(m_Data->glfw.handle);
+    glfwDestroyWindow(m_Data->handle);
   }
 
   std::shared_ptr<Window> Window::make(Engine& e, uint32 w, uint32 h, const char* title)
@@ -206,15 +218,16 @@ namespace And
 
     std::shared_ptr<Window> window(new Window);
 
-    window->m_Data->glfw.handle = handle;
-    window->m_Data->glfw.width = w;
-    window->m_Data->glfw.height = h;
-    window->m_Data->glfw.is_open = true;
+    window->m_Data->handle = handle;
+    window->m_Data->width = w;
+    window->m_Data->height = h;
+    window->m_Data->is_open = true;
     window->m_Data->keyboard = &window->m_KeyBoard;
 
-    glfwSetWindowUserPointer(window->m_Data->glfw.handle, window->m_Data.get());
-    glfwSetWindowCloseCallback(window->m_Data->glfw.handle, close_window_callback);
-    glfwSetKeyCallback(window->m_Data->glfw.handle, PressedKey);
+    glfwSetWindowUserPointer(window->m_Data->handle, window->m_Data.get());
+    glfwSetWindowCloseCallback(window->m_Data->handle, close_window_callback);
+    glfwSetWindowSizeCallback(window->m_Data->handle, resize_window_callback);
+    glfwSetKeyCallback(window->m_Data->handle, PressedKey);
 
     for (KeyState& key : window->m_KeyBoard.keys)
     {
@@ -228,22 +241,27 @@ namespace And
   }
 
   bool Window::is_open() const{
-    return m_Data->glfw.is_open;
+    return m_Data->is_open;
   }
 
   void Window::set_vsync(bool vsync) {
     vsync ? glfwSwapInterval(1) : glfwSwapInterval(0);
-    m_Data->glfw.is_vsync = vsync;
+    m_Data->is_vsync = vsync;
   }
 
   bool Window::is_vsync() const
   {
-    return m_Data->glfw.is_vsync;
+    return m_Data->is_vsync;
+  }
+
+  void Window::set_size(uint32 width, uint32 height)
+  {
+    glfwSetWindowSize(m_Data->handle, (int)width, (int)height);
   }
 
   void* Window::get_native_window()
   {
-    return m_Data->glfw.handle;
+    return m_Data->handle;
   }
 
   void Window::update()
@@ -260,7 +278,7 @@ namespace And
 
   void Window::swap_buffers()
   {
-    glfwSwapBuffers(m_Data->glfw.handle);
+    glfwSwapBuffers(m_Data->handle);
   }
 
   float Window::get_delta_time() const
@@ -286,7 +304,7 @@ namespace And
 #   endif
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Perfil de OpenGL
 #endif
-    GLFWwindow* window = glfwCreateWindow(100, 100, "OpenGL", nullptr, m_Data->glfw.handle);
+    GLFWwindow* window = glfwCreateWindow(100, 100, "OpenGL", nullptr, m_Data->handle);
     std::function<void(WorkerThreadData& Data)> function = [this, window](WorkerThreadData& Data)
       {
         glfwMakeContextCurrent(window);
@@ -330,7 +348,7 @@ namespace And
       style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
 
-    ImGui_ImplGlfw_InitForOpenGL(m_Data->glfw.handle, true);
+    ImGui_ImplGlfw_InitForOpenGL(m_Data->handle, true);
   }
 
   void Window::imgui_end()
