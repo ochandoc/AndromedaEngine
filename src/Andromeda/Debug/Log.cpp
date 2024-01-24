@@ -4,7 +4,7 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
 
-#include "Common/ImGuiSink.h"
+#include "Andromeda/Debug/ImGuiSink.h"
 
 
 static inline spdlog::level::level_enum GetSpdlogLevel(And::LogLevel level)

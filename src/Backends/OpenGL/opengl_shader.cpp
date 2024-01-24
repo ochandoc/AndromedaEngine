@@ -76,8 +76,8 @@ namespace And{
     Slurp file{path.c_str()};
     std::string shaders{file.data(), file.size()};
 
-    int vertex_pos = shaders.find("#type Vertex");
-    int fragment_pos = shaders.find("#type Fragment");
+    int vertex_pos = (int)shaders.find("#type Vertex");
+    int fragment_pos = (int)shaders.find("#type Fragment");
 
     std::string vertex_shader;
     std::string fragment_shader;
@@ -136,6 +136,7 @@ namespace And{
 
     return shader;
     }
+    return nullptr;
   }
 
   std::shared_ptr<Shader> Shader::make(ShaderInfo s_info){

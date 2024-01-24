@@ -1,6 +1,6 @@
 #include "Andromeda/Editor/ShaderTextEditor.h"
 
-#include "TextEditor.h"
+#include "Andromeda/UI/TextEditor.h"
 #include "Andromeda/Misc/Threw.h"
 #include "Andromeda/Resources/ResourceManager.h"
 #include "Andromeda/Misc/Slurp.h"

@@ -8,7 +8,7 @@
 #include "GLFW/glfw3.h"
 
 #include "imgui_impl_glfw.h"
-#include "Common/UI/Plot/implot.h"
+#include "Andromeda/UI/Plot/implot.h"
 
 namespace And
 {

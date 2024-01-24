@@ -1,6 +1,6 @@
 #include "Andromeda/TaskSystem/TaskSystem.h"
 
-#include "Common/Editor/Windows/TaskSystemInfoWindow.h"
+#include "Andromeda/Editor/Windows/TaskSystemInfoWindow.h"
 
 namespace And
 {

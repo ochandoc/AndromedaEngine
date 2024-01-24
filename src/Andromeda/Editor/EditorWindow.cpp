@@ -1,7 +1,7 @@
 #include "Andromeda/Editor/EditorWindow.h"
 #include "Andromeda/Editor/Editor.h"
 
-#include "Common/inicpp.h"
+#include "Andromeda/Misc/inicpp.h"
 
 namespace And{
 

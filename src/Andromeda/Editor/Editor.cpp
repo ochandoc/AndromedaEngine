@@ -1,9 +1,9 @@
 #include "Andromeda/Editor/Editor.h"
 #include "Andromeda/Debug/Log.h"
-#include "Common/ImGuiSink.h"
+#include "Andromeda/Debug/ImGuiSink.h"
 #include "Andromeda/Editor/ShaderTextEditor.h"
 
-#include "Common/UI/Plot/implot.h"
+#include "Andromeda/UI/Plot/implot.h"
 
 
 

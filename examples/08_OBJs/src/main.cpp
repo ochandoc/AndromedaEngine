@@ -20,31 +20,7 @@
 #include <condition_variable>
 #include <future>
 
-<<<<<<< HEAD
-#include "Common/Engine.h"
-#include "Common/Window.h"
-#include "Common/GraphicsContext.h"
-#include "Common/Renderer.h"
-#include "Common/Shader.h"
-#include "Common/Triangle.h"
-#include "Common/ObjLoader.h"
-#include "Common/ObjGenerator.h"
-#include "Common/ShaderGenerator.h"
-
-#include "Common/Input.h"
-#include "Common/ActionInput.h"
-#include "Common/EntityComponentSystem.h"
-#include "Common/Editor/Editor.h"
-
-#include "Common/TaskSystem/TaskSystem.h"
-#include "Common/Log.h"
-
-#include "Common/Resources/ResourceManager.h"
-#include "Common/ShaderTextEditor.h"
-#include "Common/Graphics/RenderTarget.h"
-=======
 #include "Andromeda.h"
->>>>>>> dc5a9dca2c52a61af44c96d81cf243302a59d037
 
 int SlowTask()
 {
@@ -78,6 +54,9 @@ int main(int argc, char** argv){
   std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
+
+  window->OnWindowResize.AddDynamic(windodResized);
+  window->set_size(1920, 1080);
 
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();

@@ -13,7 +13,7 @@
 #include "Andromeda/Graphics/Triangle.h"
 #include "Andromeda/Graphics/ObjLoader.h"
 
-#include "Common/UI/Plot/implot.h"
+#include "Andromeda/UI/Plot/implot.h"
 
 namespace And
 {
