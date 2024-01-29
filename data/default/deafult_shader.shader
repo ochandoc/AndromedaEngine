@@ -68,6 +68,7 @@ layout (std140) uniform UniformBlock{
 void main(){
   gl_Position = projection * view * model * vec4(position, 1.0);
   blend_color = vec3(directional.enabled + ambient.enabled, point.enabled, spot.enabled);
+  //blend_color = normals;
 }
 
 
@@ -136,4 +137,6 @@ layout (std140) uniform UniformBlock{
 void main(){
 
   FragColor = vec4(1.0, 0.0, 0.5, 1.0);
+  //FragColor = vec4(blend_color, 1.0);
+
 }

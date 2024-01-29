@@ -84,6 +84,7 @@ int main(int argc, char** argv){
   //ts.AddTaskInThread("Test", WaitTask, fi);
 
   // Creamos el shader
+  //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/default_shader_normals.shader");
   And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/default_shader_normals.shader");
   
 
@@ -112,9 +113,11 @@ int main(int argc, char** argv){
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   }*/
 
-  And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("teapot.obj");
-  And::Transform tran = {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
-  And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
+  for(int i = -5; i < 5; i++){
+    And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("teapot.obj");
+    And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
+    And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
+  }
 
   float active;
   float direction[3];

@@ -175,6 +175,7 @@ namespace And{
       shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(id_block, (unsigned int)size_block);
       shader->m_uniform_block = std::make_shared<UniformBlockData>();
 
+      GLenum err = glGetError();
       return shader;
     }
     return nullptr;
