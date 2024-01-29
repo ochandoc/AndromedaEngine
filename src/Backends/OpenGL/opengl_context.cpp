@@ -126,7 +126,7 @@ GraphicsContext::GraphicsContext(Window& window) : m_Data(new ContextData)
   glfwMakeContextCurrent(m_Data->window);
   glewInit();
   glEnable(GL_DEBUG_OUTPUT);
-  //glDebugMessageCallback(MessageCallback, 0);
+  glDebugMessageCallback(MessageCallback, 0);
 }
 
 GraphicsContext::~GraphicsContext() {}

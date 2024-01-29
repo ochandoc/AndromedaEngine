@@ -164,6 +164,7 @@ namespace And{
 
       //printf("id-> %d size-> %d\n", id_ambient_block, size);
 
+      GLenum err = glGetError();
 
       // Llegados hasta aqui, todo ha ido bien y creamos el shader
       std::shared_ptr<Shader> shader = std::shared_ptr<Shader>(new Shader);
@@ -172,10 +173,18 @@ namespace And{
       shader->m_Data->shader_info.path_fragment = fragment_shader.c_str();
       shader->m_Data->shader_path = path;
       //shader->m_Data->u_buffer = std::make_unique<UniformBuffer>(id_ambient_block, size);
+      //err = glGetError();
       shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(id_block, (unsigned int)size_block);
+
+      //for(int i = 0; i < 10000; i++){
+        //printf("Ole los caracoles %d ",i);
+      //}
+      
+      // Si quito esta linea, peta
+      err = glGetError();
       shader->m_uniform_block = std::make_shared<UniformBlockData>();
 
-      GLenum err = glGetError();
+      //err = glGetError();
       return shader;
     }
     return nullptr;

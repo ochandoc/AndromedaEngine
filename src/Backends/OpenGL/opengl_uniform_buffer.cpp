@@ -6,12 +6,21 @@ namespace And{
 
 UniformBuffer::UniformBuffer(unsigned int block_index, unsigned int size){
   unsigned int id;
+  //GLenum err = glGetError();
+  //printf("Error-> %d\n", err);
   glGenBuffers(1, &id);
+  //err = glGetError();
+  //printf("Error-> %d\n", err);
   glBindBuffer(GL_UNIFORM_BUFFER, id);
+  //err = glGetError();
+  //printf("Error-> %d\n", err);
   glBufferData(GL_UNIFORM_BUFFER, size, NULL, GL_DYNAMIC_DRAW);
+  //err = glGetError();
+  //printf("Error-> %d\n", err);
   glBindBuffer(GL_UNIFORM_BUFFER, 0);
   //glNamedBufferData(id, size, nullptr, GL_DYNAMIC_DRAW);
-  
+  //err = glGetError();
+  //printf("Error-> %d\n", err);
 
   m_Id = id;
   m_BlockIndex = block_index;

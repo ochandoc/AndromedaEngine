@@ -113,11 +113,12 @@ int main(int argc, char** argv){
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   }*/
 
-  for(int i = -5; i < 5; i++){
+  //for(int i = -5; i < 5; i++){
     And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("teapot.obj");
-    And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
+    //And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
+    And::Transform tran = {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
-  }
+  //}
 
   float active;
   float direction[3];

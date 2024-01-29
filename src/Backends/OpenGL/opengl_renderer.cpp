@@ -167,7 +167,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
     s->use();
   }
 
-  GLenum err = glGetError();
+  //GLenum err = glGetError();
 
   
   //glCullFace(GL_CW);
@@ -208,7 +208,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
-  err = glGetError();
+  //err = glGetError();
 
 
   std::vector<Vertex_info> vertices = obj.getVertexInfo();  
@@ -219,7 +219,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-  err = glGetError();
+  //err = glGetError();
 
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
@@ -228,7 +228,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
   std::vector<unsigned int> indices = obj.getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
   s->un_configure_shader();
-  err = glGetError();
+  //err = glGetError();
 
 }
 
