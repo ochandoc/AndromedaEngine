@@ -37,12 +37,6 @@ int main(int argc, char** argv){
 
   And::Engine e;
 
-  And::RenderTargetCreationInfo CreationInfo = {};
-  CreationInfo.width = 1024;
-  CreationInfo.height = 720;
-  CreationInfo.format = And::ETextureFormat::RGBA8;
-  And::RenderTarget rt(CreationInfo);
-
   And::TaskSystem ts;
 
   And::WorkerCreationInfo workerCreationInfo;
@@ -110,13 +104,18 @@ int main(int argc, char** argv){
     editor.ShowWindows();
 
 
+    for (auto [transform, obj] : entity_comp.get_components<And::Transform, And::Resource<And::ObjLoader>>())
+    {
+      g_renderer.draw_obj(*(*obj), &(*g_shader), *transform);
+    }
+
     std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
 
       g_renderer.draw_obj(*(*resource), &(*g_shader), *trans);
     };
 
 
-    entity_comp.execute_system(obj_draw);
+    //entity_comp.execute_system(obj_draw);
 
     g_renderer.get_render_target()->Test();
 

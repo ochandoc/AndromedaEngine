@@ -167,6 +167,16 @@ namespace And
 		class tuple_iterator
 		{
 		public:
+			tuple_iterator(bool finished, component_list_imp<comps_t>&... comps_lists) : m_IteratorBegin(comps_lists.begin()...), m_IteratorEnd(comps_lists.end()...), m_Finished(true)
+			{
+				next_result_fold result{ std::get<0>(m_IteratorBegin)->id, true, true };
+				do
+				{
+					result = next_all(std::make_integer_sequence<int, sizeof...(comps_t)>{}, result.max);
+				} while (!result.equal && !result.finished);
+				m_Finished = true;
+			}
+
 			tuple_iterator(component_list_imp<comps_t>&... comps_lists) : m_IteratorBegin(comps_lists.begin()...), m_IteratorEnd(comps_lists.end()...), m_Finished(false)
 			{
 				next_result_fold result{ std::get<0>(m_IteratorBegin)->id, true, false};
@@ -176,13 +186,18 @@ namespace And
 				} while (!result.equal && !result.finished);
 				m_Finished = result.finished;
 			}
-			tuple_iterator(const tuple_iterator& other) : m_IteratorBegin(other.m_IteratorBegin), m_IteratorEnd(other.m_IteratorEnd) {}
+			tuple_iterator(const tuple_iterator& other) : m_IteratorBegin(other.m_IteratorBegin), m_IteratorEnd(other.m_IteratorEnd), m_Finished(other.m_Finished) {}
 			tuple_iterator(tuple_iterator&& other) : m_IteratorBegin(other.m_IteratorBegin), m_IteratorEnd(other.m_IteratorEnd) {}
 
 			~tuple_iterator() = default;
 
-			tuple_iterator& operator =(const tuple_iterator& other) { if (this != &other) { m_IteratorBegin = other.m_IteratorBegin; m_IteratorEnd = other.m_IteratorEnd; } return *this; }
-			tuple_iterator& operator =(tuple_iterator&& other) { if (this != &other) { std::swap(m_IteratorBegin, other.m_IteratorBegin); std::swap(m_IteratorEnd, other.m_IteratorEnd); } return *this; }
+			tuple_iterator& operator =(const tuple_iterator& other) { if (this != &other) { m_IteratorBegin = other.m_IteratorBegin; m_IteratorEnd = other.m_IteratorEnd; m_Finished = other.m_Finished; } return *this; }
+			tuple_iterator& operator =(tuple_iterator&& other) { if (this != &other) { std::swap(m_IteratorBegin, other.m_IteratorBegin); std::swap(m_IteratorEnd, other.m_IteratorEnd); std::swap(m_Finished, other.m_Finished); } return *this; }
+
+			bool operator!=(const tuple_iterator& other) const
+			{
+				return m_Finished != other.m_Finished;
+			}
 
 			bool finished() const { return m_Finished; }
 
@@ -277,6 +292,32 @@ namespace And
 		};
 	}
 
+	template<typename... comps_t>
+	class ComponentVectorWraper
+	{
+	public:
+		using iterator = internal::tuple_iterator<comps_t...>;
+
+		ComponentVectorWraper(internal::component_list_imp<comps_t>&... comps_lists) : m_Begin(comps_lists...), m_End(true, comps_lists...)
+		{
+
+		}
+
+		iterator begin()
+		{
+			return m_Begin;
+		}
+
+		iterator end()
+		{
+			return m_End;
+		}
+
+	private:
+		iterator m_Begin;
+		iterator m_End;
+	};
+
 	class EntityComponentSystem
 	{
 		NON_COPYABLE_CLASS(EntityComponentSystem)
@@ -361,6 +402,12 @@ namespace And
 				call_system(system, tuple, std::make_integer_sequence<int, sizeof...(comps_t)>{});
 				++it;
 			}
+		}
+
+		template<typename... comps_t>
+		ComponentVectorWraper<comps_t...> get_components()
+		{
+			return ComponentVectorWraper<comps_t...>((*static_cast<internal::component_list_imp<comps_t>*>(m_Components[typeid(comps_t).hash_code()].get()))...);
 		}
 
 	private:
