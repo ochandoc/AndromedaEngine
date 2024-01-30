@@ -9,49 +9,33 @@ namespace And
   struct RenderTargetData
   {
     uint32 Id;
-    uint32 RenderBuffer;
-    uint32 Texture;
+    uint32 ColorTexture;
+    uint32 DepthTexture;
   };
 }
 
 
 And::RenderTarget::RenderTarget(const RenderTargetCreationInfo& InCreationInfo) : m_Data(new RenderTargetData)
 {
-  glGenRenderbuffers(1, &m_Data->RenderBuffer);
-  glBindRenderbuffer(GL_RENDERBUFFER, m_Data->RenderBuffer);
+  glGenTextures(1, &m_Data->ColorTexture);
+  glBindTexture(GL_TEXTURE_2D, m_Data->ColorTexture);
 
-  switch (InCreationInfo.format)
-  {
-  case ETextureFormat::Depth:
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, InCreationInfo.width, InCreationInfo.height);
-    break;
-  case ETextureFormat::RGBA8:
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, InCreationInfo.width, InCreationInfo.height);
-    break;
-  }
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, InCreationInfo.width, InCreationInfo.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
-  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  glBindTexture(GL_TEXTURE_2D, 0);
 
-  glGenTextures(1, &m_Data->Texture);
-  glBindTexture(GL_TEXTURE_2D, m_Data->Texture);
+  glGenTextures(1, &m_Data->DepthTexture);
+  glBindTexture(GL_TEXTURE_2D, m_Data->DepthTexture);
 
-  switch (InCreationInfo.format)
-  {
-  case ETextureFormat::Depth:
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, InCreationInfo.width, InCreationInfo.height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
-    break;
-  case ETextureFormat::RGBA8:
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, InCreationInfo.width, InCreationInfo.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-    break;
-  }
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, InCreationInfo.width, InCreationInfo.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
   glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -59,17 +43,9 @@ And::RenderTarget::RenderTarget(const RenderTargetCreationInfo& InCreationInfo) 
   glGenFramebuffers(1, &m_Data->Id);
   glBindFramebuffer(GL_FRAMEBUFFER, m_Data->Id);
 
-  switch (InCreationInfo.format)
-  {
-  case ETextureFormat::Depth:
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_Data->Texture, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_Data->RenderBuffer);
-    break;
-  case ETextureFormat::RGBA8:
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_Data->RenderBuffer);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Data->Texture, 0);
-    break;
-  }
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Data->ColorTexture, 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_Data->DepthTexture, 0);
+
 
   assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
@@ -78,6 +54,8 @@ And::RenderTarget::RenderTarget(const RenderTargetCreationInfo& InCreationInfo) 
 
 And::RenderTarget::~RenderTarget()
 {
+  glDeleteTextures(1, &m_Data->DepthTexture);
+  glDeleteTextures(1, &m_Data->ColorTexture);
   glDeleteFramebuffers(1, &m_Data->Id);
 }
 
@@ -103,9 +81,15 @@ void And::RenderTarget::Test()
   style.WindowPadding = ImVec2(0.0f, 0.0f);
   static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar;
   windowFlags |= ImGuiWindowFlags_NoCollapse;
-  if (ImGui::Begin("Render Target", nullptr, windowFlags))
+  if (ImGui::Begin("Render Target Color", nullptr, windowFlags))
   {
-    ImGui::Image((void*)(intptr_t)m_Data->Texture, ImGui::GetWindowSize(), ImVec2(1, 1), ImVec2(0, 0));
+    ImGui::Image((void*)(intptr_t)m_Data->ColorTexture, ImGui::GetWindowSize(), ImVec2(1, 1), ImVec2(0, 0));
+  }
+  ImGui::End();
+
+  if (ImGui::Begin("Render Target depth", nullptr, windowFlags))
+  {
+    ImGui::Image((void*)(intptr_t)m_Data->DepthTexture, ImGui::GetWindowSize(), ImVec2(1, 1), ImVec2(0, 0));
   }
   ImGui::End();
 }

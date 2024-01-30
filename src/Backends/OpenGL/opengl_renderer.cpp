@@ -60,12 +60,12 @@ void Renderer::new_frame()
   ImGui_ImplOpenGL3_NewFrame(); 
 	m_Window.new_frame();
   ImGui::NewFrame();
+  glEnable(GL_DEPTH_TEST);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   if (m_bDrawOnTexture)
   {
     m_RenderTarget->Bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 
 }

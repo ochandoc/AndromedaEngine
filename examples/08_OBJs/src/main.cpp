@@ -69,8 +69,8 @@ int main(int argc, char** argv){
   s_info.path_vertex = "vshader.vs";
 
   And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("content/teapot_shader.ashader");
-  
 
+  auto shader = And::Shader::make("default/depth.shader");
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
@@ -96,26 +96,20 @@ int main(int argc, char** argv){
     And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   }
+
   g_renderer.set_draw_on_texture(true);
+
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
 
     editor.ShowWindows();
 
-
     for (auto [transform, obj] : entity_comp.get_components<And::Transform, And::Resource<And::ObjLoader>>())
     {
+      //g_renderer.draw_obj(*(*obj), shader.get(), *transform);
       g_renderer.draw_obj(*(*obj), &(*g_shader), *transform);
     }
-
-    std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
-
-      g_renderer.draw_obj(*(*resource), &(*g_shader), *trans);
-    };
-
-
-    //entity_comp.execute_system(obj_draw);
 
     g_renderer.get_render_target()->Test();
 

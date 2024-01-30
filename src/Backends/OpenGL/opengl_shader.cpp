@@ -113,6 +113,7 @@ namespace And{
         glAttachShader(id_program, id_fragment_shader);
       }else{
         // Error
+        printf("Error on loading shader\n");
         return nullptr;
       }
 
