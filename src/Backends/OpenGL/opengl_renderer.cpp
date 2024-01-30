@@ -197,8 +197,10 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
   //s->setMat4("projection", glm::value_ptr(projectionMatrix));
   //s->setMat4("model", glm::value_ptr(modelMatrix));
 
-  //s->uploadAmbient(ambient);
+  s->set_camera_position(&m_camera_pos[0]);
+  s->set_light(ambient);
   s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
+
   s->upload_data();
   s->configure_shader();
   

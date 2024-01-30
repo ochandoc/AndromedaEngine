@@ -100,7 +100,10 @@ namespace And{
       const char* aux_v = vertex_shader.c_str();
       const char* aux_f = fragment_shader.c_str();
 
-      printf("%s\n", vertex_shader.c_str());
+      //printf("Vertex\n");
+      //printf("%s\n", vertex_shader.c_str());
+      printf("Fragment\n");
+      printf("%s\n", fragment_shader.c_str());
 
       //printf("Vertex %s\n", aux_v);
 
@@ -110,6 +113,9 @@ namespace And{
       // Compilamos
       glCompileShader(id_vertex_shader);
       glCompileShader(id_fragment_shader);
+
+      GetShaderError(id_vertex_shader);
+      GetShaderError(id_fragment_shader);
 
       if(!GetShaderError(id_vertex_shader) && !GetShaderError(id_fragment_shader)){
         // Si no hay error atachamos
@@ -216,6 +222,12 @@ namespace And{
     }
     
     //m_Data->uniform_buffer->upload_data((void*)(&tmp), (unsigned int)sizeof(ModelViewProj));
+  }
+
+  void Shader::set_camera_position(const float position[3]){
+    for(int i = 0; i < 3; i++){
+      m_uniform_block->camera_position[i] = position[i];
+    }
   }
 
   void Shader::upload_data(){

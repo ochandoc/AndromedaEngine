@@ -84,8 +84,8 @@ int main(int argc, char** argv){
   //ts.AddTaskInThread("Test", WaitTask, fi);
 
   // Creamos el shader
+  And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
   //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/default_shader_normals.shader");
-  And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/default_shader_normals.shader");
   
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -131,12 +131,16 @@ int main(int argc, char** argv){
   And::AmbientLight ambient;
   ambient.active = 1.0f;
   ambient.diffuse_color[0] = 1.0f;
-  ambient.diffuse_color[1] = 1.0f;
-  ambient.diffuse_color[2] = 1.0f;
+  ambient.diffuse_color[1] = 0.6f;
+  ambient.diffuse_color[2] = 0.0f;
   ambient.specular_color[0] = 1.0f;
   ambient.specular_color[1] = 1.0f;
   ambient.specular_color[2] = 1.0f;
-  ambient.specular_strength = 1.0f;
+  ambient.direction[0] = -1.0f;
+  ambient.direction[1] = 0.5f;
+  ambient.direction[2] = 0.0f;
+
+  ambient.specular_strength = 0.5f;
   ambient.specular_shininess = 1.0f;
  
   while (window->is_open()){
@@ -147,15 +151,12 @@ int main(int argc, char** argv){
 
     std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader, &ambient] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
       g_renderer.draw_obj(*(*resource), &(*g_shader), *trans, &ambient);
-    };
-    
-    /*std::function<void(And::Transform* trans, std::shared_ptr<And::ObjLoader> resource)> obj_draw =  [&g_renderer, &g_shader, &ambient] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
-      g_renderer.draw_obj(*resource, &(*g_shader), *trans, &ambient);
-    };*/
-
-    
+    };    
 
     entity_comp.execute_system(obj_draw);
+
+    ambient.direction[0] += 0.0001f;
+    printf("Direction0: %f\n", ambient.direction[0]);
 
     g_renderer.end_frame();
     window->swap_buffers();

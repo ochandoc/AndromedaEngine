@@ -27,6 +27,7 @@ namespace And{
     DirectionalLight light_directional;
     PointLight light_point;
     SpotLight light_spot;
+    float camera_position[3];
   };
 
   class Shader
@@ -54,6 +55,10 @@ namespace And{
     void configure_shader();
     void un_configure_shader();
     void set_light(AmbientLight* light);
+
+
+    void set_camera_position(const float position[3]);
+
     void upload_data();
     void reload();
 

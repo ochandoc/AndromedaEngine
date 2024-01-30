@@ -61,6 +61,7 @@ layout (std140) uniform UniformBlock{
   DirectionalLight directional;
   PointLight point;
   SpotLight spot;
+  vec3 camera_position;
 };
 
 
@@ -131,6 +132,7 @@ layout (std140) uniform UniformBlock{
   DirectionalLight directional;
   PointLight point;
   SpotLight spot;
+  vec3 camera_position;
 };
 
 
