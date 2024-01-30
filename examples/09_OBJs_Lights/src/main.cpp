@@ -115,6 +115,7 @@ int main(int argc, char** argv){
 
   //for(int i = -5; i < 5; i++){
     And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("teapot.obj");
+    //std::shared_ptr<And::ObjLoader> obj_teapot = And::ObjLoader::load("teapot.obj");
     //And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::Transform tran = {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
@@ -147,6 +148,12 @@ int main(int argc, char** argv){
     std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader, &ambient] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
       g_renderer.draw_obj(*(*resource), &(*g_shader), *trans, &ambient);
     };
+    
+    /*std::function<void(And::Transform* trans, std::shared_ptr<And::ObjLoader> resource)> obj_draw =  [&g_renderer, &g_shader, &ambient] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
+      g_renderer.draw_obj(*resource, &(*g_shader), *trans, &ambient);
+    };*/
+
+    
 
     entity_comp.execute_system(obj_draw);
 

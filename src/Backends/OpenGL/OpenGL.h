@@ -13,3 +13,17 @@
 	}                                                                                         \
 	glDeleteSync(sync);                                                                       \
 } 
+
+class OpenGLSync
+{
+private:
+    OpenGLSync() {}
+public:
+    ~OpenGLSync() {}
+
+    static std::mutex& GetMutex() 
+    { 
+        static std::mutex Mutex;
+        return Mutex;
+    }
+};
