@@ -27,25 +27,21 @@ Renderer::Renderer(Window& window) : m_Window(window)
   m_camera_target[0] = 0.0f;
   m_camera_target[1] = 0.0f;
   m_camera_target[2] = 0.0f;
-  m_fov = 45.0f;
+  m_fov = 90.0f;
 
   int width = m_Window.get_width();
   int height = m_Window.get_height();
-  m_aspectRatio = (float)(width/height);
+  m_aspectRatio = ((float)width) / ((float)height);
 
-  m_near = 0.1f;
-  m_far = 10000.0f;
+  m_near = 10.0f;
+  m_far = 1000.0f;
 
   set_clear_color(default_color);
   window.imgui_start();
   ImGui_ImplOpenGL3_Init("#version 430 core");
 
   {
-    RenderTargetCreationInfo CreationInfo = {};
-    CreationInfo.width = width;
-    CreationInfo.height = height;
-    CreationInfo.format = ETextureFormat::RGBA8;
-    m_RenderTarget = std::make_shared<RenderTarget>(CreationInfo);
+    m_RenderTarget = std::make_shared<RenderTarget>(width, height);
     m_Window.OnWindowResize.AddDynamic(m_RenderTarget.get(), &RenderTarget::Resize);
     m_bDrawOnTexture = false;
   }
@@ -61,12 +57,16 @@ void Renderer::new_frame()
 	m_Window.new_frame();
   ImGui::NewFrame();
   glEnable(GL_DEPTH_TEST);
+  //glDepthMask(GL_FALSE);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   if (m_bDrawOnTexture)
   {
     m_RenderTarget->Bind();
   }
+  glDepthFunc(GL_ALWAYS);
+  //glClearDepthf(0.5f);
 
 }
 
@@ -75,11 +75,18 @@ void Renderer::end_frame()
   m_RenderTarget->Unbind();
   //ImPlot::ShowDemoWindow();
   //ImGui::ShowDemoWindow();
-  if (ImGui::CollapsingHeader("Camera")) {
-    ImGui::DragFloat3("Camera position", m_camera_pos);
-    ImGui::DragFloat3("Camera target", m_camera_target);
-    ImGui::DragFloat("FOV", &m_fov);
+  if (ImGui::Begin("Camera"))
+  {
+    if (ImGui::CollapsingHeader("Camera")) {
+      ImGui::DragFloat3("Camera position", m_camera_pos);
+      ImGui::DragFloat3("Camera target", m_camera_target);
+      ImGui::DragFloat("FOV", &m_fov);
+      ImGui::DragFloat("Far", &m_far);
+      ImGui::DragFloat("Near", &m_near);
+      ImGui::DragFloat("Test", &m_test);
+    }
   }
+  ImGui::End();
 
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -201,6 +208,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
 
   glm::mat4 viewMatrix = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
   glm::mat4 projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_near, m_far);
+  //glm::mat4 projectionMatrix = glm::ortho(-m_test, m_test, -m_test, m_test, m_near, m_far);
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -209,9 +217,9 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
   float rotationAngle = 0.0f;
   glm::vec3 objectRotationAxis = glm::vec3(tran.rotation[0], tran.rotation[1], tran.rotation[2]);
 
-  modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::scale(modelMatrix, objectScale);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::translate(modelMatrix, objectPosition);
 
   s->setMat4("view", glm::value_ptr(viewMatrix));
   s->setMat4("projection", glm::value_ptr(projectionMatrix));

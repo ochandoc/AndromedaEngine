@@ -11,16 +11,10 @@ namespace And
     Depth,
   };
 
-  struct RenderTargetCreationInfo
-  {
-    uint32 width, height;
-    ETextureFormat format;
-  };
-
   class RenderTarget
   {
   public:
-    RenderTarget(const RenderTargetCreationInfo& InCreationInfo);
+    RenderTarget(uint32 width, uint32 height);
     ~RenderTarget();
 
     void Bind();

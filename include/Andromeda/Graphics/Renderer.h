@@ -54,6 +54,7 @@ private:
   float m_aspectRatio;
   float m_near;
   float m_far;
+  float m_test;
 };
 
 }

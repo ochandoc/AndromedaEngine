@@ -14,8 +14,6 @@ class ObjGenerator : public ResourceGenerator<ObjLoader>{
 
 
   virtual std::shared_ptr<ObjLoader> operator()(const std::string& Path) override{
-
-    std::this_thread::sleep_for(std::chrono::seconds(2));
     std::shared_ptr<ObjLoader> tmp = ObjLoader::load(Path);
     if(tmp)return tmp;
     

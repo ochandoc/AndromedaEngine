@@ -15,7 +15,7 @@ namespace And
 }
 
 
-And::RenderTarget::RenderTarget(const RenderTargetCreationInfo& InCreationInfo) : m_Data(new RenderTargetData)
+And::RenderTarget::RenderTarget(uint32 width, uint32 height) : m_Data(new RenderTargetData)
 {
   glGenTextures(1, &m_Data->ColorTexture);
   glBindTexture(GL_TEXTURE_2D, m_Data->ColorTexture);
@@ -24,7 +24,7 @@ And::RenderTarget::RenderTarget(const RenderTargetCreationInfo& InCreationInfo) 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, InCreationInfo.width, InCreationInfo.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
   glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -33,20 +33,17 @@ And::RenderTarget::RenderTarget(const RenderTargetCreationInfo& InCreationInfo) 
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, InCreationInfo.width, InCreationInfo.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
   glBindTexture(GL_TEXTURE_2D, 0);
-
 
   glGenFramebuffers(1, &m_Data->Id);
   glBindFramebuffer(GL_FRAMEBUFFER, m_Data->Id);
 
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Data->ColorTexture, 0);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_Data->DepthTexture, 0);
-
-
   assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -54,8 +51,8 @@ And::RenderTarget::RenderTarget(const RenderTargetCreationInfo& InCreationInfo) 
 
 And::RenderTarget::~RenderTarget()
 {
-  glDeleteTextures(1, &m_Data->DepthTexture);
   glDeleteTextures(1, &m_Data->ColorTexture);
+  glDeleteTextures(1, &m_Data->DepthTexture);
   glDeleteFramebuffers(1, &m_Data->Id);
 }
 

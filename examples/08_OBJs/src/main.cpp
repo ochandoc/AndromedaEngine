@@ -22,16 +22,6 @@
 
 #include "Andromeda.h"
 
-int SlowTask()
-{
-  std::this_thread::sleep_for(std::chrono::seconds(5));
-  return 10;
-}
-
-void WaitTask(int num)
-{
-  printf("Num: %d\n", num);
-}
 
 int main(int argc, char** argv){
 
@@ -60,17 +50,16 @@ int main(int argc, char** argv){
   // Show pc info
   g_context->create_info();
 
-  And::Future<int> fi = ts.AddTaskInThread("Resource Thread", SlowTask);
-  ts.AddTaskInThread("Test", WaitTask, fi);
-
   // Creamos el shader
   And::ShaderInfo s_info;
   s_info.path_fragment = "fshader.fs";
   s_info.path_vertex = "vshader.vs";
 
-  And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("content/teapot_shader.ashader");
+  //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("content/teapot_shader.ashader");
 
   auto shader = And::Shader::make("default/depth.shader");
+
+  //auto shader = And::Shader::make("content/teapot_shader.ashader");
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
@@ -99,6 +88,7 @@ int main(int argc, char** argv){
 
   g_renderer.set_draw_on_texture(true);
 
+
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
@@ -107,8 +97,8 @@ int main(int argc, char** argv){
 
     for (auto [transform, obj] : entity_comp.get_components<And::Transform, And::Resource<And::ObjLoader>>())
     {
-      //g_renderer.draw_obj(*(*obj), shader.get(), *transform);
-      g_renderer.draw_obj(*(*obj), &(*g_shader), *transform);
+      g_renderer.draw_obj(*(*obj), shader.get(), *transform);
+      //g_renderer.draw_obj(*(*obj), &(*g_shader), *transform);
     }
 
     g_renderer.get_render_target()->Test();
