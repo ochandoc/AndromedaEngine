@@ -34,7 +34,7 @@ public:
 
   void draw_triangle(Triangle *t);
 
-  void draw_obj(ObjLoader obj, Shader* s, Transform trans, AmbientLight* ambient);
+  void draw_obj(ObjLoader obj, Shader* s, Transform trans, AmbientLight* ambient, PointLight* point);
 
 protected:
   Window& m_Window;

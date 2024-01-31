@@ -213,6 +213,21 @@ namespace And{
   }
 
 
+  void Shader::set_light(PointLight* light){
+    m_uniform_block->light_point.active = light->active;
+    m_uniform_block->light_point.specular_strength = light->specular_strength;
+    m_uniform_block->light_point.specular_shininess = light->specular_shininess;
+    m_uniform_block->light_point.constant_att = light->constant_att;
+    m_uniform_block->light_point.linear_att = light->linear_att;
+    m_uniform_block->light_point.quadratic_att = light->quadratic_att;
+    for(int i = 0; i < 3; i++){
+      m_uniform_block->light_point.position[i] = light->position[i];
+      m_uniform_block->light_point.diffuse_color[i] = light->diffuse_color[i];
+      m_uniform_block->light_point.specular_color[i] = light->specular_color[i];
+    }
+  }
+
+
   void Shader::setModelViewProj(const float model[16], const float view[16], const float projection[16]){
 
     for(int i = 0; i < 16; i++){

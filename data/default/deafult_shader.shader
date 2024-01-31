@@ -162,6 +162,32 @@ vec3 CalculeDirLight(AmbientLight light, vec3 normal, vec3 viewDir, vec3 color_b
   return (diffuse * light.enabled);
 }
 
+vec3 CalculePointLight(PointLight light, vec3 normalValue, vec3 view_dir, vec3 fragPos){
+
+  vec3 lightDir = normalize(light.position - fragPos);
+ 
+  //Diffuse
+  float diff = max(dot(normalValue, lightDir), 0.0);
+
+  //Specular
+  vec3 reflectDir = reflect(-lightDir, normalValue);
+  float spec = pow(max(dot(view_dir, reflectDir), 0.0), light.specular_shininess);
+
+  float lightDistance = length(light.position- fragPos);
+  float attenuation = 1.0 / (light.constant_att + light.linear_att * lightDistance + light.quadratic_att * (lightDistance * lightDistance));
+  
+
+  vec3 difuse = light.diffuse_color * diff;  
+  vec3 specular = (light.specular_strength * light.specular_shininess * spec) * light.specular_color;
+
+
+  difuse *= attenuation;
+  specular *= attenuation;
+  
+  return (difuse + specular);
+
+}
+
 void main(){
   vec3 view_direction = normalize(camera_position - s_fragPos);
   float ambient_strength = 0.01;
@@ -171,8 +197,10 @@ void main(){
   vec3 color_base = vec3(0.5, 0.5, 0.0);
 
   color += CalculeDirLight(ambient, s_normal, view_direction, color_base);
+  //color += CalculePointLight(point, s_normal, view_direction, s_fragPos);
   //FragColor = vec4(ambient.diffuse_color.x, ambient.diffuse_color.y, ambient.diffuse_color.z, 1.0);
   FragColor = vec4(color, 1.0);
+  FragColor = vec4(point.diffuse_color, 1.0);
   //FragColor = vec4(1.0, 0.0, 0.5, 1.0);
   //FragColor = vec4(blend_color, 1.0);
 

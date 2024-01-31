@@ -161,7 +161,7 @@ void CheckError(){
 }
 }
 
-void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* ambient) {
+void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* ambient, PointLight* point) {
 
   if(s){
     s->use();
@@ -199,6 +199,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
 
   s->set_camera_position(&m_camera_pos[0]);
   s->set_light(ambient);
+  s->set_light(point);
   s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
 
   s->upload_data();

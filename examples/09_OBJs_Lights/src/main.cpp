@@ -142,21 +142,39 @@ int main(int argc, char** argv){
 
   ambient.specular_strength = 0.5f;
   ambient.specular_shininess = 1.0f;
- 
+
+  And::PointLight point;
+  point.active = 1.0f;
+  point.position[0] = -5.0f;
+  point.position[1] = 0.0f;
+  point.position[2] = 0.0f;
+  point.diffuse_color[0] = 1.0f;
+  point.diffuse_color[1] = 1.0f;
+  point.diffuse_color[2] = 1.0f;
+  point.specular_color[0] = 1.0f;
+  point.specular_color[1] = 1.0f;
+  point.specular_color[2] = 1.0f;
+  point.specular_strength = 0.5f;
+  point.specular_shininess = 1.0f;
+  point.constant_att = 1.0f;
+  point.linear_att = 1.0f;
+  point.quadratic_att = 1.0f;
+
+
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
 
     editor.ShowWindows();
 
-    std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader, &ambient] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
-      g_renderer.draw_obj(*(*resource), &(*g_shader), *trans, &ambient);
+    std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader, &ambient, &point] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
+      g_renderer.draw_obj(*(*resource), &(*g_shader), *trans, &ambient, &point);
     };    
 
     entity_comp.execute_system(obj_draw);
 
     ambient.direction[0] += 0.0001f;
-    printf("Direction0: %f\n", ambient.direction[0]);
+    //printf("Direction0: %f\n", ambient.direction[0]);
 
     g_renderer.end_frame();
     window->swap_buffers();

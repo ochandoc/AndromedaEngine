@@ -55,6 +55,7 @@ namespace And{
     void configure_shader();
     void un_configure_shader();
     void set_light(AmbientLight* light);
+    void set_light(PointLight* light);
 
 
     void set_camera_position(const float position[3]);
