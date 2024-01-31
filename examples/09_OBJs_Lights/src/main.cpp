@@ -121,30 +121,23 @@ int main(int argc, char** argv){
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   //}
 
-  float active;
-  float direction[3];
-  float diffuse_color[3];
-  float specular_color[3];
-  float specular_strength;
-  float specular_shininess;
-
   And::AmbientLight ambient;
-  ambient.active = 1.0f;
+  ambient.enabled = 1.0f;
   ambient.diffuse_color[0] = 1.0f;
-  ambient.diffuse_color[1] = 0.6f;
+  ambient.diffuse_color[1] = 0.0f;
   ambient.diffuse_color[2] = 0.0f;
   ambient.specular_color[0] = 1.0f;
   ambient.specular_color[1] = 1.0f;
   ambient.specular_color[2] = 1.0f;
-  ambient.direction[0] = -1.0f;
-  ambient.direction[1] = 0.5f;
+  ambient.direction[0] = -0.3f;
+  ambient.direction[1] = 0.0f;
   ambient.direction[2] = 0.0f;
 
   ambient.specular_strength = 0.5f;
   ambient.specular_shininess = 1.0f;
 
   And::PointLight point;
-  point.active = 1.0f;
+  point.enabled = 1.0f;
   point.position[0] = -5.0f;
   point.position[1] = 0.0f;
   point.position[2] = 0.0f;
@@ -174,7 +167,7 @@ int main(int argc, char** argv){
     entity_comp.execute_system(obj_draw);
 
     ambient.direction[0] += 0.0001f;
-    //printf("Direction0: %f\n", ambient.direction[0]);
+    printf("Direction0: %f\n", ambient.direction[0]);
 
     g_renderer.end_frame();
     window->swap_buffers();

@@ -28,6 +28,8 @@ namespace And{
     PointLight light_point;
     SpotLight light_spot;
     float camera_position[3];
+    float padding; // 448 bytes, aligned to 28 blocks of 16 bytes
+
   };
 
   class Shader

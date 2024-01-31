@@ -56,12 +56,13 @@ layout (std140) uniform UniformBlock{
   mat4 model;
   mat4 view;
   mat4 projection;
-  AmbientLight ambient;
+  AmbientLight ambient_light;
   DirectionalLight directional;
   PointLight point;
   SpotLight spot;
   vec3 camera_position;
 };
+
 
 out vec3 blend_color;
 out vec3 s_normal;
@@ -70,7 +71,7 @@ out vec3 s_fragPos;
 
 void main(){
   gl_Position = projection * view * model * vec4(position, 1.0);
-  blend_color = vec3(directional.enabled + ambient.enabled, point.enabled, spot.enabled);
+  blend_color = vec3(directional.enabled + ambient_light.enabled, point.enabled, spot.enabled);
   blend_color = vec3(camera_position.x/20.0, camera_position.y/20.0, camera_position.z/20.0);
   s_fragPos = vec3(model * vec4(position, 1.0));
   s_normal = normals;
@@ -137,7 +138,7 @@ layout (std140) uniform UniformBlock{
   mat4 model;
   mat4 view;
   mat4 projection;
-  AmbientLight ambient;
+  AmbientLight ambient_light;
   DirectionalLight directional;
   PointLight point;
   SpotLight spot;
@@ -145,15 +146,18 @@ layout (std140) uniform UniformBlock{
 };
 
 
-
 vec3 CalculeDirLight(AmbientLight light, vec3 normal, vec3 viewDir, vec3 color_base) {
 
+  //vec3 dir = vec3(0.5, 0.5, 0.0);  
+
   /*---Difuse---*/
+  //float diff = max(dot(normal, dir), 0.0);
   float diff = max(dot(normal, light.direction), 0.0);
   vec3 diffuse = diff * light.diffuse_color * color_base.xyz;
 
   /*---Specular---*/
 
+  //vec3 reflectDir = normalize(reflect(-(dir), normalize(normal))  );
   vec3 reflectDir = normalize(reflect(-(light.direction), normalize(normal))  );
   float spec = pow(max(dot(normalize(viewDir), normalize(reflectDir)), 0.0), light.specular_shininess);
   vec3 specular = light.specular_strength * spec * light.specular_color * color_base.xyz;
@@ -196,11 +200,12 @@ void main(){
   vec3 color = ambient_color;
   vec3 color_base = vec3(0.5, 0.5, 0.0);
 
-  color += CalculeDirLight(ambient, s_normal, view_direction, color_base);
+
+  color += CalculeDirLight(ambient_light, s_normal, view_direction, color_base);
   //color += CalculePointLight(point, s_normal, view_direction, s_fragPos);
   //FragColor = vec4(ambient.diffuse_color.x, ambient.diffuse_color.y, ambient.diffuse_color.z, 1.0);
-  FragColor = vec4(color, 1.0);
-  FragColor = vec4(point.diffuse_color, 1.0);
+  FragColor = vec4(ambient_light.direction.x, 0.0, 0.0, 1.0);
+  //FragColor = vec4(point.diffuse_color, 1.0);
   //FragColor = vec4(1.0, 0.0, 0.5, 1.0);
   //FragColor = vec4(blend_color, 1.0);
 

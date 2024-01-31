@@ -199,11 +199,12 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
 
   s->set_camera_position(&m_camera_pos[0]);
   s->set_light(ambient);
-  s->set_light(point);
+  //s->set_light(point);
   s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
 
-  s->upload_data();
   s->configure_shader();
+  s->upload_data();
+
   
 
   unsigned int VBO = obj.get_vbo();

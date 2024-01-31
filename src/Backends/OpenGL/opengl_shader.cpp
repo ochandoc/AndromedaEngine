@@ -143,8 +143,10 @@ namespace And{
 
 
       unsigned int id_block = glGetUniformBlockIndex(id_program, "UniformBlock");
+      unsigned int id_block_test = glGetUniformBlockIndex(id_program, "UniformBlockTest");
       int size_block;
       glGetActiveUniformBlockiv(id_program, id_block, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block);
+      printf("Invalid index-> %u my index-> %d\n", GL_INVALID_INDEX, id_block);
       printf("Size in C++: %d size in gl: %d\n", sizeof(UniformBlockData), size_block);
 
       // Debug
@@ -182,7 +184,8 @@ namespace And{
       shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(id_block, (unsigned int)size_block);
       shader->m_uniform_block = std::make_shared<UniformBlockData>();
 
-      WAIT_GPU_LOAD()
+      //WAIT_GPU_LOAD()
+      glFlush();
       return shader;
     }
     return nullptr;
@@ -201,7 +204,7 @@ namespace And{
   void Shader::set_light(AmbientLight* light){
     //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
 
-    m_uniform_block->light_ambient.active = light->active;
+    m_uniform_block->light_ambient.enabled = light->enabled;
     m_uniform_block->light_ambient.specular_strength = light->specular_strength;
     m_uniform_block->light_ambient.specular_shininess = light->specular_shininess;
 
@@ -214,7 +217,7 @@ namespace And{
 
 
   void Shader::set_light(PointLight* light){
-    m_uniform_block->light_point.active = light->active;
+    m_uniform_block->light_point.enabled = light->enabled;
     m_uniform_block->light_point.specular_strength = light->specular_strength;
     m_uniform_block->light_point.specular_shininess = light->specular_shininess;
     m_uniform_block->light_point.constant_att = light->constant_att;
@@ -249,13 +252,6 @@ namespace And{
     m_Data->uniform_buffer->upload_data((void*)(m_uniform_block.get()), (unsigned int)sizeof(UniformBlockData));
   }
 
-
-  Shader::Shader() : m_Data(new ShaderData){}
-
-  void Shader::use(){
-    glUseProgram(m_Data->id);
-  }
-
   void Shader::configure_shader(){
     m_Data->uniform_buffer->bind();
   }
@@ -263,6 +259,13 @@ namespace And{
   void Shader::un_configure_shader(){
     m_Data->uniform_buffer->unbind();
   }
+
+  Shader::Shader() : m_Data(new ShaderData){}
+
+  void Shader::use(){
+    glUseProgram(m_Data->id);
+  }
+
 
   Shader::~Shader(){
     glDeleteProgram(m_Data->id);
