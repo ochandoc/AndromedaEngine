@@ -22,11 +22,13 @@ namespace And{
   struct UniformBlockData{
     float model[16];
     float view[16];
-    float projection[16];
-    AmbientLight light_ambient;
-    DirectionalLight light_directional;
-    PointLight light_point;
-    SpotLight light_spot;
+    float projection[16]; // 192
+    std::shared_ptr<AmbientLight> light_ambient;
+    std::shared_ptr<DirectionalLight> light_directional;
+    std::shared_ptr<PointLight> light_point;
+    std::shared_ptr<SpotLight> light_spot;
+    // 240 bytes las luces
+    // 432 hasta aqui
     float camera_position[3];
     float padding; // 448 bytes, aligned to 28 blocks of 16 bytes
 

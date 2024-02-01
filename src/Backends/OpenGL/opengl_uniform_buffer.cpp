@@ -5,14 +5,15 @@ namespace And{
 
 
 UniformBuffer::UniformBuffer(unsigned int block_index, unsigned int size){
-  unsigned int id;
+  unsigned int id_ubo;
   
-  glGenBuffers(1, &id);
-  glBindBuffer(GL_UNIFORM_BUFFER, id);
-  glBufferData(GL_UNIFORM_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
+  glGenBuffers(1, &id_ubo);
+  glBindBuffer(GL_UNIFORM_BUFFER, id_ubo);
+  printf("Size del buffer antes de hacer buffer data: %u\n", size);
+  glBufferData(GL_UNIFORM_BUFFER, size, 0, GL_DYNAMIC_DRAW);
   glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-  m_Id = id;
+  m_Id = id_ubo;
   m_BlockIndex = block_index;
   m_Size = size;
 }
