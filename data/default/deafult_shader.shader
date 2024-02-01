@@ -200,6 +200,10 @@ void main(){
   vec3 color = ambient_color;
   vec3 color_base = vec3(0.5, 0.5, 0.0);
 
+  float test = ambient_light.enabled + ambient_light.direction.x + ambient_light.direction.y + ambient_light.direction.z + ambient_light.diffuse_color.x + ambient_light.diffuse_color.y + ambient_light.diffuse_color.z + ambient_light.specular_color.x + ambient_light.specular_color.y + ambient_light.specular_color.z + ambient_light.specular_strength + ambient_light.specular_shininess;
+  float test_directional = directional.enabled + directional.direction.x + directional.direction.y + directional.direction.z + directional.diffuse_color.x + directional.diffuse_color.y + directional.diffuse_color.z + directional.specular_color.x + directional.specular_color.y + directional.specular_color.z + directional.specular_strength + directional.specular_shininess;
+  float test_point = point.enabled + point.position.x + point.position.y + point.position.z + point.diffuse_color.x + point.diffuse_color.y + point.diffuse_color.z + point.specular_color.x + point.specular_color.y + point.specular_color.z + point.specular_strength + point.specular_shininess + point.constant_att + point.linear_att + point.quadratic_att + point.padding;
+  float test_spot = spot.enabled + spot.position.x + spot.position.y + spot.position.z + spot.direction.x + spot.direction.y + spot.direction.z + spot.cutt_off + spot.outer_cut_off + spot.diffuse_color.x + spot.diffuse_color.y + spot.diffuse_color.z + spot.specular_color.x + spot.specular_color.y + spot.specular_color.z + spot.specular_strength + spot.specular_shininess + spot.constant_att + spot.linear_att + spot.quadratic_att;   
 
   color += CalculeDirLight(ambient_light, s_normal, view_direction, color_base);
   //FragColor = vec4(ambient.diffuse_color.x, ambient.diffuse_color.y, ambient.diffuse_color.z, 1.0);
