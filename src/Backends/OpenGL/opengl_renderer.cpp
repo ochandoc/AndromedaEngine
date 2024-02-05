@@ -17,24 +17,23 @@
 namespace And
 {
 
-Renderer::Renderer(Window& window) : m_Window(window) 
+Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 {
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
-  m_camera_pos[0] = 0.0f;
-  m_camera_pos[1] = 7.0f;
-  m_camera_pos[2] = -60.0f;
 
-  m_camera_target[0] = 0.0f;
-  m_camera_target[1] = 0.0f;
-  m_camera_target[2] = 0.0f;
-  m_fov = 90.0f;
+  m_Camera.SetPosition(0.0f, 7.0f, -60.0f);
+
+
+
+  m_Camera.SetFov(90.0f);
+  m_Camera.SetDirection(0.0f, -7.0f, 60.0f);
 
   int width = m_Window.get_width();
   int height = m_Window.get_height();
-  m_aspectRatio = ((float)width) / ((float)height);
+  m_Camera.SetSize((float)width, (float)height);
 
-  m_near = 10.0f;
-  m_far = 1000.0f;
+  m_Camera.SetFar(1000.0f);
+  m_Camera.SetNear(10.0f);
 
   set_clear_color(default_color);
   window.imgui_start();
@@ -75,16 +74,10 @@ void Renderer::end_frame()
   m_RenderTarget->Unbind();
   //ImPlot::ShowDemoWindow();
   //ImGui::ShowDemoWindow();
+
   if (ImGui::Begin("Camera"))
   {
-    if (ImGui::CollapsingHeader("Camera")) {
-      ImGui::DragFloat3("Camera position", m_camera_pos);
-      ImGui::DragFloat3("Camera target", m_camera_target);
-      ImGui::DragFloat("FOV", &m_fov);
-      ImGui::DragFloat("Far", &m_far);
-      ImGui::DragFloat("Near", &m_near);
-      ImGui::DragFloat("Test", &m_test);
-    }
+    m_Camera.ShowValues();
   }
   ImGui::End();
 
@@ -196,19 +189,8 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
     s->use();
   }
 
-  
-  //glCullFace(GL_CW);
-  //glEnable(GL_FRONT_AND_BACK);
-
-  //glDisable(GL_CULL_FACE)
-
-  glm::vec3 cameraPosition(m_camera_pos[0], m_camera_pos[1], m_camera_pos[2]);
-  glm::vec3 cameraTarget(m_camera_target[0], m_camera_target[1], m_camera_target[2]);
-  glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
-
-  glm::mat4 viewMatrix = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
-  glm::mat4 projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_near, m_far);
-  //glm::mat4 projectionMatrix = glm::ortho(-m_test, m_test, -m_test, m_test, m_near, m_far);
+  glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
+  glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 

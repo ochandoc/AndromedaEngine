@@ -4,6 +4,7 @@
 #include "Andromeda/HAL/Types.h"
 #include "ObjLoader.h"
 #include "Andromeda/Graphics/RenderTarget.h"
+#include "Andromeda/Graphics/Camera.h"
 
 namespace And
 {
@@ -48,13 +49,7 @@ protected:
 private:
   bool m_bDrawOnTexture;
 
-  float m_camera_pos[3];
-  float m_camera_target[3];
-  float m_fov;
-  float m_aspectRatio;
-  float m_near;
-  float m_far;
-  float m_test;
+  Camera m_Camera;
 };
 
 }
