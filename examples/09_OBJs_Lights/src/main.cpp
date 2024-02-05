@@ -166,8 +166,8 @@ int main(int argc, char** argv){
 
     entity_comp.execute_system(obj_draw);
 
-    //ambient.direction[0] += 0.001f;
-    //printf("Direction0: %f\n", ambient.direction[0]);
+    ambient.direction[0] -= 0.0001f;
+    printf("Direction0: %f\n", ambient.direction[0]);
 
     g_renderer.end_frame();
     window->swap_buffers();
