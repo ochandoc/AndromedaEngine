@@ -32,9 +32,9 @@ void And::FlyCamera::ProcessInput()
   if (m_Input.IsKeyPressed(KeyCode::S))
     position -= speed * forward;
   if (m_Input.IsKeyPressed(KeyCode::A))
-    position -= glm::normalize(glm::cross(forward, up)) * speed;
-  if (m_Input.IsKeyPressed(KeyCode::D))
     position += glm::normalize(glm::cross(forward, up)) * speed;
+  if (m_Input.IsKeyPressed(KeyCode::D))
+    position -= glm::normalize(glm::cross(forward, up)) * speed;
 
   const float MouseX = static_cast<float>(m_Input.GetMouseX());
   const float MouseY = static_cast<float>(m_Input.GetMouseY());
@@ -58,7 +58,7 @@ void And::FlyCamera::ProcessInput()
     OffsetY *= m_Sensitivity;
 
     m_Yaw += OffsetX;
-    m_Pitch += OffsetY;
+    m_Pitch -= OffsetY;
 
     if (m_Pitch > 89.0f)
       m_Pitch = 89.0f;
