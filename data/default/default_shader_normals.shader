@@ -74,7 +74,7 @@ void main(){
 #type Fragment
 #version 430 core
 
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
 in vec3 blend_color;
 
 struct AmbientLight{

@@ -1,50 +1,49 @@
-#include "Common/Renderer.h"
-#include "Common/Window.h"
+#include "Andromeda/Graphics/Renderer.h"
+#include "Andromeda/HAL/Window.h"
 
 #include "Backends/OpenGL/OpenGL.h"
-#include "GLFW/glfw3.h"
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "imgui_impl_opengl3.h"
 
-#include "Common/Shader.h"
-#include "Common/Triangle.h"
-#include "Common/ObjLoader.h"
-#include "Common/Light.h"
-#include "Backends/OpenGL/opengl_uniform_buffer.h"
+#include "Andromeda/Graphics/Shader.h"
+#include "Andromeda/Graphics/Triangle.h"
+#include "Andromeda/Graphics/ObjLoader.h"
 
-#include "Common/UI/Plot/implot.h"
+#include "Andromeda/UI/Plot/implot.h"
 
 namespace And
 {
 
-Renderer::Renderer(Window& window) : m_Window(window) 
+Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 {
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
-  m_camera_pos[0] = 0.0f;
-  m_camera_pos[1] = 7.0f;
-  m_camera_pos[2] = 60.0f;
 
-  m_camera_target[0] = 0.0f;
-  m_camera_target[1] = 0.0f;
-  m_camera_target[2] = 0.0f;
-  m_fov = 45.0f;
-
-  GLFWwindow *window_tmp = (GLFWwindow*) m_Window.get_native_window();
-  int width, height;
-  glfwGetWindowSize(window_tmp, &width, &height);
-  m_aspectRatio = (float)(width/height);
-
-  m_near = 0.1f;
-  m_far = 10000.0f;
+  m_Camera.SetPosition(0.0f, 7.0f, -60.0f);
 
 
+
+  m_Camera.SetFov(90.0f);
+  m_Camera.SetDirection(0.0f, -7.0f, 60.0f);
+
+  int width = m_Window.get_width();
+  int height = m_Window.get_height();
+  m_Camera.SetSize((float)width, (float)height);
+
+  m_Camera.SetFar(1000.0f);
+  m_Camera.SetNear(10.0f);
 
   set_clear_color(default_color);
   window.imgui_start();
   ImGui_ImplOpenGL3_Init("#version 430 core");
+
+  {
+    m_RenderTarget = std::make_shared<RenderTarget>(width, height);
+    m_Window.OnWindowResize.AddDynamic(m_RenderTarget.get(), &RenderTarget::Resize);
+    m_bDrawOnTexture = false;
+  }
 }
 
 Renderer::~Renderer(){
@@ -53,21 +52,35 @@ Renderer::~Renderer(){
 
 void Renderer::new_frame()
 {
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   ImGui_ImplOpenGL3_NewFrame(); 
 	m_Window.new_frame();
   ImGui::NewFrame();
+  glEnable(GL_DEPTH_TEST);
+  //glDepthMask(GL_FALSE);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  if (m_bDrawOnTexture)
+  {
+    m_RenderTarget->Bind();
+  }
+  glDepthFunc(GL_ALWAYS);
+  //glClearDepthf(0.5f);
 }
 
 void Renderer::end_frame()
 {
+  m_RenderTarget->Unbind();
   //ImPlot::ShowDemoWindow();
   //ImGui::ShowDemoWindow();
-  if(ImGui::CollapsingHeader("Camera")){
-    ImGui::DragFloat3("Camera position", m_camera_pos);
-    ImGui::DragFloat3("Camera target", m_camera_target);
-    ImGui::DragFloat("FOV", &m_fov);
+
+  m_Camera.ProcessInput();
+
+  if (ImGui::Begin("Camera"))
+  {
+    m_Camera.ShowValues();
   }
+  ImGui::End();
 
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -77,9 +90,19 @@ void Renderer::end_frame()
 void Renderer::set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height){
   glViewport(x, y, width, height);
 }
+
+void Renderer::set_draw_on_texture(bool value)
+{
+  m_bDrawOnTexture = value;
+}
   
 void Renderer::set_clear_color(float* color){
   glClearColor(color[0], color[1], color[2], color[3]);
+}
+
+std::shared_ptr<RenderTarget> Renderer::get_render_target() const
+{
+  return m_RenderTarget;
 }
 
 
@@ -161,26 +184,14 @@ void CheckError(){
 }
 }
 
-void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* ambient, PointLight* point) {
-
-  if(s){
+void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran)
+{
+  if (s) {
     s->use();
   }
 
-  //GLenum err = glGetError();
-
-  
-  //glCullFace(GL_CW);
-  //glEnable(GL_FRONT_AND_BACK);
-
-  //glDisable(GL_CULL_FACE)
-
-  glm::vec3 cameraPosition(m_camera_pos[0], m_camera_pos[1], m_camera_pos[2]);
-  glm::vec3 cameraTarget(m_camera_target[0], m_camera_target[1], m_camera_target[2]);
-  glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
-
-  glm::mat4 viewMatrix = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
-  glm::mat4 projectionMatrix = glm::perspective(glm::radians(m_fov), m_aspectRatio, m_near, m_far);
+  glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
+  glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -189,11 +200,60 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
   float rotationAngle = 0.0f;
   glm::vec3 objectRotationAxis = glm::vec3(tran.rotation[0], tran.rotation[1], tran.rotation[2]);
 
-  modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::scale(modelMatrix, objectScale);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::translate(modelMatrix, objectPosition);
 
-  s->set_camera_position(&m_camera_pos[0]);
+  s->setMat4("view", glm::value_ptr(viewMatrix));
+  s->setMat4("projection", glm::value_ptr(projectionMatrix));
+  s->setMat4("model", glm::value_ptr(modelMatrix));
+
+  unsigned int VBO = obj.get_vbo();
+  unsigned int VAO = obj.get_vao();
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBindVertexArray(VAO);
+
+
+  std::vector<Vertex_info> vertices = obj.getVertexInfo();
+
+  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+
+
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glEnable(GL_DEPTH_TEST);
+
+  std::vector<unsigned int> indices = obj.getIndices();
+  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+}
+
+void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* ambient, PointLight* point) {
+
+  if(s){
+    s->use();
+  }
+
+  glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
+  glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
+
+  glm::mat4 modelMatrix = glm::mat4(1.0f);
+
+  glm::vec3 objectPosition = glm::vec3(tran.position[0], tran.position[1], tran.position[2]);
+  glm::vec3 objectScale = glm::vec3(tran.scale[0], tran.scale[1], tran.scale[2]);
+  float rotationAngle = 0.0f;
+  glm::vec3 objectRotationAxis = glm::vec3(tran.rotation[0], tran.rotation[1], tran.rotation[2]);
+
+  modelMatrix = glm::scale(modelMatrix, objectScale);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::translate(modelMatrix, objectPosition);
+
+  s->set_camera_position(m_Camera.GetPosition());
   s->set_light(ambient);
   s->set_light(point);
   s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));

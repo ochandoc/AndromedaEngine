@@ -20,37 +20,8 @@
 #include <condition_variable>
 #include <future>
 
-#include "Common/Engine.h"
-#include "Common/Window.h"
-#include "Common/GraphicsContext.h"
-#include "Common/Renderer.h"
-#include "Common/Shader.h"
-#include "Common/Triangle.h"
-#include "Common/ObjLoader.h"
-#include "Common/ObjGenerator.h"
-#include "Common/ShaderGenerator.h"
+#include "Andromeda.h"
 
-#include "Common/Input.h"
-#include "Common/ActionInput.h"
-#include "Common/EntityComponentSystem.h"
-#include "Common/Editor/Editor.h"
-
-#include "Common/TaskSystem/TaskSystem.h"
-#include "Common/Log.h"
-
-#include "Common/Resources/ResourceManager.h"
-#include "Common/ShaderTextEditor.h"
-
-int SlowTask()
-{
-  std::this_thread::sleep_for(std::chrono::seconds(5));
-  return 10;
-}
-
-void WaitTask(int num)
-{
-  printf("Num: %d\n", num);
-}
 
 int main(int argc, char** argv){
 
@@ -79,17 +50,16 @@ int main(int argc, char** argv){
   // Show pc info
   g_context->create_info();
 
-  And::Future<int> fi = ts.AddTaskInThread("Resource Thread", SlowTask);
-  ts.AddTaskInThread("Test", WaitTask, fi);
-
   // Creamos el shader
   And::ShaderInfo s_info;
   s_info.path_fragment = "fshader.fs";
   s_info.path_vertex = "vshader.vs";
 
-  And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("content/teapot_shader.ashader");
-  
+  //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("content/teapot_shader.ashader");
 
+  auto shader = And::Shader::make("default/depth.shader");
+
+  //auto shader = And::Shader::make("content/teapot_shader.ashader");
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
@@ -116,20 +86,21 @@ int main(int argc, char** argv){
     And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
   }
 
-  
- 
+  g_renderer.set_draw_on_texture(true);
+
+
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
 
     editor.ShowWindows();
 
-    std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
+    for (auto [transform, obj] : entity_comp.get_components<And::Transform, And::Resource<And::ObjLoader>>())
+    {
+      g_renderer.draw_obj(*(*obj), shader.get(), *transform);
+    }
 
-      g_renderer.draw_obj(*(*resource), &(*g_shader), *trans);
-    };
-
-    entity_comp.execute_system(obj_draw);
+    g_renderer.get_render_target()->Test();
 
     g_renderer.end_frame();
     window->swap_buffers();

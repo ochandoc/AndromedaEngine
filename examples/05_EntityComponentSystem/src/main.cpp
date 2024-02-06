@@ -24,8 +24,7 @@
 
 #include <Windows.h>
 
-#include "Common/ID.h"
-#include "Common/EntityComponentSystem.h"
+#include "Andromeda.h"
 
 #define NUM_ENTITIES 100000
 

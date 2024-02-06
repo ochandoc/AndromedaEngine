@@ -84,9 +84,7 @@ void main(){
 #type Fragment
 #version 430 core
 
-//uniform vec3 u_camera_position;
-
-out vec4 FragColor;
+layout(location = 0) out vec4 FragColor;
 in vec3 blend_color;
 in vec3 s_normal;
 in vec3 s_fragPos;

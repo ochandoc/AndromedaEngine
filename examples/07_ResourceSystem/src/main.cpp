@@ -24,9 +24,6 @@
 #include <future>
 
 #include "Andromeda.h"
-#include "Common/OpenGLTexture2D.h" 
-#include "Common/TaskSystem/TaskSystem.h"
-#include "Common/Resources/ResourceManager.h"
 
 int main(int argc, char** argv){
 
@@ -51,13 +48,13 @@ int main(int argc, char** argv){
     And::Resource<OpenGLTexture2D> tex3 = rm.NewResource<OpenGLTexture2D>("./test.jpg");
     And::Resource<OpenGLTexture2D> tex4 = rm.NewResource<OpenGLTexture2D>("./esat_team.jpg");
 
-    And::LogWindow log_window;
+    And::LogWindow log_window("Name");
     while (window->is_open())
     {
       window->update();
       g_renderer.new_frame();
 
-      log_window.Draw();
+      log_window.Show();
 
       //...
       tex->draw_in_imgui(0);
