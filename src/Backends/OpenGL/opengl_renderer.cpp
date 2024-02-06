@@ -12,6 +12,8 @@
 #include "Common/Shader.h"
 #include "Common/Triangle.h"
 #include "Common/ObjLoader.h"
+#include "Common/Light.h"
+#include "Backends/OpenGL/opengl_uniform_buffer.h"
 
 #include "Common/UI/Plot/implot.h"
 
@@ -23,7 +25,7 @@ Renderer::Renderer(Window& window) : m_Window(window)
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
   m_camera_pos[0] = 0.0f;
   m_camera_pos[1] = 7.0f;
-  m_camera_pos[2] = -60.0f;
+  m_camera_pos[2] = 60.0f;
 
   m_camera_target[0] = 0.0f;
   m_camera_target[1] = 0.0f;
@@ -159,11 +161,13 @@ void CheckError(){
 }
 }
 
-void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
+void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* ambient, PointLight* point) {
 
   if(s){
     s->use();
   }
+
+  //GLenum err = glGetError();
 
   
   //glCullFace(GL_CW);
@@ -189,15 +193,19 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
-  s->setMat4("view", glm::value_ptr(viewMatrix));
-  s->setMat4("projection", glm::value_ptr(projectionMatrix));
-  s->setMat4("model", glm::value_ptr(modelMatrix));
+  s->set_camera_position(&m_camera_pos[0]);
+  s->set_light(ambient);
+  s->set_light(point);
+  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
+  s->upload_data();
+
 
   unsigned int VBO = obj.get_vbo();
   unsigned int VAO = obj.get_vao();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
+  //err = glGetError();
 
 
   std::vector<Vertex_info> vertices = obj.getVertexInfo();  
@@ -208,7 +216,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-
+  //err = glGetError();
 
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
@@ -216,6 +224,8 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran) {
 
   std::vector<unsigned int> indices = obj.getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+  s->un_configure_shader();
+  //err = glGetError();
 
 }
 
