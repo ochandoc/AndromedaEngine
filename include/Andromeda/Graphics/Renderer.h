@@ -4,7 +4,7 @@
 #include "Andromeda/HAL/Types.h"
 #include "ObjLoader.h"
 #include "Andromeda/Graphics/RenderTarget.h"
-#include "Andromeda/Graphics/Camera.h"
+#include "Andromeda/Graphics/FlyCamera.h"
 
 namespace And
 {
@@ -23,7 +23,6 @@ public:
   Renderer(Window& window);
   ~Renderer();
 
-
   void new_frame();
   void end_frame();
 
@@ -38,6 +37,8 @@ public:
   void showDemo();
   void showImGuiDemoWindow();
 
+  void render_element(Transform& transform, ObjLoader& mesh, Shader& shader);
+
   void draw_triangle(Triangle *t);
 
   void draw_obj(ObjLoader obj, Shader* s, Transform trans);
@@ -49,7 +50,7 @@ protected:
 private:
   bool m_bDrawOnTexture;
 
-  Camera m_Camera;
+  FlyCamera m_Camera;
 };
 
 }

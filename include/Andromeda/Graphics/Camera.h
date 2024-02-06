@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Andromeda/Misc/CoreMiscDefines.h"
+#include "Andromeda/HAL/Types.h"
+
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/HAL/Window.h"
 
@@ -7,6 +10,7 @@ namespace And
 {
   class Camera
   {
+
   public:
     Camera(Window& w);
 
@@ -31,7 +35,7 @@ namespace And
     const float* GetProjectionMatrix();
     const float* GetProjectionViewMatrix();
 
-    void ShowValues();
+    virtual void ShowValues();
 
   private:
     void RecalculeViewMatrix(bool bForce = false);

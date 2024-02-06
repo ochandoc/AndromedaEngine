@@ -98,7 +98,6 @@ int main(int argc, char** argv){
     for (auto [transform, obj] : entity_comp.get_components<And::Transform, And::Resource<And::ObjLoader>>())
     {
       g_renderer.draw_obj(*(*obj), shader.get(), *transform);
-      //g_renderer.draw_obj(*(*obj), &(*g_shader), *transform);
     }
 
     g_renderer.get_render_target()->Test();

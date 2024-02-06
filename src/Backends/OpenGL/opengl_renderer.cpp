@@ -66,7 +66,6 @@ void Renderer::new_frame()
   }
   glDepthFunc(GL_ALWAYS);
   //glClearDepthf(0.5f);
-
 }
 
 void Renderer::end_frame()
@@ -74,6 +73,8 @@ void Renderer::end_frame()
   m_RenderTarget->Unbind();
   //ImPlot::ShowDemoWindow();
   //ImGui::ShowDemoWindow();
+
+  m_Camera.ProcessInput();
 
   if (ImGui::Begin("Camera"))
   {

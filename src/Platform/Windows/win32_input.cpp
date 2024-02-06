@@ -26,7 +26,7 @@ namespace And{
   }
 
   bool Input::IsKeyPressed(KeyCode key){
-    return m_KeyBoard.keys[(int)key] == KeyState::Repeat;
+    return m_KeyBoard.keys[(int)key] == KeyState::Repeat || m_KeyBoard.keys[(int)key] == KeyState::Press;
   }
 
   bool Input::IsKeyDown(KeyCode key){
