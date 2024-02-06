@@ -1,5 +1,5 @@
 #pragma once
-#include "Andromeda/Light.h"
+#include "Andromeda/Graphics/Light.h"
 #include <optional>
 
 namespace And{
