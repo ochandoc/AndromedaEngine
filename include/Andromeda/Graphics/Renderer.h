@@ -5,7 +5,7 @@
 #include "ObjLoader.h"
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/FlyCamera.h"
-#include "Andromeda/Light.h"
+#include "Andromeda/Graphics/Light.h"
 
 namespace And
 {
