@@ -5,6 +5,7 @@
 #include "ObjLoader.h"
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/FlyCamera.h"
+#include "Andromeda/Light.h"
 
 namespace And
 {
@@ -42,6 +43,7 @@ public:
   void draw_triangle(Triangle *t);
 
   void draw_obj(ObjLoader obj, Shader* s, Transform trans);
+  void draw_obj(ObjLoader obj, Shader* s, Transform trans, AmbientLight* ambient, PointLight* point);
 
 protected:
   Window& m_Window;

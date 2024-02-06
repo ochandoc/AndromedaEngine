@@ -42,5 +42,6 @@
 #include "Andromeda/ECS/EntityComponentSystem.h"
 
 #include "Andromeda/Editor/Editor.h"
+#include "Andromeda/Editor/ShaderTextEditor.h"
 
 #include "andpch.hpp"

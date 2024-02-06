@@ -9,7 +9,8 @@ class ObjGenerator : public ResourceGenerator<ObjLoader>{
   public:
 
   ObjGenerator(){
-    m_Default = ObjLoader::load("cube.obj");
+   std::shared_ptr<ObjLoader> obj = ObjLoader::load("cube.obj");
+   m_Default = obj;
   }
 
 

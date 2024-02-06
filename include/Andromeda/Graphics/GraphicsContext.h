@@ -2,7 +2,7 @@
 
 #include "Andromeda/Debug/Log.h"
 
-DECLARE_LOG_CATEGORY(GraphicsContextLog, Trace, false)
+DECLARE_LOG_CATEGORY(GraphicsContextLog, Trace, true)
 
 namespace And
 {
