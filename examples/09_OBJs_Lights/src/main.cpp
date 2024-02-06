@@ -114,7 +114,7 @@ int main(int argc, char** argv){
   }*/
 
   //for(int i = -5; i < 5; i++){
-    And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("teapot.obj");
+    And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("sponza.obj");
     //std::shared_ptr<And::ObjLoader> obj_teapot = And::ObjLoader::load("teapot.obj");
     //And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::Transform tran = {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
@@ -123,9 +123,9 @@ int main(int argc, char** argv){
 
   And::AmbientLight ambient;
   ambient.enabled = 1.0f;
-  ambient.diffuse_color[0] = 1.0f;
-  ambient.diffuse_color[1] = 0.0f;
-  ambient.diffuse_color[2] = 0.0f;
+  ambient.diffuse_color[0] = 0.3f;
+  ambient.diffuse_color[1] = 0.3f;
+  ambient.diffuse_color[2] = 0.3f;
   ambient.specular_color[0] = 1.0f;
   ambient.specular_color[1] = 1.0f;
   ambient.specular_color[2] = 1.0f;
@@ -166,8 +166,8 @@ int main(int argc, char** argv){
 
     entity_comp.execute_system(obj_draw);
 
-    ambient.direction[0] -= 0.0001f;
-    printf("Direction0: %f\n", ambient.direction[0]);
+    //ambient.direction[0] -= 0.0001f;
+    //printf("Direction0: %f\n", ambient.direction[0]);
 
     g_renderer.end_frame();
     window->swap_buffers();

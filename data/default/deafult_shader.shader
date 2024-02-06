@@ -214,7 +214,7 @@ void main(){
 
   color += CalculeDirLight(ambient_light, s_normal, view_direction, color_base);
   //FragColor = vec4(ambient.diffuse_color.x, ambient.diffuse_color.y, ambient.diffuse_color.z, 1.0);
-  FragColor = vec4(ambient_light.direction.x, ambient_light.direction.y, ambient_light.direction.z, 1.0);
+  FragColor = vec4(color, 1.0);
 
 
   //FragColor = vec4(blend_color, 1.0);

@@ -76,8 +76,6 @@ namespace And{
       return nullptr;
     }
 
-   //const char* paths[4] = {s_info.path_vertex, s_info.path_fragment, s_info.path_geometry, s_info.path_teselation};
-
     Slurp file{path.c_str()};
     std::string shaders{file.data(), file.size()};
 
@@ -103,13 +101,6 @@ namespace And{
       const char* aux_v = vertex_shader.c_str();
       const char* aux_f = fragment_shader.c_str();
 
-      //printf("Vertex\n");
-      //printf("%s\n", vertex_shader.c_str());
-      //printf("Fragment\n");
-      //printf("%s\n", fragment_shader.c_str());
-
-      //printf("Vertex %s\n", aux_v);
-
       glShaderSource(id_vertex_shader, 1, &aux_v, nullptr);
       glShaderSource(id_fragment_shader, 1, &aux_f, nullptr);
 
@@ -129,7 +120,6 @@ namespace And{
         return nullptr;
       }
 
-
       // Cuando ya tenemos todos los shader compilados, linkamos el program
       glLinkProgram(id_program);
       glValidateProgram(id_program);
@@ -140,14 +130,9 @@ namespace And{
         return nullptr;
       }
 
-      //unsigned int id_ambient_block = glGetUniformBlockIndex(id_program, "Ambient_light");
-      //int size = 0;
-      //glGetActiveUniformBlockiv(id_program, id_ambient_block, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
-
-
       unsigned int id_block = glGetUniformBlockIndex(id_program, "UniformBlock");
       unsigned int id_block_lights = glGetUniformBlockIndex(id_program, "UniformLights");
-      //unsigned int id_block_test = glGetUniformBlockIndex(id_program, "UniformBlockTest");
+
       int size_block;
       int size_block_lights;
 
@@ -155,35 +140,10 @@ namespace And{
       glGetActiveUniformBlockiv(id_program, id_block_lights, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block_lights);
       
       //printf("Invalid index-> %u my index-> %d\n", GL_INVALID_INDEX, id_block);
-      int size_struct = sizeof(UniformBlockData);
-      int size_struct_lights = sizeof(UniformLights);
-      printf("Size in C++: %d size in gl: %d\n", size_struct, size_block);
-      printf("Size in C++: %d size in gl: %d\n", size_struct_lights, size_block_lights);
-
-      // Debug
-      //GLubyte* blockbuffer = (GLubyte*) malloc(size_block);
-      /*const GLchar* names[] = {"model", "view", "projection", "ambient", "directional.enabled", "point", "spot"};
-
-      GLuint indices[7];
-      GLint offset[7];
-
-      int totalUniforms;
-      glGetProgramiv(id_program, GL_ACTIVE_UNIFORMS, &totalUniforms);
-      printf("Total uniforms in program: %d\n", totalUniforms);
-
-      glGetUniformIndices(id_program, 7, names, indices);
-      glGetActiveUniformsiv(id_program, 7, indices, GL_UNIFORM_OFFSET, offset);
-      
-       for(int i = 0; i < 7; i++){
-        printf("Atribute: %s has index %d with offset %d\n",names[i], indices[i], offset[i]);
-      }
-      //free(blockbuffer);
-      // End debug
-      */
-
-      //printf("id-> %d size-> %d\n", id_ambient_block, size);
-
-      //GLenum err = glGetError();
+      //int size_struct = sizeof(UniformBlockData);
+      //int size_struct_lights = sizeof(UniformLights);
+      //printf("Size in C++: %d size in gl: %d\n", size_struct, size_block);
+      //printf("Size in C++: %d size in gl: %d\n", size_struct_lights, size_block_lights);
 
       // Llegados hasta aqui, todo ha ido bien y creamos el shader
       std::shared_ptr<Shader> shader = std::shared_ptr<Shader>(new Shader);
@@ -200,7 +160,6 @@ namespace And{
       shader->m_Data->buffer_size = size_block;
       shader->m_Data->buffer_lights_size = size_block_lights;
 
-      //WAIT_GPU_LOAD()
       glFlush();
       return shader;
     }
@@ -231,7 +190,6 @@ namespace And{
     }    
   }
 
-
   void Shader::set_light(PointLight* light){
     m_uniform_block_lights->light_point.enabled = light->enabled;
     m_uniform_block_lights->light_point.specular_strength = light->specular_strength;
@@ -244,14 +202,6 @@ namespace And{
       m_uniform_block_lights->light_point.diffuse_color[i] = light->diffuse_color[i];
       m_uniform_block_lights->light_point.specular_color[i] = light->specular_color[i];
     }
-  }
-
-  void Shader::set_uniform_light(AmbientLight* light)
-  {
-  }
-
-  void Shader::set_uniform_light(PointLight* light){
-
   }
 
   void Shader::setModelViewProj(const float model[16], const float view[16], const float projection[16]){

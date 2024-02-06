@@ -193,19 +193,12 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
-  //s->setMat4("view", glm::value_ptr(viewMatrix));
-  //s->setMat4("projection", glm::value_ptr(projectionMatrix));
-  //s->setMat4("model", glm::value_ptr(modelMatrix));
-
   s->set_camera_position(&m_camera_pos[0]);
   s->set_light(ambient);
   s->set_light(point);
   s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
-
-  //s->configure_shader();
   s->upload_data();
 
-  
 
   unsigned int VBO = obj.get_vbo();
   unsigned int VAO = obj.get_vao();
