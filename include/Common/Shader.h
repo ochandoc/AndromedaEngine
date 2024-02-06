@@ -64,9 +64,14 @@ namespace And{
     void use();
     void configure_shader();
     void un_configure_shader();
+
+    // Uniform buffer
     void set_light(AmbientLight* light);
     void set_light(PointLight* light);
 
+    // Uniform normal
+    void set_uniform_light(AmbientLight* light);
+    void set_uniform_light(PointLight* light);
 
     void set_camera_position(const float position[3]);
 

@@ -154,7 +154,7 @@ namespace And{
       glGetActiveUniformBlockiv(id_program, id_block, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block);
       glGetActiveUniformBlockiv(id_program, id_block_lights, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block_lights);
       
-      printf("Invalid index-> %u my index-> %d\n", GL_INVALID_INDEX, id_block);
+      //printf("Invalid index-> %u my index-> %d\n", GL_INVALID_INDEX, id_block);
       int size_struct = sizeof(UniformBlockData);
       int size_struct_lights = sizeof(UniformLights);
       printf("Size in C++: %d size in gl: %d\n", size_struct, size_block);
@@ -191,7 +191,7 @@ namespace And{
       shader->m_Data->shader_info.path_vertex = vertex_shader.c_str();
       shader->m_Data->shader_info.path_fragment = fragment_shader.c_str();
       shader->m_Data->shader_path = path;
-      //shader->m_Data->u_buffer = std::make_unique<UniformBuffer>(id_ambient_block, size);
+
       shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(id_block, (unsigned int)size_block);
       shader->m_Data->uniform_buffer_lights = std::make_unique<UniformBuffer>(id_block_lights, (unsigned int)size_block_lights);
       shader->m_uniform_block = std::make_shared<UniformBlockData>();
@@ -246,6 +246,14 @@ namespace And{
     }
   }
 
+  void Shader::set_uniform_light(AmbientLight* light)
+  {
+  }
+
+  void Shader::set_uniform_light(PointLight* light){
+
+  }
+
   void Shader::setModelViewProj(const float model[16], const float view[16], const float projection[16]){
 
     for(int i = 0; i < 16; i++){
@@ -264,7 +272,7 @@ namespace And{
   }
 
   void Shader::upload_data(){
-
+ 
     m_Data->uniform_buffer->upload_data((void*)(m_uniform_block.get()), (unsigned int)m_Data->buffer_size);
     m_Data->uniform_buffer->bind();
     glFlush();
