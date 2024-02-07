@@ -13,6 +13,8 @@ namespace And
   class Shader;
   class Triangle;
   class ObjLoader;
+  class MeshComponent;
+  class TransformComponent;
   struct ShaderInfo;
 
 
@@ -44,6 +46,7 @@ public:
 
   void draw_obj(ObjLoader obj, Shader* s, Transform trans);
   void draw_obj(ObjLoader obj, Shader* s, Transform trans, AmbientLight* ambient, PointLight* point);
+  void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point);
 
 protected:
   Window& m_Window;

@@ -367,6 +367,7 @@ namespace And
 			internal::component_list_imp<comp_t>* list = static_cast<internal::component_list_imp<comp_t>*>(m_Components[type_id].get());
 			assert(list->get_component(e.get_id()) == nullptr && "Component already inserted in the entity");
 			list->add(e.get_id(), comp);
+			comp.SetOwner(nullptr	);
 		}
 
 		template<typename comp_t>
