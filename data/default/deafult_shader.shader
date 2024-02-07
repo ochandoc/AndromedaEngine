@@ -203,7 +203,7 @@ void main(){
   vec3 ambient_color = vec3(1.0);
   ambient_color = ambient_strength * ambient_color;
   vec3 color = ambient_color;
-  vec3 color_base = vec3(0.5, 0.5, 0.0);
+  vec3 color_base = vec3(0.5, 0.5, 0.5);
 
   float test = ambient_light.enabled + ambient_light.direction.x + ambient_light.direction.y + ambient_light.direction.z + ambient_light.diffuse_color.x + ambient_light.diffuse_color.y + ambient_light.diffuse_color.z + ambient_light.specular_color.x + ambient_light.specular_color.y + ambient_light.specular_color.z + ambient_light.specular_strength + ambient_light.specular_shininess;
   float test_directional = directional.enabled + directional.direction.x + directional.direction.y + directional.direction.z + directional.diffuse_color.x + directional.diffuse_color.y + directional.diffuse_color.z + directional.specular_color.x + directional.specular_color.y + directional.specular_color.z + directional.specular_strength + directional.specular_shininess;

@@ -46,7 +46,7 @@ int main(int argc, char** argv){
 
   ts.AddWorker(workerCreationInfo);
 
-  std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
+  std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
 
@@ -103,9 +103,9 @@ int main(int argc, char** argv){
 
   And::AmbientLight ambient;
   ambient.enabled = 1.0f;
-  ambient.diffuse_color[0] = 0.3f;
-  ambient.diffuse_color[1] = 0.3f;
-  ambient.diffuse_color[2] = 0.3f;
+  ambient.diffuse_color[0] = 1.0f;
+  ambient.diffuse_color[1] = 1.0f;
+  ambient.diffuse_color[2] = 1.0f;
   ambient.specular_color[0] = 1.0f;
   ambient.specular_color[1] = 1.0f;
   ambient.specular_color[2] = 1.0f;

@@ -64,7 +64,7 @@ void Renderer::new_frame()
   {
     m_RenderTarget->Bind();
   }
-  glDepthFunc(GL_ALWAYS);
+  //glDepthFunc(GL_ALWAYS);
   //glClearDepthf(0.5f);
 }
 
