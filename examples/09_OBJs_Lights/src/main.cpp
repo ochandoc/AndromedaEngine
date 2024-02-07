@@ -131,19 +131,20 @@ int main(int argc, char** argv){
   And::PointLight point;
   point.enabled = 1.0f;
   point.position[0] = -5.0f;
-  point.position[1] = 0.0f;
+  point.position[1] = 7.0f;
   point.position[2] = 0.0f;
   point.diffuse_color[0] = 1.0f;
-  point.diffuse_color[1] = 1.0f;
-  point.diffuse_color[2] = 1.0f;
+  point.diffuse_color[1] = 0.55f;
+  point.diffuse_color[2] = 0.0f;
   point.specular_color[0] = 1.0f;
   point.specular_color[1] = 1.0f;
   point.specular_color[2] = 1.0f;
   point.specular_strength = 0.5f;
   point.specular_shininess = 1.0f;
   point.constant_att = 1.0f;
-  point.linear_att = 1.0f;
-  point.quadratic_att = 1.0f;
+  point.linear_att = 0.7f;
+  point.quadratic_att = 1.8f;
+  point.attenuation = 40.0f;
 
   g_renderer.set_draw_on_texture(true);
   while (window->is_open()){

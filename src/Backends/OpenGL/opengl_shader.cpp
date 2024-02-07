@@ -129,6 +129,7 @@ namespace And{
       int succes;
       glGetProgramiv(id_program, GL_VALIDATE_STATUS, &succes);
       if(succes != GL_TRUE){
+        printf("Error on loading shader\n");
         return nullptr;
       }
 
@@ -199,6 +200,7 @@ namespace And{
     m_uniform_block_lights->light_point.constant_att = light->constant_att;
     m_uniform_block_lights->light_point.linear_att = light->linear_att;
     m_uniform_block_lights->light_point.quadratic_att = light->quadratic_att;
+    m_uniform_block_lights->light_point.attenuation = light->attenuation;
     for(int i = 0; i < 3; i++){
       m_uniform_block_lights->light_point.position[i] = light->position[i];
       m_uniform_block_lights->light_point.diffuse_color[i] = light->diffuse_color[i];

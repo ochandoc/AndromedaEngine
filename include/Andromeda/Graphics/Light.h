@@ -31,7 +31,7 @@ struct PointLight{
   float linear_att = 0.5f;
   float quadratic_att = 0.5f;
   float enabled = 0.5f;
-  float padding = 0.5f; // 64 bytes
+  float attenuation = 1.0f; // 64 bytes
 };
 
 struct SpotLight{
@@ -47,6 +47,7 @@ struct SpotLight{
   float constant_att = 0.5f;
   float linear_att = 0.5f;
   float quadratic_att = 0.5f; // 80 bytes
+  float attenuation = 1.0f;
 };
 
 }
