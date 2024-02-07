@@ -26,6 +26,37 @@ namespace And{
   }
 
   bool Input::IsKeyPressed(KeyCode key){
+    
+    if(m_KeyBoard.keys[(int)key] == KeyState::Press){
+      printf("Now-> Press");
+    }
+    if(m_KeyBoard.keys_last_frame[(int)key] == KeyState::Press){
+      printf(" Last-> Press\n");
+    }
+    
+    if(m_KeyBoard.keys[(int)key] == KeyState::Release){
+      printf("Now-> Release");
+    }
+    if(m_KeyBoard.keys_last_frame[(int)key] == KeyState::Release){
+      printf(" Last-> Release\n");
+    }
+
+    if(m_KeyBoard.keys[(int)key] == KeyState::Repeat){
+      printf("Now-> Repeat");
+    }
+    if(m_KeyBoard.keys_last_frame[(int)key] == KeyState::Repeat){
+      printf(" Last-> Repeat\n");
+    }
+
+    if(m_KeyBoard.keys[(int)key] == KeyState::Default){
+      printf("Now-> Deafult");
+    }
+    if(m_KeyBoard.keys_last_frame[(int)key] == KeyState::Default){
+      printf(" Last-> Deafult\n");
+    }
+
+
+    //return m_KeyBoard.keys[(int)key] != KeyState::Release;
     return m_KeyBoard.keys[(int)key] == KeyState::Repeat || m_KeyBoard.keys[(int)key] == KeyState::Press;
   }
 
@@ -34,6 +65,8 @@ namespace And{
   }
 
   bool Input::IsKeyRelease(KeyCode key){
+
+
     return m_KeyBoard.keys[(int)key] == KeyState::Release;
 
   }

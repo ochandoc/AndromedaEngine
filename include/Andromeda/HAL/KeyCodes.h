@@ -153,6 +153,7 @@ namespace And
   struct KeyboardState
   {
     KeyState keys[kNumKeys];
+    KeyState keys_last_frame[kNumKeys];
   };
 
 };

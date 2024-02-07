@@ -157,6 +157,7 @@ int main(int argc, char** argv){
     {
       g_renderer.draw_obj(obj, &(*g_shader), transform, &ambient, &point);
     }
+    
 
     g_renderer.get_render_target()->Test();
 

@@ -231,9 +231,12 @@ namespace And
     glfwSetWindowCloseCallback(window->m_Data->handle, close_window_callback);
     glfwSetWindowSizeCallback(window->m_Data->handle, resize_window_callback);
     glfwSetKeyCallback(window->m_Data->handle, PressedKey);
-
-    for (KeyState& key : window->m_KeyBoard.keys)
-    {
+   
+    for (KeyState& key : window->m_KeyBoard.keys){
+      key = KeyState::Default;
+    }
+  
+    for (KeyState& key : window->m_KeyBoard.keys_last_frame){
       key = KeyState::Default;
     }
 
@@ -279,9 +282,16 @@ namespace And
 
   void Window::update()
   {
-    for (KeyState& key : m_KeyBoard.keys)
+    
+    /*for (KeyState& key : window->m_KeyBoard.keys)
     {
       key = KeyState::Default;
+    }*/
+    
+
+    for(int i = 0; i < kNumKeys; i++){
+      m_KeyBoard.keys_last_frame[i] = m_KeyBoard.keys[i];
+      m_KeyBoard.keys[i] = KeyState::Default;
     }
     glfwPollEvents();
     float CurrentTime = static_cast<float>(glfwGetTime());

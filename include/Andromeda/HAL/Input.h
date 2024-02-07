@@ -34,6 +34,7 @@ public:
 private:
   Window& m_window;
   KeyboardState& m_KeyBoard;
+
 };
   
 };
