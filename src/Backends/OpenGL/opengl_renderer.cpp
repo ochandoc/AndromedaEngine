@@ -301,12 +301,12 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran,
   glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
 
-  glm::mat4 modelMatrix = glm::mat4(1.0f);
+  glm::mat4 modelMatrix = glm::identity<glm::mat4>();
 
   glm::vec3 objectPosition = glm::vec3(tran->position[0], tran->position[1], tran->position[2]);
   glm::vec3 objectScale = glm::vec3(tran->scale[0], tran->scale[1], tran->scale[2]);
   float rotationAngle = 0.0f;
-  glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
+  glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]); // esto esta mal
 
   modelMatrix = glm::scale(modelMatrix, objectScale);
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);

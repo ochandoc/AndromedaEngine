@@ -79,7 +79,7 @@ namespace And
 			virtual ~component_list_base() = default;
 
 			virtual T* get_component(ID id) = 0;
-			virtual void add(ID id, const T& value) = 0;
+			virtual T* add(ID id, const T& value) = 0;
 		};
 
 		template<typename T>
@@ -98,10 +98,11 @@ namespace And
 				m_Components.push_back(component<T>(id));
 			}
 
-			virtual void add(ID id, const T& value)
+			virtual T* add(ID id, const T& value)
 			{
 				m_Sorted = false;
 				m_Components.emplace_back(id, value);
+				return &m_Components.back().value;
 			}
 
 			virtual void remove(ID id) override
@@ -335,13 +336,17 @@ namespace And
 		}
 
 		template<typename... comps_t>
-		Entity new_entity(comps_t... comps)
+		Entity* new_entity(comps_t... comps)
 		{
-			Entity new_e;
+			std::unique_ptr<Entity> new_e = std::make_unique<Entity>();
 
-			(add_entity_component<comps_t>(new_e, comps), ...);
+			Entity* ett = new_e.get();
 
-			return new_e;
+			(add_entity_component<comps_t>(ett, comps), ...);
+
+			m_Entities.push_back(std::move(new_e));
+
+			return ett;
 		}
 
 		void remove_entity(Entity e)
@@ -353,30 +358,33 @@ namespace And
 		}
 
 		template<typename comp_t>
-		comp_t* get_entity_component(Entity e)
+		comp_t* get_entity_component(Entity* e)
 		{
+			if (!e) return;
 			size_t type_id = typeid(comp_t).hash_code();
 			internal::component_list_imp<comp_t>* list = static_cast<internal::component_list_imp<comp_t>*>(m_Components[type_id].get());
-			return list->get_component(e.get_id());
+			return list->get_component(e->get_id());
 		}
 
 		template<typename comp_t>
-		void add_entity_component(Entity e, comp_t& comp)
+		void add_entity_component(Entity* e, comp_t& comp)
 		{
+			if (!e) return;
 			size_t type_id = typeid(comp_t).hash_code();
 			internal::component_list_imp<comp_t>* list = static_cast<internal::component_list_imp<comp_t>*>(m_Components[type_id].get());
-			assert(list->get_component(e.get_id()) == nullptr && "Component already inserted in the entity");
-			list->add(e.get_id(), comp);
-			comp.SetOwner(nullptr	);
+			assert(list->get_component(e->get_id()) == nullptr && "Component already inserted in the entity");
+			comp_t* c = list->add(e->get_id(), comp);
+			c->SetOwner(e);
 		}
 
 		template<typename comp_t>
-		void remove_entity_component(Entity e)
+		void remove_entity_component(Entity* e)
 		{
+			if (!e) return;
 			size_t type_id = typeid(comp_t).hash_code();
 			internal::component_list_imp<comp_t>* list = static_cast<internal::component_list_imp<comp_t>*>(m_Components[type_id].get());
-			assert(list->get_component(e.get_id()) != nullptr && "Component already inserted in the entity");
-			list->remove(e.get_id());
+			assert(list->get_component(e->get_id()) != nullptr && "Component already inserted in the entity");
+			list->remove(e->get_id());
 		}
 
 		template<typename func_t, typename... comps_t>
@@ -420,6 +428,7 @@ namespace And
 		}
 
 		std::unordered_map<size_t, std::unique_ptr<internal::component_list_abs>> m_Components;
+		std::vector<std::unique_ptr<Entity>> m_Entities;
 	};
 
 }

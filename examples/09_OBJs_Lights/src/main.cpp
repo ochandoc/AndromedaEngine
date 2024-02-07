@@ -111,7 +111,7 @@ int main(int argc, char** argv){
     tran.scale[0] = 1.0f;
     tran.scale[1] = 1.0f;
     tran.scale[2] = 1.0f;
-    And::Entity obj_id = entity_comp.new_entity(MC, tran);
+    And::Entity* obj_id = entity_comp.new_entity(MC, tran);
   //}
 
   And::AmbientLight ambient;
@@ -146,7 +146,7 @@ int main(int argc, char** argv){
   point.linear_att = 1.0f;
   point.quadratic_att = 1.0f;
 
-
+  g_renderer.set_draw_on_texture(true);
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
@@ -157,6 +157,8 @@ int main(int argc, char** argv){
     {
       g_renderer.draw_obj(obj, &(*g_shader), transform, &ambient, &point);
     }
+
+    g_renderer.get_render_target()->Test();
 
     //ambient.direction[0] -= 0.0001f;
     //printf("Direction0: %f\n", ambient.direction[0]);
