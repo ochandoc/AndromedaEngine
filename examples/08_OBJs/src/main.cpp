@@ -59,7 +59,8 @@ int main(int argc, char** argv){
 
   //auto shader = And::Shader::make("default/depth.shader");
 
-  auto shader = And::Shader::make("content/teapot_shader.ashader");
+  //auto shader = And::Shader::make("content/teapot_shader.ashader");
+  auto shader = And::Shader::make("default/deafult_shader_without_lights.shader");
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
@@ -74,7 +75,7 @@ int main(int argc, char** argv){
   float pos_x = 0.0f;
   float pos_y = -5.0f;
 
-  for(int i = -5; i < (int)(num_obj / 2); i++){
+  for (int i = -5; i < (int)(num_obj / 2); i++) {
     And::MeshComponent MC;
     MC.Mesh = r_manager.NewResource<And::ObjLoader>("teapot.obj");
     And::TransformComponent tran;
@@ -105,6 +106,39 @@ int main(int argc, char** argv){
     tran.scale[2] = 1.0f;
     And::Entity* obj_id = entity_comp.new_entity(MC, tran);
   }
+
+
+  /* {
+    And::MeshComponent MC;
+    MC.Mesh = r_manager.NewResource<And::ObjLoader>("teapot.obj");
+    And::TransformComponent tran;
+    tran.position[0] = 0.0f;
+    tran.position[1] = 0.0f;
+    tran.position[2] = 0.0f;
+    tran.rotation[0] = 0.0f;
+    tran.rotation[1] = 0.0f;
+    tran.rotation[2] = 0.0f;
+    tran.scale[0] = 1.0f;
+    tran.scale[1] = 1.0f;
+    tran.scale[2] = 1.0f;
+    And::Entity* obj_id = entity_comp.new_entity(MC, tran);
+  }*/
+
+  /* {
+    And::MeshComponent MC;
+    MC.Mesh = r_manager.NewResource<And::ObjLoader>("teapot.obj");
+    And::TransformComponent tran;
+    tran.position[0] = 10.0f;
+    tran.position[1] = 0.0f;
+    tran.position[2] = 0.0f;
+    tran.rotation[0] = 0.0f;
+    tran.rotation[1] = 0.0f;
+    tran.rotation[2] = 0.0f;
+    tran.scale[0] = 1.0f;
+    tran.scale[1] = 1.0f;
+    tran.scale[2] = 1.0f;
+    And::Entity* obj_id = entity_comp.new_entity(MC, tran);
+  }*/
 
   g_renderer.set_draw_on_texture(true);
 
