@@ -1,6 +1,6 @@
 #pragma once
 
-/* Copyright (C) 2023
+/* Copyright (C) 2024
  * Author: Hector Ochando <ochandoca@esat-alumni.com>
  *
  * Events              
