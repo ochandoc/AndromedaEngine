@@ -187,7 +187,7 @@ void CheckError(){
 }
 }
 
-void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran)
+void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
 {
   if (s) {
     s->use();
@@ -198,10 +198,10 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran)
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-  glm::vec3 objectPosition = glm::vec3(tran.position[0], tran.position[1], tran.position[2]);
-  glm::vec3 objectScale = glm::vec3(tran.scale[0], tran.scale[1], tran.scale[2]);
+  glm::vec3 objectPosition = glm::vec3(tran->position[0], tran->position[1], tran->position[2]);
+  glm::vec3 objectScale = glm::vec3(tran->scale[0], tran->scale[1], tran->scale[2]);
   float rotationAngle = 0.0f;
-  glm::vec3 objectRotationAxis = glm::vec3(tran.rotation[0], tran.rotation[1], tran.rotation[2]);
+  glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
 
   modelMatrix = glm::scale(modelMatrix, objectScale);
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
@@ -211,14 +211,14 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran)
   s->setMat4("projection", glm::value_ptr(projectionMatrix));
   s->setMat4("model", glm::value_ptr(modelMatrix));
 
-  unsigned int VBO = obj.get_vbo();
-  unsigned int VAO = obj.get_vao();
+  unsigned int VBO = obj->Mesh->get_vbo();
+  unsigned int VAO = obj->Mesh->get_vao();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
 
 
-  std::vector<Vertex_info> vertices = obj.getVertexInfo();
+  std::vector<Vertex_info> vertices = obj->Mesh->getVertexInfo();
 
   glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
 
@@ -232,7 +232,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran)
   glCullFace(GL_BACK);
   glEnable(GL_DEPTH_TEST);
 
-  std::vector<unsigned int> indices = obj.getIndices();
+  const std::vector<unsigned int>& indices = obj->Mesh->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
 }
 

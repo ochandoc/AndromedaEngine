@@ -22,8 +22,7 @@
 
 #include "Andromeda.h"
 
-#include "Andromeda/ECS/Components/TransformComponent.h"
-#include "Andromeda/ECS/Components/MeshComponent.h"
+
 
 int SlowTask()
 {

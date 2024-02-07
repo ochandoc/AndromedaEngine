@@ -338,9 +338,10 @@ namespace And
 		template<typename... comps_t>
 		Entity* new_entity(comps_t... comps)
 		{
-			std::unique_ptr<Entity> new_e = std::make_unique<Entity>();
+			std::unique_ptr<Entity> new_e(new Entity);
 
 			Entity* ett = new_e.get();
+			ett->m_ECS = this;
 
 			(add_entity_component<comps_t>(ett, comps), ...);
 
