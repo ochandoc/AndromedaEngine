@@ -232,6 +232,9 @@ namespace And{
     m_Data->uniform_buffer_lights->upload_data((void*)(m_uniform_block_lights.get()), (unsigned int)m_Data->buffer_lights_size);
     m_Data->uniform_buffer_lights->bind();
     glFlush();
+
+    m_texture->bind(0);
+    
   }
 
   void Shader::configure_shader(){
@@ -243,6 +246,11 @@ namespace And{
     m_Data->uniform_buffer_lights->unbind();
   }
 
+  void Shader::set_texture(OpenGLTexture2D* texture){
+    m_texture = texture;
+  }
+
+  //void Shader::get_texture(){}
   Shader::Shader() : m_Data(new ShaderData){}
 
   void Shader::use(){

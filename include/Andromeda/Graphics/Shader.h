@@ -1,5 +1,7 @@
 #pragma once
 #include "Andromeda/Graphics/Light.h"
+#include "Andromeda/Graphics/OpenGLTexture2D.h"
+#include "Andromeda/Resources/Resource.h"
 #include <optional>
 
 namespace And{
@@ -23,12 +25,6 @@ namespace And{
     float model[16];
     float view[16];
     float projection[16]; // 192
-    //std::shared_ptr<AmbientLight> light_ambient;
-    //std::shared_ptr<DirectionalLight> light_directional;
-    //std::shared_ptr<PointLight> light_point;
-    //std::shared_ptr<SpotLight> light_spot;
-    // 240 bytes las luces
-    // 432 hasta aqui
     float camera_position[3];
     //float padding; // 448 bytes, aligned to 28 blocks of 16 bytes
   };
@@ -71,6 +67,9 @@ namespace And{
     void upload_data();
     void reload();
 
+    void set_texture(OpenGLTexture2D* r);
+    //const OpenGLTexture2D& get_texture();
+
   private:
     Shader();
     std::unique_ptr<struct ShaderData> m_Data;
@@ -78,7 +77,7 @@ namespace And{
 
     std::shared_ptr<UniformBlockData> m_uniform_block;
     std::shared_ptr<UniformLights> m_uniform_block_lights;
-
-
+    
+    OpenGLTexture2D* m_texture;
   };
 }

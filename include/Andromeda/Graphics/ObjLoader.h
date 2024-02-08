@@ -17,7 +17,8 @@ namespace And{
   // x, y, z,    nx, ny, nz
   struct Vertex_info{
     float position[3];
-    float normal[3];  
+    float normal[3];
+    float uv[2];
   };
 
   struct Transform{

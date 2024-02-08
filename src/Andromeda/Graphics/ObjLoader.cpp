@@ -43,7 +43,7 @@ std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string bas
     //vertices = attrib.GetVertices();
     vertices_wheights = attrib.GetVertexWeights();
     //normals = attrib.normals;
-    tex_coords = attrib.texcoords;
+    //tex_coords = attrib.texcoords;
     colors = attrib.colors;
 
 
@@ -69,6 +69,14 @@ std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string bas
                 v_info.normal[0] = attrib.normals[3 * index.normal_index + 0];
                 v_info.normal[1] = attrib.normals[3 * index.normal_index + 1];
                 v_info.normal[2] = attrib.normals[3 * index.normal_index + 2];
+            }
+
+            if(attrib.texcoords.size() > 0){
+              tex_coords.push_back(attrib.texcoords[2 * index.texcoord_index + 0]);
+              tex_coords.push_back(attrib.texcoords[2 * index.texcoord_index + 1]);
+
+              v_info.uv[0] = attrib.texcoords[2 * index.texcoord_index + 0];
+              v_info.uv[1] = attrib.texcoords[2 * index.texcoord_index + 1];
             }
 
             vertex_info.push_back(v_info);
