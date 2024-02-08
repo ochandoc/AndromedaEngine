@@ -75,20 +75,23 @@ void And::RenderTarget::Resize(uint32 width, uint32 height)
 void And::RenderTarget::Test()
 {
   ImGuiStyle& style = ImGui::GetStyle();
+  ImVec2 padding = style.WindowPadding;
   style.WindowPadding = ImVec2(0.0f, 0.0f);
   static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar;
   windowFlags |= ImGuiWindowFlags_NoCollapse;
   if (ImGui::Begin("Render Target Color", nullptr, windowFlags))
   {
-    ImGui::Image((void*)(intptr_t)m_Data->ColorTexture, ImGui::GetWindowSize(), ImVec2(1, 1), ImVec2(0, 0));
+    ImGui::Image((void*)(intptr_t)m_Data->ColorTexture, ImGui::GetWindowSize(), ImVec2(0, 1), ImVec2(1, 0));
   }
   ImGui::End();
 
   if (ImGui::Begin("Render Target depth", nullptr, windowFlags))
   {
-    ImGui::Image((void*)(intptr_t)m_Data->DepthTexture, ImGui::GetWindowSize(), ImVec2(1, 1), ImVec2(0, 0));
+    ImGui::Image((void*)(intptr_t)m_Data->DepthTexture, ImGui::GetWindowSize(), ImVec2(0, 1), ImVec2(1, 0));
   }
   ImGui::End();
+
+  style.WindowPadding = padding;
 }
 
 

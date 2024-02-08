@@ -40,6 +40,8 @@
 
 #include "Andromeda/ECS/Entity.h"
 #include "Andromeda/ECS/EntityComponentSystem.h"
+#include "Andromeda/ECS/Components/TransformComponent.h"
+#include "Andromeda/ECS/Components/MeshComponent.h"
 
 #include "Andromeda/Editor/Editor.h"
 #include "Andromeda/Editor/ShaderTextEditor.h"

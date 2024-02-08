@@ -33,7 +33,7 @@ struct PointLight{
   float linear_att;
   float quadratic_att;
   float enabled;
-  float padding; // 64 bytes
+  float attenuation; // 64 bytes
 };
 
 struct SpotLight{
@@ -49,6 +49,7 @@ struct SpotLight{
   float constant_att;
   float linear_att;
   float quadratic_att; // 80 bytes
+  float attenuation;
 };
 
 
@@ -126,7 +127,8 @@ struct PointLight{
   float linear_att;
   float quadratic_att;
   float enabled;
-  float padding; // 64 bytes
+  //float padding;
+  float attenuation; // 64 bytes
 };
 
 struct SpotLight{
@@ -142,6 +144,7 @@ struct SpotLight{
   float constant_att;
   float linear_att;
   float quadratic_att; // 80 bytes
+  float attenuation;
 };
 
 layout (std140, binding = 0) uniform UniformBlock{
@@ -198,7 +201,7 @@ vec3 CalculePointLight(PointLight light, vec3 normalValue, vec3 view_dir, vec3 f
   vec3 specular = (light.specular_strength * light.specular_shininess * spec) * light.specular_color;
 
 
-  difuse *= attenuation;
+  difuse *= (attenuation * light.attenuation);
   specular *= attenuation;
   
   return (difuse + specular);
@@ -215,13 +218,15 @@ void main(){
 
   float test = ambient_light.enabled + ambient_light.direction.x + ambient_light.direction.y + ambient_light.direction.z + ambient_light.diffuse_color.x + ambient_light.diffuse_color.y + ambient_light.diffuse_color.z + ambient_light.specular_color.x + ambient_light.specular_color.y + ambient_light.specular_color.z + ambient_light.specular_strength + ambient_light.specular_shininess;
   float test_directional = directional.enabled + directional.direction.x + directional.direction.y + directional.direction.z + directional.diffuse_color.x + directional.diffuse_color.y + directional.diffuse_color.z + directional.specular_color.x + directional.specular_color.y + directional.specular_color.z + directional.specular_strength + directional.specular_shininess;
-  float test_point = point.enabled + point.position.x + point.position.y + point.position.z + point.diffuse_color.x + point.diffuse_color.y + point.diffuse_color.z + point.specular_color.x + point.specular_color.y + point.specular_color.z + point.specular_strength + point.specular_shininess + point.constant_att + point.linear_att + point.quadratic_att + point.padding;
+  float test_point = point.enabled + point.position.x + point.position.y + point.position.z + point.diffuse_color.x + point.diffuse_color.y + point.diffuse_color.z + point.specular_color.x + point.specular_color.y + point.specular_color.z + point.specular_strength + point.specular_shininess + point.constant_att + point.linear_att + point.quadratic_att + point.attenuation;
   float test_spot = spot.enabled + spot.position.x + spot.position.y + spot.position.z + spot.direction.x + spot.direction.y + spot.direction.z + spot.cutt_off + spot.outer_cut_off + spot.diffuse_color.x + spot.diffuse_color.y + spot.diffuse_color.z + spot.specular_color.x + spot.specular_color.y + spot.specular_color.z + spot.specular_strength + spot.specular_shininess + spot.constant_att + spot.linear_att + spot.quadratic_att;   
 
   vec4 tex_color = texture(tex, uv);
   color += CalculeDirLight(ambient_light, s_normal, view_direction, color_base);
-  FragColor = vec4(color, 1.0) + tex_color;  
-  //FragColor = tex_color;  
+
+  color += CalculePointLight(point, s_normal, view_direction, s_fragPos);
+  //FragColor = vec4(ambient.diffuse_color.x, ambient.diffuse_color.y, ambient.diffuse_color.z, 1.0);
+  FragColor = vec4(color, 1.0);
 
   //FragColor = vec4(blend_color, 1.0);
 

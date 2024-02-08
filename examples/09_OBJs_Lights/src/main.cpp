@@ -22,6 +22,8 @@
 
 #include "Andromeda.h"
 
+
+
 int SlowTask()
 {
   std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -78,8 +80,8 @@ int main(int argc, char** argv){
   
   And::EntityComponentSystem entity_comp;
     
-  entity_comp.add_component_class<And::Resource<And::ObjLoader>>();
-  entity_comp.add_component_class<And::Transform>();
+  entity_comp.add_component_class<And::MeshComponent>();
+  entity_comp.add_component_class<And::TransformComponent>();
 
   int num_obj = 10;
   float pos_x = 0.0f;
@@ -98,12 +100,22 @@ int main(int argc, char** argv){
   }*/
 
   //for(int i = -5; i < 5; i++){
-    And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("sponza.obj");
-    //And::Resource<And::ObjLoader> obj_teapot = r_manager.NewResource<And::ObjLoader>("cube.obj");
+    And::MeshComponent MC;
+    MC.Mesh = r_manager.NewResource<And::ObjLoader>("sponza.obj");
+
     //std::shared_ptr<And::ObjLoader> obj_teapot = And::ObjLoader::load("teapot.obj");
     //And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
-    And::Transform tran = {{0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
-    And::Entity obj_id = entity_comp.new_entity(obj_teapot, tran);
+    And::TransformComponent tran;
+    tran.position[0] = 0.0f;
+    tran.position[1] = 0.0f;
+    tran.position[2] = 0.0f;
+    tran.rotation[0] = 0.0f;
+    tran.rotation[1] = 1.0f;
+    tran.rotation[2] = 0.0f;
+    tran.scale[0] = 1.0f;
+    tran.scale[1] = 1.0f;
+    tran.scale[2] = 1.0f;
+    And::Entity* obj_id = entity_comp.new_entity(MC, tran);
   //}
 
   And::AmbientLight ambient;
@@ -124,35 +136,35 @@ int main(int argc, char** argv){
   And::PointLight point;
   point.enabled = 1.0f;
   point.position[0] = -5.0f;
-  point.position[1] = 0.0f;
+  point.position[1] = 7.0f;
   point.position[2] = 0.0f;
   point.diffuse_color[0] = 1.0f;
-  point.diffuse_color[1] = 1.0f;
-  point.diffuse_color[2] = 1.0f;
+  point.diffuse_color[1] = 0.55f;
+  point.diffuse_color[2] = 0.0f;
   point.specular_color[0] = 1.0f;
   point.specular_color[1] = 1.0f;
   point.specular_color[2] = 1.0f;
   point.specular_strength = 0.5f;
   point.specular_shininess = 1.0f;
   point.constant_att = 1.0f;
-  point.linear_att = 1.0f;
-  point.quadratic_att = 1.0f;
+  point.linear_att = 0.7f;
+  point.quadratic_att = 1.8f;
+  point.attenuation = 40.0f;
 
-
-
+  g_renderer.set_draw_on_texture(true);
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
 
     editor.ShowWindows();
 
-    //texture->draw_in_imgui(0);
 
-    std::function<void(And::Transform* trans, And::Resource<And::ObjLoader>* resource)> obj_draw =  [&g_renderer, &g_shader, &ambient, &point, &texture] (And::Transform* trans, And::Resource<And::ObjLoader>* resource){
-      g_renderer.draw_obj(*(*resource), &(*g_shader), *trans, &ambient, &point, &(*texture) );
-    };    
+    for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>())
+    {
+      g_renderer.draw_obj(obj, &(*g_shader), transform, &ambient, &point);
+    }
 
-    entity_comp.execute_system(obj_draw);
+    g_renderer.get_render_target()->Test();
 
     //ambient.direction[0] -= 0.0001f;
     //printf("Direction0: %f\n", ambient.direction[0]);
