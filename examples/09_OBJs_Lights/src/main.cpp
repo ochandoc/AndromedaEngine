@@ -55,6 +55,7 @@ int main(int argc, char** argv){
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();
   r_manager.AddGenerator<And::ShaderGenerator>();
+  r_manager.AddGenerator<TextureGenerator>();
   
   And::Editor editor{*window, &r_manager};
 
@@ -67,6 +68,9 @@ int main(int argc, char** argv){
 
   // Creamos el shader
   And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
+  And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("teapot_texture.jpg");
+  //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("missing_texture.png");
+  //g_shader->set_texture(texture);
   //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/default_shader_normals.shader");
   
 
@@ -98,6 +102,7 @@ int main(int argc, char** argv){
   //for(int i = -5; i < 5; i++){
     And::MeshComponent MC;
     MC.Mesh = r_manager.NewResource<And::ObjLoader>("sponza.obj");
+
     //std::shared_ptr<And::ObjLoader> obj_teapot = And::ObjLoader::load("teapot.obj");
     //And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::TransformComponent tran;
@@ -152,6 +157,7 @@ int main(int argc, char** argv){
     g_renderer.new_frame();
 
     editor.ShowWindows();
+
 
     for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>())
     {

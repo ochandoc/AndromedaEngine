@@ -6,6 +6,7 @@
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/FlyCamera.h"
 #include "Andromeda/Graphics/Light.h"
+#include "Andromeda/Graphics/OpenGLTexture2D.h"
 
 namespace And
 {
@@ -45,6 +46,8 @@ public:
   void draw_obj(ObjLoader obj, Shader* s, Transform trans, AmbientLight* ambient, PointLight* point);
   void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans);
   void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point);
+  void draw_obj(ObjLoader obj, Shader* s, Transform trans, AmbientLight* ambient, PointLight* point, OpenGLTexture2D* texture);
+
 
 protected:
   Window& m_Window;

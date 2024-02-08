@@ -236,7 +236,7 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
 }
 
-void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* ambient, PointLight* point) {
+void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* ambient, PointLight* point, OpenGLTexture2D* texture) {
 
   if(s){
     s->use();
@@ -259,6 +259,7 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
   s->set_camera_position(m_Camera.GetPosition());
   s->set_light(ambient);
   s->set_light(point);
+  s->set_texture(texture);
   s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
   s->upload_data();
 
@@ -279,6 +280,8 @@ void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
   //err = glGetError();
 
   glEnable(GL_CULL_FACE);

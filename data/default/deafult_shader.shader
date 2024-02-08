@@ -3,6 +3,7 @@
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normals;
+layout(location = 2) in vec2 TexCoord;
 
 struct AmbientLight{
   vec3 direction;
@@ -71,6 +72,7 @@ out vec3 blend_color;
 out vec3 s_normal;
 out vec3 s_fragPos;
 out vec3 camera_pos;
+out vec2 uv;
 
 
 void main(){
@@ -79,6 +81,7 @@ void main(){
   s_fragPos = vec3(model * vec4(position, 1.0));
   s_normal = normals;
   camera_pos = camera_position;
+  uv = TexCoord;
 }
 
 
@@ -86,10 +89,15 @@ void main(){
 #version 430 core
 
 layout(location = 0) out vec4 FragColor;
+
+uniform sampler2D tex;
+in vec2 TexCoord;
+
 in vec3 blend_color;
 in vec3 s_normal;
 in vec3 s_fragPos;
 in vec3 camera_pos;
+in vec2 uv;
 
 struct AmbientLight{
   vec3 direction;
@@ -213,11 +221,12 @@ void main(){
   float test_point = point.enabled + point.position.x + point.position.y + point.position.z + point.diffuse_color.x + point.diffuse_color.y + point.diffuse_color.z + point.specular_color.x + point.specular_color.y + point.specular_color.z + point.specular_strength + point.specular_shininess + point.constant_att + point.linear_att + point.quadratic_att + point.attenuation;
   float test_spot = spot.enabled + spot.position.x + spot.position.y + spot.position.z + spot.direction.x + spot.direction.y + spot.direction.z + spot.cutt_off + spot.outer_cut_off + spot.diffuse_color.x + spot.diffuse_color.y + spot.diffuse_color.z + spot.specular_color.x + spot.specular_color.y + spot.specular_color.z + spot.specular_strength + spot.specular_shininess + spot.constant_att + spot.linear_att + spot.quadratic_att;   
 
+  vec4 tex_color = texture(tex, uv);
   color += CalculeDirLight(ambient_light, s_normal, view_direction, color_base);
+
   color += CalculePointLight(point, s_normal, view_direction, s_fragPos);
   //FragColor = vec4(ambient.diffuse_color.x, ambient.diffuse_color.y, ambient.diffuse_color.z, 1.0);
   FragColor = vec4(color, 1.0);
-
 
   //FragColor = vec4(blend_color, 1.0);
 
