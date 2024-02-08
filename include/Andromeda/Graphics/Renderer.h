@@ -46,7 +46,7 @@ public:
   void draw_obj(ObjLoader obj, Shader* s, Transform trans, AmbientLight* ambient, PointLight* point);
   void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans);
   void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point);
-  void draw_obj(ObjLoader obj, Shader* s, Transform trans, AmbientLight* ambient, PointLight* point, OpenGLTexture2D* texture);
+  void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point, OpenGLTexture2D* texture);
 
 
 protected:

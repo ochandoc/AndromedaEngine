@@ -161,7 +161,7 @@ int main(int argc, char** argv){
 
     for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>())
     {
-      g_renderer.draw_obj(obj, &(*g_shader), transform, &ambient, &point);
+      g_renderer.draw_obj(obj, &(*g_shader), transform, &ambient, &point, &(*texture));
     }
 
     g_renderer.get_render_target()->Test();
