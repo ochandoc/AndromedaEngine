@@ -32,10 +32,10 @@ std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string bas
 
     int inner = 0;
     int outer = 0;
+    Vertex_info v_info;
     for (const auto& shape : shapes) {
         for (const auto& index : shape.mesh.indices) {
 
-            Vertex_info v_info;
   
             // Load vertex
             v_info.position[0] = attrib.vertices[3 * index.vertex_index + 0];
