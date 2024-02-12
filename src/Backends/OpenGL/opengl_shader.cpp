@@ -235,7 +235,7 @@ namespace And{
     m_Data->uniform_buffer_lights->bind();
     glFlush();
 
-    m_texture->bind(0);
+    //m_texture->bind(0);
     
   }
 

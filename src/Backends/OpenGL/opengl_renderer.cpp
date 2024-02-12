@@ -295,6 +295,16 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran,
 
 }
 
+void Renderer::draw_scene(Scene& scene, Shader* s)
+{
+  EntityComponentSystem& ECS = scene.m_ECS;
+
+  for (auto [transform, obj] : ECS.get_components<TransformComponent, MeshComponent>())
+  {
+    draw_obj(obj, s, transform);
+  }
+}
+
 void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point) {
 
   if (s) {
