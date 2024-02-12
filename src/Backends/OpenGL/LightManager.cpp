@@ -6,10 +6,10 @@ namespace And {
 
 
     LightManager::LightManager() {
-        m_ambient_shader = Shader::make_default("lights/ambient.shader", "UniformAmbient");
-        m_directional_shader = Shader::make_default("lights/ambient.shader", "UniformAmbient");
-        m_point_shader = Shader::make_default("lights/ambient.shader", "UniformAmbient");
-        m_spot_shader = Shader::make_default("lights/ambient.shader", "UniformAmbient");
+        m_ambient_shader = Shader::make_default("lights/ambient.shader", "UniformAmbient", LightType::Ambient);
+        //m_directional_shader = Shader::make_default("lights/ambient.shader", "UniformDirectional", LightType::Directional);
+        //m_point_shader = Shader::make_default("lights/ambient.shader", "UniformPoint", LightType::Point);
+        //m_spot_shader = Shader::make_default("lights/ambient.shader", "UniformSpot", LightType::Spot);
     }
 
     LightManager::~LightManager() {
@@ -39,12 +39,12 @@ namespace And {
 
     void LightManager::add_light(std::shared_ptr<PointLight> l) {
 
-        /*Light default_light;
+        Light default_light;
 
         default_light.point = l;
         default_light.type = LightType::Point;
 
-        m_Lights.push_back(default_light);*/
+        //m_Lights.push_back(default_light);
     }
 
     void LightManager::add_light(std::shared_ptr<SpotLight> l) {
@@ -61,14 +61,16 @@ namespace And {
         
         switch (light.type){
         case LightType::Ambient: 
-            m_ambient_shader->set_light(light.ambient.get());
+            m_ambient_shader->use();
+            m_ambient_shader->set_default_light(light.ambient.get());
+            m_ambient_shader->upload_default_data(light.type);
             return m_ambient_shader.get();
             break;
         //case LightType::Directional:m_directional_shader.set_light(light.directional.get());break;
         case LightType::Point:
-            m_point_shader->set_light(light.point.get());
-            return m_point_shader.get();
-            break;
+            //m_point_shader->set_default_light(light.point.get());
+            //return m_point_shader.get();
+            //break;
        // case LightType::Spot:m_spot_shader.set_light(light.spot.get());break;
         
         default:

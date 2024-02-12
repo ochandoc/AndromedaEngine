@@ -54,7 +54,7 @@ int main(int argc, char** argv){
 
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();
-  r_manager.AddGenerator<And::ShaderGenerator>();
+  //r_manager.AddGenerator<And::ShaderGenerator>();
   r_manager.AddGenerator<TextureGenerator>();
   
   And::Editor editor{*window, &r_manager};
@@ -67,7 +67,7 @@ int main(int argc, char** argv){
   //ts.AddTaskInThread("Test", WaitTask, fi);
 
   // Creamos el shader
-  And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
+  //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
   And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("teapot_texture.jpg");
   //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("missing_texture.png");
   //g_shader->set_texture(texture);
@@ -101,7 +101,7 @@ int main(int argc, char** argv){
 
   //for(int i = -5; i < 5; i++){
     And::MeshComponent MC;
-    MC.Mesh = r_manager.NewResource<And::ObjLoader>("sponza.obj");
+    MC.Mesh = r_manager.NewResource<And::ObjLoader>("cube.obj");
 
     //std::shared_ptr<And::ObjLoader> obj_teapot = And::ObjLoader::load("teapot.obj");
     //And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
@@ -112,9 +112,9 @@ int main(int argc, char** argv){
     tran.rotation[0] = 0.0f;
     tran.rotation[1] = 1.0f;
     tran.rotation[2] = 0.0f;
-    tran.scale[0] = 1.0f;
-    tran.scale[1] = 1.0f;
-    tran.scale[2] = 1.0f;
+    tran.scale[0] = 5.0f;
+    tran.scale[1] = 5.0f;
+    tran.scale[2] = 5.0f;
     And::Entity* obj_id = entity_comp.new_entity(MC, tran);
   //}
 
@@ -156,8 +156,8 @@ int main(int argc, char** argv){
   std::shared_ptr<And::AmbientLight> l = std::make_shared<And::AmbientLight>();
   l->enabled = 1.0f;
   l->diffuse_color[0] = 0.0f;
-  l->diffuse_color[1] = 1.0f;
-  l->diffuse_color[2] = 0.0f;
+  l->diffuse_color[1] = 0.0f;
+  l->diffuse_color[2] = 1.0f;
   l->specular_color[0] = 1.0f;
   l->specular_color[1] = 1.0f;
   l->specular_color[2] = 1.0f;
@@ -185,6 +185,7 @@ int main(int argc, char** argv){
     }
 
     g_renderer.get_render_target()->Test();
+    l->diffuse_color[0] += 0.0001f;
 
     //ambient.direction[0] -= 0.0001f;
     //printf("Direction0: %f\n", ambient.direction[0]);

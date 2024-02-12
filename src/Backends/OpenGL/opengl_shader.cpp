@@ -18,6 +18,15 @@ namespace And{
     std::unique_ptr<UniformBuffer> uniform_buffer;
     int buffer_size;
     std::unique_ptr<UniformBuffer> uniform_buffer_lights;
+
+    std::unique_ptr<UniformBuffer> uniform_buffer_ambient;
+    int ambient_size;
+    std::unique_ptr<UniformBuffer> uniform_buffer_directional;
+    int directional_size;
+    std::unique_ptr<UniformBuffer> uniform_buffer_point;
+    int point_size;
+    std::unique_ptr<UniformBuffer> uniform_buffer_spot;
+    int spot_size;
     int buffer_lights_size;
   };
 
@@ -142,6 +151,9 @@ namespace And{
 
       glGetActiveUniformBlockiv(id_program, id_block, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block);
       glGetActiveUniformBlockiv(id_program, id_block_lights, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block_lights);
+
+       glUniformBlockBinding(id_program, id_block, 0);
+      glUniformBlockBinding(id_program, id_block_lights, 1);
       
       //printf("Invalid index-> %u my index-> %d\n", GL_INVALID_INDEX, id_block);
       //int size_struct = sizeof(UniformBlockData);
@@ -156,8 +168,9 @@ namespace And{
       shader->m_Data->shader_info.path_fragment = fragment_shader.c_str();
       shader->m_Data->shader_path = path;
 
-      shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(id_block, (unsigned int)size_block);
-      shader->m_Data->uniform_buffer_lights = std::make_unique<UniformBuffer>(id_block_lights, (unsigned int)size_block_lights);
+      shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(0, (unsigned int)size_block);
+      shader->m_Data->uniform_buffer_lights = std::make_unique<UniformBuffer>(1, (unsigned int)size_block_lights);
+      
       shader->m_uniform_block = std::make_shared<UniformBlockData>();
       shader->m_uniform_block_lights = std::make_shared<UniformLights>();
       
@@ -170,7 +183,7 @@ namespace And{
     return nullptr;
   }
 
-  std::shared_ptr<Shader> Shader::make_default(const std::string& path, const std::string& light_path){
+  std::shared_ptr<Shader> Shader::make_default(const std::string& path, const std::string& light_path, LightType type){
 
     unsigned int id_program = glCreateProgram();
     // Error
@@ -245,6 +258,11 @@ namespace And{
 
       glGetActiveUniformBlockiv(id_program, id_block, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block);
       glGetActiveUniformBlockiv(id_program, id_block_lights, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block_lights);
+
+      glUniformBlockBinding(id_program, id_block, 0);
+      glUniformBlockBinding(id_program, id_block_lights, 2);
+
+      //id_block_lights = glGetUniformBlockIndex(id_program, light_path.c_str());
       
       //printf("Invalid index-> %u my index-> %d\n", GL_INVALID_INDEX, id_block);
       //int size_struct = sizeof(UniformBlockData);
@@ -259,20 +277,38 @@ namespace And{
       shader->m_Data->shader_info.path_fragment = fragment_shader.c_str();
       shader->m_Data->shader_path = path;
 
-      shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(id_block, (unsigned int)size_block);
-      shader->m_Data->uniform_buffer_lights = std::make_unique<UniformBuffer>(id_block_lights, (unsigned int)size_block_lights);
+      shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(0, (unsigned int)size_block);
+      switch(type){
+        case LightType::Ambient: 
+        shader->m_Data->uniform_buffer_ambient = std::make_unique<UniformBuffer>(2, (unsigned int)size_block_lights);
+        shader->m_Data->ambient_size = size_block_lights;
+        shader->m_default_ambient = std::make_shared<AmbientLight>();
+        break;
+        case LightType::Directional: 
+        shader->m_Data->uniform_buffer_directional = std::make_unique<UniformBuffer>(3, (unsigned int)size_block_lights);
+        shader->m_Data->directional_size = size_block_lights;
+        shader->m_default_directional = std::make_shared<DirectionalLight>();
+        break;
+        case LightType::Point: 
+        shader->m_Data->uniform_buffer_point = std::make_unique<UniformBuffer>(4, (unsigned int)size_block_lights);
+        shader->m_Data->point_size = size_block_lights;
+        shader->m_default_point = std::make_shared<PointLight>();
+        break;
+        case LightType::Spot: shader->m_Data->uniform_buffer_spot = std::make_unique<UniformBuffer>(5, (unsigned int)size_block_lights);
+        shader->m_Data->spot_size = size_block_lights;
+        shader->m_default_spot = std::make_shared<SpotLight>();
+        break;
+      }
+
       shader->m_uniform_block = std::make_shared<UniformBlockData>();
-      shader->m_uniform_block_lights = std::make_shared<UniformLights>();
-      
       shader->m_Data->buffer_size = size_block;
-      shader->m_Data->buffer_lights_size = size_block_lights;
+
 
       glFlush();
       return shader;
     }
     return nullptr;
   }
-
 
   void Shader::setMat4(std::string name, const float matrix[16]){ 
     glUniformMatrix4fv(glGetUniformLocation(m_Data->id, name.c_str()), 1, GL_FALSE, &matrix[0]);
@@ -283,6 +319,35 @@ namespace And{
     glUniform3fv(glGetUniformLocation(m_Data->id, name.c_str()),1, &vector[0]);
   }
 
+  void Shader::set_default_light(AmbientLight* light){
+    //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
+
+    m_default_ambient->enabled = light->enabled;
+    m_default_ambient->specular_strength = light->specular_strength;
+    m_default_ambient->specular_shininess = light->specular_shininess;
+
+    for(int i = 0; i < 3; i++){
+      m_default_ambient->direction[i] = light->direction[i];
+      m_default_ambient->diffuse_color[i] = light->diffuse_color[i];
+      m_default_ambient->specular_color[i] = light->specular_color[i];
+    }    
+  }
+
+  void Shader::set_default_light(PointLight* light){
+    m_default_point->enabled = light->enabled;
+    m_default_point->specular_strength = light->specular_strength;
+    m_default_point->specular_shininess = light->specular_shininess;
+    m_default_point->constant_att = light->constant_att;
+    m_default_point->linear_att = light->linear_att;
+    m_default_point->quadratic_att = light->quadratic_att;
+    m_default_point->attenuation = light->attenuation;
+    for(int i = 0; i < 3; i++){
+      m_default_point->position[i] = light->position[i];
+      m_default_point->diffuse_color[i] = light->diffuse_color[i];
+      m_default_point->specular_color[i] = light->specular_color[i];
+    }
+  }
+  
   void Shader::set_light(AmbientLight* light){
     //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
 
@@ -330,16 +395,49 @@ namespace And{
   }
 
   void Shader::upload_data(){
- 
+    
+    // this ubo is for MVP matrices
     m_Data->uniform_buffer->upload_data((void*)(m_uniform_block.get()), (unsigned int)m_Data->buffer_size);
     m_Data->uniform_buffer->bind();
     glFlush();
 
-    m_Data->uniform_buffer_lights->upload_data((void*)(m_uniform_block_lights.get()), (unsigned int)m_Data->buffer_lights_size);
-    m_Data->uniform_buffer_lights->bind();
-    glFlush();
+    
+    //m_Data->uniform_buffer_lights->upload_data((void*)(m_uniform_block_lights.get()), (unsigned int)m_Data->buffer_lights_size);
+    //m_Data->uniform_buffer_lights->bind();
+    //glFlush();
 
     //m_texture->bind(0);
+    
+  }
+
+  void Shader::upload_default_data(LightType type){
+ 
+    //m_Data->uniform_buffer->upload_data((void*)(m_uniform_block.get()), (unsigned int)m_Data->buffer_size);
+    //m_Data->uniform_buffer->bind();
+    //glFlush();
+
+
+    switch(type){
+      case LightType::Ambient:
+        m_Data->uniform_buffer_ambient->upload_data((void*)(m_default_ambient.get()), (unsigned int)m_Data->ambient_size);
+        m_Data->uniform_buffer_ambient->bind();
+        break;
+      case LightType::Directional:
+        m_Data->uniform_buffer_directional->upload_data((void*)(m_default_directional.get()), (unsigned int)m_Data->directional_size);
+        m_Data->uniform_buffer_directional->bind();
+        break;
+      case LightType::Point:
+        m_Data->uniform_buffer_point->upload_data((void*)(m_default_point.get()), (unsigned int)m_Data->point_size);
+        m_Data->uniform_buffer_point->bind();
+        break;
+      case LightType::Spot:
+        m_Data->uniform_buffer_spot->upload_data((void*)(m_default_spot.get()), (unsigned int)m_Data->spot_size);
+        m_Data->uniform_buffer_spot->bind();
+        break;
+    }
+
+    //m_Data->uniform_buffer_lights->bind();
+    glFlush();
     
   }
 

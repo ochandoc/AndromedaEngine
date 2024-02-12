@@ -187,9 +187,9 @@ void CheckError(){
 
 void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
 {
-  if(s){
-    s->use();
-  }
+  //if(s){
+    //s->use();
+  //}
 
   glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
