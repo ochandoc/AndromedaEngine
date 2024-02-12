@@ -101,7 +101,7 @@ int main(int argc, char** argv){
 
   //for(int i = -5; i < 5; i++){
     And::MeshComponent MC;
-    MC.Mesh = r_manager.NewResource<And::ObjLoader>("cube.obj");
+    MC.Mesh = r_manager.NewResource<And::ObjLoader>("sponza.obj");
 
     //std::shared_ptr<And::ObjLoader> obj_teapot = And::ObjLoader::load("teapot.obj");
     //And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
@@ -155,8 +155,8 @@ int main(int argc, char** argv){
   And::LightManager l_manager;
   std::shared_ptr<And::AmbientLight> l = std::make_shared<And::AmbientLight>();
   l->enabled = 1.0f;
-  l->diffuse_color[0] = 0.0f;
-  l->diffuse_color[1] = 0.0f;
+  l->diffuse_color[0] = 1.0f;
+  l->diffuse_color[1] = 1.0f;
   l->diffuse_color[2] = 1.0f;
   l->specular_color[0] = 1.0f;
   l->specular_color[1] = 1.0f;
@@ -185,7 +185,7 @@ int main(int argc, char** argv){
     }
 
     g_renderer.get_render_target()->Test();
-    l->diffuse_color[0] += 0.0001f;
+    //l->diffuse_color[0] += 0.0001f;
 
     //ambient.direction[0] -= 0.0001f;
     //printf("Direction0: %f\n", ambient.direction[0]);
