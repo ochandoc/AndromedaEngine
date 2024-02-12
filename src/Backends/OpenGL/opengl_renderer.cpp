@@ -108,7 +108,6 @@ std::shared_ptr<RenderTarget> Renderer::get_render_target() const
   return m_RenderTarget;
 }
 
-
 void Renderer::draw_triangle(Triangle *t){
     
   Vertex *v = t->get_vertex();
@@ -149,7 +148,6 @@ void Renderer::draw_triangle(Triangle *t){
   
 }
 
-
 void CheckError(){
   GLenum error = glGetError();
   switch (error) {
@@ -189,7 +187,7 @@ void CheckError(){
 
 void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
 {
-  if (s) {
+  if(s){
     s->use();
   }
 
@@ -207,9 +205,9 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
 
-  s->setMat4("view", glm::value_ptr(viewMatrix));
-  s->setMat4("projection", glm::value_ptr(projectionMatrix));
-  s->setMat4("model", glm::value_ptr(modelMatrix));
+  s->set_camera_position(m_Camera.GetPosition());
+  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
+  s->upload_data();
 
   unsigned int VBO = obj->Mesh->get_vbo();
   unsigned int VAO = obj->Mesh->get_vao();

@@ -120,9 +120,9 @@ int main(int argc, char** argv){
 
   And::AmbientLight ambient;
   ambient.enabled = 1.0f;
-  ambient.diffuse_color[0] = 1.0f;
+  ambient.diffuse_color[0] = 0.0f;
   ambient.diffuse_color[1] = 1.0f;
-  ambient.diffuse_color[2] = 1.0f;
+  ambient.diffuse_color[2] = 0.0f;
   ambient.specular_color[0] = 1.0f;
   ambient.specular_color[1] = 1.0f;
   ambient.specular_color[2] = 1.0f;
@@ -151,6 +151,22 @@ int main(int argc, char** argv){
   point.quadratic_att = 1.8f;
   point.attenuation = 40.0f;
 
+
+  And::LightManager l_manager;
+  std::shared_ptr<And::AmbientLight> l = std::make_shared<And::AmbientLight>();
+  l->enabled = 1.0f;
+  l->diffuse_color[0] = 0.0f;
+  l->diffuse_color[1] = 1.0f;
+  l->diffuse_color[2] = 0.0f;
+  l->specular_color[0] = 1.0f;
+  l->specular_color[1] = 1.0f;
+  l->specular_color[2] = 1.0f;
+  l->direction[0] = 1.0f;
+  l->direction[1] = 1.0f;
+  l->direction[2] = 0.0f;
+  l_manager.add_light(l);
+
+
   g_renderer.set_draw_on_texture(true);
   while (window->is_open()){
     window->update();
@@ -158,10 +174,14 @@ int main(int argc, char** argv){
 
     editor.ShowWindows();
 
+    for (auto light : l_manager.get_lights()) {
 
-    for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>())
-    {
-      g_renderer.draw_obj(obj, &(*g_shader), transform, &ambient, &point, &(*texture));
+        And::Shader* s = l_manager.bind_light(light);
+
+        for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>())
+        {
+          g_renderer.draw_obj(obj, s, transform);
+        }
     }
 
     g_renderer.get_render_target()->Test();

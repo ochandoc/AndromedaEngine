@@ -42,6 +42,7 @@ namespace And{
 
     //static std::shared_ptr<Shader> make(ShaderInfo s_info);
     static std::shared_ptr<Shader> make(const std::string& path);
+    static std::shared_ptr<Shader> make_default(const std::string& path, const std::string& light_path);
     Shader(const Shader& other) = delete;
     Shader(Shader&& other);
     ~Shader();

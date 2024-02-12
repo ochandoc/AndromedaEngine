@@ -10,6 +10,7 @@
 
 namespace And{
 
+// Tengo que crearme un uniform buffer de cada tipo de luz
   struct ShaderData{
     unsigned int id;
     ShaderInfo shader_info;
@@ -169,6 +170,109 @@ namespace And{
     return nullptr;
   }
 
+  std::shared_ptr<Shader> Shader::make_default(const std::string& path, const std::string& light_path){
+
+    unsigned int id_program = glCreateProgram();
+    // Error
+    if(id_program == 0){
+        //return std::nullopt;
+      return nullptr;
+    }
+
+    Slurp file{path.c_str()};
+    std::string shaders{file.data(), file.size()};
+
+    int vertex_pos = (int)shaders.find("#type Vertex");
+    int fragment_pos = (int)shaders.find("#type Fragment");
+
+    std::string vertex_shader;
+    std::string fragment_shader;
+
+    if(vertex_pos != std::string::npos && fragment_pos != std::string::npos){
+      vertex_shader = shaders.substr(vertex_pos, fragment_pos);
+      fragment_shader = shaders.substr(fragment_pos, shaders.size() - 1);
+
+      std::string vertex_title = "#type Vertex";
+      std::string fragment_title = "#type Fragment";
+
+      vertex_shader.erase(0, vertex_title.size());
+      fragment_shader.erase(0, fragment_title.size());
+
+      unsigned int id_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+      unsigned int id_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+
+      const char* aux_v = vertex_shader.c_str();
+      const char* aux_f = fragment_shader.c_str();
+
+      glShaderSource(id_vertex_shader, 1, &aux_v, nullptr);
+      glShaderSource(id_fragment_shader, 1, &aux_f, nullptr);
+
+      // Compilamos
+      glCompileShader(id_vertex_shader);
+      glCompileShader(id_fragment_shader);
+
+      GetShaderError(id_vertex_shader);
+      GetShaderError(id_fragment_shader);
+
+      if(!GetShaderError(id_vertex_shader) && !GetShaderError(id_fragment_shader)){
+        // Si no hay error atachamos
+        glAttachShader(id_program, id_vertex_shader);
+        glAttachShader(id_program, id_fragment_shader);
+      }else{
+        // Error
+        printf("Error on loading shader\n");
+        return nullptr;
+      }
+
+      // Cuando ya tenemos todos los shader compilados, linkamos el program
+      glLinkProgram(id_program);
+      glValidateProgram(id_program);
+
+      int succes;
+      glGetProgramiv(id_program, GL_VALIDATE_STATUS, &succes);
+      if(succes != GL_TRUE){
+        printf("Error on loading shader\n");
+        return nullptr;
+      }
+
+      unsigned int id_block = glGetUniformBlockIndex(id_program, "UniformBlock");
+
+      // this block must be for ambient, directional, point or spotlight
+      unsigned int id_block_lights = glGetUniformBlockIndex(id_program, light_path.c_str());
+
+      int size_block;
+      int size_block_lights;
+
+      glGetActiveUniformBlockiv(id_program, id_block, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block);
+      glGetActiveUniformBlockiv(id_program, id_block_lights, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block_lights);
+      
+      //printf("Invalid index-> %u my index-> %d\n", GL_INVALID_INDEX, id_block);
+      //int size_struct = sizeof(UniformBlockData);
+      //int size_struct_lights = sizeof(UniformLights);
+      //printf("Size in C++: %d size in gl: %d\n", size_struct, size_block);
+      //printf("Size in C++: %d size in gl: %d\n", size_struct_lights, size_block_lights);
+
+      // Llegados hasta aqui, todo ha ido bien y creamos el shader
+      std::shared_ptr<Shader> shader = std::shared_ptr<Shader>(new Shader);
+      shader->m_Data->id = id_program;
+      shader->m_Data->shader_info.path_vertex = vertex_shader.c_str();
+      shader->m_Data->shader_info.path_fragment = fragment_shader.c_str();
+      shader->m_Data->shader_path = path;
+
+      shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(id_block, (unsigned int)size_block);
+      shader->m_Data->uniform_buffer_lights = std::make_unique<UniformBuffer>(id_block_lights, (unsigned int)size_block_lights);
+      shader->m_uniform_block = std::make_shared<UniformBlockData>();
+      shader->m_uniform_block_lights = std::make_shared<UniformLights>();
+      
+      shader->m_Data->buffer_size = size_block;
+      shader->m_Data->buffer_lights_size = size_block_lights;
+
+      glFlush();
+      return shader;
+    }
+    return nullptr;
+  }
+
 
   void Shader::setMat4(std::string name, const float matrix[16]){ 
     glUniformMatrix4fv(glGetUniformLocation(m_Data->id, name.c_str()), 1, GL_FALSE, &matrix[0]);
@@ -235,7 +339,7 @@ namespace And{
     m_Data->uniform_buffer_lights->bind();
     glFlush();
 
-    m_texture->bind(0);
+    //m_texture->bind(0);
     
   }
 
