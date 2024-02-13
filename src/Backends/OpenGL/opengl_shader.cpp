@@ -236,7 +236,6 @@ namespace And{
     glFlush();
 
     //m_texture->bind(0);
-    
   }
 
   void Shader::configure_shader(){

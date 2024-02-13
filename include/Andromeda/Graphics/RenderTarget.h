@@ -14,7 +14,7 @@ namespace And
   class RenderTarget
   {
   public:
-    RenderTarget(uint32 width, uint32 height);
+    RenderTarget(uint32 width, uint32 height, const std::vector<ETextureFormat>& TextureFormats);
     ~RenderTarget();
 
     void Bind();

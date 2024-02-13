@@ -77,6 +77,7 @@ int main(int argc, char** argv){
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
 
+
   
   And::EntityComponentSystem entity_comp;
     
@@ -157,7 +158,6 @@ int main(int argc, char** argv){
     g_renderer.new_frame();
 
     editor.ShowWindows();
-
 
     for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>())
     {

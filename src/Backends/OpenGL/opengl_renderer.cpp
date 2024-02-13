@@ -43,7 +43,8 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   ImGui_ImplOpenGL3_Init("#version 430 core");
 
   {
-    m_RenderTarget = std::make_shared<RenderTarget>(width, height);
+    std::vector<ETextureFormat> Formats = { ETextureFormat::RGBA8, ETextureFormat::RGBA8, ETextureFormat::Depth };
+    m_RenderTarget = std::make_shared<RenderTarget>(width, height, Formats);
     m_Window.OnWindowResize.AddDynamic(m_RenderTarget.get(), &RenderTarget::Resize);
     m_bDrawOnTexture = false;
   }
