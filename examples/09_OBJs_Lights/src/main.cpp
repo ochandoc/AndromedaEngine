@@ -155,8 +155,8 @@ int main(int argc, char** argv){
   And::LightManager l_manager;
   std::shared_ptr<And::AmbientLight> l = std::make_shared<And::AmbientLight>();
   l->enabled = 1.0f;
-  l->diffuse_color[0] = 1.0f;
-  l->diffuse_color[1] = 1.0f;
+  l->diffuse_color[0] = 0.0f;
+  l->diffuse_color[1] = 0.0f;
   l->diffuse_color[2] = 1.0f;
   l->specular_color[0] = 1.0f;
   l->specular_color[1] = 1.0f;
@@ -165,6 +165,35 @@ int main(int argc, char** argv){
   l->direction[1] = 1.0f;
   l->direction[2] = 0.0f;
   l_manager.add_light(l);
+  
+  std::shared_ptr<And::AmbientLight> l2 = std::make_shared<And::AmbientLight>();
+  l2->enabled = 1.0f;
+  l2->diffuse_color[0] = 0.0f;
+  l2->diffuse_color[1] = 1.0f;
+  l2->diffuse_color[2] = 0.0f;
+  l2->specular_color[0] = 1.0f;
+  l2->specular_color[1] = 1.0f;
+  l2->specular_color[2] = 1.0f;
+  l2->direction[0] = 1.0f;
+  l2->direction[1] = 1.0f;
+  l2->direction[2] = 0.0f;
+  l_manager.add_light(l2);
+  
+  std::shared_ptr<And::PointLight> point_light = std::make_shared<And::PointLight>();
+  point_light->enabled = 1.0f;
+  point_light->diffuse_color[0] = 0.0f;
+  point_light->diffuse_color[1] = 1.0f;
+  point_light->diffuse_color[2] = 0.0f;
+  point_light->specular_color[0] = 1.0f;
+  point_light->specular_color[1] = 1.0f;
+  point_light->specular_color[2] = 1.0f;
+  point_light->specular_strength = 1.0f;
+  point_light->specular_shininess = 1.0f;
+  point_light->constant_att = 1.0f;
+  point_light->linear_att = 0.7f;
+  point_light->quadratic_att = 1.8f;
+  point_light->attenuation = 40.0f;
+  l_manager.add_light(point_light);
 
 
   g_renderer.set_draw_on_texture(true);

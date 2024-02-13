@@ -217,6 +217,8 @@ namespace And{
       const char* aux_v = vertex_shader.c_str();
       const char* aux_f = fragment_shader.c_str();
 
+      printf("%s\n %s\n", aux_v, aux_f);
+
       glShaderSource(id_vertex_shader, 1, &aux_v, nullptr);
       glShaderSource(id_fragment_shader, 1, &aux_f, nullptr);
 
@@ -260,7 +262,6 @@ namespace And{
       glGetActiveUniformBlockiv(id_program, id_block_lights, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block_lights);
 
       glUniformBlockBinding(id_program, id_block, 0);
-      glUniformBlockBinding(id_program, id_block_lights, 2);
 
       //id_block_lights = glGetUniformBlockIndex(id_program, light_path.c_str());
       
@@ -280,21 +281,25 @@ namespace And{
       shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(0, (unsigned int)size_block);
       switch(type){
         case LightType::Ambient: 
-        shader->m_Data->uniform_buffer_ambient = std::make_unique<UniformBuffer>(2, (unsigned int)size_block_lights);
+        glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Ambient);
+        shader->m_Data->uniform_buffer_ambient = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Ambient, (unsigned int)size_block_lights);
         shader->m_Data->ambient_size = size_block_lights;
         shader->m_default_ambient = std::make_shared<AmbientLight>();
         break;
         case LightType::Directional: 
-        shader->m_Data->uniform_buffer_directional = std::make_unique<UniformBuffer>(3, (unsigned int)size_block_lights);
+        glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Directional);
+        shader->m_Data->uniform_buffer_directional = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Directional, (unsigned int)size_block_lights);
         shader->m_Data->directional_size = size_block_lights;
         shader->m_default_directional = std::make_shared<DirectionalLight>();
         break;
         case LightType::Point: 
-        shader->m_Data->uniform_buffer_point = std::make_unique<UniformBuffer>(4, (unsigned int)size_block_lights);
+        glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Point);
+        shader->m_Data->uniform_buffer_point = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Point, (unsigned int)size_block_lights);
         shader->m_Data->point_size = size_block_lights;
         shader->m_default_point = std::make_shared<PointLight>();
         break;
-        case LightType::Spot: shader->m_Data->uniform_buffer_spot = std::make_unique<UniformBuffer>(5, (unsigned int)size_block_lights);
+        case LightType::Spot: shader->m_Data->uniform_buffer_spot = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Spot, (unsigned int)size_block_lights);
+        glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Spot);
         shader->m_Data->spot_size = size_block_lights;
         shader->m_default_spot = std::make_shared<SpotLight>();
         break;

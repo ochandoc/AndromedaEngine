@@ -62,6 +62,8 @@ void Renderer::new_frame()
   //glDepthMask(GL_FALSE);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_ONE, GL_ONE);
 
   if (m_bDrawOnTexture)
   {

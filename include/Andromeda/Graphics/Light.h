@@ -13,6 +13,13 @@ enum class LightType : unsigned int{
   Spot
 };
 
+enum class LightBindingPoint : unsigned int{
+  Ambient = 2,
+  Directional = 3,
+  Point = 4,
+  Spot = 5
+};
+
 /*struct Light{
   float enabled = 0.5f;
   float position[3] = {0.5f, 0.5f, 0.5f};
