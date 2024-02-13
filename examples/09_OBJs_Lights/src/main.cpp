@@ -19,7 +19,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <future>
-
+#include <chrono>
 #include "Andromeda.h"
 
 
@@ -164,13 +164,13 @@ int main(int argc, char** argv){
   l->direction[0] = 1.0f;
   l->direction[1] = 1.0f;
   l->direction[2] = 0.0f;
-  l_manager.add_light(l);
+  //l_manager.add_light(l);
   
   std::shared_ptr<And::DirectionalLight> l2 = std::make_shared<And::DirectionalLight>();
   l2->enabled = 1.0f;
-  l2->diffuse_color[0] = 0.0f;
+  l2->diffuse_color[0] = 1.0f;
   l2->diffuse_color[1] = 1.0f;
-  l2->diffuse_color[2] = 0.0f;
+  l2->diffuse_color[2] = 1.0f;
   l2->specular_color[0] = 1.0f;
   l2->specular_color[1] = 1.0f;
   l2->specular_color[2] = 1.0f;
@@ -198,18 +198,22 @@ int main(int argc, char** argv){
 
   g_renderer.set_draw_on_texture(true);
   while (window->is_open()){
+
     window->update();
     g_renderer.new_frame();
-
     editor.ShowWindows();
 
     for (auto light : l_manager.get_lights()) {
 
         And::Shader* s = l_manager.bind_light(light);
-
+        
+        //start = std::chrono::high_resolution_clock::now();
         for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
           g_renderer.draw_obj(obj, s, transform);
         }
+        //end = std::chrono::high_resolution_clock::now();
+        //elapsed = end - start;
+        //printf("Duration inner loop-> %f\n", elapsed.count() * 1000.0f);
     }
 
     g_renderer.get_render_target()->Test();

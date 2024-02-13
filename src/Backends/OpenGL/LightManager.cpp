@@ -68,7 +68,8 @@ namespace And {
             return m_ambient_shader.get();
             break;
         case LightType::Directional:
-            glBlendFunc(GL_ONE, GL_ONE);
+            //glDepthFunc(GL_LEQUAL);
+            //glBlendFunc(GL_ONE, GL_ONE);
             m_directional_shader->use();
             m_directional_shader->set_default_light(light.directional.get());
             m_directional_shader->upload_default_data(light.type);

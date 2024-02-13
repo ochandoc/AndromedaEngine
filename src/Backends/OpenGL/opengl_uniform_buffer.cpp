@@ -28,7 +28,7 @@ void UniformBuffer::upload_data(const void* data, unsigned int size){
   //glBufferSubData(GL_UNIFORM_BUFFER, 0, size, data);
   glNamedBufferSubData(m_Id, 0, size, data);
   glBindBuffer(GL_UNIFORM_BUFFER, 0);
-  glFlush();
+  //glFlush();
 }
 
 // Estas funciones no hacen falta si hago el glNamedBufferSubData

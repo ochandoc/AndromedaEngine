@@ -177,7 +177,7 @@ namespace And{
       shader->m_Data->buffer_size = size_block;
       shader->m_Data->buffer_lights_size = size_block_lights;
 
-      glFlush();
+      //glFlush();
       return shader;
     }
     return nullptr;
@@ -309,7 +309,7 @@ namespace And{
       shader->m_Data->buffer_size = size_block;
 
 
-      glFlush();
+      //glFlush();
       return shader;
     }
     return nullptr;
@@ -418,7 +418,7 @@ namespace And{
     // this ubo is for MVP matrices
     m_Data->uniform_buffer->upload_data((void*)(m_uniform_block.get()), (unsigned int)m_Data->buffer_size);
     m_Data->uniform_buffer->bind();
-    glFlush();
+    //glFlush();
 
     
     //m_Data->uniform_buffer_lights->upload_data((void*)(m_uniform_block_lights.get()), (unsigned int)m_Data->buffer_lights_size);
@@ -456,7 +456,7 @@ namespace And{
     }
 
     //m_Data->uniform_buffer_lights->bind();
-    glFlush();
+    //glFlush();
     
   }
 

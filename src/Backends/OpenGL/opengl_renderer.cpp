@@ -197,7 +197,9 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   //if(s){
     //s->use();
   //}
-
+  //auto start = std::chrono::high_resolution_clock::now();
+  
+    
   glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
 
@@ -222,16 +224,12 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
 
-
-  std::vector<Vertex_info> vertices = obj->Mesh->getVertexInfo();
-
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
+  const std::vector<Vertex_info>& vertices = obj->Mesh->getVertexInfo();
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-
 
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
