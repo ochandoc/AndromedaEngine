@@ -5,7 +5,7 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normals;
 layout(location = 2) in vec2 TexCoord;
 
-struct AmbientLight{
+struct DirectionalLight{
   vec3 direction;
   float enabled;
   vec3 diffuse_color;
@@ -16,7 +16,6 @@ struct AmbientLight{
 
 
 
-
 layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
   mat4 view;
@@ -24,8 +23,8 @@ layout (std140, binding = 0) uniform UniformBlock{
   vec3 camera_position;
 };
 
-layout (std140, binding = 2) uniform UniformAmbient{
-  AmbientLight ambient_light;
+layout (std140, binding = 3) uniform UniformDirectional{
+  DirectionalLight directional_light;
 };
 
 
@@ -51,7 +50,7 @@ void main(){
 
 layout(location = 0) out vec4 FragColor;
 
-
+uniform sampler2D tex;
 in vec2 TexCoord;
 
 in vec3 blend_color;
@@ -60,7 +59,7 @@ in vec3 s_fragPos;
 in vec3 camera_pos;
 in vec2 uv;
 
-struct AmbientLight{
+struct DirectionalLight{
   vec3 direction;
   float enabled;
   vec3 diffuse_color;
@@ -78,16 +77,43 @@ layout (std140, binding = 0) uniform UniformBlock{
   vec3 camera_position;
 };
 
-layout (std140, binding = 2) uniform UniformAmbient{
-  AmbientLight ambient_light;
+layout (std140, binding = 3) uniform UniformDirectional{
+  DirectionalLight directional_light;
 };
 
+
+vec3 CalculeDirLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 color_base) {
+
+  //vec3 dir = vec3(0.5, 0.5, 0.0);  
+
+  /*---Difuse---*/
+  //float diff = max(dot(normal, dir), 0.0);
+  float diff = max(dot(normal, light.direction), 0.0);
+  vec3 diffuse = diff * light.diffuse_color * color_base.xyz;
+
+  /*---Specular---*/
+
+  //vec3 reflectDir = normalize(reflect(-(dir), normalize(normal))  );
+  vec3 reflectDir = normalize(reflect(-(light.direction), normalize(normal))  );
+  float spec = pow(max(dot(normalize(viewDir), normalize(reflectDir)), 0.0), light.specular_shininess);
+  vec3 specular = light.specular_strength * spec * light.specular_color * color_base.xyz;
+
+  //return (diffuse + specular * light.active);
+  return (diffuse * light.enabled);
+}
 
 
 void main(){
   vec3 view_direction = normalize(camera_pos - s_fragPos);
   float ambient_strength = 0.01;
-  vec3 color = ambient_strength * ambient_light.diffuse_color;
+  vec3 ambient_color = vec3(1.0);
+  ambient_color = ambient_strength * ambient_color;
+  vec3 color = ambient_color;
+  vec3 color_base = vec3(0.5, 0.5, 0.5);
 
-  FragColor = vec4(ambient_light.diffuse_color, 1.0);
+  color = CalculeDirLight(directional_light, s_normal, view_direction, color_base);
+
+  FragColor = vec4(color, 1.0);
+
+
 }

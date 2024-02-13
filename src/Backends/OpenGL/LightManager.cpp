@@ -1,5 +1,6 @@
 #include "Andromeda/Graphics/Light.h"
 #include "Andromeda/Graphics/Shader.h"
+#include "Backends/OpenGL/OpenGL.h"
 
 namespace And {
 
@@ -7,8 +8,8 @@ namespace And {
 
     LightManager::LightManager() {
         m_ambient_shader = Shader::make_default("lights/ambient.shader", "UniformAmbient", LightType::Ambient);
-        //m_directional_shader = Shader::make_default("lights/ambient.shader", "UniformDirectional", LightType::Directional);
-        m_point_shader = Shader::make_default("lights/point.shader", "UniformPoint", LightType::Point);
+        m_directional_shader = Shader::make_default("lights/directional.shader", "UniformDirectional", LightType::Directional);
+        //m_point_shader = Shader::make_default("lights/point.shader", "UniformPoint", LightType::Point);
         //m_spot_shader = Shader::make_default("lights/ambient.shader", "UniformSpot", LightType::Spot);
     }
 
@@ -67,10 +68,11 @@ namespace And {
             return m_ambient_shader.get();
             break;
         case LightType::Directional:
+            glBlendFunc(GL_ONE, GL_ONE);
             m_directional_shader->use();
-            //m_directional_shader->set_default_light(light.directional.get());
-            //m_directional_shader->upload_default_data(light.type);
-            //return m_directional_shader.get();
+            m_directional_shader->set_default_light(light.directional.get());
+            m_directional_shader->upload_default_data(light.type);
+            return m_directional_shader.get();
             break;
         case LightType::Point:
             m_point_shader->use();

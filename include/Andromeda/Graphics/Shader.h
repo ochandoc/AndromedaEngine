@@ -65,6 +65,7 @@ namespace And{
     
     void set_default_light(AmbientLight* light);
     void set_default_light(PointLight* light);
+    void set_default_light(DirectionalLight* light);
 
     void set_camera_position(const float position[3]);
 

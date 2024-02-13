@@ -155,9 +155,9 @@ int main(int argc, char** argv){
   And::LightManager l_manager;
   std::shared_ptr<And::AmbientLight> l = std::make_shared<And::AmbientLight>();
   l->enabled = 1.0f;
-  l->diffuse_color[0] = 0.0f;
-  l->diffuse_color[1] = 0.0f;
-  l->diffuse_color[2] = 1.0f;
+  l->diffuse_color[0] = 0.4f;
+  l->diffuse_color[1] = 0.4f;
+  l->diffuse_color[2] = 0.4f;
   l->specular_color[0] = 1.0f;
   l->specular_color[1] = 1.0f;
   l->specular_color[2] = 1.0f;
@@ -166,7 +166,7 @@ int main(int argc, char** argv){
   l->direction[2] = 0.0f;
   l_manager.add_light(l);
   
-  std::shared_ptr<And::AmbientLight> l2 = std::make_shared<And::AmbientLight>();
+  std::shared_ptr<And::DirectionalLight> l2 = std::make_shared<And::DirectionalLight>();
   l2->enabled = 1.0f;
   l2->diffuse_color[0] = 0.0f;
   l2->diffuse_color[1] = 1.0f;
@@ -193,7 +193,7 @@ int main(int argc, char** argv){
   point_light->linear_att = 0.7f;
   point_light->quadratic_att = 1.8f;
   point_light->attenuation = 40.0f;
-  l_manager.add_light(point_light);
+  //l_manager.add_light(point_light);
 
 
   g_renderer.set_draw_on_texture(true);
@@ -207,8 +207,7 @@ int main(int argc, char** argv){
 
         And::Shader* s = l_manager.bind_light(light);
 
-        for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>())
-        {
+        for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
           g_renderer.draw_obj(obj, s, transform);
         }
     }

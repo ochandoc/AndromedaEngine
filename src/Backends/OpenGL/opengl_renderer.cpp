@@ -58,12 +58,17 @@ void Renderer::new_frame()
   ImGui_ImplOpenGL3_NewFrame(); 
 	m_Window.new_frame();
   ImGui::NewFrame();
-  glEnable(GL_DEPTH_TEST);
+
   //glDepthMask(GL_FALSE);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+  glEnable(GL_DEPTH_TEST);
+  //glDepthFunc(GL_LEQUAL);
+
   glEnable(GL_BLEND);
-  glBlendFunc(GL_ONE, GL_ONE);
+  glBlendFunc(GL_ONE, GL_ZERO);
 
   if (m_bDrawOnTexture)
   {

@@ -337,6 +337,20 @@ namespace And{
       m_default_ambient->specular_color[i] = light->specular_color[i];
     }    
   }
+  
+  void Shader::set_default_light(DirectionalLight* light){
+    //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
+
+    m_default_directional->enabled = light->enabled;
+    m_default_directional->specular_strength = light->specular_strength;
+    m_default_directional->specular_shininess = light->specular_shininess;
+
+    for(int i = 0; i < 3; i++){
+      m_default_directional->direction[i] = light->direction[i];
+      m_default_directional->diffuse_color[i] = light->diffuse_color[i];
+      m_default_directional->specular_color[i] = light->specular_color[i];
+    }    
+  }
 
   void Shader::set_default_light(PointLight* light){
     m_default_point->enabled = light->enabled;
