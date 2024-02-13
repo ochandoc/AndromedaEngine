@@ -272,9 +272,7 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran,
   //err = glGetError();
 
 
-  std::vector<Vertex_info> vertices = obj->Mesh->getVertexInfo();  
-
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
+  const std::vector<Vertex_info>& vertices = obj->Mesh->getVertexInfo();  
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
