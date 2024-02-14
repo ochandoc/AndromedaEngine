@@ -31,7 +31,7 @@
 #include "Andromeda/Graphics/ObjGenerator.h"
 #include "Andromeda/Graphics/Shader.h"
 #include "Andromeda/Graphics/ShaderGenerator.h"
-#include "Andromeda/Graphics/OpenGLTexture2D.h"
+#include "Andromeda/Graphics/Texture.h"
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/Triangle.h"
 

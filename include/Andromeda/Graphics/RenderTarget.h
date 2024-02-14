@@ -2,28 +2,38 @@
 
 #include "Andromeda/Misc/CoreMiscDefines.h"
 #include "Andromeda/HAL/Types.h"
+#include "Andromeda/Graphics/Texture.h"
 
 namespace And
 {
-  enum class ETextureFormat
+  struct RenderTargetCreationInfo
   {
-    RGBA8,
-    Depth,
+    uint32 Width;
+    uint32 Height;
+    std::vector<ETextureFormat> Formats;
   };
 
   class RenderTarget
   {
+    NON_COPYABLE_CLASS(RenderTarget);
+    NON_MOVABLE_CLASS(RenderTarget);
   public:
-    RenderTarget(uint32 width, uint32 height, const std::vector<ETextureFormat>& TextureFormats);
-    ~RenderTarget();
+    RenderTarget() = default;
 
-    void Bind();
-    void Unbind();
-    void Resize(uint32 width, uint32 height);
+    virtual ~RenderTarget() = default;
 
-    void Test();
+    virtual void Activate() const = 0;
+    virtual void Desactivate() const = 0;
+    virtual void Resize(uint32 width, uint32 height) = 0;
 
-  private:
-    std::unique_ptr<struct RenderTargetData> m_Data;
+    inline const std::vector<std::shared_ptr<Texture>>& GetTextures() const { return m_Textures; }
+    inline const RenderTargetCreationInfo& GetCreationInfo() { return m_CretionInfo; }
+
+  protected:
+    RenderTargetCreationInfo m_CretionInfo;
+    std::vector<std::shared_ptr<Texture>> m_Textures;
   };
+
+  std::shared_ptr<RenderTarget> MakeRenderTarget(const RenderTargetCreationInfo& CreationInfo);
+
 }

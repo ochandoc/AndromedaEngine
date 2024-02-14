@@ -55,7 +55,7 @@ int main(int argc, char** argv){
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();
   r_manager.AddGenerator<And::ShaderGenerator>();
-  r_manager.AddGenerator<TextureGenerator>();
+  //r_manager.AddGenerator<TextureGenerator>();
   
   And::Editor editor{*window, &r_manager};
 
@@ -68,7 +68,8 @@ int main(int argc, char** argv){
 
   // Creamos el shader
   And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
-  And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("teapot_texture.jpg");
+  std::shared_ptr<And::Texture> texture = And::MakeTexture("teapot_texture.jpg");
+  //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("teapot_texture.jpg");
   //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("missing_texture.png");
   //g_shader->set_texture(texture);
   //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/default_shader_normals.shader");
@@ -164,7 +165,7 @@ int main(int argc, char** argv){
       g_renderer.draw_obj(obj, &(*g_shader), transform, &ambient, &point, &(*texture));
     }
 
-    g_renderer.get_render_target()->Test();
+    //g_renderer.get_render_target()->Test();
 
     //ambient.direction[0] -= 0.0001f;
     //printf("Direction0: %f\n", ambient.direction[0]);

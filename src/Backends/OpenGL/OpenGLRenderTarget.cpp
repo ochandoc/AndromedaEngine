@@ -1,114 +1,98 @@
-#include "Andromeda/Graphics/RenderTarget.h"
+#include "Backends/OpenGL/OpenGLRenderTarget.h"
 
+#include "Backends/OpenGL/OpenGLTexture2D.h"
 #include "Backends/OpenGL/OpenGL.h"
 
 #include "imgui.h"
 
 namespace And
 {
-  struct RenderTargetTextureData
+  OpenGLRenderTarget::OpenGLRenderTarget() : m_Id(0)
   {
-    ETextureFormat Format;
-    uint32 Id;
-  };
 
-  struct RenderTargetData
+  }
+
+  OpenGLRenderTarget::OpenGLRenderTarget(ENoInit) : OpenGLRenderTarget()
   {
-    uint32 Id;
-    std::vector<RenderTargetTextureData> Textures;
-  };
-}
+  }
 
-
-And::RenderTarget::RenderTarget(uint32 width, uint32 height, const std::vector<ETextureFormat>& TextureFormats) : m_Data(new RenderTargetData)
-{
-  for (ETextureFormat Format : TextureFormats)
+  OpenGLRenderTarget::~OpenGLRenderTarget()
   {
-    RenderTargetTextureData& TextureData = m_Data->Textures.emplace_back();
-    TextureData.Format = Format;
+    m_Textures.clear();
 
-    switch (Format)
+    if (m_Id)
     {
-    case And::ETextureFormat::RGBA8:
-      {
-        glGenTextures(1, &TextureData.Id);
-        glBindTexture(GL_TEXTURE_2D, TextureData.Id);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-      }
-      break;
-    case And::ETextureFormat::Depth:
-      {
-        glGenTextures(1, &TextureData.Id);
-        glBindTexture(GL_TEXTURE_2D, TextureData.Id);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-      }
-      break;
+      glDeleteFramebuffers(1, &m_Id);
     }
   }
 
-  glGenFramebuffers(1, &m_Data->Id);
-  glBindFramebuffer(GL_FRAMEBUFFER, m_Data->Id);
-
-  for (RenderTargetTextureData& Textures : m_Data->Textures)
+  std::shared_ptr<OpenGLRenderTarget> OpenGLRenderTarget::Make(const RenderTargetCreationInfo& CreationInfo)
   {
-    switch (Textures.Format)
-    {
-    case And::ETextureFormat::RGBA8:
-    {
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, Textures.Id, 0);
-    }
-    break;
-    case And::ETextureFormat::Depth:
-    {
-      glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, Textures.Id, 0);
-    }
-    break;
-    }
-  }  
-  assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
+    uint64 Size = CreationInfo.Width * CreationInfo.Height;
+    if (Size == 0) return std::shared_ptr<OpenGLRenderTarget>();
 
-And::RenderTarget::~RenderTarget()
-{
-  for (RenderTargetTextureData& Texture : m_Data->Textures)
-  {
-    glDeleteTextures(1, &Texture.Id);
+    std::shared_ptr<OpenGLRenderTarget> Rendertarget(new OpenGLRenderTarget);
+
+    TextureCreationInfo TexCreationInfo;
+    TexCreationInfo.Width = CreationInfo.Width;
+    TexCreationInfo.Height = CreationInfo.Height;
+    TexCreationInfo.Mipmaps = false;
+    for (ETextureFormat Format : CreationInfo.Formats)
+    {
+      TexCreationInfo.Format = Format;
+      Rendertarget->m_Textures.push_back(MakeTexture(TexCreationInfo));
+    }
+
+    glGenFramebuffers(1, &Rendertarget->m_Id);
+    glBindFramebuffer(GL_FRAMEBUFFER, Rendertarget->m_Id);
+
+    uint32 ColorIndex = 0;
+    for (std::shared_ptr<Texture>& Textures : Rendertarget->m_Textures)
+    {
+      OpenGLTexture2D* OpenGlTexture = dynamic_cast<OpenGLTexture2D*>(Textures.get());
+      switch (OpenGlTexture->GetFormat())
+      {
+      case And::ETextureFormat::RGBA8:
+        {
+          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ColorIndex, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
+          ++ColorIndex;
+        }
+        break;
+      case And::ETextureFormat::RGB8:
+        {
+          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ColorIndex, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
+          ++ColorIndex;
+        }
+        break;
+      case And::ETextureFormat::Depth:
+        {
+          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
+        }
+        break;
+      }
+    }
+    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    return Rendertarget;
   }
-  glDeleteFramebuffers(1, &m_Data->Id);
+
+  void OpenGLRenderTarget::Activate() const
+  {
+    glBindFramebuffer(GL_FRAMEBUFFER, m_Id);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  }
+
+  void OpenGLRenderTarget::Desactivate() const
+  {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  }
+
+  void OpenGLRenderTarget::Resize(uint32 width, uint32 height)
+  {
+  }
 }
 
-void And::RenderTarget::Bind()
-{
-  glBindFramebuffer(GL_FRAMEBUFFER, m_Data->Id);
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void And::RenderTarget::Unbind()
-{
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void And::RenderTarget::Resize(uint32 width, uint32 height)
-{
-}
-
-void And::RenderTarget::Test()
+/*void And::RenderTarget::Test()
 {
   ImGuiStyle& style = ImGui::GetStyle();
   ImVec2 padding = style.WindowPadding;
@@ -129,6 +113,6 @@ void And::RenderTarget::Test()
   };
 
   style.WindowPadding = padding;
-}
+}*/
 
 

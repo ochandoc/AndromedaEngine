@@ -16,6 +16,7 @@
 
 #include "Andromeda/ECS/Components/TransformComponent.h"
 #include "Andromeda/ECS/Components/MeshComponent.h"
+#include "Backends/OpenGL/OpenGLTexture2D.h"
 
 namespace And
 {
@@ -42,12 +43,12 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   window.imgui_start();
   ImGui_ImplOpenGL3_Init("#version 430 core");
 
-  {
+  /* {
     std::vector<ETextureFormat> Formats = { ETextureFormat::RGBA8, ETextureFormat::RGBA8, ETextureFormat::Depth };
     m_RenderTarget = std::make_shared<RenderTarget>(width, height, Formats);
     m_Window.OnWindowResize.AddDynamic(m_RenderTarget.get(), &RenderTarget::Resize);
     m_bDrawOnTexture = false;
-  }
+  }*/
 }
 
 Renderer::~Renderer(){
@@ -64,17 +65,17 @@ void Renderer::new_frame()
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  if (m_bDrawOnTexture)
+  /*if (m_bDrawOnTexture)
   {
     m_RenderTarget->Bind();
-  }
+  }*/
   //glDepthFunc(GL_ALWAYS);
   //glClearDepthf(0.5f);
 }
 
 void Renderer::end_frame()
 {
-  m_RenderTarget->Unbind();
+  //m_RenderTarget->Unbind();
   //ImPlot::ShowDemoWindow();
   //ImGui::ShowDemoWindow();
 
@@ -237,8 +238,7 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
 }
 
-void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point, OpenGLTexture2D* texture) {
-
+void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point, Texture* texture) {
   if(s){
     s->use();
   }
