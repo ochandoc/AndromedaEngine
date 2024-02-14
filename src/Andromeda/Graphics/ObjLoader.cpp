@@ -110,6 +110,8 @@ std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string bas
   // Desbindeamos el vao
   glBindVertexArray(0);  
 
+  obj.filename_ = std::string(filename);
+
   WAIT_GPU_LOAD()
   return std::make_shared<ObjLoader>(obj);
 }
@@ -125,6 +127,11 @@ const std::vector<Vertex_info>& ObjLoader::getVertexInfo(){
 
 const std::vector<unsigned int>& ObjLoader::getIndices(){
   return m_indices;
+}
+
+ObjLoader::~ObjLoader() {
+  printf("Destruction %s\n", filename_.c_str());
+
 }
 
 

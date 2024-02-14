@@ -64,7 +64,6 @@ struct SpotLight{
   float constant_att = 0.5f;
   float linear_att = 0.5f;
   float quadratic_att = 0.5f; // 80 bytes
-  float attenuation = 1.0f;
 };
 
 struct Light{

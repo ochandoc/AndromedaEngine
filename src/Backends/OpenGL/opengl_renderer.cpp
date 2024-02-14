@@ -237,6 +237,8 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
 
   const std::vector<unsigned int>& indices = obj->Mesh->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+  //glFlush();
+  //WAIT_GPU_LOAD();
 }
 
 void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point, OpenGLTexture2D* texture) {

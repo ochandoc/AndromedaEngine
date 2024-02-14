@@ -100,12 +100,14 @@ int main(int argc, char** argv){
   }*/
 
   //for(int i = -5; i < 5; i++){
-    And::MeshComponent MC;
+    And::MeshComponent MC, MC_teapot;
     MC.Mesh = r_manager.NewResource<And::ObjLoader>("sponza.obj");
+    MC_teapot.Mesh = r_manager.NewResource<And::ObjLoader>("teapot.obj");
 
     //std::shared_ptr<And::ObjLoader> obj_teapot = And::ObjLoader::load("teapot.obj");
     //And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::TransformComponent tran;
+    And::TransformComponent tran_teapot;
     tran.position[0] = 0.0f;
     tran.position[1] = 0.0f;
     tran.position[2] = 0.0f;
@@ -115,7 +117,18 @@ int main(int argc, char** argv){
     tran.scale[0] = 5.0f;
     tran.scale[1] = 5.0f;
     tran.scale[2] = 5.0f;
+    
+    tran_teapot.position[0] = 0.0f;
+    tran_teapot.position[1] = 2.0f;
+    tran_teapot.position[2] = 0.0f;
+    tran_teapot.rotation[0] = 0.0f;
+    tran_teapot.rotation[1] = 1.0f;
+    tran_teapot.rotation[2] = 0.0f;
+    tran_teapot.scale[0] = 2.0f;
+    tran_teapot.scale[1] = 2.0f;
+    tran_teapot.scale[2] = 2.0f;
     And::Entity* obj_id = entity_comp.new_entity(MC, tran);
+    //And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
   //}
 
   And::AmbientLight ambient;
@@ -177,7 +190,7 @@ int main(int argc, char** argv){
   l2->direction[0] = 1.0f;
   l2->direction[1] = 1.0f;
   l2->direction[2] = 0.0f;
-  l_manager.add_light(l2);
+  //l_manager.add_light(l2);
   
   std::shared_ptr<And::PointLight> point_light = std::make_shared<And::PointLight>();
   point_light->enabled = 1.0f;
@@ -193,7 +206,42 @@ int main(int argc, char** argv){
   point_light->linear_att = 0.7f;
   point_light->quadratic_att = 1.8f;
   point_light->attenuation = 40.0f;
-  //l_manager.add_light(point_light);
+  l_manager.add_light(point_light);
+
+
+  std::shared_ptr<And::SpotLight> spot_light = std::make_shared<And::SpotLight>();
+  spot_light->enabled = 1.0f;
+  spot_light->diffuse_color[0] = 1.0f;
+  spot_light->diffuse_color[1] = 0.0f;
+  spot_light->diffuse_color[2] = 0.0f;
+  spot_light->specular_color[0] = 1.0f;
+  spot_light->specular_color[1] = 1.0f;
+  spot_light->specular_color[2] = 1.0f;
+  spot_light->position[0] = 1.0f;
+  spot_light->position[1] = 1.0f;
+  spot_light->position[2] = 1.0f;
+  spot_light->direction[0] = 0.0f;
+  spot_light->direction[1] = 0.0f;
+  spot_light->direction[2] = -1.0f;
+  spot_light->specular_strength = 0.003f;
+  spot_light->specular_shininess = 8.0f;
+  spot_light->constant_att = 1.0f;
+  spot_light->linear_att = 0.014f;
+  spot_light->quadratic_att = 0.0007f;
+  spot_light->cutt_off = 12.5f;
+  spot_light->cutt_off = 17.5f;
+  //l_manager.add_light(spot_light);
+
+
+  /*Light(Light::Type t, 
+  glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), 
+  glm::vec3 att = glm::vec3(1.0f, 0.014f, 0.0007f),
+  glm::vec3 col = glm::vec3(1.0f, 1.0f, 1.0f), 
+  glm::vec3 dir = glm::vec3(0.0f, 0.0f, -1.0f), 
+  float cut = 12.5f, 
+  float outer_cut = 17.5f);*/
+
+
 
 
   g_renderer.set_draw_on_texture(true);
@@ -203,7 +251,7 @@ int main(int argc, char** argv){
     g_renderer.new_frame();
     editor.ShowWindows();
 
-    for (auto light : l_manager.get_lights()) {
+     for (auto light : l_manager.get_lights()) {
 
         And::Shader* s = l_manager.bind_light(light);
         

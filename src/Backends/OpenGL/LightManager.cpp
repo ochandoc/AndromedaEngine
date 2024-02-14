@@ -9,8 +9,8 @@ namespace And {
     LightManager::LightManager() {
         m_ambient_shader = Shader::make_default("lights/ambient.shader", "UniformAmbient", LightType::Ambient);
         m_directional_shader = Shader::make_default("lights/directional.shader", "UniformDirectional", LightType::Directional);
-        //m_point_shader = Shader::make_default("lights/point.shader", "UniformPoint", LightType::Point);
-        //m_spot_shader = Shader::make_default("lights/ambient.shader", "UniformSpot", LightType::Spot);
+        m_point_shader = Shader::make_default("lights/point.shader", "UniformPoint", LightType::Point);
+        m_spot_shader = Shader::make_default("lights/spot.shader", "UniformSpot", LightType::Spot);
     }
 
     LightManager::~LightManager() {
@@ -82,11 +82,11 @@ namespace And {
             return m_point_shader.get();
             break;
         case LightType::Spot:
-            //m_spot_shader->use();
-            //m_spot_shader->set_default_light(light.spot.get());
-            //m_spot_shader->upload_default_data(light.type);
-            //return m_spot_shader.get();
-            //break;
+            m_spot_shader->use();
+            m_spot_shader->set_default_light(light.spot.get());
+            m_spot_shader->upload_default_data(light.type);
+            return m_spot_shader.get();
+            break;
         
         default:
             break;

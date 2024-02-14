@@ -75,7 +75,6 @@ struct PointLight{
   float linear_att;
   float quadratic_att;
   float enabled;
-  //float padding;
   float attenuation; // 64 bytes
 };
 
@@ -86,7 +85,7 @@ layout (std140, binding = 0) uniform UniformBlock{
   vec3 camera_position;
 };
 
-layout (std140, binding = 1) uniform UniformPoint{
+layout (std140, binding = 4) uniform UniformPoint{
   PointLight point;
 };
 

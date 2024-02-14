@@ -217,7 +217,7 @@ namespace And{
       const char* aux_v = vertex_shader.c_str();
       const char* aux_f = fragment_shader.c_str();
 
-      printf("%s\n %s\n", aux_v, aux_f);
+      //printf("%s\n %s\n", aux_v, aux_f);
 
       glShaderSource(id_vertex_shader, 1, &aux_v, nullptr);
       glShaderSource(id_fragment_shader, 1, &aux_f, nullptr);
@@ -261,6 +261,8 @@ namespace And{
       glGetActiveUniformBlockiv(id_program, id_block, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block);
       glGetActiveUniformBlockiv(id_program, id_block_lights, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block_lights);
 
+      printf("Size of Spot in c++ %zu size in opengl %d\n", sizeof(SpotLight), size_block_lights);
+
       glUniformBlockBinding(id_program, id_block, 0);
 
       //id_block_lights = glGetUniformBlockIndex(id_program, light_path.c_str());
@@ -298,8 +300,9 @@ namespace And{
         shader->m_Data->point_size = size_block_lights;
         shader->m_default_point = std::make_shared<PointLight>();
         break;
-        case LightType::Spot: shader->m_Data->uniform_buffer_spot = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Spot, (unsigned int)size_block_lights);
+        case LightType::Spot: 
         glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Spot);
+        shader->m_Data->uniform_buffer_spot = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Spot, (unsigned int)size_block_lights);
         shader->m_Data->spot_size = size_block_lights;
         shader->m_default_spot = std::make_shared<SpotLight>();
         break;
@@ -364,6 +367,23 @@ namespace And{
       m_default_point->position[i] = light->position[i];
       m_default_point->diffuse_color[i] = light->diffuse_color[i];
       m_default_point->specular_color[i] = light->specular_color[i];
+    }
+  }
+
+  void Shader::set_default_light(SpotLight* light){
+    m_default_spot->enabled = light->enabled;
+    m_default_spot->specular_strength = light->specular_strength;
+    m_default_spot->specular_shininess = light->specular_shininess;
+    m_default_spot->constant_att = light->constant_att;
+    m_default_spot->linear_att = light->linear_att;
+    m_default_spot->quadratic_att = light->quadratic_att;
+    m_default_spot->cutt_off = light->cutt_off;
+    m_default_spot->outer_cut_off = light->outer_cut_off;
+    for(int i = 0; i < 3; i++){
+      m_default_spot->position[i] = light->position[i];
+      m_default_spot->diffuse_color[i] = light->diffuse_color[i];
+      m_default_spot->specular_color[i] = light->specular_color[i];
+      m_default_spot->direction[i] = light->direction[i];
     }
   }
   
