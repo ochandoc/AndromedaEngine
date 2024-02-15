@@ -89,5 +89,5 @@ void main(){
   float ambient_strength = 0.01;
   vec3 color = ambient_strength * ambient_light.diffuse_color;
 
-  FragColor = vec4(ambient_light.diffuse_color, 1.0);
+  FragColor = vec4(color, 1.0);
 }

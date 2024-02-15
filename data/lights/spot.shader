@@ -7,14 +7,17 @@ layout(location = 2) in vec2 TexCoord;
 
 
 struct SpotLight{
-  float enabled;
   vec3 position;
-  float cutt_off;
+  float padding3;
   vec3 direction;
-  float outer_cut_off;
+  float padding;
   vec3 diffuse_color;
-  float specular_strength;
+  float padding2;
   vec3 specular_color;
+  float enabled;
+  float cutt_off;
+  float outer_cut_off;
+  float specular_strength;
   float specular_shininess;
   float constant_att;
   float linear_att;
@@ -66,14 +69,17 @@ in vec2 uv;
 
 
 struct SpotLight{
-  float enabled;
   vec3 position;
-  float cutt_off;
+  float padding3;
   vec3 direction;
-  float outer_cut_off;
+  float padding;
   vec3 diffuse_color;
-  float specular_strength;
+  float padding2;
   vec3 specular_color;
+  float enabled;
+  float cutt_off;
+  float outer_cut_off;
+  float specular_strength;
   float specular_shininess;
   float constant_att;
   float linear_att;

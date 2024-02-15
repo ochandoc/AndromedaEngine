@@ -206,7 +206,7 @@ int main(int argc, char** argv){
   point_light->linear_att = 0.7f;
   point_light->quadratic_att = 1.8f;
   point_light->attenuation = 40.0f;
-  l_manager.add_light(point_light);
+  //l_manager.add_light(point_light);
 
 
   std::shared_ptr<And::SpotLight> spot_light = std::make_shared<And::SpotLight>();
@@ -218,19 +218,19 @@ int main(int argc, char** argv){
   spot_light->specular_color[1] = 1.0f;
   spot_light->specular_color[2] = 1.0f;
   spot_light->position[0] = 1.0f;
-  spot_light->position[1] = 1.0f;
-  spot_light->position[2] = 1.0f;
+  spot_light->position[1] = 65.0f;
+  spot_light->position[2] = 0.0f;
   spot_light->direction[0] = 0.0f;
   spot_light->direction[1] = 0.0f;
-  spot_light->direction[2] = -1.0f;
+  spot_light->direction[2] = 1.0f;
   spot_light->specular_strength = 0.003f;
   spot_light->specular_shininess = 8.0f;
   spot_light->constant_att = 1.0f;
   spot_light->linear_att = 0.014f;
   spot_light->quadratic_att = 0.0007f;
-  spot_light->cutt_off = 12.5f;
-  spot_light->cutt_off = 17.5f;
-  //l_manager.add_light(spot_light);
+  spot_light->cutt_off = 2.5f;
+  spot_light->outer_cut_off= 17.5f;
+  l_manager.add_light(spot_light);
 
 
   /*Light(Light::Type t, 

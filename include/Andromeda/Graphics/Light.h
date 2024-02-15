@@ -52,14 +52,17 @@ struct PointLight{
 };
 
 struct SpotLight{
-  float enabled = 0.5f;
   float position[3] = {0.5f, 0.5f, 0.5f};
-  float cutt_off = 0.5f;
+  float padding3 = -1.0f;
   float direction[3] = {0.5f, 0.5f, 0.5f};
-  float outer_cut_off = 0.5f;
+  float padding = -1.0f;
   float diffuse_color[3] = {0.5f, 0.5f, 0.5f};
-  float specular_strength = 0.5f;
+  float padding2 = -1.0f;
   float specular_color[3] = {0.5f, 0.5f, 0.5f};
+  float enabled = 0.5f;
+  float cutt_off = 0.5f;
+  float outer_cut_off = 0.5f;
+  float specular_strength = 0.5f;
   float specular_shininess = 0.5f;
   float constant_att = 0.5f;
   float linear_att = 0.5f;
