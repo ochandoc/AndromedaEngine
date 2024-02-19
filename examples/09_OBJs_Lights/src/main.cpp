@@ -114,9 +114,9 @@ int main(int argc, char** argv){
     tran.rotation[0] = 0.0f;
     tran.rotation[1] = 1.0f;
     tran.rotation[2] = 0.0f;
-    tran.scale[0] = 5.0f;
-    tran.scale[1] = 5.0f;
-    tran.scale[2] = 5.0f;
+    tran.scale[0] = 1.0f;
+    tran.scale[1] = 1.0f;
+    tran.scale[2] = 1.0f;
     
     tran_teapot.position[0] = 0.0f;
     tran_teapot.position[1] = 2.0f;
@@ -217,12 +217,12 @@ int main(int argc, char** argv){
   spot_light->specular_color[0] = 1.0f;
   spot_light->specular_color[1] = 1.0f;
   spot_light->specular_color[2] = 1.0f;
-  spot_light->position[0] = 1.0f;
-  spot_light->position[1] = 65.0f;
+  spot_light->position[0] = 0.0f;
+  spot_light->position[1] = 5.0f;
   spot_light->position[2] = 0.0f;
   spot_light->direction[0] = 0.0f;
   spot_light->direction[1] = 0.0f;
-  spot_light->direction[2] = 1.0f;
+  spot_light->direction[2] = -1.0f;
   spot_light->specular_strength = 0.003f;
   spot_light->specular_shininess = 8.0f;
   spot_light->constant_att = 1.0f;

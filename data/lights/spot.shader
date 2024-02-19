@@ -86,6 +86,24 @@ struct SpotLight{
   float quadratic_att; // 80 bytes
 };
 
+struct Light{
+  vec3 position;
+  float padding3;
+  vec3 direction;
+  float padding;
+  vec3 diffuse_color;
+  float padding2;
+  vec3 specular_color;
+  float enabled;
+  float cutt_off;
+  float outer_cut_off;
+  float specular_strength;
+  float specular_shininess;
+  float constant_att;
+  float linear_att;
+  float quadratic_att; // 80 bytes
+};
+
 layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
   mat4 view;
@@ -96,6 +114,47 @@ layout (std140, binding = 0) uniform UniformBlock{
 layout (std140, binding = 5) uniform UniformSpot{
   SpotLight spot;
 };
+
+Light CalcLight(vec3 light_direction, vec3 light_color){
+  vec3 viewDir = normalize(camera_position - s_fragPos);
+  Light light;
+
+  float diff = max(dot(s_normal, light_direction),0.0);
+  light.diffuse_color = diff * light_color;// * texture(u_texture, uv).rgb;
+
+  vec3 reflectDir = reflect(-light_direction, s_normal);
+  float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+
+  light.specular_color = 0.5 * spec * vec3(1.0, 1.0, 1.0); // * texture(u_texture, uv).rgb;
+
+  return light;
+}
+
+vec3 CalculeSpotLightJou(SpotLight spot){
+
+  vec3 lightDir  = normalize(spot.position - s_fragPos);
+  float cut_off = cos(spot.cutt_off * 3.1415/180);
+  float outer_cut_off = cos(spot.outer_cut_off * 3.1415/180);
+  Light light = CalcLight(lightDir, spot.diffuse_color);
+
+  float distance = length(spot.position - s_fragPos);
+
+  float k0 = spot.linear_att;
+  float k1 = spot.linear_att;
+  float k2 = spot.quadratic_att;
+
+  float attenuationAmount = 1.0 / (k0 + (k1*distance) + k2* (distance*distance));
+  light.diffuse_color *= attenuationAmount ;
+  light.specular_color *= attenuationAmount;
+  float theta = dot(lightDir,normalize(-spot.direction));//0.5
+
+  float epsilon = (cut_off - outer_cut_off); // 0.9978 - 0.953 /
+  float intensity = clamp((theta - outer_cut_off) / epsilon, 0.0, 1.0); //  0.5 - 0.953 / 0.9978 - 0.953
+  light.diffuse_color  *= intensity;
+  light.specular_color *= intensity;
+
+  return light.diffuse_color + light.specular_color;
+}
 
 vec3 CalculeSpotLight(SpotLight light, vec3 normal, vec3 viewDir, vec3 fragPos) {
   vec3 lightDir = normalize(light.position - fragPos);
@@ -139,7 +198,7 @@ void main(){
   //vec3 color = ambient_color;
   vec3 color_base = vec3(0.5, 0.5, 0.5);
   
-  vec3 color = CalculeSpotLight(spot, s_normal, view_direction, s_fragPos);
+  vec3 color = CalculeSpotLightJou(spot);
 
 
   FragColor = vec4(color, 1.0);
