@@ -235,8 +235,7 @@ namespace And{
     m_Data->uniform_buffer_lights->bind();
     glFlush();
 
-    m_texture->bind(0);
-    
+    //m_texture->bind(0);
   }
 
   void Shader::configure_shader(){
@@ -248,7 +247,7 @@ namespace And{
     m_Data->uniform_buffer_lights->unbind();
   }
 
-  void Shader::set_texture(OpenGLTexture2D* texture){
+  void Shader::set_texture(Texture* texture){
     m_texture = texture;
   }
 

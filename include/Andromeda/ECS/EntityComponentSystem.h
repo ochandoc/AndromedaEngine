@@ -4,10 +4,11 @@
 #include "Andromeda/HAL/Types.h"
 
 #include "Andromeda/Misc/ID.h"
-#include "Andromeda/ECS/Entity.h"
 
 namespace And
 {
+	class Entity;
+
 	namespace internal
 	{
 		template<typename T>
@@ -336,89 +337,33 @@ namespace And
 		}
 
 		template<typename... comps_t>
-		Entity* new_entity(comps_t... comps)
-		{
-			std::unique_ptr<Entity> new_e(new Entity);
+		Entity* new_entity(comps_t... comps);
 
-			Entity* ett = new_e.get();
-			ett->m_ECS = this;
-
-			(add_entity_component<comps_t>(ett, comps), ...);
-
-			m_Entities.push_back(std::move(new_e));
-
-			return ett;
-		}
-
-		void remove_entity(Entity e)
+		void remove_entity(Entity* e)
 		{
 			for (auto& [key, value] : m_Components)
 			{
-				value->remove(e.get_id());
+				value->remove(e->get_id());
 			}
 		}
 
 		template<typename comp_t>
-		comp_t* get_entity_component(Entity* e)
-		{
-			if (!e) return;
-			size_t type_id = typeid(comp_t).hash_code();
-			internal::component_list_imp<comp_t>* list = static_cast<internal::component_list_imp<comp_t>*>(m_Components[type_id].get());
-			return list->get_component(e->get_id());
-		}
+		comp_t* get_entity_component(Entity* e);
 
 		template<typename comp_t>
-		void add_entity_component(Entity* e, comp_t& comp)
-		{
-			if (!e) return;
-			size_t type_id = typeid(comp_t).hash_code();
-			internal::component_list_imp<comp_t>* list = static_cast<internal::component_list_imp<comp_t>*>(m_Components[type_id].get());
-			assert(list->get_component(e->get_id()) == nullptr && "Component already inserted in the entity");
-			comp_t* c = list->add(e->get_id(), comp);
-			c->SetOwner(e);
-		}
+		void add_entity_component(Entity* e, comp_t& comp);
 
 		template<typename comp_t>
-		void remove_entity_component(Entity* e)
-		{
-			if (!e) return;
-			size_t type_id = typeid(comp_t).hash_code();
-			internal::component_list_imp<comp_t>* list = static_cast<internal::component_list_imp<comp_t>*>(m_Components[type_id].get());
-			assert(list->get_component(e->get_id()) != nullptr && "Component already inserted in the entity");
-			list->remove(e->get_id());
-		}
+		void remove_entity_component(Entity* e);
 
 		template<typename func_t, typename... comps_t>
-		void execute_system(func_t system(comps_t*...))
-		{
-			assert((m_Components.contains(typeid(comps_t).hash_code()) && ...) && "Component class not registered!");
-			internal::tuple_iterator<comps_t...> it((*static_cast<internal::component_list_imp<comps_t>*>(m_Components[typeid(comps_t).hash_code()].get()))...);
-			while (!it.finished())
-			{
-				std::tuple<comps_t*...> tuple = *it;
-				call_system(system, tuple, std::make_integer_sequence<int, sizeof...(comps_t)>{});
-				++it;
-			}
-		}
+		void execute_system(func_t system(comps_t*...));
 
 		template<typename... comps_t>
-		void execute_system(std::function<void(comps_t*...)> system)
-		{
-			assert((m_Components.contains(typeid(comps_t).hash_code()) && ...) && "Component class not registered!");
-			internal::tuple_iterator<comps_t...> it((*static_cast<internal::component_list_imp<comps_t>*>(m_Components[typeid(comps_t).hash_code()].get()))...);
-			while (!it.finished())
-			{
-				std::tuple<comps_t*...> tuple = *it;
-				call_system(system, tuple, std::make_integer_sequence<int, sizeof...(comps_t)>{});
-				++it;
-			}
-		}
+		void execute_system(std::function<void(comps_t*...)> system);
 
 		template<typename... comps_t>
-		ComponentVectorWraper<comps_t...> get_components()
-		{
-			return ComponentVectorWraper<comps_t...>((*static_cast<internal::component_list_imp<comps_t>*>(m_Components[typeid(comps_t).hash_code()].get()))...);
-		}
+		ComponentVectorWraper<comps_t...> get_components();
 
 	private:
 
@@ -432,4 +377,87 @@ namespace And
 		std::vector<std::unique_ptr<Entity>> m_Entities;
 	};
 
+}
+
+#include "Andromeda/ECS/Entity.h"
+
+namespace And
+{
+	template<typename... comps_t>
+	Entity* EntityComponentSystem::new_entity(comps_t... comps)
+	{
+		std::unique_ptr<Entity> new_e(new Entity);
+
+		Entity* ett = new_e.get();
+		ett->m_ECS = this;
+
+		(add_entity_component<comps_t>(ett, comps), ...);
+
+		m_Entities.push_back(std::move(new_e));
+
+		return ett;
+	}
+
+
+	template<typename comp_t>
+	comp_t* EntityComponentSystem::get_entity_component(Entity* e)
+	{
+		if (!e) return nullptr;
+		size_t type_id = typeid(comp_t).hash_code();
+		internal::component_list_imp<comp_t>* list = static_cast<internal::component_list_imp<comp_t>*>(m_Components[type_id].get());
+		return list->get_component(e->get_id());
+	}
+
+	template<typename comp_t>
+	void EntityComponentSystem::add_entity_component(Entity* e, comp_t& comp)
+	{
+		if (!e) return;
+		size_t type_id = typeid(comp_t).hash_code();
+		internal::component_list_imp<comp_t>* list = static_cast<internal::component_list_imp<comp_t>*>(m_Components[type_id].get());
+		assert(list->get_component(e->get_id()) == nullptr && "Component already inserted in the entity");
+		comp_t* c = list->add(e->get_id(), comp);
+		c->SetOwner(e);
+	}
+
+	template<typename comp_t>
+	void EntityComponentSystem::remove_entity_component(Entity* e)
+	{
+		if (!e) return;
+		size_t type_id = typeid(comp_t).hash_code();
+		internal::component_list_imp<comp_t>* list = static_cast<internal::component_list_imp<comp_t>*>(m_Components[type_id].get());
+		assert(list->get_component(e->get_id()) != nullptr && "Component already inserted in the entity");
+		list->remove(e->get_id());
+	}
+
+	template<typename func_t, typename... comps_t>
+	void EntityComponentSystem::execute_system(func_t system(comps_t*...))
+	{
+		assert((m_Components.contains(typeid(comps_t).hash_code()) && ...) && "Component class not registered!");
+		internal::tuple_iterator<comps_t...> it((*static_cast<internal::component_list_imp<comps_t>*>(m_Components[typeid(comps_t).hash_code()].get()))...);
+		while (!it.finished())
+		{
+			std::tuple<comps_t*...> tuple = *it;
+			call_system(system, tuple, std::make_integer_sequence<int, sizeof...(comps_t)>{});
+			++it;
+		}
+	}
+
+	template<typename... comps_t>
+	void EntityComponentSystem::execute_system(std::function<void(comps_t*...)> system)
+	{
+		assert((m_Components.contains(typeid(comps_t).hash_code()) && ...) && "Component class not registered!");
+		internal::tuple_iterator<comps_t...> it((*static_cast<internal::component_list_imp<comps_t>*>(m_Components[typeid(comps_t).hash_code()].get()))...);
+		while (!it.finished())
+		{
+			std::tuple<comps_t*...> tuple = *it;
+			call_system(system, tuple, std::make_integer_sequence<int, sizeof...(comps_t)>{});
+			++it;
+		}
+	}
+
+	template<typename... comps_t>
+	ComponentVectorWraper<comps_t...> EntityComponentSystem::get_components()
+	{
+		return ComponentVectorWraper<comps_t...>((*static_cast<internal::component_list_imp<comps_t>*>(m_Components[typeid(comps_t).hash_code()].get()))...);
+	}
 }
