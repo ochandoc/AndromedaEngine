@@ -49,6 +49,15 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
     m_Window.OnWindowResize.AddDynamic(m_RenderTarget.get(), &RenderTarget::Resize);
     m_bDrawOnTexture = false;
   }*/
+  RenderTargetCreationInfo info;
+  info.Width = width;
+  info.Height = height;
+  info.Formats.push_back(ETextureFormat::Depth);
+  m_shadows_buffer_ = MakeRenderTarget(info);
+
+
+  // Crear shader de profundidad
+  m_depth_shader = Shader::make_default("lights/depth_shader.shader", "none", LightType::None);
 }
 
 Renderer::~Renderer(){
@@ -71,7 +80,7 @@ void Renderer::new_frame()
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ZERO);
 
-  if (m_bDrawOnTexture)
+  //if (m_bDrawOnTexture)
 
   /*if (m_bDrawOnTexture)
   {
@@ -366,6 +375,46 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran,
 
 }
 
+void Renderer::draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, float* view, float* projection){
+
+  glm::mat4 modelMatrix = glm::mat4(1.0f);
+
+  glm::vec3 objectPosition = glm::vec3(tran->position[0], tran->position[1], tran->position[2]);
+  glm::vec3 objectScale = glm::vec3(tran->scale[0], tran->scale[1], tran->scale[2]);
+  float rotationAngle = 0.0f;
+  glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
+
+  modelMatrix = glm::scale(modelMatrix, objectScale);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::translate(modelMatrix, objectPosition);
+
+  s->set_camera_position(m_Camera.GetPosition());
+  s->setModelViewProj(glm::value_ptr(modelMatrix), view, projection);
+  s->upload_data();
+
+  unsigned int VBO = obj->Mesh->get_vbo();
+  unsigned int VAO = obj->Mesh->get_vao();
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBindVertexArray(VAO);
+
+  const std::vector<Vertex_info>& vertices = obj->Mesh->getVertexInfo();
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glEnable(GL_DEPTH_TEST);
+
+  const std::vector<unsigned int>& indices = obj->Mesh->getIndices();
+  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+  //glFlush();
+  //WAIT_GPU_LOAD();
+}
+
 void Renderer::showDemo(){
 
   float triangle[6] = {
@@ -409,6 +458,32 @@ void Renderer::showImGuiDemoWindow()
 {
   ImGui::ShowDemoWindow();
 }
+std::shared_ptr<RenderTarget> Renderer::get_shadow_buffer(){
+  return m_shadows_buffer_;
+}
+
+void Renderer::draw_shadows(Light l, MeshComponent* obj, TransformComponent* tran){
+
+  // Pintar cada obj de la escena con el shader de profundidad y guardar todo lo que pinte en el render target
+  // sacar la view y projeciton de la posicion de la luz
+  glm::vec3 pos(l.spot->position[0],l.spot->position[1], l.spot->position[2]);
+  glm::vec3 dir(l.spot->direction[0],l.spot->direction[1], l.spot->direction[2]);
+  glm::vec3 up(0.0f, 1.0f, 0.0f);
+
+  glm::vec3 right = glm::normalize(glm::cross(up, dir));
+  up = glm::cross(dir, right);
+  glm::mat4 view = glm::lookAt(pos, pos + glm::normalize(dir), up);
+  int width = m_shadows_buffer_->GetCreationInfo().Width;
+  int height = m_shadows_buffer_->GetCreationInfo().Height;
+  
+  glm::perspective persp(glm::radians(l.spot->outer_cut_off), width / height, 10.0f, 310.0f);
 
 
+  m_depth_shader->use();
+  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));
+
+
+
+
+}
 }

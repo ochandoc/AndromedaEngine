@@ -253,13 +253,20 @@ namespace And{
       unsigned int id_block = glGetUniformBlockIndex(id_program, "UniformBlock");
 
       // this block must be for ambient, directional, point or spotlight
-      unsigned int id_block_lights = glGetUniformBlockIndex(id_program, light_path.c_str());
+      unsigned int id_block_lights = -1;
+      if(type != LightType::None){
+        id_block_lights = glGetUniformBlockIndex(id_program, light_path.c_str());
+      }
 
       int size_block;
-      int size_block_lights;
+      int size_block_lights = -1;
 
       glGetActiveUniformBlockiv(id_program, id_block, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block);
-      glGetActiveUniformBlockiv(id_program, id_block_lights, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block_lights);
+
+      if(type != LightType::None){
+        glGetActiveUniformBlockiv(id_program, id_block_lights, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block_lights);
+      }
+        
 
       printf("Size of Spot in c++ %zu size in opengl %d\n", sizeof(SpotLight), size_block_lights);
 

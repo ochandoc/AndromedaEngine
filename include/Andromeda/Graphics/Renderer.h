@@ -47,8 +47,13 @@ public:
   void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans);
   void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point);
   void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point, Texture* texture);
+  void draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* tran,float* view, float* projection);
 
   void draw_scene(Scene& scene, Shader* s);
+
+  void draw_shadows(Light l, MeshComponent* obj, TransformComponent* tran);
+  std::shared_ptr<RenderTarget> get_shadow_buffer();
+
 
 protected:
   Window& m_Window;
@@ -58,6 +63,9 @@ private:
   bool m_bDrawOnTexture;
 
   FlyCamera m_Camera;
+
+  std::shared_ptr<Shader> m_depth_shader;
+  std::shared_ptr<RenderTarget> m_shadows_buffer_;
 };
 
 }

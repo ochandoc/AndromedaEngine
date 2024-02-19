@@ -54,7 +54,7 @@ int main(int argc, char** argv){
 
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();
-  r_manager.AddGenerator<TextureGenerator>();
+  //r_manager.AddGenerator<TextureGenerator>();
   r_manager.AddGenerator<And::ShaderGenerator>();
   
   And::Editor editor{*window, &r_manager};
@@ -122,8 +122,8 @@ int main(int argc, char** argv){
     tran.scale[2] = 1.0f;
     
     tran_teapot.position[0] = 0.0f;
-    tran_teapot.position[1] = 2.0f;
-    tran_teapot.position[2] = 0.0f;
+    tran_teapot.position[1] = 5.0f;
+    tran_teapot.position[2] = -5.0f;
     tran_teapot.rotation[0] = 0.0f;
     tran_teapot.rotation[1] = 1.0f;
     tran_teapot.rotation[2] = 0.0f;
@@ -131,7 +131,7 @@ int main(int argc, char** argv){
     tran_teapot.scale[1] = 2.0f;
     tran_teapot.scale[2] = 2.0f;
     And::Entity* obj_id = entity_comp.new_entity(MC, tran);
-    //And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
+    And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
   //}
 
   And::AmbientLight ambient;
@@ -221,8 +221,8 @@ int main(int argc, char** argv){
   spot_light->specular_color[1] = 1.0f;
   spot_light->specular_color[2] = 1.0f;
   spot_light->position[0] = 0.0f;
-  spot_light->position[1] = 5.0f;
-  spot_light->position[2] = 0.0f;
+  spot_light->position[1] = 14.0f;
+  spot_light->position[2] = 11.0f;
   spot_light->direction[0] = 0.0f;
   spot_light->direction[1] = 0.0f;
   spot_light->direction[2] = -1.0f;
@@ -253,8 +253,15 @@ int main(int argc, char** argv){
     window->update();
     g_renderer.new_frame();
     editor.ShowWindows();
+    std::shared_ptr<RenderTarget> shadow_buffer = g_renderer->get_shadow_buffer();
 
      for (auto light : l_manager.get_lights()) {
+
+        shadow_buffer->Activate();
+        for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
+          g_renderer->draw_shadows(light, obj, transform);
+        }
+        shadow_buffer->Desactivate();
 
         And::Shader* s = l_manager.bind_light(light);
         
@@ -267,7 +274,7 @@ int main(int argc, char** argv){
         //printf("Duration inner loop-> %f\n", elapsed.count() * 1000.0f);
     }
 
-    g_renderer.get_render_target()->Test();
+    //g_renderer.get_render_target()->Test();
     //l->diffuse_color[0] += 0.0001f;
 
 
