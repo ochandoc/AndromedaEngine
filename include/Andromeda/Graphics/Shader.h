@@ -42,6 +42,7 @@ namespace And{
 
     //static std::shared_ptr<Shader> make(ShaderInfo s_info);
     static std::shared_ptr<Shader> make(const std::string& path);
+    static std::shared_ptr<Shader> make_default(const std::string& path, const std::string& light_path, LightType type);
     Shader(const Shader& other) = delete;
     Shader(Shader&& other);
     ~Shader();
@@ -61,10 +62,16 @@ namespace And{
     // Uniform buffer
     void set_light(AmbientLight* light);
     void set_light(PointLight* light);
+    
+    void set_default_light(AmbientLight* light);
+    void set_default_light(PointLight* light);
+    void set_default_light(DirectionalLight* light);
+    void set_default_light(SpotLight* light);
 
     void set_camera_position(const float position[3]);
 
     void upload_data();
+    void upload_default_data(LightType type);
     void reload();
 
     void set_texture(Texture* r);
@@ -77,6 +84,11 @@ namespace And{
 
     std::shared_ptr<UniformBlockData> m_uniform_block;
     std::shared_ptr<UniformLights> m_uniform_block_lights;
+
+    std::shared_ptr<AmbientLight> m_default_ambient;
+    std::shared_ptr<DirectionalLight> m_default_directional;
+    std::shared_ptr<PointLight> m_default_point;
+    std::shared_ptr<SpotLight> m_default_spot;
     
     Texture* m_texture;
   };

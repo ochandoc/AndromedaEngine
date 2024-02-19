@@ -32,6 +32,7 @@ class ObjLoader{
   public:
   ObjLoader(const ObjLoader&) = default;
   ObjLoader(ObjLoader&&) = default;
+  ~ObjLoader();
 
   static std::shared_ptr<ObjLoader> load(std::string filename, std::string base_path = "");
 
@@ -46,6 +47,8 @@ class ObjLoader{
 
   const std::vector<Vertex_info>& get_vertex_info(){return m_vertex_info;}
 
+  std::string filename_;
+
   private:
 
   ObjLoader(std::vector<unsigned int> indices, std::vector<Vertex_info> vertex_info, Material_info mat);
@@ -57,6 +60,7 @@ class ObjLoader{
 
   unsigned int m_VAO = 0;
   unsigned int m_VBO = 0;
+
 
 };
 }

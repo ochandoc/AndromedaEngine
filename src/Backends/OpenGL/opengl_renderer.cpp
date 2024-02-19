@@ -60,10 +60,18 @@ void Renderer::new_frame()
   ImGui_ImplOpenGL3_NewFrame(); 
 	m_Window.new_frame();
   ImGui::NewFrame();
-  glEnable(GL_DEPTH_TEST);
+
   //glDepthMask(GL_FALSE);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glEnable(GL_DEPTH_TEST);
+  //glDepthFunc(GL_LEQUAL);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_ONE, GL_ZERO);
+
+  if (m_bDrawOnTexture)
 
   /*if (m_bDrawOnTexture)
   {
@@ -110,7 +118,6 @@ std::shared_ptr<RenderTarget> Renderer::get_render_target() const
   return m_RenderTarget;
 }
 
-
 void Renderer::draw_triangle(Triangle *t){
     
   Vertex *v = t->get_vertex();
@@ -151,7 +158,6 @@ void Renderer::draw_triangle(Triangle *t){
   
 }
 
-
 void CheckError(){
   GLenum error = glGetError();
   switch (error) {
@@ -191,10 +197,12 @@ void CheckError(){
 
 void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
 {
-  if (s) {
-    s->use();
-  }
-
+  //if(s){
+    //s->use();
+  //}
+  //auto start = std::chrono::high_resolution_clock::now();
+  
+    
   glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
 
@@ -209,9 +217,9 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
 
-  s->setMat4("view", glm::value_ptr(viewMatrix));
-  s->setMat4("projection", glm::value_ptr(projectionMatrix));
-  s->setMat4("model", glm::value_ptr(modelMatrix));
+  s->set_camera_position(m_Camera.GetPosition());
+  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
+  s->upload_data();
 
   unsigned int VBO = obj->Mesh->get_vbo();
   unsigned int VAO = obj->Mesh->get_vao();
@@ -219,16 +227,12 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
 
-
-  std::vector<Vertex_info> vertices = obj->Mesh->getVertexInfo();
-
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
+  const std::vector<Vertex_info>& vertices = obj->Mesh->getVertexInfo();
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-
 
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
@@ -236,6 +240,8 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
 
   const std::vector<unsigned int>& indices = obj->Mesh->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+  //glFlush();
+  //WAIT_GPU_LOAD();
 }
 
 void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point, Texture* texture) {
