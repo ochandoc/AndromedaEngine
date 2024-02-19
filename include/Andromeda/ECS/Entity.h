@@ -23,6 +23,9 @@ namespace And
     template<typename T>
     T* get_component();
 
+    template<typename T>
+    void add_component(T& comp);
+
     friend class EntityComponentSystem;
   private:
     class EntityComponentSystem* m_ECS;
@@ -39,5 +42,11 @@ namespace And
   inline T* Entity::get_component()
   {
     return m_ECS->get_entity_component<T>(this);
+  }
+
+  template<typename T>
+  inline void Entity::add_component(T& comp)
+  {
+    m_ECS->add_entity_component<T>(this, comp);
   }
 }

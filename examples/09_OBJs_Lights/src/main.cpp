@@ -54,8 +54,8 @@ int main(int argc, char** argv){
 
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();
-  //r_manager.AddGenerator<And::ShaderGenerator>();
   r_manager.AddGenerator<TextureGenerator>();
+  r_manager.AddGenerator<And::ShaderGenerator>();
   
   And::Editor editor{*window, &r_manager};
 
@@ -68,7 +68,9 @@ int main(int argc, char** argv){
 
   // Creamos el shader
   //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
-  And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("teapot_texture.jpg");
+  And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
+  std::shared_ptr<And::Texture> texture = And::MakeTexture("teapot_texture.jpg");
+  //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("teapot_texture.jpg")
   //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("missing_texture.png");
   //g_shader->set_texture(texture);
   //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/default_shader_normals.shader");
@@ -76,6 +78,7 @@ int main(int argc, char** argv){
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
+
 
   
   And::EntityComponentSystem entity_comp;
@@ -266,6 +269,7 @@ int main(int argc, char** argv){
 
     g_renderer.get_render_target()->Test();
     //l->diffuse_color[0] += 0.0001f;
+
 
     //ambient.direction[0] -= 0.0001f;
     //printf("Direction0: %f\n", ambient.direction[0]);

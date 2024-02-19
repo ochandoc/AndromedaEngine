@@ -1,6 +1,6 @@
 #pragma once
 #include "Andromeda/Graphics/Light.h"
-#include "Andromeda/Graphics/OpenGLTexture2D.h"
+#include "Andromeda/Graphics/Texture.h"
 #include "Andromeda/Resources/Resource.h"
 #include <optional>
 
@@ -74,7 +74,7 @@ namespace And{
     void upload_default_data(LightType type);
     void reload();
 
-    void set_texture(OpenGLTexture2D* r);
+    void set_texture(Texture* r);
     //const OpenGLTexture2D& get_texture();
 
   private:
@@ -90,6 +90,6 @@ namespace And{
     std::shared_ptr<PointLight> m_default_point;
     std::shared_ptr<SpotLight> m_default_spot;
     
-    OpenGLTexture2D* m_texture;
+    Texture* m_texture;
   };
 }

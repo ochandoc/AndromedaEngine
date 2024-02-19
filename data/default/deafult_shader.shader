@@ -89,6 +89,7 @@ void main(){
 #version 430 core
 
 layout(location = 0) out vec4 FragColor;
+layout(location = 1) out vec4 FragNormal;
 
 uniform sampler2D tex;
 in vec2 TexCoord;
@@ -223,10 +224,11 @@ void main(){
 
   vec4 tex_color = texture(tex, uv);
   color += CalculeDirLight(ambient_light, s_normal, view_direction, color_base);
-  color += CalculePointLight(point, s_normal, view_direction, s_fragPos);
+  //color += CalculePointLight(point, s_normal, view_direction, s_fragPos);
 
   //FragColor = vec4(ambient.diffuse_color.x, ambient.diffuse_color.y, ambient.diffuse_color.z, 1.0);
-  FragColor = vec4(color, 1.0) + tex_color;
+  FragColor = vec4(color, 1.0);
+  FragNormal = vec4(s_normal, 1.0);
 
   //FragColor = vec4(blend_color, 1.0);
 
