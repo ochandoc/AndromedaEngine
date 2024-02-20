@@ -7,9 +7,22 @@ namespace And
 {
   enum class ETextureFormat : uint8
   {
+    /**  Common color format */
     RGB8,
     RGBA8,
 
+
+    /**  Common format for position or normals */
+    RGB16F,
+    RGBA16F,
+
+
+    /**  Extended format of 32 bits floats */
+    RGB32F,
+    RGBA32F,
+
+
+    /** Format for depth texture */
     Depth,
   };
 
