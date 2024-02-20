@@ -27,7 +27,9 @@ namespace And
     virtual void Resize(uint32 width, uint32 height) = 0;
 
     inline const std::vector<std::shared_ptr<Texture>>& GetTextures() const { return m_Textures; }
-    inline const RenderTargetCreationInfo& GetCreationInfo() { return m_CretionInfo; }
+    inline const RenderTargetCreationInfo& GetCreationInfo() const { return m_CretionInfo; }
+    inline uint32 GetWidth() const { return m_CretionInfo.Width; }
+    inline uint32 GetHeight() const { return m_CretionInfo.Height; }
 
   protected:
     RenderTargetCreationInfo m_CretionInfo;

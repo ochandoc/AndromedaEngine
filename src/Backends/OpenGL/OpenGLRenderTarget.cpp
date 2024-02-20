@@ -46,6 +46,7 @@ namespace And
     glGenFramebuffers(1, &Rendertarget->m_Id);
     glBindFramebuffer(GL_FRAMEBUFFER, Rendertarget->m_Id);
 
+    std::vector<uint32> ColotAttachments;
     uint32 ColorIndex = 0;
     for (std::shared_ptr<Texture>& Textures : Rendertarget->m_Textures)
     {
@@ -53,24 +54,29 @@ namespace And
       switch (OpenGlTexture->GetFormat())
       {
       case And::ETextureFormat::RGBA8:
-        {
-          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ColorIndex, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
-          ++ColorIndex;
-        }
-        break;
+      {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ColorIndex, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
+        ColotAttachments.push_back(GL_COLOR_ATTACHMENT0 + ColorIndex);
+        ++ColorIndex;
+      }
+      break;
       case And::ETextureFormat::RGB8:
-        {
-          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ColorIndex, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
-          ++ColorIndex;
-        }
-        break;
+      {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ColorIndex, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
+        ColotAttachments.push_back(GL_COLOR_ATTACHMENT0 + ColorIndex);
+        ++ColorIndex;
+      }
+      break;
       case And::ETextureFormat::Depth:
-        {
-          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
-        }
-        break;
+      {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
+      }
+      break;
       }
     }
+
+    glDrawBuffers((int)ColotAttachments.size(), ColotAttachments.data());
+
     assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     return Rendertarget;
@@ -91,28 +97,3 @@ namespace And
   {
   }
 }
-
-/*void And::RenderTarget::Test()
-{
-  ImGuiStyle& style = ImGui::GetStyle();
-  ImVec2 padding = style.WindowPadding;
-  style.WindowPadding = ImVec2(0.0f, 0.0f);
-  static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar;
-  windowFlags |= ImGuiWindowFlags_NoCollapse;
-
-  std::string WindowName;
-  for (RenderTargetTextureData& Texture : m_Data->Textures)
-  {
-    WindowName = "Render Target" + std::to_string(Texture.Id);
-
-    if (ImGui::Begin(WindowName.c_str(), nullptr, windowFlags))
-    {
-      ImGui::Image((void*)(intptr_t)Texture.Id, ImGui::GetWindowSize(), ImVec2(0, 1), ImVec2(1, 0));
-    }
-    ImGui::End();
-  };
-
-  style.WindowPadding = padding;
-}*/
-
-
