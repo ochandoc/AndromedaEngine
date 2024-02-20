@@ -1,11 +1,27 @@
 #pragma once
 
+#include "Andromeda/Misc/CoreMiscDefines.h"
+
 namespace And
 {
   class Shader
   {
+    NON_COPYABLE_CLASS(Shader)
+    NON_MOVABLE_CLASS(Shader)
+  public:
+    Shader() = default;
 
+    virtual ~Shader() = default;
+
+    virtual void Use() const = 0;
+    virtual void StopUsing() const = 0;
+
+    inline const std::string& GetPath() const { return m_Path; }
+  private:
+    std::string m_Path;
   };
+
+  std::shared_ptr<Shader> MakeShader(const std::string& Path);
 }
 
 #include "Andromeda/Graphics/Light.h"
