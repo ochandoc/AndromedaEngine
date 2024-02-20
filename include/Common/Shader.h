@@ -37,6 +37,8 @@ namespace And{
     
     void use();
 
+    void reload();
+
   private:
     Shader();
     std::unique_ptr<struct ShaderData> m_Data;

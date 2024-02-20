@@ -2,6 +2,8 @@
 
 #include "andpch.hpp"
 #include "base.h"
+#include "Editor/EditorWindow.h"
+#include <string>
 
 namespace spdlog
 {
@@ -65,17 +67,28 @@ namespace And
     inline LogCategory(const char* CategoryName) : LogCategoryBase(CategoryName, InCategoryLevel, InConsoleLog) {}
   };
 
-  class LogWindow
+  class LogWindow : public EditorWindow
   {
   public:
-    void Draw();
+
+    LogWindow(const std::string& Title);
+    void Show() override;
 
     void ClearLog();
 
-    inline void Open() { bOpen = true; }
-    inline void Close() { bOpen = false; }
+    inline void Open() { m_is_open = true; }
+    inline void Close() { m_is_open = false; }
   private:
-    bool bOpen = true;
+    char SearchText[1024];
+    bool EnableAutoScrolling = true;
+    uint32 LogCategoryId = -1;
+    bool bTrace = false;
+    bool bDebug = false;
+    bool bInfo = true;
+    bool bWarning = true;
+    bool bError = true;
+    bool bCritical = false;
+    bool bGoDown;
   };
 }
 

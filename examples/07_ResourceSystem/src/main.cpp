@@ -24,8 +24,9 @@
 #include <future>
 
 #include "Andromeda.h"
-#include "Common/ResourceManager.h" 
 #include "Common/OpenGLTexture2D.h" 
+#include "Common/TaskSystem/TaskSystem.h"
+#include "Common/Resources/ResourceManager.h"
 
 int main(int argc, char** argv){
 
@@ -33,7 +34,7 @@ int main(int argc, char** argv){
   {
     And::Engine e;
 
-    And::JobSystem js{ e };
+    And::TaskSystem ts;
 
 
     std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
@@ -42,13 +43,13 @@ int main(int argc, char** argv){
     float clear_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
     g_renderer.set_clear_color(clear_color);
 
-    And::ResourceManager rm(*window, js);
+    And::ResourceManager rm(*window, ts);
 
-    rm.add_resource_generator<TextureGenerator>();
-    And::resource<OpenGLTexture2D> tex = rm.new_resource<OpenGLTexture2D>("./jou.jpg");
-    And::resource<OpenGLTexture2D> tex2 = rm.new_resource<OpenGLTexture2D>("vm_esat.png");
-    And::resource<OpenGLTexture2D> tex3 = rm.new_resource<OpenGLTexture2D>("./test.jpg");
-    And::resource<OpenGLTexture2D> tex4 = rm.new_resource<OpenGLTexture2D>("./esat_team.jpg");
+    rm.AddGenerator<TextureGenerator>();
+    And::Resource<OpenGLTexture2D> tex = rm.NewResource<OpenGLTexture2D>("./jou.jpg");
+    And::Resource<OpenGLTexture2D> tex2 = rm.NewResource<OpenGLTexture2D>("vm_esat.png");
+    And::Resource<OpenGLTexture2D> tex3 = rm.NewResource<OpenGLTexture2D>("./test.jpg");
+    And::Resource<OpenGLTexture2D> tex4 = rm.NewResource<OpenGLTexture2D>("./esat_team.jpg");
 
     And::LogWindow log_window;
     while (window->is_open())

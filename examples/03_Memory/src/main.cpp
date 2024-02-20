@@ -20,7 +20,6 @@
 #include <condition_variable>
 #include <future>
 
-#include "Common/JobSystem.h"
 #include "Common/Engine.h"
 #include "Common/Window.h"
 #include "Common/GraphicsContext.h"
@@ -32,7 +31,6 @@
 #include "Common/EntityComponentSystem.h"
 #include "Common/Save.h"
 
-#include "Common/JobSystem.h"
 #include "Common/Log.h"
 #include "Common/Save.h"
 

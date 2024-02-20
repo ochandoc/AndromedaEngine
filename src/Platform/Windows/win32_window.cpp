@@ -8,6 +8,7 @@
 #include "GLFW/glfw3.h"
 
 #include "imgui_impl_glfw.h"
+#include "Common/UI/Plot/implot.h"
 
 namespace And
 {
@@ -18,6 +19,8 @@ namespace And
     PLATFORM_WINDOW_DATA glfw;
     KeyboardState* keyboard;
     std::shared_ptr<GraphicsContext> m_Context;
+    float LastTime;
+    float DeltaTime;
     // Camera cam;
   };
 
@@ -174,6 +177,7 @@ namespace And
   Window::Window() : m_Data(new WindowData) 
   {
     m_Data->class_instance = this;
+    m_Data->LastTime = 0.0f;
   }
 
   Window::~Window()
@@ -249,6 +253,9 @@ namespace And
       key = KeyState::Default;
     }
     glfwPollEvents();
+    float CurrentTime = static_cast<float>(glfwGetTime());
+    m_Data->DeltaTime = CurrentTime - m_Data->LastTime;
+    m_Data->LastTime = CurrentTime;
   }
 
   void Window::swap_buffers()
@@ -256,15 +263,58 @@ namespace And
     glfwSwapBuffers(m_Data->glfw.handle);
   }
 
+  float Window::get_delta_time() const
+  {
+      return m_Data->DeltaTime;
+  }
+
   std::shared_ptr<GraphicsContext> Window::get_context() const
   {
     return m_Data->m_Context;
+  }
+
+  std::function<void(WorkerThreadData& Data)> Window::get_worker_function()
+  {
+    glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+#ifdef AND_OPENGL
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // Version principal de OpenGL
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);  // Version menor de OpenGL
+#   ifdef DEBUG
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); // Activar debug
+#   endif
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Perfil de OpenGL
+#endif
+    GLFWwindow* window = glfwCreateWindow(100, 100, "OpenGL", nullptr, m_Data->glfw.handle);
+    std::function<void(WorkerThreadData& Data)> function = [this, window](WorkerThreadData& Data)
+      {
+        glfwMakeContextCurrent(window);
+        while (true)
+        {
+          Task task(NoInit);
+          {
+            std::unique_lock<std::mutex> lock(Data.QueueMutex);
+            Data.ConditionVariable.wait(lock, [&Data]() { return !Data.TasksQueue.empty() || Data.Stop; });
+            if (Data.TasksQueue.empty() && Data.Stop) { glfwDestroyWindow(window); return; }
+            task = std::move(Data.TasksQueue.front());
+            Data.TasksQueue.pop();
+          }
+          auto start = std::chrono::system_clock::now();
+          task();
+          auto endt = std::chrono::system_clock::now();
+
+          Data.TaskSystemOwner->MarkTaskAsResolved(task, std::chrono::duration<float>(endt - start).count());
+        }
+      };
+    return function;
   }
 
   void Window::imgui_start()
   {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
+    ImPlot::CreateContext();
 
     ImGuiIO& io = ImGui::GetIO();
 
@@ -286,6 +336,7 @@ namespace And
   void Window::imgui_end()
   {
     ImGui_ImplGlfw_Shutdown();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
   }
 

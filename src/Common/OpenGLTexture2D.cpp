@@ -6,7 +6,6 @@
 
 #include "imgui.h"
 
-#include "Common/ResourceManager.h"
 
 OpenGLTexture2D::OpenGLTexture2D()
 {
@@ -17,7 +16,7 @@ OpenGLTexture2D::~OpenGLTexture2D()
 {
 	if (m_Id)
 	{
-		AND_LOG(ResourceManagerLog, And::Info, "Texture {} destroyed", m_Path.c_str());
+		//AND_LOG(ResourceManagerLog, And::Info, "Texture {} destroyed", m_Path.c_str());
 		glDeleteTextures(1, &m_Id);
 	}
 }
@@ -60,12 +59,12 @@ OpenGLTexture2D* OpenGLTexture2D::Make(const std::string& path)
 		//ISDEV_LOG();
 
 		Loaded = true;
-		AND_LOG(ResourceManagerLog, And::Info, "Image {} loaded", path.c_str());
+		//AND_LOG(ResourceManagerLog, And::Info, "Image {} loaded", path.c_str());
 	}
 	else
 	{
 		Loaded = false;
-		AND_LOG(ResourceManagerLog, And::Error, "Failed to load texture {}", path.c_str());
+		//AND_LOG(ResourceManagerLog, And::Error, "Failed to load texture {}", path.c_str());
 	}
 
 	stbi_image_free(pixels);

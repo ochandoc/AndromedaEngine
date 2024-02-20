@@ -6,6 +6,7 @@
 
 #include "Common/ImGuiSink.h"
 
+
 static inline spdlog::level::level_enum GetSpdlogLevel(And::LogLevel level)
 {
   switch (level)
@@ -123,22 +124,16 @@ namespace And
 
   }
 
-  void LogWindow::Draw()
+  LogWindow::LogWindow(const std::string& Title) : EditorWindow(Title)
   {
-    static char SearchText[1024];
-    static bool EnableAutoScrolling = true;
-    static uint32 LogCategoryId = -1;
-    static bool bTrace = false;
-    static bool bDebug = false;
-    static bool bInfo = true;
-    static bool bWarning = true;
-    static bool bError = true;
-    static bool bCritical = false;
-    static bool bGoDown;
+    memset(SearchText, 0, sizeof(SearchText));
+  }
 
-    if (bOpen)
+  void LogWindow::Show()
+  {
+    if (m_is_open)
     {
-      if (ImGui::Begin("Console Log", &bOpen))
+      if (ImGui::Begin(m_title.c_str(), &m_is_open))
       {
         ImGui::InputText("##ConsoleLogSearchText", SearchText, sizeof(SearchText));
         ImGui::SameLine();
