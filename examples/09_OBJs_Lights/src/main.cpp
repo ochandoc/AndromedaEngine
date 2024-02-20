@@ -53,8 +53,7 @@ int main(int argc, char** argv){
   And::Renderer g_renderer(*window);
 
   And::ResourceManager r_manager{*window, ts};
-  r_manager.AddGenerator<And::ObjGenerator>();
-  //r_manager.AddGenerator<TextureGenerator>();
+  //r_manager.AddGenerator<And::ObjGenerator>();
   r_manager.AddGenerator<And::ShaderGenerator>();
   
   And::Editor editor{*window, &r_manager};
@@ -68,7 +67,9 @@ int main(int argc, char** argv){
 
   // Creamos el shader
   //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
-  And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
+ 
+ 
+  //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
   std::shared_ptr<And::Texture> texture = And::MakeTexture("teapot_texture.jpg");
   //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("teapot_texture.jpg")
   //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("missing_texture.png");
@@ -104,8 +105,9 @@ int main(int argc, char** argv){
 
   //for(int i = -5; i < 5; i++){
     And::MeshComponent MC, MC_teapot;
-    MC.Mesh = r_manager.NewResource<And::ObjLoader>("sponza.obj");
-    MC_teapot.Mesh = r_manager.NewResource<And::ObjLoader>("teapot.obj");
+    //MC.Mesh = r_manager.NewResource<And::ObjLoader>("sponza.obj");
+    MC.MeshOBJ = And::ObjLoader::load("sponza.obj");
+    MC_teapot.MeshOBJ = And::ObjLoader::load("teapot.obj");
 
     //std::shared_ptr<And::ObjLoader> obj_teapot = And::ObjLoader::load("teapot.obj");
     //And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
@@ -256,14 +258,23 @@ int main(int argc, char** argv){
     std::shared_ptr<And::RenderTarget> shadow_buffer = g_renderer.get_shadow_buffer();
 
      for (auto light : l_manager.get_lights()) {
+        if(light.type == And::LightType::Spot){
 
-        shadow_buffer->Activate();
-        for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
-          g_renderer.draw_shadows(light, obj, transform);
+
+          shadow_buffer->Activate();
+          for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
+            g_renderer.draw_shadows(light, obj, transform);
+          }
+          shadow_buffer->Desactivate();
+
+
+        
+        
         }
-        shadow_buffer->Desactivate();
         
         And::Shader* s = l_manager.bind_light(light);
+        std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+        //s->set_texture(shadow_texture[0].get());
         
         //start = std::chrono::high_resolution_clock::now();
         for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
@@ -272,7 +283,13 @@ int main(int argc, char** argv){
         //end = std::chrono::high_resolution_clock::now();
         //elapsed = end - start;
         //printf("Duration inner loop-> %f\n", elapsed.count() * 1000.0f);
+
+
+
     }
+
+
+
 
     //g_renderer.get_render_target()->Test();
     //l->diffuse_color[0] += 0.0001f;

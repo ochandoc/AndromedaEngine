@@ -65,6 +65,7 @@ private:
   FlyCamera m_Camera;
 
   std::shared_ptr<Shader> m_depth_shader;
+  std::shared_ptr<Shader> m_shadow_shader;
   std::shared_ptr<RenderTarget> m_shadows_buffer_;
 };
 

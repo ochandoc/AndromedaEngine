@@ -4,6 +4,7 @@
 
 #include "Backends/OpenGL/OpenGL.h"
 #include "Backends/OpenGL/opengl_uniform_buffer.h"
+#include "Backends/OpenGL/OpenGLTexture2D.h"
 
 #include "andpch.hpp"
 
@@ -176,7 +177,7 @@ namespace And{
       
       shader->m_Data->buffer_size = size_block;
       shader->m_Data->buffer_lights_size = size_block_lights;
-
+      shader->m_texture = nullptr;
       //glFlush();
       return shader;
     }
@@ -452,8 +453,13 @@ namespace And{
     //m_Data->uniform_buffer_lights->bind();
     //glFlush();
 
-    //m_texture->bind(0);
+   
+    OpenGLTexture2D* text = static_cast<OpenGLTexture2D*>(m_texture);
+    if (text != nullptr) {
+        text->Activate(0);
+    }
     
+   
   }
 
   void Shader::upload_default_data(LightType type){

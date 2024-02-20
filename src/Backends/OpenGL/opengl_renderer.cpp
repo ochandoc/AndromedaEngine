@@ -61,6 +61,7 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 
   // Crear shader de profundidad
   m_depth_shader = Shader::make_default("lights/depth_shader.shader", "none", LightType::None);
+  //m_shadow_shader = Shader::make_default("lights/shadow_shader.shader", "none", LightType::None);
 }
 
 Renderer::~Renderer(){
@@ -233,13 +234,14 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
   s->upload_data();
 
-  unsigned int VBO = obj->Mesh->get_vbo();
-  unsigned int VAO = obj->Mesh->get_vao();
+  unsigned int VBO = obj->MeshOBJ->get_vbo();
+  unsigned int VAO = obj->MeshOBJ->get_vao();
+  WAIT_GPU_LOAD();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindVertexArray(VAO);
+  glBindVertexArray(VAO); // Aqui salta el error en el 2
 
-  const std::vector<Vertex_info>& vertices = obj->Mesh->getVertexInfo();
+  const std::vector<Vertex_info>& vertices = obj->MeshOBJ->getVertexInfo();
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
@@ -250,10 +252,11 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   glCullFace(GL_BACK);
   glEnable(GL_DEPTH_TEST);
 
-  const std::vector<unsigned int>& indices = obj->Mesh->getIndices();
+  const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-  glFlush();
-  //WAIT_GPU_LOAD();
+  //glFlush();
+  WAIT_GPU_LOAD();
+
 }
 
 void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point, Texture* texture) {
@@ -395,13 +398,14 @@ void Renderer::draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* 
   s->setModelViewProj(glm::value_ptr(modelMatrix), view, projection);
   s->upload_data();
 
-  unsigned int VBO = obj->Mesh->get_vbo();
-  unsigned int VAO = obj->Mesh->get_vao();
+  unsigned int VBO = obj->MeshOBJ->get_vbo();
+  unsigned int VAO = obj->MeshOBJ->get_vao();
+  WAIT_GPU_LOAD();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindVertexArray(VAO);
+  glBindVertexArray(VAO); // Aqui tambien
 
-  const std::vector<Vertex_info>& vertices = obj->Mesh->getVertexInfo();
+  const std::vector<Vertex_info>& vertices = obj->MeshOBJ->getVertexInfo();
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
@@ -412,10 +416,10 @@ void Renderer::draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* 
   glCullFace(GL_BACK);
   glEnable(GL_DEPTH_TEST);
 
-  const std::vector<unsigned int>& indices = obj->Mesh->getIndices();
+  const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-  glFlush();
-  //WAIT_GPU_LOAD();
+  //glFlush();
+  WAIT_GPU_LOAD();
 }
 
 void Renderer::showDemo(){
@@ -480,7 +484,7 @@ void Renderer::draw_shadows(Light l, MeshComponent* obj, TransformComponent* tra
   int width = m_shadows_buffer_->GetCreationInfo().Width;
   int height = m_shadows_buffer_->GetCreationInfo().Height;
   
-  glm::mat4 persp = glm::perspective<float>(glm::radians(l.spot->outer_cut_off), (float)width / (float)height, 10.0f, 310.0f);
+  glm::mat4 persp = glm::perspective(glm::radians(l.spot->outer_cut_off), (float)width / (float)height, 10.0f, 310.0f);
 
 
   m_depth_shader->use();
