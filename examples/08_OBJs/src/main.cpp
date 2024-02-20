@@ -21,6 +21,7 @@
 #include <future>
 
 #include "Andromeda.h"
+#include "Andromeda/ECS/Scene.h"
 
 
 int main(int argc, char** argv){
@@ -74,36 +75,40 @@ int main(int argc, char** argv){
   float pos_x = 0.0f;
   float pos_y = -5.0f;
 
-  for(int i = -5; i < (int)(num_obj / 2); i++){
+  And::Scene scene;
+
+  for (int i = -5; i < (int)(num_obj / 2); i++) {
     And::MeshComponent MC;
     MC.Mesh = r_manager.NewResource<And::ObjLoader>("teapot.obj");
-    And::TransformComponent tran;
-    tran.position[0] = pos_x + (i * 6.0f);
-    tran.position[1] = pos_y;
-    tran.position[2] = 0.0f;
-    tran.rotation[0] = 0.0f;
-    tran.rotation[1] = 1.0f;
-    tran.rotation[2] = 0.0f;
-    tran.scale[0] = 1.0f;
-    tran.scale[1] = 1.0f;
-    tran.scale[2] = 1.0f;
-    And::Entity* obj_id = entity_comp.new_entity(MC, tran);
+    And::Entity* ett = scene.NewSceneEntity();
+    ett->add_component(MC);
+    And::TransformComponent* tran = ett->get_component<And::TransformComponent>();
+    tran->position[0] = pos_x + (i * 6.0f);
+    tran->position[1] = pos_y;
+    tran->position[2] = 0.0f;
+    tran->rotation[0] = 0.0f;
+    tran->rotation[1] = 1.0f;
+    tran->rotation[2] = 0.0f;
+    tran->scale[0] = 1.0f;
+    tran->scale[1] = 1.0f;
+    tran->scale[2] = 1.0f;
   }
   pos_y = 5.0f;
-  for(int i = -5; i < (int)(num_obj / 2); i++){
+  for (int i = -5; i < (int)(num_obj / 2); i++) {
     And::MeshComponent MC;
     MC.Mesh = r_manager.NewResource<And::ObjLoader>("teapot.obj");
-    And::TransformComponent tran;
-    tran.position[0] = pos_x + (i * 6.0f);
-    tran.position[1] = pos_y;
-    tran.position[2] = 0.0f;
-    tran.rotation[0] = 0.0f;
-    tran.rotation[1] = 1.0f;
-    tran.rotation[2] = 0.0f;
-    tran.scale[0] = 1.0f;
-    tran.scale[1] = 1.0f;
-    tran.scale[2] = 1.0f;
-    And::Entity* obj_id = entity_comp.new_entity(MC, tran);
+    And::Entity* ett = scene.NewSceneEntity();
+    ett->add_component(MC);
+    And::TransformComponent* tran = ett->get_component<And::TransformComponent>();
+    tran->position[0] = pos_x + (i * 6.0f);
+    tran->position[1] = pos_y;
+    tran->position[2] = 0.0f;
+    tran->rotation[0] = 0.0f;
+    tran->rotation[1] = 1.0f;
+    tran->rotation[2] = 0.0f;
+    tran->scale[0] = 1.0f;
+    tran->scale[1] = 1.0f;
+    tran->scale[2] = 1.0f;
   }
 
   g_renderer.set_draw_on_texture(true);
@@ -115,10 +120,7 @@ int main(int argc, char** argv){
 
     editor.ShowWindows();
 
-    for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>())
-    {
-      g_renderer.draw_obj(obj, shader.get(), transform);
-    }
+    g_renderer.draw_scene(scene, shader.get());
 
     g_renderer.get_render_target()->Test();
 

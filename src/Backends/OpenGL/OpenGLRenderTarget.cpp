@@ -1,16 +1,20 @@
-#include "Andromeda/Graphics/RenderTarget.h"
+#include "Backends/OpenGL/OpenGLRenderTarget.h"
 
+#include "Backends/OpenGL/OpenGLTexture2D.h"
 #include "Backends/OpenGL/OpenGL.h"
 
 #include "imgui.h"
 
 namespace And
 {
-  struct RenderTargetData
+  OpenGLRenderTarget::OpenGLRenderTarget() : m_Id(0)
   {
 
   }
 
+  OpenGLRenderTarget::OpenGLRenderTarget(ENoInit) : OpenGLRenderTarget()
+  {
+  }
 
   OpenGLRenderTarget::~OpenGLRenderTarget()
   {
@@ -50,24 +54,24 @@ namespace And
       switch (OpenGlTexture->GetFormat())
       {
       case And::ETextureFormat::RGBA8:
-        {
-          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ColorIndex, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
-          ColotAttachments.push_back(GL_COLOR_ATTACHMENT0 + ColorIndex);
-          ++ColorIndex;
-        }
-        break;
+      {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ColorIndex, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
+        ColotAttachments.push_back(GL_COLOR_ATTACHMENT0 + ColorIndex);
+        ++ColorIndex;
+      }
+      break;
       case And::ETextureFormat::RGB8:
-        {
-          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ColorIndex, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
-          ColotAttachments.push_back(GL_COLOR_ATTACHMENT0 + ColorIndex);
-          ++ColorIndex;
-        }
-        break;
+      {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ColorIndex, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
+        ColotAttachments.push_back(GL_COLOR_ATTACHMENT0 + ColorIndex);
+        ++ColorIndex;
+      }
+      break;
       case And::ETextureFormat::Depth:
-        {
-          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
-        }
-        break;
+      {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
+      }
+      break;
       }
     }
 
@@ -78,43 +82,18 @@ namespace And
     return Rendertarget;
   }
 
-void And::RenderTarget::Bind()
-{
-  glBindFramebuffer(GL_FRAMEBUFFER, m_Data->Id);
-  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void And::RenderTarget::Unbind()
-{
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void And::RenderTarget::Resize(uint32 width, uint32 height)
-{
-}
-
-/*void And::RenderTarget::Test()
-{
-  ImGuiStyle& style = ImGui::GetStyle();
-  ImVec2 padding = style.WindowPadding;
-  style.WindowPadding = ImVec2(0.0f, 0.0f);
-  static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar;
-  windowFlags |= ImGuiWindowFlags_NoCollapse;
-
-  std::string WindowName;
-  for (RenderTargetTextureData& Texture : m_Data->Textures)
+  void OpenGLRenderTarget::Activate() const
   {
-    WindowName = "Render Target" + std::to_string(Texture.Id);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_Id);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  }
 
-    if (ImGui::Begin(WindowName.c_str(), nullptr, windowFlags))
-    {
-      ImGui::Image((void*)(intptr_t)Texture.Id, ImGui::GetWindowSize(), ImVec2(0, 1), ImVec2(1, 0));
-    }
-    ImGui::End();
-  };
+  void OpenGLRenderTarget::Desactivate() const
+  {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  }
 
-  style.WindowPadding = padding;
-}*/
-
-
+  void OpenGLRenderTarget::Resize(uint32 width, uint32 height)
+  {
+  }
+}

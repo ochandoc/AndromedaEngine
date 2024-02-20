@@ -2,6 +2,7 @@
 #include "Andromeda/Debug/Log.h"
 #include "Andromeda/Debug/ImGuiSink.h"
 #include "Andromeda/Editor/ShaderTextEditor.h"
+#include "Andromeda/Editor/Windows/GameInfoWindow.h"
 
 #include "Andromeda/UI/Plot/implot.h"
 
@@ -19,6 +20,7 @@ Editor::Editor(Window& window, ResourceManager* rm) : m_MainWindow(window), m_re
 	m_Windows.insert({ "Console Log 4", std::shared_ptr<LogWindow>(new LogWindow("Console Log 4")) });
 	m_Windows.insert({ "Shader Editor 1", std::shared_ptr<ShaderTextEditor>(new ShaderTextEditor("Shader Editor 1")) });
 	m_Windows.insert({ "Shader Editor 2", std::shared_ptr<ShaderTextEditor>(new ShaderTextEditor("Shader Editor 2")) });
+	m_Windows.insert({ "Game Info Window", std::shared_ptr<GameInfoWindow>(new GameInfoWindow()) });
 
 	for (auto& [name, window] : m_Windows)
 	{
@@ -106,6 +108,11 @@ void Editor::ShowWindows(){
 				{
 					ImGui::MenuItem("Task System Info", nullptr, &m_Windows["Task System Info"]->m_is_open);
 				}
+				ImGui::EndMenu();
+			}
+
+			if(ImGui::BeginMenu("Game Info")){
+				ImGui::MenuItem("Game info window", nullptr, &m_Windows["Game Info Window"]->m_is_open);	
 				ImGui::EndMenu();
 			}
 
