@@ -8,53 +8,75 @@ namespace And
 {
   struct RenderTargetData
   {
-    uint32 Id;
-    uint32 ColorTexture;
-    uint32 DepthTexture;
-  };
-}
+
+  }
 
 
-And::RenderTarget::RenderTarget(uint32 width, uint32 height) : m_Data(new RenderTargetData)
-{
-  glGenTextures(1, &m_Data->ColorTexture);
-  glBindTexture(GL_TEXTURE_2D, m_Data->ColorTexture);
+  OpenGLRenderTarget::~OpenGLRenderTarget()
+  {
+    m_Textures.clear();
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    if (m_Id)
+    {
+      glDeleteFramebuffers(1, &m_Id);
+    }
+  }
 
-  glBindTexture(GL_TEXTURE_2D, 0);
+  std::shared_ptr<OpenGLRenderTarget> OpenGLRenderTarget::Make(const RenderTargetCreationInfo& CreationInfo)
+  {
+    uint64 Size = CreationInfo.Width * CreationInfo.Height;
+    if (Size == 0) return std::shared_ptr<OpenGLRenderTarget>();
 
-  glGenTextures(1, &m_Data->DepthTexture);
-  glBindTexture(GL_TEXTURE_2D, m_Data->DepthTexture);
+    std::shared_ptr<OpenGLRenderTarget> Rendertarget(new OpenGLRenderTarget);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    TextureCreationInfo TexCreationInfo;
+    TexCreationInfo.Width = CreationInfo.Width;
+    TexCreationInfo.Height = CreationInfo.Height;
+    TexCreationInfo.Mipmaps = false;
+    for (ETextureFormat Format : CreationInfo.Formats)
+    {
+      TexCreationInfo.Format = Format;
+      Rendertarget->m_Textures.push_back(MakeTexture(TexCreationInfo));
+    }
 
-  glBindTexture(GL_TEXTURE_2D, 0);
+    glGenFramebuffers(1, &Rendertarget->m_Id);
+    glBindFramebuffer(GL_FRAMEBUFFER, Rendertarget->m_Id);
 
-  glGenFramebuffers(1, &m_Data->Id);
-  glBindFramebuffer(GL_FRAMEBUFFER, m_Data->Id);
+    std::vector<uint32> ColotAttachments;
+    uint32 ColorIndex = 0;
+    for (std::shared_ptr<Texture>& Textures : Rendertarget->m_Textures)
+    {
+      OpenGLTexture2D* OpenGlTexture = dynamic_cast<OpenGLTexture2D*>(Textures.get());
+      switch (OpenGlTexture->GetFormat())
+      {
+      case And::ETextureFormat::RGBA8:
+        {
+          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ColorIndex, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
+          ColotAttachments.push_back(GL_COLOR_ATTACHMENT0 + ColorIndex);
+          ++ColorIndex;
+        }
+        break;
+      case And::ETextureFormat::RGB8:
+        {
+          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + ColorIndex, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
+          ColotAttachments.push_back(GL_COLOR_ATTACHMENT0 + ColorIndex);
+          ++ColorIndex;
+        }
+        break;
+      case And::ETextureFormat::Depth:
+        {
+          glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, OpenGlTexture->GetId(), 0);
+        }
+        break;
+      }
+    }
 
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_Data->ColorTexture, 0);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_Data->DepthTexture, 0);
-  assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+    glDrawBuffers((int)ColotAttachments.size(), ColotAttachments.data());
 
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-And::RenderTarget::~RenderTarget()
-{
-  glDeleteTextures(1, &m_Data->ColorTexture);
-  glDeleteTextures(1, &m_Data->DepthTexture);
-  glDeleteFramebuffers(1, &m_Data->Id);
-}
+    assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    return Rendertarget;
+  }
 
 void And::RenderTarget::Bind()
 {
@@ -72,26 +94,27 @@ void And::RenderTarget::Resize(uint32 width, uint32 height)
 {
 }
 
-void And::RenderTarget::Test()
+/*void And::RenderTarget::Test()
 {
   ImGuiStyle& style = ImGui::GetStyle();
   ImVec2 padding = style.WindowPadding;
   style.WindowPadding = ImVec2(0.0f, 0.0f);
   static ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar;
   windowFlags |= ImGuiWindowFlags_NoCollapse;
-  if (ImGui::Begin("Render Target Color", nullptr, windowFlags))
-  {
-    ImGui::Image((void*)(intptr_t)m_Data->ColorTexture, ImGui::GetWindowSize(), ImVec2(0, 1), ImVec2(1, 0));
-  }
-  ImGui::End();
 
-  if (ImGui::Begin("Render Target depth", nullptr, windowFlags))
+  std::string WindowName;
+  for (RenderTargetTextureData& Texture : m_Data->Textures)
   {
-    ImGui::Image((void*)(intptr_t)m_Data->DepthTexture, ImGui::GetWindowSize(), ImVec2(0, 1), ImVec2(1, 0));
-  }
-  ImGui::End();
+    WindowName = "Render Target" + std::to_string(Texture.Id);
+
+    if (ImGui::Begin(WindowName.c_str(), nullptr, windowFlags))
+    {
+      ImGui::Image((void*)(intptr_t)Texture.Id, ImGui::GetWindowSize(), ImVec2(0, 1), ImVec2(1, 0));
+    }
+    ImGui::End();
+  };
 
   style.WindowPadding = padding;
-}
+}*/
 
 
