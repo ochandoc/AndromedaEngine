@@ -1,7 +1,10 @@
+
+#include "Backends/OpenGL/OpenGL.h"
+
 #include "Andromeda/Graphics/Renderer.h"
 #include "Andromeda/HAL/Window.h"
 
-#include "Backends/OpenGL/OpenGL.h"
+
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -458,6 +461,7 @@ void Renderer::showImGuiDemoWindow()
 {
   ImGui::ShowDemoWindow();
 }
+
 std::shared_ptr<RenderTarget> Renderer::get_shadow_buffer(){
   return m_shadows_buffer_;
 }
@@ -476,11 +480,11 @@ void Renderer::draw_shadows(Light l, MeshComponent* obj, TransformComponent* tra
   int width = m_shadows_buffer_->GetCreationInfo().Width;
   int height = m_shadows_buffer_->GetCreationInfo().Height;
   
-  glm::perspective persp(glm::radians(l.spot->outer_cut_off), width / height, 10.0f, 310.0f);
+  glm::mat4 persp = glm::perspective<float>(glm::radians(l.spot->outer_cut_off), (float)width / (float)height, 10.0f, 310.0f);
 
 
   m_depth_shader->use();
-  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));
+  draw_deep_obj(obj, m_depth_shader.get(), tran, glm::value_ptr(view), glm::value_ptr(persp));
 
 
 

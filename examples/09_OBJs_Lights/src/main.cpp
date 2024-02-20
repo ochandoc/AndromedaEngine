@@ -253,13 +253,13 @@ int main(int argc, char** argv){
     window->update();
     g_renderer.new_frame();
     editor.ShowWindows();
-    std::shared_ptr<RenderTarget> shadow_buffer = g_renderer->get_shadow_buffer();
+    std::shared_ptr<And::RenderTarget> shadow_buffer = g_renderer.get_shadow_buffer();
 
      for (auto light : l_manager.get_lights()) {
 
         shadow_buffer->Activate();
         for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
-          g_renderer->draw_shadows(light, obj, transform);
+          g_renderer.draw_shadows(light, obj, transform);
         }
         shadow_buffer->Desactivate();
 
