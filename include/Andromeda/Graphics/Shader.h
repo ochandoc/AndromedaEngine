@@ -1,4 +1,13 @@
 #pragma once
+
+namespace And
+{
+  class Shader
+  {
+
+  };
+}
+
 #include "Andromeda/Graphics/Light.h"
 #include "Andromeda/Graphics/Texture.h"
 #include "Andromeda/Resources/Resource.h"
@@ -6,15 +15,15 @@
 
 namespace And{
 
-  enum ShaderType
+  enum OldShaderType
   {
-    Shader_Vertex,
-    Shader_Fragment,
-    Shader_Geometry,
-    Shader_Teselation,
+    OldShader_Vertex,
+    OldShader_Fragment,
+    OldShader_Geometry,
+    OldShader_Teselation,
   };
 
-  struct ShaderInfo{
+  struct OldShaderInfo{
     const char* path_fragment = nullptr;
     const char* path_vertex = nullptr;
     const char* path_teselation = nullptr;
@@ -36,28 +45,28 @@ namespace And{
     SpotLight light_spot;
   };
 
-  class Shader
+  class OldShader
   {
   public:
 
-    //static std::shared_ptr<Shader> make(ShaderInfo s_info);
-    static std::shared_ptr<Shader> make(const std::string& path);
-    static std::shared_ptr<Shader> make_default(const std::string& path, const std::string& light_path, LightType type);
-    Shader(const Shader& other) = delete;
-    Shader(Shader&& other);
-    ~Shader();
+    //static std::shared_ptr<OldShader> make(OldShaderInfo s_info);
+    static std::shared_ptr<OldShader> make(const std::string& path);
+    static std::shared_ptr<OldShader> make_default(const std::string& path, const std::string& light_path, LightType type);
+    OldShader(const OldShader& other) = delete;
+    OldShader(OldShader&& other);
+    ~OldShader();
 
 
-    Shader& operator=(const Shader& other) = delete;
-    Shader& operator=(Shader&& other);
+    OldShader& operator=(const OldShader& other) = delete;
+    OldShader& operator=(OldShader&& other);
 
     void setMat4(std::string name, const float matrix[16]);
     void setVec3(std::string name, const float vector[9]);
     void setModelViewProj(const float model[16], const float view[16], const float projection[16]);
     
     void use();
-    void configure_shader();
-    void un_configure_shader();
+    void configure_OldShader();
+    void un_configure_OldShader();
 
     // Uniform buffer
     void set_light(AmbientLight* light);
@@ -78,9 +87,9 @@ namespace And{
     //const OpenGLTexture2D& get_texture();
 
   private:
-    Shader();
-    std::unique_ptr<struct ShaderData> m_Data;
-    char m_shader_error[1024] = {0};
+    OldShader();
+    std::unique_ptr<struct OldShaderData> m_Data;
+    char m_OldShader_error[1024] = {0};
 
     std::shared_ptr<UniformBlockData> m_uniform_block;
     std::shared_ptr<UniformLights> m_uniform_block_lights;

@@ -2,26 +2,25 @@
 #include "Andromeda/Misc/CoreMiscDefines.h"
 #include "Backends/OpenGL/OpenGL.h"
 
-#include "base.h"
-#include "Common/GraphicsContext.h"
-#include "OpenGL.h"
 
-class OpenGLUniformBuffer
-{
-  NON_COPYABLE_CLASS(OpenGLUniformBuffer)
-  NON_MOVABLE_CLASS(OpenGLUniformBuffer)
-    public:
-  OpenGLUniformBuffer(uint32 block_index, uint32 size);
-      
-  ~OpenGLUniformBuffer();
+namespace And {
 
-      void bind() const;
-      void unbind() const;
+  class UniformBuffer {
+  public:
+    NON_COPYABLE_CLASS(UniformBuffer)
 
-  void upload_data(const void* data, uint32 size);
-    private:
-  GLuint m_BufferId;
-      GLuint m_Size;
-      GLuint m_BlockIndex;
+      UniformBuffer(unsigned int block_index, unsigned int size);
+    ~UniformBuffer();
+
+    void upload_data(const void* data, unsigned int size);
+
+    void bind() const;
+    void unbind() const;
+
+
+  private:
+    GLuint m_Id;
+    GLuint m_Size;
+    GLuint m_BlockIndex;
   };
 }

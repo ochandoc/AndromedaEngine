@@ -11,10 +11,10 @@
 namespace And{
 
 // Tengo que crearme un uniform buffer de cada tipo de luz
-  struct ShaderData{
+  struct OldShaderData{
     unsigned int id;
-    ShaderInfo shader_info;
-    std::string shader_path;
+    OldShaderInfo OldShader_info;
+    std::string OldShader_path;
     std::unique_ptr<UniformBuffer> uniform_buffer;
     int buffer_size;
     std::unique_ptr<UniformBuffer> uniform_buffer_lights;
@@ -31,28 +31,28 @@ namespace And{
   };
 
 /*
-  Shader::Shader(const Shader& other) : Shader(){
+  OldShader::OldShader(const OldShader& other) : OldShader(){
     m_Data->id = other.m_Data->id;
   }
 */
 
-  Shader::Shader(Shader&& other) : Shader(){
+  OldShader::OldShader(OldShader&& other) : OldShader(){
     m_Data->id = other.m_Data->id;
-    m_Data->shader_info = other.m_Data->shader_info;
+    m_Data->OldShader_info = other.m_Data->OldShader_info;
     other.m_Data->id = 0;
   }
 
   /*
-  Shader& Shader::operator=(const Shader& other){
+  OldShader& OldShader::operator=(const OldShader& other){
     m_Data->id = other.m_Data->id; 
 
     return *this;
   }
   */
 
-  Shader& Shader::operator=(Shader&& other){
+  OldShader& OldShader::operator=(OldShader&& other){
     m_Data->id = other.m_Data->id;
-    m_Data->shader_info = other.m_Data->shader_info;
+    m_Data->OldShader_info = other.m_Data->OldShader_info;
     other.m_Data->id = 0;
 
     return *this;
@@ -60,7 +60,7 @@ namespace And{
 
 
   // Returns true if gets an error
-  bool GetShaderError(unsigned int id){
+  bool GetOldShaderError(unsigned int id){
     // Recogemos codigo de error en caso de que lo haya
     int result;
     glGetShaderiv(id, GL_COMPILE_STATUS, &result);
@@ -68,17 +68,17 @@ namespace And{
     // Fallo en la compilacion
     if(result == GL_FALSE){
       int lenght;
-      char shader_error[1024];
+      char OldShader_error[1024];
       glGetShaderiv(id, GL_INFO_LOG_LENGTH, &lenght);
-      glGetShaderInfoLog(id, lenght, &lenght, shader_error);
-      printf("%s\n",shader_error);
+      glGetShaderInfoLog(id, lenght, &lenght, OldShader_error);
+      printf("%s\n",OldShader_error);
       return true;
     }
 
     return false;
   }
 
-  std::shared_ptr<Shader> Shader::make(const std::string& path){
+  std::shared_ptr<OldShader> OldShader::make(const std::string& path){
 
     unsigned int id_program = glCreateProgram();
     // Error
@@ -88,58 +88,58 @@ namespace And{
     }
 
     Slurp file{path.c_str()};
-    std::string shaders{file.data(), file.size()};
+    std::string OldShaders{file.data(), file.size()};
 
-    int vertex_pos = (int)shaders.find("#type Vertex");
-    int fragment_pos = (int)shaders.find("#type Fragment");
+    int vertex_pos = (int)OldShaders.find("#type Vertex");
+    int fragment_pos = (int)OldShaders.find("#type Fragment");
 
-    std::string vertex_shader;
-    std::string fragment_shader;
+    std::string vertex_OldShader;
+    std::string fragment_OldShader;
 
     if(vertex_pos != std::string::npos && fragment_pos != std::string::npos){
-      vertex_shader = shaders.substr(vertex_pos, fragment_pos);
-      fragment_shader = shaders.substr(fragment_pos, shaders.size() - 1);
+      vertex_OldShader = OldShaders.substr(vertex_pos, fragment_pos);
+      fragment_OldShader = OldShaders.substr(fragment_pos, OldShaders.size() - 1);
 
       std::string vertex_title = "#type Vertex";
       std::string fragment_title = "#type Fragment";
 
-      vertex_shader.erase(0, vertex_title.size());
-      fragment_shader.erase(0, fragment_title.size());
+      vertex_OldShader.erase(0, vertex_title.size());
+      fragment_OldShader.erase(0, fragment_title.size());
 
-      unsigned int id_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-      unsigned int id_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+      unsigned int id_vertex_OldShader = glCreateShader(GL_VERTEX_SHADER);
+      unsigned int id_fragment_OldShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-      const char* aux_v = vertex_shader.c_str();
-      const char* aux_f = fragment_shader.c_str();
+      const char* aux_v = vertex_OldShader.c_str();
+      const char* aux_f = fragment_OldShader.c_str();
 
-      glShaderSource(id_vertex_shader, 1, &aux_v, nullptr);
-      glShaderSource(id_fragment_shader, 1, &aux_f, nullptr);
+      glShaderSource(id_vertex_OldShader, 1, &aux_v, nullptr);
+      glShaderSource(id_fragment_OldShader, 1, &aux_f, nullptr);
 
       // Compilamos
-      glCompileShader(id_vertex_shader);
-      glCompileShader(id_fragment_shader);
+      glCompileShader(id_vertex_OldShader);
+      glCompileShader(id_fragment_OldShader);
 
-      GetShaderError(id_vertex_shader);
-      GetShaderError(id_fragment_shader);
+      GetOldShaderError(id_vertex_OldShader);
+      GetOldShaderError(id_fragment_OldShader);
 
-      if(!GetShaderError(id_vertex_shader) && !GetShaderError(id_fragment_shader)){
+      if(!GetOldShaderError(id_vertex_OldShader) && !GetOldShaderError(id_fragment_OldShader)){
         // Si no hay error atachamos
-        glAttachShader(id_program, id_vertex_shader);
-        glAttachShader(id_program, id_fragment_shader);
+        glAttachShader(id_program, id_vertex_OldShader);
+        glAttachShader(id_program, id_fragment_OldShader);
       }else{
         // Error
-        printf("Error on loading shader\n");
+        printf("Error on loading OldShader\n");
         return nullptr;
       }
 
-      // Cuando ya tenemos todos los shader compilados, linkamos el program
+      // Cuando ya tenemos todos los OldShader compilados, linkamos el program
       glLinkProgram(id_program);
       glValidateProgram(id_program);
 
       int succes;
       glGetProgramiv(id_program, GL_VALIDATE_STATUS, &succes);
       if(succes != GL_TRUE){
-        printf("Error on loading shader\n");
+        printf("Error on loading OldShader\n");
         return nullptr;
       }
 
@@ -161,29 +161,29 @@ namespace And{
       //printf("Size in C++: %d size in gl: %d\n", size_struct, size_block);
       //printf("Size in C++: %d size in gl: %d\n", size_struct_lights, size_block_lights);
 
-      // Llegados hasta aqui, todo ha ido bien y creamos el shader
-      std::shared_ptr<Shader> shader = std::shared_ptr<Shader>(new Shader);
-      shader->m_Data->id = id_program;
-      shader->m_Data->shader_info.path_vertex = vertex_shader.c_str();
-      shader->m_Data->shader_info.path_fragment = fragment_shader.c_str();
-      shader->m_Data->shader_path = path;
+      // Llegados hasta aqui, todo ha ido bien y creamos el OldShader
+      std::shared_ptr<OldShader> Oldshader = std::shared_ptr<OldShader>(new OldShader);
+      Oldshader->m_Data->id = id_program;
+      Oldshader->m_Data->OldShader_info.path_vertex = vertex_OldShader.c_str();
+      Oldshader->m_Data->OldShader_info.path_fragment = fragment_OldShader.c_str();
+      Oldshader->m_Data->OldShader_path = path;
 
-      shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(0, (unsigned int)size_block);
-      shader->m_Data->uniform_buffer_lights = std::make_unique<UniformBuffer>(1, (unsigned int)size_block_lights);
+      Oldshader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(0, (unsigned int)size_block);
+      Oldshader->m_Data->uniform_buffer_lights = std::make_unique<UniformBuffer>(1, (unsigned int)size_block_lights);
       
-      shader->m_uniform_block = std::make_shared<UniformBlockData>();
-      shader->m_uniform_block_lights = std::make_shared<UniformLights>();
+      Oldshader->m_uniform_block = std::make_shared<UniformBlockData>();
+      Oldshader->m_uniform_block_lights = std::make_shared<UniformLights>();
       
-      shader->m_Data->buffer_size = size_block;
-      shader->m_Data->buffer_lights_size = size_block_lights;
+      Oldshader->m_Data->buffer_size = size_block;
+      Oldshader->m_Data->buffer_lights_size = size_block_lights;
 
       //glFlush();
-      return shader;
+      return Oldshader;
     }
     return nullptr;
   }
 
-  std::shared_ptr<Shader> Shader::make_default(const std::string& path, const std::string& light_path, LightType type){
+  std::shared_ptr<OldShader> OldShader::make_default(const std::string& path, const std::string& light_path, LightType type){
 
     unsigned int id_program = glCreateProgram();
     // Error
@@ -193,60 +193,60 @@ namespace And{
     }
 
     Slurp file{path.c_str()};
-    std::string shaders{file.data(), file.size()};
+    std::string OldShaders{file.data(), file.size()};
 
-    int vertex_pos = (int)shaders.find("#type Vertex");
-    int fragment_pos = (int)shaders.find("#type Fragment");
+    int vertex_pos = (int)OldShaders.find("#type Vertex");
+    int fragment_pos = (int)OldShaders.find("#type Fragment");
 
-    std::string vertex_shader;
-    std::string fragment_shader;
+    std::string vertex_OldShader;
+    std::string fragment_OldShader;
 
     if(vertex_pos != std::string::npos && fragment_pos != std::string::npos){
-      vertex_shader = shaders.substr(vertex_pos, fragment_pos);
-      fragment_shader = shaders.substr(fragment_pos, shaders.size() - 1);
+      vertex_OldShader = OldShaders.substr(vertex_pos, fragment_pos);
+      fragment_OldShader = OldShaders.substr(fragment_pos, OldShaders.size() - 1);
 
       std::string vertex_title = "#type Vertex";
       std::string fragment_title = "#type Fragment";
 
-      vertex_shader.erase(0, vertex_title.size());
-      fragment_shader.erase(0, fragment_title.size());
+      vertex_OldShader.erase(0, vertex_title.size());
+      fragment_OldShader.erase(0, fragment_title.size());
 
-      unsigned int id_vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-      unsigned int id_fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
+      unsigned int id_vertex_OldShader = glCreateShader(GL_VERTEX_SHADER);
+      unsigned int id_fragment_OldShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-      const char* aux_v = vertex_shader.c_str();
-      const char* aux_f = fragment_shader.c_str();
+      const char* aux_v = vertex_OldShader.c_str();
+      const char* aux_f = fragment_OldShader.c_str();
 
       //printf("%s\n %s\n", aux_v, aux_f);
 
-      glShaderSource(id_vertex_shader, 1, &aux_v, nullptr);
-      glShaderSource(id_fragment_shader, 1, &aux_f, nullptr);
+      glShaderSource(id_vertex_OldShader, 1, &aux_v, nullptr);
+      glShaderSource(id_fragment_OldShader, 1, &aux_f, nullptr);
 
       // Compilamos
-      glCompileShader(id_vertex_shader);
-      glCompileShader(id_fragment_shader);
+      glCompileShader(id_vertex_OldShader);
+      glCompileShader(id_fragment_OldShader);
 
-      GetShaderError(id_vertex_shader);
-      GetShaderError(id_fragment_shader);
+      GetOldShaderError(id_vertex_OldShader);
+      GetOldShaderError(id_fragment_OldShader);
 
-      if(!GetShaderError(id_vertex_shader) && !GetShaderError(id_fragment_shader)){
+      if(!GetOldShaderError(id_vertex_OldShader) && !GetOldShaderError(id_fragment_OldShader)){
         // Si no hay error atachamos
-        glAttachShader(id_program, id_vertex_shader);
-        glAttachShader(id_program, id_fragment_shader);
+        glAttachShader(id_program, id_vertex_OldShader);
+        glAttachShader(id_program, id_fragment_OldShader);
       }else{
         // Error
-        printf("Error on loading shader\n");
+        printf("Error on loading OldShader\n");
         return nullptr;
       }
 
-      // Cuando ya tenemos todos los shader compilados, linkamos el program
+      // Cuando ya tenemos todos los OldShader compilados, linkamos el program
       glLinkProgram(id_program);
       glValidateProgram(id_program);
 
       int succes;
       glGetProgramiv(id_program, GL_VALIDATE_STATUS, &succes);
       if(succes != GL_TRUE){
-        printf("Error on loading shader\n");
+        printf("Error on loading OldShader\n");
         return nullptr;
       }
 
@@ -273,61 +273,61 @@ namespace And{
       //printf("Size in C++: %d size in gl: %d\n", size_struct, size_block);
       //printf("Size in C++: %d size in gl: %d\n", size_struct_lights, size_block_lights);
 
-      // Llegados hasta aqui, todo ha ido bien y creamos el shader
-      std::shared_ptr<Shader> shader = std::shared_ptr<Shader>(new Shader);
-      shader->m_Data->id = id_program;
-      shader->m_Data->shader_info.path_vertex = vertex_shader.c_str();
-      shader->m_Data->shader_info.path_fragment = fragment_shader.c_str();
-      shader->m_Data->shader_path = path;
+      // Llegados hasta aqui, todo ha ido bien y creamos el OldShader
+      std::shared_ptr<OldShader> Oldshader = std::shared_ptr<OldShader>(new OldShader);
+      Oldshader->m_Data->id = id_program;
+      Oldshader->m_Data->OldShader_info.path_vertex = vertex_OldShader.c_str();
+      Oldshader->m_Data->OldShader_info.path_fragment = fragment_OldShader.c_str();
+      Oldshader->m_Data->OldShader_path = path;
 
-      shader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(0, (unsigned int)size_block);
+      Oldshader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(0, (unsigned int)size_block);
       switch(type){
         case LightType::Ambient: 
         glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Ambient);
-        shader->m_Data->uniform_buffer_ambient = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Ambient, (unsigned int)size_block_lights);
-        shader->m_Data->ambient_size = size_block_lights;
-        shader->m_default_ambient = std::make_shared<AmbientLight>();
+        Oldshader->m_Data->uniform_buffer_ambient = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Ambient, (unsigned int)size_block_lights);
+        Oldshader->m_Data->ambient_size = size_block_lights;
+        Oldshader->m_default_ambient = std::make_shared<AmbientLight>();
         break;
         case LightType::Directional: 
         glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Directional);
-        shader->m_Data->uniform_buffer_directional = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Directional, (unsigned int)size_block_lights);
-        shader->m_Data->directional_size = size_block_lights;
-        shader->m_default_directional = std::make_shared<DirectionalLight>();
+        Oldshader->m_Data->uniform_buffer_directional = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Directional, (unsigned int)size_block_lights);
+        Oldshader->m_Data->directional_size = size_block_lights;
+        Oldshader->m_default_directional = std::make_shared<DirectionalLight>();
         break;
         case LightType::Point: 
         glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Point);
-        shader->m_Data->uniform_buffer_point = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Point, (unsigned int)size_block_lights);
-        shader->m_Data->point_size = size_block_lights;
-        shader->m_default_point = std::make_shared<PointLight>();
+        Oldshader->m_Data->uniform_buffer_point = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Point, (unsigned int)size_block_lights);
+        Oldshader->m_Data->point_size = size_block_lights;
+        Oldshader->m_default_point = std::make_shared<PointLight>();
         break;
         case LightType::Spot: 
         glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Spot);
-        shader->m_Data->uniform_buffer_spot = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Spot, (unsigned int)size_block_lights);
-        shader->m_Data->spot_size = size_block_lights;
-        shader->m_default_spot = std::make_shared<SpotLight>();
+        Oldshader->m_Data->uniform_buffer_spot = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Spot, (unsigned int)size_block_lights);
+        Oldshader->m_Data->spot_size = size_block_lights;
+        Oldshader->m_default_spot = std::make_shared<SpotLight>();
         break;
       }
 
-      shader->m_uniform_block = std::make_shared<UniformBlockData>();
-      shader->m_Data->buffer_size = size_block;
+      Oldshader->m_uniform_block = std::make_shared<UniformBlockData>();
+      Oldshader->m_Data->buffer_size = size_block;
 
 
       //glFlush();
-      return shader;
+      return Oldshader;
     }
     return nullptr;
   }
 
-  void Shader::setMat4(std::string name, const float matrix[16]){ 
+  void OldShader::setMat4(std::string name, const float matrix[16]){ 
     glUniformMatrix4fv(glGetUniformLocation(m_Data->id, name.c_str()), 1, GL_FALSE, &matrix[0]);
   }
 
-  void Shader::setVec3(std::string name, const float vector[9]){
+  void OldShader::setVec3(std::string name, const float vector[9]){
 
     glUniform3fv(glGetUniformLocation(m_Data->id, name.c_str()),1, &vector[0]);
   }
 
-  void Shader::set_default_light(AmbientLight* light){
+  void OldShader::set_default_light(AmbientLight* light){
     //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
 
     m_default_ambient->enabled = light->enabled;
@@ -341,7 +341,7 @@ namespace And{
     }    
   }
   
-  void Shader::set_default_light(DirectionalLight* light){
+  void OldShader::set_default_light(DirectionalLight* light){
     //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
 
     m_default_directional->enabled = light->enabled;
@@ -355,7 +355,7 @@ namespace And{
     }    
   }
 
-  void Shader::set_default_light(PointLight* light){
+  void OldShader::set_default_light(PointLight* light){
     m_default_point->enabled = light->enabled;
     m_default_point->specular_strength = light->specular_strength;
     m_default_point->specular_shininess = light->specular_shininess;
@@ -370,7 +370,7 @@ namespace And{
     }
   }
 
-  void Shader::set_default_light(SpotLight* light){
+  void OldShader::set_default_light(SpotLight* light){
     m_default_spot->enabled = light->enabled;
     m_default_spot->specular_strength = light->specular_strength;
     m_default_spot->specular_shininess = light->specular_shininess;
@@ -387,7 +387,7 @@ namespace And{
     }
   }
   
-  void Shader::set_light(AmbientLight* light){
+  void OldShader::set_light(AmbientLight* light){
     //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
 
     m_uniform_block_lights->light_ambient.enabled = light->enabled;
@@ -401,7 +401,7 @@ namespace And{
     }    
   }
 
-  void Shader::set_light(PointLight* light){
+  void OldShader::set_light(PointLight* light){
     m_uniform_block_lights->light_point.enabled = light->enabled;
     m_uniform_block_lights->light_point.specular_strength = light->specular_strength;
     m_uniform_block_lights->light_point.specular_shininess = light->specular_shininess;
@@ -416,7 +416,7 @@ namespace And{
     }
   }
 
-  void Shader::setModelViewProj(const float model[16], const float view[16], const float projection[16]){
+  void OldShader::setModelViewProj(const float model[16], const float view[16], const float projection[16]){
 
     for(int i = 0; i < 16; i++){
       m_uniform_block->model[i] = model[i];
@@ -427,13 +427,13 @@ namespace And{
     //m_Data->uniform_buffer->upload_data((void*)(&tmp), (unsigned int)sizeof(ModelViewProj));
   }
 
-  void Shader::set_camera_position(const float position[3]){
+  void OldShader::set_camera_position(const float position[3]){
     for(int i = 0; i < 3; i++){
       m_uniform_block->camera_position[i] = position[i];
     }
   }
 
-  void Shader::upload_data(){
+  void OldShader::upload_data(){
     
     // this ubo is for MVP matrices
     m_Data->uniform_buffer->upload_data((void*)(m_uniform_block.get()), (unsigned int)m_Data->buffer_size);
@@ -449,7 +449,7 @@ namespace And{
     
   }
 
-  void Shader::upload_default_data(LightType type){
+  void OldShader::upload_default_data(LightType type){
  
     //m_Data->uniform_buffer->upload_data((void*)(m_uniform_block.get()), (unsigned int)m_Data->buffer_size);
     //m_Data->uniform_buffer->bind();
@@ -484,35 +484,35 @@ namespace And{
 
   }
 
-  void Shader::configure_shader(){
+  void OldShader::configure_OldShader(){
     //m_Data->uniform_buffer->bind();
   }
 
-  void Shader::un_configure_shader(){
+  void OldShader::un_configure_OldShader(){
     m_Data->uniform_buffer->unbind();
     m_Data->uniform_buffer_lights->unbind();
   }
 
-  void Shader::set_texture(Texture* texture){
+  void OldShader::set_texture(Texture* texture){
     m_texture = texture;
   }
 
-  //void Shader::get_texture(){}
-  Shader::Shader() : m_Data(new ShaderData){}
+  //void OldShader::get_texture(){}
+  OldShader::OldShader() : m_Data(new OldShaderData){}
 
-  void Shader::use(){
+  void OldShader::use(){
     glUseProgram(m_Data->id);
   }
 
 
-  Shader::~Shader(){
+  OldShader::~OldShader(){
     glDeleteProgram(m_Data->id);
   }
 
-  void Shader::reload(){
+  void OldShader::reload(){
     //glLinkProgram(m_Data->id);
     glDeleteShader(m_Data->id);
-    std::shared_ptr<Shader> s = make(m_Data->shader_path);
+    std::shared_ptr<OldShader> s = make(m_Data->OldShader_path);
     m_Data->id = s->m_Data->id;
   }
 

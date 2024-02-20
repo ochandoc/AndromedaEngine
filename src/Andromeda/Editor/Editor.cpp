@@ -13,13 +13,13 @@ namespace And{
 Editor::Editor(Window& window, ResourceManager* rm) : m_MainWindow(window), m_resourceManager(rm)
 {
 
-  // Logger, shader editor, job system, content browser
+  // Logger, OldShader editor, job system, content browser
 	m_Windows.insert({ "Console Log 1", std::shared_ptr<LogWindow>(new LogWindow("Console Log 1")) });
 	m_Windows.insert({ "Console Log 2", std::shared_ptr<LogWindow>(new LogWindow("Console Log 2")) });
 	m_Windows.insert({ "Console Log 3", std::shared_ptr<LogWindow>(new LogWindow("Console Log 3")) });
 	m_Windows.insert({ "Console Log 4", std::shared_ptr<LogWindow>(new LogWindow("Console Log 4")) });
-	m_Windows.insert({ "Shader Editor 1", std::shared_ptr<ShaderTextEditor>(new ShaderTextEditor("Shader Editor 1")) });
-	m_Windows.insert({ "Shader Editor 2", std::shared_ptr<ShaderTextEditor>(new ShaderTextEditor("Shader Editor 2")) });
+	m_Windows.insert({ "OldShader Editor 1", std::shared_ptr<ShaderTextEditor>(new ShaderTextEditor("OldShader Editor 1")) });
+	m_Windows.insert({ "OldShader Editor 2", std::shared_ptr<ShaderTextEditor>(new ShaderTextEditor("OldShader Editor 2")) });
 	m_Windows.insert({ "Game Info Window", std::shared_ptr<GameInfoWindow>(new GameInfoWindow()) });
 
 	for (auto& [name, window] : m_Windows)
@@ -30,7 +30,7 @@ Editor::Editor(Window& window, ResourceManager* rm) : m_MainWindow(window), m_re
 	}
 
 	// Debug
-	std::static_pointer_cast<ShaderTextEditor>(m_Windows["Shader Editor 1"])->Load("default/deafult_shader.shader");
+	std::static_pointer_cast<ShaderTextEditor>(m_Windows["OldShader Editor 1"])->Load("default/deafult_OldShader.OldShader");
 }
 
 Editor::~Editor(){
@@ -93,10 +93,10 @@ void Editor::ShowWindows(){
 
 			if (ImGui::BeginMenu("Code Editor"))
 			{
-				if (ImGui::BeginMenu("Shaders"))
+				if (ImGui::BeginMenu("OldShaders"))
 				{
-					ImGui::MenuItem("Shader Editor 1", nullptr, &m_Windows["Shader Editor 1"]->m_is_open);
-					ImGui::MenuItem("Shader Editor 2", nullptr, &m_Windows["Shader Editor 2"]->m_is_open);
+					ImGui::MenuItem("OldShader Editor 1", nullptr, &m_Windows["OldShader Editor 1"]->m_is_open);
+					ImGui::MenuItem("OldShader Editor 2", nullptr, &m_Windows["OldShader Editor 2"]->m_is_open);
 					ImGui::EndMenu();
 				}
 				ImGui::EndMenu();

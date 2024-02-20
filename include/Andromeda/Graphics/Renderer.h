@@ -12,11 +12,11 @@
 namespace And
 {
   class Window;
-  class Shader;
+  class OldShader;
   class Triangle;
   class ObjLoader;
   class TransformComponent;
-  struct ShaderInfo;
+  struct OldShaderInfo;
 
 
 class Renderer
@@ -43,12 +43,12 @@ public:
 
   void draw_triangle(Triangle *t);
 
-  void draw_obj(ObjLoader obj, Shader* s, Transform trans, AmbientLight* ambient, PointLight* point);
-  void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans);
-  void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point);
-  void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point, Texture* texture);
+  void draw_obj(ObjLoader obj, OldShader* s, Transform trans, AmbientLight* ambient, PointLight* point);
+  void draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* trans);
+  void draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point);
+  void draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point, Texture* texture);
 
-  void draw_scene(Scene& scene, Shader* s);
+  void draw_scene(Scene& scene, OldShader* s);
 
 protected:
   Window& m_Window;

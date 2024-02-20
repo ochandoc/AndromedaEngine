@@ -13,19 +13,19 @@ namespace And
   {
     ShaderEditorInfo(const std::string& type, const std::string& Source) : Type(type)
     {
-      shaderEditor.SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL());
-      shaderEditor.SetShowWhitespaces(false);
-      shaderEditor.SetTabSize(2);
-      shaderEditor.SetText(Source);
+      OldShaderEditor.SetLanguageDefinition(TextEditor::LanguageDefinition::GLSL());
+      OldShaderEditor.SetShowWhitespaces(false);
+      OldShaderEditor.SetTabSize(2);
+      OldShaderEditor.SetText(Source);
     }
 
     std::string Type;
-    TextEditor shaderEditor;
+    TextEditor OldShaderEditor;
   };
 
   struct ShaderTextEditorData
   {
-    std::vector<ShaderEditorInfo> shaderEditors;
+    std::vector<ShaderEditorInfo> OldShaderEditors;
     std::string Path;
   };
 
@@ -39,7 +39,7 @@ namespace And
 
   void ShaderTextEditor::Load(const std::string& Path)
   {
-    m_Data->shaderEditors.clear();
+    m_Data->OldShaderEditors.clear();
     m_Data->Path = Path;
 
     Slurp file(Path.c_str());
@@ -48,24 +48,24 @@ namespace And
     {
       bool bEnd = false;
 
-      std::string ShaderSource(file.data(), file.size());
+      std::string OldShaderSource(file.data(), file.size());
 
       while (!bEnd)
       {
-        size_t ShaderStart = ShaderSource.find("#type");
-        size_t ShaderEnd = ShaderSource.find("#type", ShaderStart + 5);
+        size_t OldShaderStart = OldShaderSource.find("#type");
+        size_t OldShaderEnd = OldShaderSource.find("#type", OldShaderStart + 5);
 
-        if (ShaderEnd == std::string::npos)
+        if (OldShaderEnd == std::string::npos)
         {
           bEnd = true;
-          ShaderEnd = ShaderSource.size();
+          OldShaderEnd = OldShaderSource.size();
         }
 
-        std::string Source = ShaderSource.substr(ShaderStart, ShaderEnd);
-        ShaderSource = ShaderSource.substr(ShaderEnd, ShaderSource.size());
+        std::string Source = OldShaderSource.substr(OldShaderStart, OldShaderEnd);
+        OldShaderSource = OldShaderSource.substr(OldShaderEnd, OldShaderSource.size());
 
         size_t TypeEnd = Source.find("\n", 5);
-        m_Data->shaderEditors.emplace_back(Source.substr(ShaderStart + 6, TypeEnd - 5).c_str(), Source.substr(TypeEnd + 1, Source.size()));
+        m_Data->OldShaderEditors.emplace_back(Source.substr(OldShaderStart + 6, TypeEnd - 5).c_str(), Source.substr(TypeEnd + 1, Source.size()));
       }
       
     }
@@ -74,12 +74,12 @@ namespace And
 
   void ShaderTextEditor::Save()
   {
-    std::string ShaderSource;
-    for (auto& shader : m_Data->shaderEditors)
+    std::string OldShaderSource;
+    for (auto& OldShader : m_Data->OldShaderEditors)
     {
-      ShaderSource += "#type ";
-      ShaderSource += shader.Type + "\n";
-      ShaderSource += shader.shaderEditor.GetText();
+      OldShaderSource += "#type ";
+      OldShaderSource += OldShader.Type + "\n";
+      OldShaderSource += OldShader.OldShaderEditor.GetText();
     }
 
     FILE* f;
@@ -88,7 +88,7 @@ namespace And
 
     if (f != NULL) 
     {
-      fwrite(ShaderSource.c_str(), 1, ShaderSource.size(), f);
+      fwrite(OldShaderSource.c_str(), 1, OldShaderSource.size(), f);
       fclose(f);
     }
   }
@@ -105,24 +105,24 @@ namespace And
         if(ImGui::BeginMenuBar()){
           if(ImGui::BeginMenu("File")){
             if(ImGui::MenuItem("Save")){
-              printf("\n*** Reload shader ***\n");
+              printf("\n*** Reload OldShader ***\n");
               Save();
               // ReloadResource
               if(m_resourceManager){
-                m_resourceManager->ReloadResource<Shader>(m_Data->Path);
+                m_resourceManager->ReloadResource<OldShader>(m_Data->Path);
               }
             }
             ImGui::EndMenu();
           }
           ImGui::EndMenuBar();
         }
-        if (ImGui::BeginTabBar("Shaders"))
+        if (ImGui::BeginTabBar("OldShaders"))
         {
-          for (auto& shader : m_Data->shaderEditors)
+          for (auto& OldShader : m_Data->OldShaderEditors)
           {
-            if (ImGui::BeginTabItem(shader.Type.c_str()))
+            if (ImGui::BeginTabItem(OldShader.Type.c_str()))
             {
-              shader.shaderEditor.Render(shader.Type.c_str());
+              OldShader.OldShaderEditor.Render(OldShader.Type.c_str());
               ImGui::EndTabItem();
             }
           }
@@ -140,7 +140,7 @@ namespace And
       if (!m_is_open)
       {
         m_Data->Path = "";
-        m_Data->shaderEditors.clear();
+        m_Data->OldShaderEditors.clear();
       }
     }
   }

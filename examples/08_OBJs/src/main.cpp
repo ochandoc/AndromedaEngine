@@ -43,7 +43,7 @@ int main(int argc, char** argv){
 
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();
-  r_manager.AddGenerator<And::ShaderGenerator>();
+  r_manager.AddGenerator<And::OldShaderGenerator>();
   
   And::Editor editor{*window, &r_manager};
 
@@ -51,16 +51,16 @@ int main(int argc, char** argv){
   // Show pc info
   g_context->create_info();
 
-  // Creamos el shader
-  /*And::ShaderInfo s_info;
-  s_info.path_fragment = "fshader.fs";
-  s_info.path_vertex = "vshader.vs";*/
+  // Creamos el OldShader
+  /*And::OldShaderInfo s_info;
+  s_info.path_fragment = "fOldShader.fs";
+  s_info.path_vertex = "vOldShader.vs";*/
 
-  //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("content/teapot_shader.ashader");
+  //And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("content/teapot_OldShader.aOldShader");
 
-  //auto shader = And::Shader::make("default/depth.shader");
+  //auto OldShader = And::OldShader::make("default/depth.OldShader");
 
-  auto shader = And::Shader::make("content/teapot_shader.ashader");
+  auto OldShader = And::OldShader::make("content/teapot_OldShader.aOldShader");
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
@@ -120,7 +120,7 @@ int main(int argc, char** argv){
 
     editor.ShowWindows();
 
-    g_renderer.draw_scene(scene, shader.get());
+    g_renderer.draw_scene(scene, OldShader.get());
 
     g_renderer.get_render_target()->Test();
 
