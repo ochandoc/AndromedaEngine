@@ -262,7 +262,7 @@ int main(int argc, char** argv){
           g_renderer.draw_shadows(light, obj, transform);
         }
         shadow_buffer->Desactivate();
-
+        
         And::Shader* s = l_manager.bind_light(light);
         
         //start = std::chrono::high_resolution_clock::now();

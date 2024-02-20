@@ -28,12 +28,12 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 {
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
 
-  m_Camera.SetPosition(0.0f, 7.0f, -60.0f);
+  m_Camera.SetPosition(0.0f, 14.0f, 11.0f);
 
 
 
   m_Camera.SetFov(90.0f);
-  m_Camera.SetDirection(0.0f, -7.0f, 60.0f);
+  m_Camera.SetDirection(0.0f, 0.0f, -1.0f);
 
   int width = m_Window.get_width();
   int height = m_Window.get_height();
@@ -252,7 +252,7 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
 
   const std::vector<unsigned int>& indices = obj->Mesh->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-  //glFlush();
+  glFlush();
   //WAIT_GPU_LOAD();
 }
 
@@ -414,7 +414,7 @@ void Renderer::draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* 
 
   const std::vector<unsigned int>& indices = obj->Mesh->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-  //glFlush();
+  glFlush();
   //WAIT_GPU_LOAD();
 }
 
@@ -471,7 +471,7 @@ void Renderer::draw_shadows(Light l, MeshComponent* obj, TransformComponent* tra
   // Pintar cada obj de la escena con el shader de profundidad y guardar todo lo que pinte en el render target
   // sacar la view y projeciton de la posicion de la luz
   glm::vec3 pos(l.spot->position[0],l.spot->position[1], l.spot->position[2]);
-  glm::vec3 dir(l.spot->direction[0],l.spot->direction[1], l.spot->direction[2]);
+  glm::vec3 dir(-l.spot->direction[0],-l.spot->direction[1], -l.spot->direction[2]);
   glm::vec3 up(0.0f, 1.0f, 0.0f);
 
   glm::vec3 right = glm::normalize(glm::cross(up, dir));
