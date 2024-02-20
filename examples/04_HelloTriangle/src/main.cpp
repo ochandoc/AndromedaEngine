@@ -20,19 +20,7 @@
 #include <condition_variable>
 #include <future>
 
-#include "Common/Engine.h"
-#include "Common/Window.h"
-#include "Common/GraphicsContext.h"
-#include "Common/Renderer.h"
-#include "Common/Shader.h"
-#include "Common/Triangle.h"
-#include "Common/Input.h"
-#include "Common/ActionInput.h"
-#include "Common/EntityComponentSystem.h"
-#include "Common/Save.h"
-
-#include "Common/Log.h"
-#include "Common/Save.h"
+#include "Andromeda.h"
 
 
 int main(int argc, char** argv){
@@ -52,7 +40,7 @@ int main(int argc, char** argv){
   s_info.path_fragment = "fshader.fs";
   s_info.path_vertex = "vshader_tri.vs";
 
-   std::optional<And::Shader> g_shader = And::Shader::make(s_info);
+   std::shared_ptr<And::Shader> g_shader = And::Shader::make(s_info);
 
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -131,7 +119,7 @@ int main(int argc, char** argv){
       }
     }
 
-    if(g_shader.has_value()){
+    if(g_shader){
       g_shader->use();
     }
     

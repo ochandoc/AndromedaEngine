@@ -1,4 +1,4 @@
-#include "Common/Triangle.h"
+#include "Andromeda/Graphics/Triangle.h"
 #include "Backends/OpenGL/OpenGL.h"
 #include "GLFW/glfw3.h"
 #include <string>

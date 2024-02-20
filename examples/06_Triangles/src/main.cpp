@@ -20,15 +20,8 @@
 #include <condition_variable>
 #include <future>
 
-#include "Common/Engine.h"
-#include "Common/Window.h"
-#include "Common/GraphicsContext.h"
-#include "Common/Renderer.h"
-#include "Common/Shader.h"
-#include "Common/Triangle.h"
-#include "Common/Input.h"
-#include "Common/ActionInput.h"
-#include "Common/EntityComponentSystem.h"
+#include "Andromeda.h"
+
 
 class InputComponent {
 public:
@@ -199,14 +192,14 @@ int main(int argc, char** argv) {
 
 
 
-  And::LogWindow logWindow;
+  And::LogWindow logWindow("Name");
 
   float speed = 0.01f;
   while (window->is_open()) {
     window->update();
     g_renderer.new_frame();
 
-    logWindow.Draw();
+    logWindow.Show();
 
     if (input.check_action(jump)) {
       printf("Jummpinggggg!!!\n");

@@ -1,8 +1,8 @@
-#include "configuration.h"
+#include "Andromeda/HAL/configuration.h"
 
-#include "Common/Input.h"
-#include "Common/Window.h"
-#include "Common/ActionInput.h"
+#include "Andromeda/HAL/Input.h"
+#include "Andromeda/HAL/Window.h"
+#include "Andromeda/HAL/ActionInput.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -26,7 +26,7 @@ namespace And{
   }
 
   bool Input::IsKeyPressed(KeyCode key){
-    return m_KeyBoard.keys[(int)key] == KeyState::Repeat;
+    return m_KeyBoard.keys[(int)key] == KeyState::Repeat || m_KeyBoard.keys[(int)key] == KeyState::Press;
   }
 
   bool Input::IsKeyDown(KeyCode key){

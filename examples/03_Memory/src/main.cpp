@@ -20,19 +20,7 @@
 #include <condition_variable>
 #include <future>
 
-#include "Common/Engine.h"
-#include "Common/Window.h"
-#include "Common/GraphicsContext.h"
-#include "Common/Renderer.h"
-#include "Common/Shader.h"
-#include "Common/Triangle.h"
-#include "Common/Input.h"
-#include "Common/ActionInput.h"
-#include "Common/EntityComponentSystem.h"
-#include "Common/Save.h"
-
-#include "Common/Log.h"
-#include "Common/Save.h"
+#include "Andromeda.h"
 
 struct SPrueba {
   int uno = 1;

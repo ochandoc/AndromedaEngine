@@ -51,7 +51,7 @@ workspace "AndromedEngine"
   flags
   {
     "MultiProcessorCompile",
-    --"FatalWarnings",
+    "FatalWarnings",
   }
 
 group "Core"
@@ -93,7 +93,7 @@ project "Andromeda"
   {
     "include/**.h",
     "include/**.hpp",
-    "src/Common/**.*",
+    "src/Andromeda/**.*",
     "src/Graphics/**.*",
     "include/andpch.hpp",
     "src/andpch.cpp",
@@ -147,6 +147,7 @@ group "Examples"
   include "examples/06_Triangles"
   include "examples/07_ResourceSystem"
   include "examples/08_OBJs"
+  include "examples/09_OBJs_Lights"
 group ""
 
 newoption

@@ -1,33 +1,31 @@
 #include "opengl_uniform_buffer.h"
 
-OpenGLUniformBuffer::OpenGLUniformBuffer(uint32 block_index, uint32 size) : m_Size(size), m_BlockIndex(block_index), m_BufferId(0)
-{
-  if (size == 0)
-  {
-    AND_LOG(GraphicsContextLog, And::Error, "Invalid size in Uniform Buffer creation!");
-  }
-  else
-  {
-    glGenBuffers(1, &m_BufferId);
-    glBindBuffer(GL_UNIFORM_BUFFER, m_BufferId);
-    glBufferData(GL_UNIFORM_BUFFER, m_Size, NULL, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
-  }
+
+namespace And{
+
+
+UniformBuffer::UniformBuffer(unsigned int block_index, unsigned int size){
+  unsigned int id_ubo;
   
+  glGenBuffers(1, &id_ubo);
+  glBindBuffer(GL_UNIFORM_BUFFER, id_ubo);
+  printf("Size del buffer antes de hacer buffer data: %u\n", size);
+  glBufferData(GL_UNIFORM_BUFFER, size, 0, GL_DYNAMIC_DRAW);
+  glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+  m_Id = id_ubo;
+  m_BlockIndex = block_index;
+  m_Size = size;
 }
 
-OpenGLUniformBuffer::~OpenGLUniformBuffer()
-{
-  if (m_BufferId != 0) glDeleteBuffers(1, &m_BufferId);
+UniformBuffer::~UniformBuffer(){
+  glDeleteBuffers(1, &m_Id);
 }
 
-void OpenGLUniformBuffer::bind() const
-{
-  glBindBufferBase(GL_UNIFORM_BUFFER, m_BlockIndex, m_BufferId);
 }
 
-void OpenGLUniformBuffer::unbind() const
-{
+}
+
   glBindBufferBase(GL_UNIFORM_BUFFER, m_BlockIndex, 0);
 }
 

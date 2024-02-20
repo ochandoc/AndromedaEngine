@@ -1,4 +1,6 @@
 #pragma once
+#include "Andromeda/Misc/CoreMiscDefines.h"
+#include "Backends/OpenGL/OpenGL.h"
 
 #include "base.h"
 #include "Common/GraphicsContext.h"
@@ -8,17 +10,18 @@ class OpenGLUniformBuffer
 {
   NON_COPYABLE_CLASS(OpenGLUniformBuffer)
   NON_MOVABLE_CLASS(OpenGLUniformBuffer)
-public:
+    public:
   OpenGLUniformBuffer(uint32 block_index, uint32 size);
-
+      
   ~OpenGLUniformBuffer();
 
-  void bind() const;
-  void unbind() const;
+      void bind() const;
+      void unbind() const;
 
   void upload_data(const void* data, uint32 size);
-private:
+    private:
   GLuint m_BufferId;
-  GLuint m_Size;
-  GLuint m_BlockIndex;
-};
+      GLuint m_Size;
+      GLuint m_BlockIndex;
+  };
+}
