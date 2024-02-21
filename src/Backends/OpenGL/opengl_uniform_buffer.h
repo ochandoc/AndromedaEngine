@@ -9,7 +9,7 @@ namespace And {
   public:
     NON_COPYABLE_CLASS(UniformBuffer)
 
-      UniformBuffer(unsigned int block_index, unsigned int size);
+    UniformBuffer(unsigned int block_index, unsigned int size);
     ~UniformBuffer();
 
     void upload_data(const void* data, unsigned int size);

@@ -2,6 +2,9 @@
 
 #include "Andromeda/Graphics/Shader.h"
 
+#include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
 namespace And
 {
   enum class EUniformType : uint8
@@ -37,7 +40,14 @@ namespace And
   {
     std::unordered_map<uint32, std::string> ShaderSources;
     std::unordered_map<std::string, EUniformType> SimpleUniforms;
+    std::unordered_map<uint8, std::string> UniformBlocks;
     uint8 UniformBuffers;
+  };
+
+  struct UniformInfo
+  {
+    EUniformType Type;
+    int32 Location;
   };
 
   class OpenGLShader : public Shader
@@ -55,11 +65,27 @@ namespace And
     virtual void Use() const override;
     virtual void StopUsing() const override;
 
+    inline uint8 GetUniformBlocks() const { return m_UniformBlocks; }
+    inline uint8 GetNumTextures() const { return m_NumTextures; }
+
+    void SetFloat(const std::string& Name, float value);
+    void SetInt(const std::string& Name, int32 value);
+    void SetVec2(const std::string& Name, const glm::vec2& vec);
+    void SetVec3(const std::string& Name, const glm::vec3& vec);
+    void SetVec4(const std::string& Name, const glm::vec4& vec);
+    void SetMat2(const std::string& Name, const glm::mat2& mat);
+    void SetMat3(const std::string& Name, const glm::mat3& mat);
+    void SetMat4(const std::string& Name, const glm::mat4& mat);
+    void SetTexture(const std::string& Name, int8 Slot);
+
   private:
     static std::string ReadFile(const std::string& Path);
 
   private:
     uint32 m_Id;
+    uint8 m_UniformBlocks;
+    uint8 m_NumTextures;
+    std::unordered_map<std::string, UniformInfo> m_Uniforms;
   };
 
   enum class ELayoutSpecification : uint8
@@ -75,7 +101,7 @@ namespace And
 
   private:
     static std::unordered_map<uint32, std::string> SplitSource(const std::string& source);
-    static uint8 GetUniformBlockFromShaderSource(const std::string& source);
+    static uint8 GetUniformBlockFromShaderSource(const std::string& source, std::unordered_map<uint8, std::string>& UniformBlocks);
     static void GetSingleUniforms(const std::string& source, std::unordered_map<std::string, EUniformType>& Uniforms);
     static EUniformType GetUniformTypeFromString(const std::string& uniform);
     static int32 GetUniformLayoutSpecificationAsInt(const std::string& UniformSrc, ELayoutSpecification specification);

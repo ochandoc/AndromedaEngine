@@ -2,6 +2,7 @@
 #include "Backends/OpenGL/OpenGL.h"
 
 #include <algorithm>
+#include <assert.h>
 
 static const char* UniformTypesStr[] = { "float", "int", "vec2", "vec3", "vec4", "mat2", "mat3", "mat4", "sampler1D", "sampler2D", "sampler3D" };
 
@@ -9,12 +10,12 @@ namespace And
 {
   uint32 GetShaderTypeFromString(const std::string& typeStr)
   {
-    if (typeStr.compare("Vertex"))
+    if (typeStr.find("Vertex") != std::string::npos)
     {
       return GL_VERTEX_SHADER;
     }
 
-    if (typeStr.compare("Fragment"))
+    if (typeStr.find("Fragment") != std::string::npos)
     {
       return GL_FRAGMENT_SHADER;
     }
@@ -22,7 +23,8 @@ namespace And
     return 0;
   }
 
-  OpenGLShader::OpenGLShader() : m_Id(0)
+  OpenGLShader::OpenGLShader() 
+    : m_Id(0), m_NumTextures(0), m_UniformBlocks(0)
   {
   }
 
@@ -32,6 +34,7 @@ namespace And
 
   OpenGLShader::~OpenGLShader()
   {
+    glDeleteProgram(m_Id);
   }
 
   std::shared_ptr<OpenGLShader> OpenGLShader::Make(const std::string& Path)
@@ -41,20 +44,153 @@ namespace And
     std::string source = ReadFile(Path);
     ShaderPreProcessInfo PreProcessInfo = OpenGLShaderPreProcessor::PreProcess(source);
     
-    for (auto& [type, src] : PreProcessInfo.ShaderSources)
+    uint32 programId = OpenGLShaderCompiler::CompileShaders(PreProcessInfo.ShaderSources);
+
+    if (programId != 0)
     {
-      
+      shader->m_Id = programId;
+      shader->m_UniformBlocks = PreProcessInfo.UniformBuffers;
+
+      for (auto& [name, type] : PreProcessInfo.SimpleUniforms)
+      {
+        int32 location = glGetUniformLocation(programId, name.c_str());
+        shader->m_Uniforms[name] = { type, location };
+      }
+
+      for (auto& [type, name] : PreProcessInfo.UniformBlocks)
+      {
+        uint32 blockIndex = glGetUniformBlockIndex(programId, name.c_str());
+        uint32 desiredIndex = (uint32)log2f(type);
+        glUniformBlockBinding(programId, blockIndex, desiredIndex);
+      }
     }
+    else
+    {
+      shader.reset();
+    }
+
 
     return shader;
   }
 
   void OpenGLShader::Use() const
   {
+    glUseProgram(m_Id);
   }
 
   void OpenGLShader::StopUsing() const
   {
+    glUseProgram(0);
+  }
+
+  void OpenGLShader::SetFloat(const std::string& Name, float value)
+  {
+    assert(m_Uniforms.contains(Name));
+    assert(m_Uniforms[Name].Type == EUniformType::Float);
+
+    int32 location = m_Uniforms[Name].Location;
+    if (location != -1)
+    {
+      glUniform1f(location, value);
+    }
+  }
+
+  void OpenGLShader::SetInt(const std::string& Name, int32 value)
+  {
+    assert(m_Uniforms.contains(Name));
+    assert(m_Uniforms[Name].Type == EUniformType::Int);
+
+    int32 location = m_Uniforms[Name].Location;
+    if (location != -1)
+    {
+      glUniform1i(location, value);
+    }
+  }
+
+  void OpenGLShader::SetVec2(const std::string& Name, const glm::vec2& vec)
+  {
+    assert(m_Uniforms.contains(Name));
+    assert(m_Uniforms[Name].Type == EUniformType::Vec2);
+
+    int32 location = m_Uniforms[Name].Location;
+    if (location != -1)
+    {
+      glUniform2f(location, vec.x, vec.y);
+    }
+  }
+
+  void OpenGLShader::SetVec3(const std::string& Name, const glm::vec3& vec)
+  {
+    assert(m_Uniforms.contains(Name));
+    assert(m_Uniforms[Name].Type == EUniformType::Vec3);
+
+    int32 location = m_Uniforms[Name].Location;
+    if (location != -1)
+    {
+      glUniform3f(location, vec.x, vec.y, vec.z);
+    }
+  }
+
+  void OpenGLShader::SetVec4(const std::string& Name, const glm::vec4& vec)
+  {
+    assert(m_Uniforms.contains(Name));
+    assert(m_Uniforms[Name].Type == EUniformType::Vec4);
+
+    int32 location = m_Uniforms[Name].Location;
+    if (location != -1)
+    {
+      glUniform4f(location, vec.x, vec.y, vec.z, vec.w);
+    }
+  }
+
+  void OpenGLShader::SetMat2(const std::string& Name, const glm::mat2& mat)
+  {
+    assert(m_Uniforms.contains(Name));
+    assert(m_Uniforms[Name].Type == EUniformType::Mat2);
+
+    int32 location = m_Uniforms[Name].Location;
+    if (location != -1)
+    {
+      glUniformMatrix2fv(location, 1, GL_FALSE, glm::value_ptr(mat));
+    }
+  }
+
+  void OpenGLShader::SetMat3(const std::string& Name, const glm::mat3& mat)
+  {
+    assert(m_Uniforms.contains(Name));
+    assert(m_Uniforms[Name].Type == EUniformType::Mat3);
+
+    int32 location = m_Uniforms[Name].Location;
+    if (location != -1)
+    {
+      glUniformMatrix3fv(location, 1, GL_FALSE, glm::value_ptr(mat));
+    }
+  }
+
+  void OpenGLShader::SetMat4(const std::string& Name, const glm::mat4& mat)
+  {
+    assert(m_Uniforms.contains(Name));
+    assert(m_Uniforms[Name].Type == EUniformType::Mat4);
+
+    int32 location = m_Uniforms[Name].Location;
+    if (location != -1)
+    {
+      glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(mat));
+    }
+  }
+
+  void OpenGLShader::SetTexture(const std::string& Name, int8 Slot)
+  {
+    assert(m_Uniforms.contains(Name));
+    assert(m_Uniforms[Name].Type == EUniformType::Sampler1D || 
+           m_Uniforms[Name].Type == EUniformType::Sampler2D || 
+           m_Uniforms[Name].Type == EUniformType::Sampler3D);
+
+    int32 location = m_Uniforms[Name].Location;
+    if (location != -1)
+    {
+      glUniform1i(location, Slot);
+    }
   }
 
   std::string OpenGLShader::ReadFile(const std::string& Path)
@@ -85,12 +221,11 @@ namespace And
     uint8 UniformBuffers = 0;
     for (auto& [type, src] : PreProcessInfo.ShaderSources)
     {
-      UniformBuffers |= GetUniformBlockFromShaderSource(src);
+      UniformBuffers |= GetUniformBlockFromShaderSource(src, PreProcessInfo.UniformBlocks);
       GetSingleUniforms(src, PreProcessInfo.SimpleUniforms);
     }
-
-
     PreProcessInfo.UniformBuffers = UniformBuffers;
+
     return PreProcessInfo;
   }
 
@@ -119,11 +254,10 @@ namespace And
         sources[GetShaderTypeFromString(type)] = source.substr(nextLinePos, pos - nextLinePos);
       }
     }
-
     return sources;
   }
 
-  uint8 OpenGLShaderPreProcessor::GetUniformBlockFromShaderSource(const std::string& source)
+  uint8 OpenGLShaderPreProcessor::GetUniformBlockFromShaderSource(const std::string& source, std::unordered_map<uint8, std::string>& UniformBlocks)
   {
     uint8 UniformBuffers = 0;
 
@@ -148,6 +282,10 @@ namespace And
           if (BindingPoint != -1)
           {
             UniformBuffers |= 1 << BindingPoint;
+            uint64 nameBegin = UnformStr.find(uniformToken) + uniformTokenLength + 1;
+            uint64 semiColon = UnformStr.find_first_of(" \r\n{", nameBegin);
+            UnformStr = UnformStr.substr(nameBegin, (semiColon - nameBegin));
+            UniformBlocks[1 << BindingPoint] = UnformStr;
           }
         }
       }
@@ -255,9 +393,13 @@ namespace And
     for (auto& [type, src] : Sources)
     {
       uint32 shaderId = CompileShader(type, src);
-      shaderIds.push_back(shaderId);
+      if (shaderId != 0)
+      {
+        shaderIds.push_back(shaderId);
+      }
+      
     }
-
+    
     for (uint32 shaderId : shaderIds)
     {
       glAttachShader(programId, shaderId);
@@ -306,7 +448,11 @@ namespace And
 
     if (value == GL_FALSE)
     {
-      // TODO: show the compile error
+      int lenght;
+      char OldShader_error[1024];
+      glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &lenght);
+      glGetShaderInfoLog(ID, lenght, &lenght, OldShader_error);
+      printf("%s\n", OldShader_error);
       return false;
     }
 
