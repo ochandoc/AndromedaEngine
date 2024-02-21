@@ -52,6 +52,8 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
 
+  std::shared_ptr<And::Shader> s = And::MakeShader("default/deafult_shader.shader");
+
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();
   //r_manager.AddGenerator<TextureGenerator>();
@@ -68,7 +70,7 @@ int main(int argc, char** argv){
 
   // Creamos el OldShader
   //And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("default/deafult_OldShader.OldShader");
-  And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("default/deafult_OldShader.OldShader");
+  And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("default/deafult_shader.shader");
   std::shared_ptr<And::Texture> texture = And::MakeTexture("teapot_texture.jpg");
   //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("teapot_texture.jpg")
   //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("missing_texture.png");
