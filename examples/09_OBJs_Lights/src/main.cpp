@@ -257,34 +257,42 @@ int main(int argc, char** argv){
     editor.ShowWindows();
     std::shared_ptr<And::RenderTarget> shadow_buffer = g_renderer.get_shadow_buffer();
 
-     for (auto light : l_manager.get_lights()) {
-        if(light.type == And::LightType::Spot){
+    shadow_buffer->Activate();
+    for (auto light : l_manager.get_lights()) {
 
+      //And::Shader* s = l_manager.bind_light(light);
 
-          shadow_buffer->Activate();
-          for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
-            g_renderer.draw_shadows(light, obj, transform);
-          }
-          shadow_buffer->Desactivate();
+      if(light.type == And::LightType::Spot){
 
-
-        
-        
-        }
-        
-        And::Shader* s = l_manager.bind_light(light);
-        std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
-        //s->set_texture(shadow_texture[0].get());
-        
-        //start = std::chrono::high_resolution_clock::now();
         for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
-          g_renderer.draw_obj(obj, s, transform);
+          g_renderer.draw_shadows(light, obj, transform);
         }
-        //end = std::chrono::high_resolution_clock::now();
-        //elapsed = end - start;
-        //printf("Duration inner loop-> %f\n", elapsed.count() * 1000.0f);
+      }
+
+    }
+    shadow_buffer->Desactivate();
 
 
+
+     for (auto light : l_manager.get_lights()) {
+        
+        
+      And::Shader* s = l_manager.bind_light(light);
+      
+      if(light.type == And::LightType::Spot){
+        std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+        s->set_texture(shadow_texture[0].get());
+      }
+      //s->set_texture(texture.get());
+      
+      //start = std::chrono::high_resolution_clock::now();
+      for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
+        // A este draw obj, si es de la spot tengo que pasarle bien las matrices premultiplicadas, que esta llamando a la funcion normal y no las estoy precalculando
+        g_renderer.draw_obj(obj, s, transform);
+      }
+      //end = std::chrono::high_resolution_clock::now();
+      //elapsed = end - start;
+      //printf("Duration inner loop-> %f\n", elapsed.count() * 1000.0f);
 
     }
 

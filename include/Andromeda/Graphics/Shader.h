@@ -91,5 +91,6 @@ namespace And{
     std::shared_ptr<SpotLight> m_default_spot;
     
     Texture* m_texture;
+    bool m_has_texture_;
   };
 }

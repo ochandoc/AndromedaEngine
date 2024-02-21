@@ -178,6 +178,7 @@ namespace And{
       shader->m_Data->buffer_size = size_block;
       shader->m_Data->buffer_lights_size = size_block_lights;
       shader->m_texture = nullptr;
+      shader->m_has_texture_ = false;
       //glFlush();
       return shader;
     }
@@ -318,6 +319,8 @@ namespace And{
 
       shader->m_uniform_block = std::make_shared<UniformBlockData>();
       shader->m_Data->buffer_size = size_block;
+      shader->m_texture = nullptr;
+      shader->m_has_texture_ = false;
 
 
       //glFlush();
@@ -454,9 +457,11 @@ namespace And{
     //glFlush();
 
    
-    OpenGLTexture2D* text = static_cast<OpenGLTexture2D*>(m_texture);
-    if (text != nullptr) {
-        text->Activate(0);
+    if(m_has_texture_){
+      OpenGLTexture2D* text = static_cast<OpenGLTexture2D*>(m_texture);
+      if (text != nullptr) {
+          text->Activate(0);
+      }
     }
     
    
@@ -493,7 +498,12 @@ namespace And{
     //glFlush();
     
 
-    //m_texture->bind(0);
+    if(m_has_texture_){
+      OpenGLTexture2D* text = static_cast<OpenGLTexture2D*>(m_texture);
+      if (text != nullptr) {
+          text->Activate(0);
+      }
+    }
 
   }
 
@@ -507,7 +517,12 @@ namespace And{
   }
 
   void Shader::set_texture(Texture* texture){
-    m_texture = texture;
+    if(texture){
+      m_texture = texture;
+      m_has_texture_ = true;
+    }else{
+      m_has_texture_ = false;
+    }
   }
 
   //void Shader::get_texture(){}

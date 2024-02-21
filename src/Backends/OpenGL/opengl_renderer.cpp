@@ -56,6 +56,7 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   info.Width = width;
   info.Height = height;
   info.Formats.push_back(ETextureFormat::Depth);
+  info.Formats.push_back(ETextureFormat::RGBA8);
   m_shadows_buffer_ = MakeRenderTarget(info);
 
 
@@ -247,6 +248,8 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
 
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
@@ -394,8 +397,19 @@ void Renderer::draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* 
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
 
+  // projection * view de la light
+  glm::mat4 viewLight = glm::make_mat4(view);
+  glm::mat4 projectionLight = glm::make_mat4(projection);
+  glm::mat4 projViewLight = projectionLight * viewLight;
+
+  // Projection * view de la camara
+  glm::mat4 viewCam = glm::make_mat4(m_Camera.GetViewMatrix());
+  glm::mat4 projectionCam = glm::make_mat4(m_Camera.GetProjectionMatrix());
+  glm::mat4 prjViewCam = projectionCam * viewCam;
+
   s->set_camera_position(m_Camera.GetPosition());
-  s->setModelViewProj(glm::value_ptr(modelMatrix), view, projection);
+  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(projViewLight), glm::value_ptr(prjViewCam));
+  //s->setModelViewProj(glm::value_ptr(modelMatrix), view, projection);
   s->upload_data();
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
@@ -475,7 +489,8 @@ void Renderer::draw_shadows(Light l, MeshComponent* obj, TransformComponent* tra
   // Pintar cada obj de la escena con el shader de profundidad y guardar todo lo que pinte en el render target
   // sacar la view y projeciton de la posicion de la luz
   glm::vec3 pos(l.spot->position[0],l.spot->position[1], l.spot->position[2]);
-  glm::vec3 dir(-l.spot->direction[0],-l.spot->direction[1], -l.spot->direction[2]);
+  //glm::vec3 dir(-l.spot->direction[0],-l.spot->direction[1], -l.spot->direction[2]);
+  glm::vec3 dir(l.spot->direction[0],l.spot->direction[1], l.spot->direction[2]);
   glm::vec3 up(0.0f, 1.0f, 0.0f);
 
   glm::vec3 right = glm::normalize(glm::cross(up, dir));
@@ -483,8 +498,13 @@ void Renderer::draw_shadows(Light l, MeshComponent* obj, TransformComponent* tra
   glm::mat4 view = glm::lookAt(pos, pos + glm::normalize(dir), up);
   int width = m_shadows_buffer_->GetCreationInfo().Width;
   int height = m_shadows_buffer_->GetCreationInfo().Height;
+
+  float fov_radians = glm::radians(l.spot->outer_cut_off) * 1.5f;
+  float aspect_ratio = (float)width / (float)height;
+  float near = 10.0f;
+  float far = 310.0f;
   
-  glm::mat4 persp = glm::perspective(glm::radians(l.spot->outer_cut_off), (float)width / (float)height, 10.0f, 310.0f);
+  glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);
 
 
   m_depth_shader->use();
