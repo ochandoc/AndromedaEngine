@@ -262,42 +262,58 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
 
 }
 
-void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point, Texture* texture) {
-  if(s){
-    s->use();
-  }
-
+void Renderer::draw_obj_shadows(MeshComponent* obj, Shader* s, TransformComponent* trans, const Light& l){
+  //if(s){
+    //s->use();
+  //}
+  //auto start = std::chrono::high_resolution_clock::now();
+  
+    
   glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-  glm::vec3 objectPosition = glm::vec3(tran->position[0], tran->position[1], tran->position[2]);
-  glm::vec3 objectScale = glm::vec3(tran->scale[0], tran->scale[1], tran->scale[2]);
+  glm::vec3 objectPosition = glm::vec3(trans->position[0], trans->position[1], trans->position[2]);
+  glm::vec3 objectScale = glm::vec3(trans->scale[0], trans->scale[1], trans->scale[2]);
   float rotationAngle = 0.0f;
-  glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
+  glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
 
   modelMatrix = glm::scale(modelMatrix, objectScale);
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
+  glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
+
+  // Projection & view of light
+  // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
+  // Esto solo con la spot para probar
+  glm::vec3 pos(l.spot->position[0],l.spot->position[1], l.spot->position[2]);
+  glm::vec3 dir(l.spot->direction[0],l.spot->direction[1], l.spot->direction[2]);
+  glm::vec3 up(0.0f, 1.0f, 0.0f);
+  glm::vec3 right = glm::normalize(glm::cross(up, dir));
+  up = glm::cross(dir, right);
+  glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(dir), up);
+
+  float fov_radians = glm::radians(l.spot->outer_cut_off) * 1.5f;
+  float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
+  float near = 10.0f;
+  float far = 310.0f;
+  glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
+  glm::mat4 projViewLight = projLight * viewLight;
+
 
   s->set_camera_position(m_Camera.GetPosition());
-  s->set_light(ambient);
-  s->set_light(point);
-  s->set_texture(texture);
-  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
+  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewProjCam), glm::value_ptr(projViewLight));
   s->upload_data();
 
-
-  unsigned int VBO = obj->Mesh->get_vbo();
-  unsigned int VAO = obj->Mesh->get_vao();
+  unsigned int VBO = obj->MeshOBJ->get_vbo();
+  unsigned int VAO = obj->MeshOBJ->get_vao();
+  WAIT_GPU_LOAD();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
-  //err = glGetError();
 
-
-  const std::vector<Vertex_info>& vertices = obj->Mesh->getVertexInfo();  
+  const std::vector<Vertex_info>& vertices = obj->MeshOBJ->getVertexInfo();
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
@@ -305,16 +321,15 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran,
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
-  //err = glGetError();
 
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
   glEnable(GL_DEPTH_TEST);
 
-  std::vector<unsigned int> indices = obj->Mesh->getIndices();
+  const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-  s->un_configure_shader();
-  //err = glGetError();
+  //glFlush();
+  WAIT_GPU_LOAD();
 
 }
 
@@ -326,62 +341,6 @@ void Renderer::draw_scene(Scene& scene, Shader* s)
   {
     draw_obj(obj, s, transform);
   }
-}
-
-void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point) {
-
-  if (s) {
-    s->use();
-  }
-
-  glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
-  glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
-
-  glm::mat4 modelMatrix = glm::identity<glm::mat4>();
-
-  glm::vec3 objectPosition = glm::vec3(tran->position[0], tran->position[1], tran->position[2]);
-  glm::vec3 objectScale = glm::vec3(tran->scale[0], tran->scale[1], tran->scale[2]);
-  float rotationAngle = 0.0f;
-  glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]); // esto esta mal
-
-  modelMatrix = glm::scale(modelMatrix, objectScale);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
-  modelMatrix = glm::translate(modelMatrix, objectPosition);
-
-  s->set_camera_position(m_Camera.GetPosition());
-  s->set_light(ambient);
-  s->set_light(point);
-  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
-  s->upload_data();
-
-
-  unsigned int VBO = obj->Mesh->get_vbo();
-  unsigned int VAO = obj->Mesh->get_vao();
-
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindVertexArray(VAO);
-  //err = glGetError();
-
-
-  std::vector<Vertex_info> vertices = obj->Mesh->getVertexInfo();
-
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-  //err = glGetError();
-
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-  glEnable(GL_DEPTH_TEST);
-
-  std::vector<unsigned int> indices = obj->Mesh->getIndices();
-  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-  s->un_configure_shader();
-  //err = glGetError();
-
 }
 
 void Renderer::draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, float* view, float* projection){
@@ -398,18 +357,18 @@ void Renderer::draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
 
   // projection * view de la light
-  glm::mat4 viewLight = glm::make_mat4(view);
-  glm::mat4 projectionLight = glm::make_mat4(projection);
-  glm::mat4 projViewLight = projectionLight * viewLight;
+  //glm::mat4 viewLight = glm::make_mat4(view);
+  //glm::mat4 projectionLight = glm::make_mat4(projection);
+  //glm::mat4 projViewLight = projectionLight * viewLight;
 
   // Projection * view de la camara
-  glm::mat4 viewCam = glm::make_mat4(m_Camera.GetViewMatrix());
-  glm::mat4 projectionCam = glm::make_mat4(m_Camera.GetProjectionMatrix());
-  glm::mat4 prjViewCam = projectionCam * viewCam;
+  //glm::mat4 viewCam = glm::make_mat4(m_Camera.GetViewMatrix());
+  //glm::mat4 projectionCam = glm::make_mat4(m_Camera.GetProjectionMatrix());
+  //glm::mat4 prjViewCam = projectionCam * viewCam;
 
   s->set_camera_position(m_Camera.GetPosition());
-  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(projViewLight), glm::value_ptr(prjViewCam));
-  //s->setModelViewProj(glm::value_ptr(modelMatrix), view, projection);
+  //s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(projViewLight), glm::value_ptr(prjViewCam));
+  s->setModelViewProj(glm::value_ptr(modelMatrix), view, projection);
   s->upload_data();
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();

@@ -27,9 +27,9 @@ struct SpotLight{
 layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
   //mat4 view;
-  mat4 ProjViewLight;
   //mat4 projection;
   mat4 ProjViewCam;
+  mat4 ProjViewLight;
   vec3 camera_position;
 };
 
@@ -114,9 +114,9 @@ struct Light{
 layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
   //mat4 view;
-  mat4 ProjViewLight;
   //mat4 projection;
   mat4 ProjViewCam;
+  mat4 ProjViewLight;
   vec3 camera_position;
 };
 
@@ -246,7 +246,7 @@ void main(){
   
   vec3 color = CalculeSpotLightJou(spot);
   float shadow = ShadowCalculation(lightSpace);
-  //color = (1.0 - shadow) * color;
+  color = (1.0 - shadow) * color;
 
 
   FragColor = vec4(color,1.0);

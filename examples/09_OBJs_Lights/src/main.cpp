@@ -288,7 +288,11 @@ int main(int argc, char** argv){
       //start = std::chrono::high_resolution_clock::now();
       for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
         // A este draw obj, si es de la spot tengo que pasarle bien las matrices premultiplicadas, que esta llamando a la funcion normal y no las estoy precalculando
-        g_renderer.draw_obj(obj, s, transform);
+        if(light.type == And::LightType::Spot){
+          g_renderer.draw_obj_shadows(obj, s, transform, light);
+        }else{
+          g_renderer.draw_obj(obj, s, transform);
+        }
       }
       //end = std::chrono::high_resolution_clock::now();
       //elapsed = end - start;

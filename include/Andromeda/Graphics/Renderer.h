@@ -43,10 +43,10 @@ public:
 
   void draw_triangle(Triangle *t);
 
-  void draw_obj(ObjLoader obj, Shader* s, Transform trans, AmbientLight* ambient, PointLight* point);
   void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans);
-  void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point);
-  void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point, Texture* texture);
+
+  // Si castea sombras, precalculamos las matrices de la camara y pasamos ademas la view * projection de la luz
+  void draw_obj_shadows(MeshComponent* obj, Shader* s, TransformComponent* trans, const Light& l);
   void draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* tran,float* view, float* projection);
 
   void draw_scene(Scene& scene, Shader* s);
