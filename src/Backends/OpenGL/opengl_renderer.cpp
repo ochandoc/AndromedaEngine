@@ -445,13 +445,25 @@ std::shared_ptr<RenderTarget> Renderer::get_shadow_buffer(){
 
 void Renderer::draw_shadows(Light l, MeshComponent* obj, TransformComponent* tran){
 
-  // Pintar cada obj de la escena con el shader de profundidad y guardar todo lo que pinte en el render target
-  // sacar la view y projeciton de la posicion de la luz
-  glm::vec3 pos(l.spot->position[0],l.spot->position[1], l.spot->position[2]);
-  //glm::vec3 dir(-l.spot->direction[0],-l.spot->direction[1], -l.spot->direction[2]);
-  glm::vec3 dir(l.spot->direction[0],l.spot->direction[1], l.spot->direction[2]);
-  glm::vec3 up(0.0f, 1.0f, 0.0f);
+  // Esto para la spot light
+  glm::vec3 pos;
+  glm::vec3 dir;
 
+  if(l.spot){
+    pos = glm::vec3(l.spot->position[0],l.spot->position[1], l.spot->position[2]);
+    dir = glm::vec3(l.spot->direction[0],l.spot->direction[1], l.spot->direction[2]);
+  }
+
+  if(l.directional){
+    //glm::vec3cam_pos = m_Camera.GetPosition();
+    //float middle = 
+  }
+  
+  // Para la directional, la posicion tiene que estar en la mitad del flusthrum en z, y en x e y tengo que sacar la posicion segun la direccion a la que viene la luz,
+  // y luego ir moviendola ligeramente hasta sacar los valores vorrectos
+
+
+  glm::vec3 up(0.0f, 1.0f, 0.0f);
   glm::vec3 right = glm::normalize(glm::cross(up, dir));
   up = glm::cross(dir, right);
   glm::mat4 view = glm::lookAt(pos, pos + glm::normalize(dir), up);
