@@ -52,7 +52,7 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
 
-  std::shared_ptr<And::Shader> s = And::MakeShader("default/deafult_shader.shader");
+  std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
 
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();

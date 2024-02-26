@@ -55,11 +55,18 @@ namespace And
       {
         int32 location = glGetUniformLocation(programId, name.c_str());
         shader->m_Uniforms[name] = { type, location };
+
+        EUniformType enumType = EUniformType(type);
+        if (enumType == EUniformType::Sampler1D || enumType == EUniformType::Sampler2D || enumType == EUniformType::Sampler3D)
+          shader->m_NumTextures++;
       }
 
       for (auto& [type, name] : PreProcessInfo.UniformBlocks)
       {
         uint32 blockIndex = glGetUniformBlockIndex(programId, name.c_str());
+        int32 size = 0;
+        glGetActiveUniformBlockiv(programId, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &size);
+        shader->m_UniformBlocksSizes.insert({ EUniformBlockType(type), size});
         uint32 desiredIndex = (uint32)log2f(type);
         glUniformBlockBinding(programId, blockIndex, desiredIndex);
       }
@@ -81,6 +88,15 @@ namespace And
   void OpenGLShader::StopUsing() const
   {
     glUseProgram(0);
+  }
+
+  int32 OpenGLShader::GetUniformBlockSize(EUniformBlockType type) const
+  {
+    EUniformBlockType enumType = EUniformBlockType(type);
+    if (!m_UniformBlocksSizes.contains(enumType))
+      return -1;
+
+    return m_UniformBlocksSizes.at(enumType);
   }
 
   void OpenGLShader::SetFloat(const std::string& Name, float value)

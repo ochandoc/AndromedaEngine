@@ -68,6 +68,8 @@ namespace And
     inline uint8 GetUniformBlocks() const { return m_UniformBlocks; }
     inline uint8 GetNumTextures() const { return m_NumTextures; }
 
+    int32 GetUniformBlockSize(EUniformBlockType type) const;
+
     void SetFloat(const std::string& Name, float value);
     void SetInt(const std::string& Name, int32 value);
     void SetVec2(const std::string& Name, const glm::vec2& vec);
@@ -86,6 +88,7 @@ namespace And
     uint8 m_UniformBlocks;
     uint8 m_NumTextures;
     std::unordered_map<std::string, UniformInfo> m_Uniforms;
+    std::unordered_map<EUniformBlockType, int32> m_UniformBlocksSizes;
   };
 
   enum class ELayoutSpecification : uint8
