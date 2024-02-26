@@ -1,6 +1,7 @@
 #pragma once
 #include "Andromeda/Misc/CoreMiscDefines.h"
 #include "Andromeda/Resources/ResourceManager.h"
+#include "Backends/OpenGL/opengl_uniform_buffer.h"
 
 namespace And{
 
@@ -103,6 +104,15 @@ class LightManager{
     std::shared_ptr<OldShader> m_directional_OldShader;
     std::shared_ptr<OldShader> m_point_OldShader;
     std::shared_ptr<OldShader> m_spot_OldShader;
+
+
+    std::shared_ptr<UniformBuffer> m_buffer_matrix;
+    std::shared_ptr<UniformBuffer> m_buffer_spot;
+   
+    std::shared_ptr<OldShader> m_ambient_Shader;
+    std::shared_ptr<OldShader> m_directional_Shader;
+    std::shared_ptr<OldShader> m_point_Shader;
+    std::shared_ptr<OldShader> m_spot_Shader;
 
 
 };

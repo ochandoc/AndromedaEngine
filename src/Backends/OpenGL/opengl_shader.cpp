@@ -175,10 +175,10 @@ namespace And{
       Oldshader->m_uniform_block = std::make_shared<UniformBlockData>();
       Oldshader->m_uniform_block_lights = std::make_shared<UniformLights>();
       
-      shader->m_Data->buffer_size = size_block;
-      shader->m_Data->buffer_lights_size = size_block_lights;
-      shader->m_texture = nullptr;
-      shader->m_has_texture_ = false;
+      Oldshader->m_Data->buffer_size = size_block;
+      Oldshader->m_Data->buffer_lights_size = size_block_lights;
+      Oldshader->m_texture = nullptr;
+      Oldshader->m_has_texture_ = false;
       //glFlush();
       return Oldshader;
     }
@@ -317,10 +317,10 @@ namespace And{
         break;
       }
 
-      shader->m_uniform_block = std::make_shared<UniformBlockData>();
-      shader->m_Data->buffer_size = size_block;
-      shader->m_texture = nullptr;
-      shader->m_has_texture_ = false;
+      Oldshader->m_uniform_block = std::make_shared<UniformBlockData>();
+      Oldshader->m_Data->buffer_size = size_block;
+      Oldshader->m_texture = nullptr;
+      Oldshader->m_has_texture_ = false;
 
 
       //glFlush();
@@ -513,10 +513,10 @@ namespace And{
 
   void OldShader::un_configure_OldShader(){
     m_Data->uniform_buffer->unbind();
-    m_Data->uniform_buffer_lights->unbind();
+    //m_Data->uniform_buffer_lights->unbind();
   }
 
-  void Shader::set_texture(Texture* texture){
+  void OldShader::set_texture(Texture* texture){
     if(texture){
       m_texture = texture;
       m_has_texture_ = true;

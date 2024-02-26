@@ -61,7 +61,7 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 
 
   // Crear shader de profundidad
-  m_depth_shader = Shader::make_default("lights/depth_shader.shader", "none", LightType::None);
+  m_depth_shader = OldShader::make_default("lights/depth_shader.shader", "none", LightType::None);
   //m_shadow_shader = Shader::make_default("lights/shadow_shader.shader", "none", LightType::None);
 }
 
@@ -262,7 +262,7 @@ void Renderer::draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* tr
 
 }
 
-void Renderer::draw_obj_shadows(MeshComponent* obj, Shader* s, TransformComponent* trans, const Light& l){
+void Renderer::draw_obj_shadows(MeshComponent* obj, OldShader* s, TransformComponent* trans, const Light& l){
   //if(s){
     //s->use();
   //}
@@ -343,7 +343,7 @@ void Renderer::draw_scene(Scene& scene, OldShader* s)
   }
 }
 
-void Renderer::draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, float* view, float* projection){
+void Renderer::draw_deep_obj(MeshComponent* obj, OldShader* s, TransformComponent* tran, float* view, float* projection){
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -488,4 +488,55 @@ void Renderer::draw_shadows(Light l, MeshComponent* obj, TransformComponent* tra
 
 
 }
+
+
+void DrawForward(EntityComponentSystem& entity, Renderer& renderer, LightManager& l_manager){
+  std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
+
+    shadow_buffer->Activate();
+    for (auto light : l_manager.get_lights()) {
+
+      //And::Shader* s = l_manager.bind_light(light);
+
+      if(light.type == And::LightType::Spot){
+
+        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
+          renderer.draw_shadows(light, obj, transform);
+        }
+      }
+
+    }
+    shadow_buffer->Desactivate();
+
+
+
+     for (auto light : l_manager.get_lights()) {
+
+      And::OldShader* s = l_manager.bind_light(light);
+        
+        
+      //And::Shader* s = l_manager.bind_light(light);
+      
+      if(light.type == And::LightType::Spot){
+        std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+        s->set_texture(shadow_texture[0].get());
+      }
+      //s->set_texture(texture.get());
+      
+      //start = std::chrono::high_resolution_clock::now();
+      for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
+        // A este draw obj, si es de la spot tengo que pasarle bien las matrices premultiplicadas, que esta llamando a la funcion normal y no las estoy precalculando
+        if(light.type == And::LightType::Spot){
+          renderer.draw_obj_shadows(obj, s, transform, light);
+        }else{
+          renderer.draw_obj(obj, s, transform);
+        }
+      }
+      //end = std::chrono::high_resolution_clock::now();
+      //elapsed = end - start;
+      //printf("Duration inner loop-> %f\n", elapsed.count() * 1000.0f);
+
+    }
+}
+
 }

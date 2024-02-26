@@ -49,6 +49,7 @@ int main(int argc, char** argv){
   ts.AddWorker(workerCreationInfo);
 
   std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine");
+  //window->set_vsync(true);
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
 
@@ -268,64 +269,10 @@ int main(int argc, char** argv){
     window->update();
     g_renderer.new_frame();
     editor.ShowWindows();
-    std::shared_ptr<And::RenderTarget> shadow_buffer = g_renderer.get_shadow_buffer();
-
-    shadow_buffer->Activate();
-    for (auto light : l_manager.get_lights()) {
-
-      //And::Shader* s = l_manager.bind_light(light);
-
-      if(light.type == And::LightType::Spot){
-
-        for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
-          g_renderer.draw_shadows(light, obj, transform);
-        }
-      }
-
-    }
-    shadow_buffer->Desactivate();
-
-
-
-     for (auto light : l_manager.get_lights()) {
-
-      And::OldShader* s = l_manager.bind_light(light);
-        
-        
-      //And::Shader* s = l_manager.bind_light(light);
-      
-      if(light.type == And::LightType::Spot){
-        std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
-        s->set_texture(shadow_texture[0].get());
-      }
-      //s->set_texture(texture.get());
-      
-      //start = std::chrono::high_resolution_clock::now();
-      for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
-        // A este draw obj, si es de la spot tengo que pasarle bien las matrices premultiplicadas, que esta llamando a la funcion normal y no las estoy precalculando
-        if(light.type == And::LightType::Spot){
-          g_renderer.draw_obj_shadows(obj, s, transform, light);
-        }else{
-          g_renderer.draw_obj(obj, s, transform);
-        }
-      }
-      //end = std::chrono::high_resolution_clock::now();
-      //elapsed = end - start;
-      //printf("Duration inner loop-> %f\n", elapsed.count() * 1000.0f);
-
-    }
-
-
-
-
-    //g_renderer.get_render_target()->Test();
-    //l->diffuse_color[0] += 0.0001f;
+    And::DrawForward(entity_comp, g_renderer, l_manager);
 
     spot_light->position[0] = cosf(fps_count) * 6.0f;
     fps_count += 0.01f;
-
-    //ambient.direction[0] -= 0.0001f;
-    //printf("Direction0: %f\n", ambient.direction[0]);
 
     g_renderer.end_frame();
     window->swap_buffers();

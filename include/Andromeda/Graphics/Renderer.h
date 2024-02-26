@@ -8,6 +8,7 @@
 #include "Andromeda/Graphics/Light.h"
 #include "Andromeda/ECS/Components/MeshComponent.h"
 #include "Andromeda/ECS/Scene.h"
+#include "Andromeda/Backends/OpenGL/uniform_buffer.h"
 
 namespace And
 {
@@ -43,11 +44,11 @@ public:
 
   void draw_triangle(Triangle *t);
 
-  void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans);
+  void draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* trans);
 
   // Si castea sombras, precalculamos las matrices de la camara y pasamos ademas la view * projection de la luz
-  void draw_obj_shadows(MeshComponent* obj, Shader* s, TransformComponent* trans, const Light& l);
-  void draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* tran,float* view, float* projection);
+  void draw_obj_shadows(MeshComponent* obj, OldShader* s, TransformComponent* trans, const Light& l);
+  void draw_deep_obj(MeshComponent* obj, OldShader* s, TransformComponent* tran,float* view, float* projection);
 
   void draw_scene(Scene& scene, OldShader* s);
 
@@ -64,9 +65,18 @@ private:
 
   FlyCamera m_Camera;
 
-  std::shared_ptr<Shader> m_depth_shader;
-  std::shared_ptr<Shader> m_shadow_shader;
+  std::shared_ptr<OldShader> m_depth_shader;
+  std::shared_ptr<OldShader> m_shadow_shader;
   std::shared_ptr<RenderTarget> m_shadows_buffer_;
+
+  std::shared_ptr<UniformBuffer> m_buffer_matrix;
+  std::shared_ptr<UniformBuffer> m_buffer_ambient_light;
+  std::shared_ptr<UniformBuffer> m_buffer_directional_light;
+  std::shared_ptr<UniformBuffer> m_buffer_point_light;
+  std::shared_ptr<UniformBuffer> m_buffer_spot_light;
+
 };
+
+void DrawForward(EntityComponentSystem& entity, Renderer& renderer, LightManager& l_manager);
 
 }
