@@ -209,7 +209,7 @@ void CheckError(){
 }
 }
 
-void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
+void Renderer::draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* tran)
 {
   //if(s){
     //s->use();
@@ -333,7 +333,7 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, Shader* s, TransformComponen
 
 }
 
-void Renderer::draw_scene(Scene& scene, Shader* s)
+void Renderer::draw_scene(Scene& scene, OldShader* s)
 {
   EntityComponentSystem& ECS = scene.m_ECS;
 
@@ -392,7 +392,10 @@ void Renderer::draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* 
   const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
   //glFlush();
-  WAIT_GPU_LOAD();
+  //WAIT_GPU_LOAD();
+  s->un_configure_OldShader();
+  //err = glGetError();
+
 }
 
 void Renderer::showDemo(){

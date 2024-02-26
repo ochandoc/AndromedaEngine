@@ -9,6 +9,96 @@
 
 namespace And
 {
+	static int32 GetOpenGLInternalFormat(ETextureFormat Format)
+	{
+		switch (Format)
+		{
+		case And::ETextureFormat::RGB8:
+			return GL_RGB8;
+			break;
+		case And::ETextureFormat::RGBA8:
+			return GL_RGBA8;
+			break;
+		case And::ETextureFormat::RGB16F:
+			return GL_RGB16F;
+			break;
+		case And::ETextureFormat::RGBA16F:
+			return GL_RGBA16F;
+			break;
+		case And::ETextureFormat::RGB32F:
+			return GL_RGB32F;
+			break;
+		case And::ETextureFormat::RGBA32F:
+			return GL_RGBA32F;
+			break;
+		case And::ETextureFormat::Depth:
+			return GL_DEPTH_COMPONENT;
+			break;
+		}
+
+		return 0;
+	}
+
+	static uint32 GetOpenGLFormat(ETextureFormat Format)
+	{
+		switch (Format)
+		{
+		case And::ETextureFormat::RGB8:
+			return GL_RGB;
+			break;
+		case And::ETextureFormat::RGBA8:
+			return GL_RGBA;
+			break;
+		case And::ETextureFormat::RGB16F:
+			return GL_RGB;
+			break;
+		case And::ETextureFormat::RGBA16F:
+			return GL_RGBA;
+			break;
+		case And::ETextureFormat::RGB32F:
+			return GL_RGB;
+			break;
+		case And::ETextureFormat::RGBA32F:
+			return GL_RGBA;
+			break;
+		case And::ETextureFormat::Depth:
+			return GL_DEPTH_COMPONENT;
+			break;
+		}
+
+		return 0;
+	}
+
+	static uint32 GetOpenGLFormatType(ETextureFormat Format)
+	{
+		switch (Format)
+		{
+		case And::ETextureFormat::RGB8:
+			return GL_UNSIGNED_BYTE;
+			break;
+		case And::ETextureFormat::RGBA8:
+			return GL_UNSIGNED_BYTE;
+			break;
+		case And::ETextureFormat::RGB16F:
+			return GL_FLOAT;
+			break;
+		case And::ETextureFormat::RGBA16F:
+			return GL_FLOAT;
+			break;
+		case And::ETextureFormat::RGB32F:
+			return GL_FLOAT;
+			break;
+		case And::ETextureFormat::RGBA32F:
+			return GL_FLOAT;
+			break;
+		case And::ETextureFormat::Depth:
+			return GL_FLOAT;
+			break;
+		}
+
+		return 0;
+	}
+
 	OpenGLTexture2D::OpenGLTexture2D() : m_Id(0), m_LoadedFromFile(false)
 	{
 
@@ -38,40 +128,15 @@ namespace And
 		glGenTextures(1, &Texture->m_Id);
 		glBindTexture(GL_TEXTURE_2D, Texture->m_Id);
 
-		switch (CreationInfo.Format)
-		{
-		case ETextureFormat::RGB8:
-			{
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, CreationInfo.Width, CreationInfo.Height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-				if (CreationInfo.Mipmaps)
-					glGenerateMipmap(GL_TEXTURE_2D);
-			}
-			break;
-		case ETextureFormat::RGBA8:
-			{
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, CreationInfo.Width, CreationInfo.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-				if (CreationInfo.Mipmaps)
-					glGenerateMipmap(GL_TEXTURE_2D);
-			}
-			break;
-		case ETextureFormat::Depth:
-			{
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, CreationInfo.Width, CreationInfo.Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-			}
-			break;
-		}
+		/*
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		*/
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, GetOpenGLInternalFormat(CreationInfo.Format), CreationInfo.Width, CreationInfo.Height, 0, GetOpenGLFormat(CreationInfo.Format), GetOpenGLFormatType(CreationInfo.Format), NULL);
 
 		WAIT_GPU_LOAD();
 		glBindTexture(GL_TEXTURE_2D, 0);

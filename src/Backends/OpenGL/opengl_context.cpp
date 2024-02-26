@@ -35,7 +35,7 @@ namespace And
 			break;
 
 		case GL_DEBUG_SOURCE_SHADER_COMPILER:
-			source_ = "SHADER COMPILER";
+			source_ = "Shader COMPILER";
 			break;
 
 		case GL_DEBUG_SOURCE_THIRD_PARTY:

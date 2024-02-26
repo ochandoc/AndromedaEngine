@@ -4,21 +4,21 @@
 
 namespace And{
 
-class ShaderGenerator : public ResourceGenerator<Shader>{
+class ShaderGenerator : public ResourceGenerator<OldShader>{
 
   public:
 
-  ShaderGenerator(){
+    ShaderGenerator(){
 
-    std::shared_ptr<Shader> shader = Shader::make("default/deafult_shader.shader");
-    m_Default = shader;
+    std::shared_ptr<OldShader> OldShader = OldShader::make("default/deafult_shader.shader");
+    m_Default = OldShader;
   }
   ShaderGenerator(const ShaderGenerator&);
   ShaderGenerator(ShaderGenerator&&);
   ~ShaderGenerator(){}
 
-  virtual std::shared_ptr<Shader> operator()(const std::string& path) override{
-    std::shared_ptr<Shader> tmp = Shader::make(path);
+  virtual std::shared_ptr<OldShader> operator()(const std::string& path) override{
+    std::shared_ptr<OldShader> tmp = OldShader::make(path);
     if(tmp)return tmp;
 
     return m_Default;
@@ -28,13 +28,13 @@ class ShaderGenerator : public ResourceGenerator<Shader>{
 		return std::hash<std::string>{}(Path);
 	}
 
-	virtual std::shared_ptr<Shader> GetDefault() override{
+	virtual std::shared_ptr<OldShader> GetDefault() override{
 		return m_Default;
 	}
 
   private:
 
-  std::shared_ptr<Shader> m_Default;
+  std::shared_ptr<OldShader> m_Default;
 };
 
 }

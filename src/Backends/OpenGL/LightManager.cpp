@@ -7,10 +7,10 @@ namespace And {
 
 
     LightManager::LightManager() {
-        m_ambient_shader = Shader::make_default("lights/ambient.shader", "UniformAmbient", LightType::Ambient);
-        m_directional_shader = Shader::make_default("lights/directional.shader", "UniformDirectional", LightType::Directional);
-        m_point_shader = Shader::make_default("lights/point.shader", "UniformPoint", LightType::Point);
-        m_spot_shader = Shader::make_default("lights/spot.shader", "UniformSpot", LightType::Spot);
+        m_ambient_OldShader = OldShader::make_default("lights/ambient.shader", "UniformAmbient", LightType::Ambient);
+        m_directional_OldShader = OldShader::make_default("lights/directional.shader", "UniformDirectional", LightType::Directional);
+        m_point_OldShader = OldShader::make_default("lights/point.shader", "UniformPoint", LightType::Point);
+        m_spot_OldShader = OldShader::make_default("lights/spot.shader", "UniformSpot", LightType::Spot);
     }
 
     LightManager::~LightManager() {
@@ -58,34 +58,34 @@ namespace And {
     }
 
 
-    Shader* LightManager::bind_light(Light light){
+    OldShader* LightManager::bind_light(Light light){
         
         switch (light.type){
         case LightType::Ambient: 
-            m_ambient_shader->use();
-            m_ambient_shader->set_default_light(light.ambient.get());
-            m_ambient_shader->upload_default_data(light.type);
-            return m_ambient_shader.get();
+            m_ambient_OldShader->use();
+            m_ambient_OldShader->set_default_light(light.ambient.get());
+            m_ambient_OldShader->upload_default_data(light.type);
+            return m_ambient_OldShader.get();
             break;
         case LightType::Directional:
             //glDepthFunc(GL_LEQUAL);
             //glBlendFunc(GL_ONE, GL_ONE);
-            m_directional_shader->use();
-            m_directional_shader->set_default_light(light.directional.get());
-            m_directional_shader->upload_default_data(light.type);
-            return m_directional_shader.get();
+            m_directional_OldShader->use();
+            m_directional_OldShader->set_default_light(light.directional.get());
+            m_directional_OldShader->upload_default_data(light.type);
+            return m_directional_OldShader.get();
             break;
         case LightType::Point:
-            m_point_shader->use();
-            m_point_shader->set_default_light(light.point.get());
-            m_point_shader->upload_default_data(light.type);
-            return m_point_shader.get();
+            m_point_OldShader->use();
+            m_point_OldShader->set_default_light(light.point.get());
+            m_point_OldShader->upload_default_data(light.type);
+            return m_point_OldShader.get();
             break;
         case LightType::Spot:
-            m_spot_shader->use();
-            m_spot_shader->set_default_light(light.spot.get());
-            m_spot_shader->upload_default_data(light.type);
-            return m_spot_shader.get();
+            m_spot_OldShader->use();
+            m_spot_OldShader->set_default_light(light.spot.get());
+            m_spot_OldShader->upload_default_data(light.type);
+            return m_spot_OldShader.get();
             break;
         
         default:

@@ -12,11 +12,11 @@
 namespace And
 {
   class Window;
-  class Shader;
+  class OldShader;
   class Triangle;
   class ObjLoader;
   class TransformComponent;
-  struct ShaderInfo;
+  struct OldShaderInfo;
 
 
 class Renderer
@@ -49,7 +49,7 @@ public:
   void draw_obj_shadows(MeshComponent* obj, Shader* s, TransformComponent* trans, const Light& l);
   void draw_deep_obj(MeshComponent* obj, Shader* s, TransformComponent* tran,float* view, float* projection);
 
-  void draw_scene(Scene& scene, Shader* s);
+  void draw_scene(Scene& scene, OldShader* s);
 
   void draw_shadows(Light l, MeshComponent* obj, TransformComponent* tran);
   std::shared_ptr<RenderTarget> get_shadow_buffer();

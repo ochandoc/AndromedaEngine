@@ -78,7 +78,7 @@ struct Light{
 };
 
 
-class Shader;
+class OldShader;
 class LightManager{
 
   public:
@@ -93,16 +93,16 @@ class LightManager{
     void add_light(std::shared_ptr<PointLight> l);
     void add_light(std::shared_ptr<SpotLight> l);
         
-    Shader* bind_light(Light l);
+    OldShader* bind_light(Light l);
 
     std::vector<Light> get_lights() { return m_Lights; }
   private:
     std::vector<Light> m_Lights;
 
-    std::shared_ptr<Shader> m_ambient_shader;
-    std::shared_ptr<Shader> m_directional_shader;
-    std::shared_ptr<Shader> m_point_shader;
-    std::shared_ptr<Shader> m_spot_shader;
+    std::shared_ptr<OldShader> m_ambient_OldShader;
+    std::shared_ptr<OldShader> m_directional_OldShader;
+    std::shared_ptr<OldShader> m_point_OldShader;
+    std::shared_ptr<OldShader> m_spot_OldShader;
 
 
 };
