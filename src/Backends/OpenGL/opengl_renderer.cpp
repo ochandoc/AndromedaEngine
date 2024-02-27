@@ -20,6 +20,7 @@
 #include "Andromeda/ECS/Components/TransformComponent.h"
 #include "Andromeda/ECS/Components/MeshComponent.h"
 #include "Backends/OpenGL/OpenGLTexture2D.h"
+#include "Backends/OpenGL/opengl_uniform_buffer.h"
 
 namespace And
 {
@@ -60,9 +61,18 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   m_shadows_buffer_ = MakeRenderTarget(info);
 
 
+
   // Crear shader de profundidad
   m_depth_shader = OldShader::make_default("lights/depth_shader.shader", "none", LightType::None);
   //m_shadow_shader = Shader::make_default("lights/shadow_shader.shader", "none", LightType::None);
+
+  // Primero creamos todos los shaders y luego cogemos los datos de los uniform buffers de cada uno
+  // Cada vez que quiera usar el shader los casteo a opengl shader
+  m_shader_spot = MakeShader("lights/spot.shader");
+
+  // Create uniform buffers for lights
+  m_buffer_matrix = std::make_shared<UniformBuffer>(0, 208);
+  m_buffer_spot_light = std::make_shared<UniformBuffer>(5, 96);
 }
 
 Renderer::~Renderer(){

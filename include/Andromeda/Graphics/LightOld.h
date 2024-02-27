@@ -1,7 +1,6 @@
 #pragma once
-#include "Andromeda/Misc/CoreMiscDefines.h"
-#include "Andromeda/Resources/ResourceManager.h"
-#include "Backends/OpenGL/opengl_uniform_buffer.h"
+//#include "Andromeda/Misc/CoreMiscDefines.h"
+//#include "Andromeda/Resources/ResourceManager.h
 
 namespace And{
 

@@ -8,7 +8,7 @@
 #include "Andromeda/Graphics/LightOld.h"
 #include "Andromeda/ECS/Components/MeshComponent.h"
 #include "Andromeda/ECS/Scene.h"
-#include "Backends/OpenGL/opengl_uniform_buffer.h"
+#include "Andromeda/Graphics/Lights/SpotLight.h"
 
 namespace And
 {
@@ -18,6 +18,7 @@ namespace And
   class ObjLoader;
   class TransformComponent;
   struct OldShaderInfo;
+  class UniformBuffer;
 
 
 class Renderer
@@ -69,11 +70,13 @@ private:
   std::shared_ptr<OldShader> m_shadow_shader;
   std::shared_ptr<RenderTarget> m_shadows_buffer_;
 
+  std::shared_ptr<Shader> m_shader_spot;
+
   std::shared_ptr<UniformBuffer> m_buffer_matrix;
-  std::shared_ptr<UniformBuffer> m_buffer_ambient_light;
-  std::shared_ptr<UniformBuffer> m_buffer_directional_light;
+  std::shared_ptr<UniformBuffer> m_buffer_ambient_light; // 48
+  std::shared_ptr<UniformBuffer> m_buffer_directional_light; // 48
   std::shared_ptr<UniformBuffer> m_buffer_point_light;
-  std::shared_ptr<UniformBuffer> m_buffer_spot_light;
+  std::shared_ptr<UniformBuffer> m_buffer_spot_light; // 96
 
 };
 

@@ -21,44 +21,19 @@ struct SpotLightRaw {
     float quadratic_att = 0.5f; // 80 bytes
 };
 
-std::shared_ptr<SpotLight> SpotLight::MakeSpotLight(){
-    std::shared_ptr<SpotLight> spot = std::make_shared<SpotLight>();
-    std::shared_ptr<Shader> shader = MakeShader("lights/spot.shader");
-    if (shader) {
-        spot->m_shader = shader;
-        return spot;
-    }
 
-    return nullptr;
-}
-
-SpotLight::SpotLight() : m_raw(){}
-
-SpotLight::~SpotLight(){
+SpotLight::SpotLight() : m_raw(){
 
 }
 
+SpotLight::~SpotLight(){}
 
-void* SpotLight::GetData() {
-    /*SpotLightRaw raw;
-    raw.enabled = m_enabled;
-    raw.cutt_off = m_cutt_off;
-    raw.outer_cut_off = m_outer_cut_off;
-    raw.specular_strength = m_specular_strength;
-    raw.specular_shininess = m_specular_shininess;
-    raw.constant_att = m_constant_att;
-    raw.linear_att = m_linear_att;
-    raw.quadratic_att = m_quadratic_att;
+void* SpotLight::GetData(){
 
-    for (int i = 0; i < 3; i++) {
-        raw.position[i] = m_position[i];
-        raw.direction[i] = m_direction[i];
-        raw.diffuse_color[i] = m_diffuse_color[i];
-        raw.specular_color[i] = m_specular_color[i];
-    }*/
-
-    return (void*)&m_raw;
+    return (void*)m_raw.get();
 }
+
+//std::shared_ptr<Shader> SpotLight::GetShader(){}
 
 float SpotLight::GetEnabled(){
     return m_enabled;

@@ -7,13 +7,14 @@ class SpotLight;
 class Light{
 
     public:
-        ~Light();
+        Light(){}
+        ~Light(){}
         Light(const Light&) = delete;
         Light(Light&&) = default;
 
 
 
-        virtual std::shared_ptr<Shader> GetShader() = 0;
+        //virtual std::shared_ptr<Shader> GetShader() = 0;
 
         // Returns all light data in void*
         virtual void* GetData() = 0;
@@ -24,7 +25,6 @@ class Light{
         friend class SpotLight;
 
     protected:
-        Light();
 
         float m_enabled = -1.0f;
         float m_diffuse_color[3] = {0.5f, 0.5f, 0.5f};
