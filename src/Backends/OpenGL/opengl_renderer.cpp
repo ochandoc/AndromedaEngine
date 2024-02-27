@@ -68,11 +68,18 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 
   // Primero creamos todos los shaders y luego cogemos los datos de los uniform buffers de cada uno
   // Cada vez que quiera usar el shader los casteo a opengl shader
+  m_shader_ambient = MakeShader("lights/ambient.shader");
+  m_shader_directional = MakeShader("lights/directional.shader");
+  m_shader_point = MakeShader("lights/point.shader");
   m_shader_spot = MakeShader("lights/spot.shader");
 
   // Create uniform buffers for lights
   m_buffer_matrix = std::make_shared<UniformBuffer>(0, 208);
+  m_buffer_ambient_light = std::make_shared<UniformBuffer>(2, 48);
+  m_buffer_directional_light = std::make_shared<UniformBuffer>(3, 48);
+  m_buffer_point_light = std::make_shared<UniformBuffer>(4, 64);
   m_buffer_spot_light = std::make_shared<UniformBuffer>(5, 96);
+
 }
 
 Renderer::~Renderer(){

@@ -252,6 +252,8 @@ int main(int argc, char** argv){
   l_manager.add_light(spot_light);
 
   */
+
+  
   /*Light(Light::Type t, 
   glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), 
   glm::vec3 att = glm::vec3(1.0f, 0.014f, 0.0007f),

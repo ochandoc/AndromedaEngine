@@ -70,12 +70,15 @@ private:
   std::shared_ptr<OldShader> m_shadow_shader;
   std::shared_ptr<RenderTarget> m_shadows_buffer_;
 
+  std::shared_ptr<Shader> m_shader_ambient;
+  std::shared_ptr<Shader> m_shader_directional;
+  std::shared_ptr<Shader> m_shader_point;
   std::shared_ptr<Shader> m_shader_spot;
 
-  std::shared_ptr<UniformBuffer> m_buffer_matrix;
+  std::shared_ptr<UniformBuffer> m_buffer_matrix; // 208 o 256
   std::shared_ptr<UniformBuffer> m_buffer_ambient_light; // 48
   std::shared_ptr<UniformBuffer> m_buffer_directional_light; // 48
-  std::shared_ptr<UniformBuffer> m_buffer_point_light;
+  std::shared_ptr<UniformBuffer> m_buffer_point_light; // 64
   std::shared_ptr<UniformBuffer> m_buffer_spot_light; // 96
 
 };
