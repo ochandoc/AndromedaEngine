@@ -35,7 +35,7 @@ void main(){
 
 layout(location = 0) out vec4 FragColor;
 
-uniform sampler2D tex;
+uniform sampler2D texShadow;
 in vec2 TexCoord;
 
 in vec3 blend_color;
