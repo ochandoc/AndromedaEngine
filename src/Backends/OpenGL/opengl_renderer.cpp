@@ -299,7 +299,7 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
 
 }
 
-/*void Renderer::draw_obj_shadows(MeshComponent* obj, OldShader* s, TransformComponent* trans, const Light& l) {
+void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, SpotLight* l){
   //if(s){
     //s->use();
   //}
@@ -324,8 +324,12 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   // Projection & view of light
   // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
   // Esto solo con la spot para probar
-  glm::vec3 pos(l.spot->position[0],l.spot->position[1], l.spot->position[2]);
-  glm::vec3 dir(l.spot->direction[0],l.spot->direction[1], l.spot->direction[2]);
+
+  // Cambiar lo de subir la luz al uniform buffer de ahora
+
+  glm::vec3 pos(*(l->GetPosition()));
+  glm::vec3 dir(*(l->GetDirection()));
+
   glm::vec3 up(0.0f, 1.0f, 0.0f);
   glm::vec3 right = glm::normalize(glm::cross(up, dir));
   up = glm::cross(dir, right);
@@ -338,10 +342,17 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
   glm::mat4 projViewLight = projLight * viewLight;
 
+  
+  UniformBlockMatrices matrices_tmp = {modelMatrix, viewProjCam, projViewLight, glm::vec3(m_Camera.GetPosition())};
 
-  s->set_camera_position(m_Camera.GetPosition());
-  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewProjCam), glm::value_ptr(projViewLight));
-  s->upload_data();
+  //int32 size_matrix = shader_tmp->GetUniformBlockSize(EUniformBlockType::UniformBuffer0);
+  m_buffer_matrix->upload_data((void*)&matrices_tmp, 204);
+  m_buffer_matrix->bind();
+
+
+  //s->set_camera_position(m_Camera.GetPosition());
+  //s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewProjCam), glm::value_ptr(projViewLight));
+  //s->upload_data();
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
   unsigned int VAO = obj->MeshOBJ->get_vao();
@@ -368,7 +379,7 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   //glFlush();
   WAIT_GPU_LOAD();
 
-}*/
+}
 
 void Renderer::draw_scene(Scene& scene, Shader* s)
 {
@@ -573,6 +584,15 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
 
       //tmp->Use();
       //draw_obj(obj, tmp, transform);
+      m_shader_spot->Use();
+      for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
+
+        if(light->GetCastShadows()){
+          renderer.draw_obj_shadows(obj, transform, light);
+        }else{
+          renderer.draw_obj(obj, s, transform);
+        }
+      }
       
 
     }

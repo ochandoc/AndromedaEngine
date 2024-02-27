@@ -48,12 +48,13 @@ public:
   void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran);
 
   // Si castea sombras, precalculamos las matrices de la camara y pasamos ademas la view * projection de la luz
-  //void draw_obj_shadows(MeshComponent* obj, OldShader* s, TransformComponent* trans, const Light& l);
+  void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, SpotLight* l);
   void draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran,float* view, float* projection);
 
   void draw_scene(Scene& scene, Shader* s);
 
   void draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran);
+
   std::shared_ptr<RenderTarget> get_shadow_buffer();
 
   friend void DrawForward(EntityComponentSystem& entity, Renderer& renderer);
