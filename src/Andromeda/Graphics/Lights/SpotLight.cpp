@@ -3,23 +3,6 @@
 
 namespace And{
 
-struct SpotLightRaw {
-    float position[3] = { 0.5f, 0.5f, 0.5f };
-    float padding3 = -1.0f;
-    float direction[3] = { 0.5f, 0.5f, 0.5f };
-    float padding = -1.0f;
-    float diffuse_color[3] = { 0.5f, 0.5f, 0.5f };
-    float padding2 = -1.0f;
-    float specular_color[3] = { 0.5f, 0.5f, 0.5f };
-    float enabled = 0.5f;
-    float cutt_off = 0.5f;
-    float outer_cut_off = 0.5f;
-    float specular_strength = 0.5f;
-    float specular_shininess = 0.5f;
-    float constant_att = 0.5f;
-    float linear_att = 0.5f;
-    float quadratic_att = 0.5f; // 80 bytes
-};
 
 
 SpotLight::SpotLight() : m_raw(){
@@ -30,8 +13,23 @@ SpotLight::~SpotLight(){}
 
 void* SpotLight::GetData(){
 
-    return (void*)m_raw.get();
+    return (void*)&m_raw;
 }
+
+SpotLight::SpotLight(const SpotLight& other){
+    
+    this->m_raw = other.m_raw;
+}
+
+SpotLight::SpotLight(SpotLight&& other){
+    this->m_raw = other.m_raw;
+}
+
+SpotLight& SpotLight::operator=(const SpotLight& other){
+    this->m_raw = other.m_raw;
+    return *this;
+}
+
 
 //std::shared_ptr<Shader> SpotLight::GetShader(){}
 
@@ -40,119 +38,119 @@ float SpotLight::GetEnabled(){
 }
 
 float* SpotLight::GetDiffuseColor() {
-    return &m_diffuse_color[0];
+    return &m_raw.diffuse_color[0];
 }
 
 float SpotLight::GetSpecularStrength(){
-    return m_specular_strength;
+    return m_raw.specular_strength;
 }
 
 float* SpotLight::GetSpecularColor(){
-    return &m_specular_color[0];
+    return &m_raw.specular_color[0];
 }
 
-float  SpotLight::GetSpecularShininess(){
-    return m_specular_shininess;
+float SpotLight::GetSpecularShininess(){
+    return m_raw.specular_shininess;
 }
 
 float* SpotLight::GetPosition(){
-    return &m_position[0];
+    return &m_raw.position[0];
 }
 
 float* SpotLight::GetDirection(){
-    return &m_direction[0];
+    return &m_raw.direction[0];
 
 }
 
 float SpotLight::GetCuttOff(){
-    return m_cutt_off;
+    return m_raw.cutt_off;
 }
 
 float SpotLight::GetOuterCuttOff(){
-    return m_outer_cut_off;
+    return m_raw.outer_cut_off;
 }
 
 float SpotLight::GetConstantAtt(){
-    return m_constant_att;
+    return m_raw.constant_att;
 }
 
 float SpotLight::GetLinearAtt(){
-    return m_linear_att;
+    return m_raw.linear_att;
 }
 
 float SpotLight::GetQuadraticAtt(){
-    return m_quadratic_att;
+    return m_raw.quadratic_att;
 }
 
 
 void SpotLight::SetEnabled(float e){
-    m_enabled = e;
-    m_raw->enabled = e;
+    //m_enabled = e;
+    m_raw.enabled = e;
 }
 
 void SpotLight::SetDiffuseColor(float color[3]){
     for (int i = 0; i < 3; i++) {
-        m_diffuse_color[i] = color[i];
-        m_raw->diffuse_color[i] = color[i];
+        //m_diffuse_color[i] = color[i];
+        m_raw.diffuse_color[i] = color[i];
     }
 }
 
 
 void  SpotLight::SetSpecularStrength(float strength){
-    m_specular_strength = strength;
-    m_raw->specular_strength = strength;
+    //m_specular_strength = strength;
+    m_raw.specular_strength = strength;
 }
 
 void  SpotLight::SetSpecularColor(float color[3]){
     for (int i = 0; i < 3; i++) {
-        m_specular_color[i] = color[i];
-        m_raw->specular_color[i] = color[i];
+        //m_specular_color[i] = color[i];
+        m_raw.specular_color[i] = color[i];
     }
 
 }
 
-void  SpotLight::SetSpecularShininess(float shininess){
-    m_specular_shininess = shininess;
-    m_raw->specular_shininess = shininess;
+void SpotLight::SetSpecularShininess(float shininess){
+    //m_specular_shininess = shininess;
+    m_raw.specular_shininess = shininess;
 }
 
-void  SpotLight::SetPosition(float position[3]){
+void SpotLight::SetPosition(float position[3]){
     for (int i = 0; i < 3; i++) {
-        m_position[i] = position[i];
-        m_raw->position[i] = position[i];
+        //m_position[i] = position[i];
+        m_raw.position[i] = position[i];
     }
 }
 
-void  SpotLight::SetDirection(float direction[3]){
+void SpotLight::SetDirection(float direction[3]){
     for (int i = 0; i < 3; i++) {
-        m_direction[i] = direction[i];
-        m_raw->direction[i] = direction[i];
+        //m_direction[i] = direction[i];
+        m_raw.direction[i] = direction[i];
     }
 }
 
-void  SpotLight::SetCuttOff(float cutt){
-    m_cutt_off = cutt;
-    m_raw->cutt_off = cutt;
+void SpotLight::SetCuttOff(float cutt){
+    //m_cutt_off = cutt;
+    m_raw.cutt_off = cutt;
 }
 
-void  SpotLight::SetOuterCuttOff(float outer){
-    m_outer_cut_off = outer;
-    m_raw->outer_cut_off = outer;
+void SpotLight::SetOuterCuttOff(float outer){
+    //m_outer_cut_off = outer;
+    m_raw.outer_cut_off = outer;
 }
 
-void  SpotLight::SetConstantAtt(float constant){
-    m_constant_att = constant;
-    m_raw->constant_att = constant;
+void SpotLight::SetConstantAtt(float constant){
+    //m_constant_att = constant;
+    m_raw.constant_att = constant;
 }
 
-void  SpotLight::SetLinearAtt(float linear){
-    m_linear_att = linear;
-    m_raw->linear_att = linear;
+void SpotLight::SetLinearAtt(float linear){
+    //m_linear_att = linear;
+    m_raw.linear_att = linear;
 }
 
 void  SpotLight::SetQuadraticAtt(float quadratic){
-    m_quadratic_att = quadratic;
-    m_raw->quadratic_att = quadratic;
+    //m_quadratic_att = quadratic;
+    m_raw.quadratic_att = quadratic;
 }
 
 

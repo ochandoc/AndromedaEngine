@@ -21,9 +21,19 @@
 #include "Andromeda/ECS/Components/MeshComponent.h"
 #include "Backends/OpenGL/OpenGLTexture2D.h"
 #include "Backends/OpenGL/opengl_uniform_buffer.h"
+#include "Backends/OpenGL/OpenGLShader.h"
+#include "Andromeda/Graphics/Lights/SpotLight.h"
 
 namespace And
 {
+
+  struct UniformBlockMatrices{
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 projection; // 192
+    glm::vec3 camera_position;
+    //float padding; // 448 bytes, aligned to 28 blocks of 16 bytes
+  };
 
 Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 {
@@ -63,7 +73,8 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 
 
   // Crear shader de profundidad
-  m_depth_shader = OldShader::make_default("lights/depth_shader.shader", "none", LightType::None);
+  //m_depth_shader = OldShader::make_default("lights/depth_shader.shader", "none", LightType::None);
+  m_depth_shader = MakeShader("lights/depth_shader.shader");
   //m_shadow_shader = Shader::make_default("lights/shadow_shader.shader", "none", LightType::None);
 
   // Primero creamos todos los shaders y luego cogemos los datos de los uniform buffers de cada uno
@@ -226,12 +237,13 @@ void CheckError(){
 }
 }
 
-void Renderer::draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* tran)
+void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
 {
   //if(s){
     //s->use();
   //}
   //auto start = std::chrono::high_resolution_clock::now();
+  s->Use();
   
     
   glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
@@ -248,9 +260,17 @@ void Renderer::draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* tr
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
 
-  s->set_camera_position(m_Camera.GetPosition());
-  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
-  s->upload_data();
+  const float* cam_pos = m_Camera.GetPosition();
+
+  printf("Size of struct %zu\n", sizeof(UniformBlockMatrices));
+  //UniformBlockMatrices matrices_tmp;
+  
+
+  //m_buffer_matrix->upload_data();
+
+  //s->set_camera_position(m_Camera.GetPosition());
+  //s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
+  //s->upload_data();
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
   unsigned int VAO = obj->MeshOBJ->get_vao();
@@ -350,7 +370,7 @@ void Renderer::draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* tr
 
 }*/
 
-void Renderer::draw_scene(Scene& scene, OldShader* s)
+void Renderer::draw_scene(Scene& scene, Shader* s)
 {
   EntityComponentSystem& ECS = scene.m_ECS;
 
@@ -360,7 +380,11 @@ void Renderer::draw_scene(Scene& scene, OldShader* s)
   }
 }
 
-void Renderer::draw_deep_obj(MeshComponent* obj, OldShader* s, TransformComponent* tran, float* view, float* projection){
+void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection){
+
+  OpenGLShader* shader_tmp = static_cast<OpenGLShader*>(s.get());
+  shader_tmp->Use();
+  
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -383,17 +407,28 @@ void Renderer::draw_deep_obj(MeshComponent* obj, OldShader* s, TransformComponen
   //glm::mat4 projectionCam = glm::make_mat4(m_Camera.GetProjectionMatrix());
   //glm::mat4 prjViewCam = projectionCam * viewCam;
 
-  s->set_camera_position(m_Camera.GetPosition());
+
+  const float* tmp = m_Camera.GetPosition();
+  glm::vec3 cam_pos(tmp[0], tmp[1], tmp[2]);
+
+  UniformBlockMatrices matrices_tmp = {modelMatrix, glm::mat4(*view), glm::mat4(*projection), cam_pos};
+
+  int32 size_matrix = shader_tmp->GetUniformBlockSize(EUniformBlockType::UniformBuffer0);
+
+  m_buffer_matrix->upload_data((void*)&matrices_tmp, size_matrix);
+  m_buffer_matrix->bind();
+
+  //s->set_camera_position();
   //s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(projViewLight), glm::value_ptr(prjViewCam));
-  s->setModelViewProj(glm::value_ptr(modelMatrix), view, projection);
-  s->upload_data();
+  //s->setModelViewProj(glm::value_ptr(modelMatrix), view, projection);
+  //s->upload_data();
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
   unsigned int VAO = obj->MeshOBJ->get_vao();
   WAIT_GPU_LOAD();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindVertexArray(VAO); // Aqui tambien
+  glBindVertexArray(VAO);
 
   const std::vector<Vertex_info>& vertices = obj->MeshOBJ->getVertexInfo();
 
@@ -410,7 +445,7 @@ void Renderer::draw_deep_obj(MeshComponent* obj, OldShader* s, TransformComponen
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
   //glFlush();
   //WAIT_GPU_LOAD();
-  s->un_configure_OldShader();
+  //s->un_configure_OldShader();
   //err = glGetError();
 
 }
@@ -463,21 +498,24 @@ std::shared_ptr<RenderTarget> Renderer::get_shadow_buffer(){
   return m_shadows_buffer_;
 }
 
-/*void Renderer::draw_shadows(Light l, MeshComponent* obj, TransformComponent* tran) {
+void Renderer::draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran) {
 
   // Esto para la spot light
   glm::vec3 pos;
   glm::vec3 dir;
 
-  if(l.spot){
-    pos = glm::vec3(l.spot->position[0],l.spot->position[1], l.spot->position[2]);
-    dir = glm::vec3(l.spot->direction[0],l.spot->direction[1], l.spot->direction[2]);
-  }
+  float* position = l->GetPosition(); 
+  float* direction = l->GetDirection(); 
+  pos = glm::vec3(position[0],position[1],position[2]);
+  dir = glm::vec3(direction[0],direction[1], direction[2]);
+  //pos = glm::vec3(l.spot->position[0],l.spot->position[1], l.spot->position[2]);
+  //dir = glm::vec3(l.spot->direction[0],l.spot->direction[1], l.spot->direction[2]);
+  
 
-  if(l.directional){
+  //if(l.directional){
     //glm::vec3cam_pos = m_Camera.GetPosition();
     //float middle = 
-  }
+  //}
   
   // Para la directional, la posicion tiene que estar en la mitad del flusthrum en z, y en x e y tengo que sacar la posicion segun la direccion a la que viene la luz,
   // y luego ir moviendola ligeramente hasta sacar los valores vorrectos
@@ -490,24 +528,57 @@ std::shared_ptr<RenderTarget> Renderer::get_shadow_buffer(){
   int width = m_shadows_buffer_->GetCreationInfo().Width;
   int height = m_shadows_buffer_->GetCreationInfo().Height;
 
-  float fov_radians = glm::radians(l.spot->outer_cut_off) * 1.5f;
+  float fov_radians = glm::radians(l->GetOuterCuttOff()) * 1.5f;
   float aspect_ratio = (float)width / (float)height;
   float near = 10.0f;
   float far = 310.0f;
   
   glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);
 
+  //OpenGLShader* tmp = static_cast<OpenGLShader*>(m_depth_shader);
+  //tmp->Use();
+  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));
 
-  m_depth_shader->use();
-  draw_deep_obj(obj, m_depth_shader.get(), tran, glm::value_ptr(view), glm::value_ptr(persp));
-
-
-
-
-}*/
+}
 
 void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
-    /*/std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
+
+    /* Sombras */
+    std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
+    shadow_buffer->Activate();
+    for(auto [light] : entity.get_components<SpotLight>()){
+
+      if(light->GetCastShadows()){
+        // Por cada luz que castea sombras guardamos textura de profundidad
+        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
+          renderer.draw_shadows(light, obj, transform);
+        }
+      }
+    }
+    shadow_buffer->Desactivate();
+
+    /* Render */
+
+    for( auto [light] : entity.get_components<SpotLight>()){
+      // shader use
+      // Le meto las cosas al u buffer
+      // Renderizo
+      //OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_spot.get());
+      //tmp->GetUniformBlocks();
+      //int32 size = tmp->GetUniformBlockSize(EUniformBlockType::UniformBuffer0);
+      //assert(size > 0);
+      
+      //renderer.m_buffer_matrix->upload_data(light->GetData(), size);
+      //renderer.m_buffer_matrix->bind();
+
+      //tmp->Use();
+      //draw_obj(obj, tmp, transform);
+      
+
+    }
+
+
+    /*/
 
     shadow_buffer->Activate();
     for (auto light : l_manager.get_lights()) {

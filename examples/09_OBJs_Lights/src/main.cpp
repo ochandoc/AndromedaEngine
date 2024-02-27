@@ -87,6 +87,7 @@ int main(int argc, char** argv){
     
   entity_comp.add_component_class<And::MeshComponent>();
   entity_comp.add_component_class<And::TransformComponent>();
+  entity_comp.add_component_class<And::SpotLight>();
 
   int num_obj = 10;
   float pos_x = 0.0f;
@@ -227,6 +228,8 @@ int main(int argc, char** argv){
   point_light->attenuation = 40.0f;
   //l_manager.add_light(point_light);
 
+  
+
 
   std::shared_ptr<And::SpotLight> spot_light = std::make_shared<And::SpotLight>();
   spot_light->enabled = 1.0f;
@@ -253,7 +256,40 @@ int main(int argc, char** argv){
 
   */
 
-  
+
+  float enabled = 1.0f;
+  float diffuse_color[3] = {1.0f, 0.0f, 0.0f};
+  float specular_color[3] = {1.0f, 1.0f, 1.0f};
+  float position[3] = {0.0f, 14.0f, 11.0f};
+  float direction[3] = {0.0f, 0.0f, -1.0f};
+
+  float specular_strength = 0.003f;
+  float specular_shininess = 8.0f;
+  float constant_att = 1.0f;
+  float linear_att = 0.014f;
+  float quadratic_att = 0.0007f;
+  float cutt_off = 2.5f;
+  float outer_cut_off= 17.5f;
+
+
+
+  And::SpotLight spot{};
+  spot.SetPosition(position);
+  spot.SetDirection(direction);
+  spot.SetDiffuseColor(diffuse_color);
+  spot.SetSpecularColor(specular_color);
+  spot.SetSpecularStrength(specular_strength);
+  spot.SetSpecularShininess(specular_shininess);
+  spot.SetConstantAtt(constant_att);
+  spot.SetLinearAtt(linear_att);
+  spot.SetQuadraticAtt(quadratic_att);
+  spot.SetCuttOff(cutt_off);
+  spot.SetOuterCuttOff(outer_cut_off);
+  spot.SetCastShadows(true);
+  spot.SetEnabled(true);
+  entity_comp.new_entity(spot);
+
+
   /*Light(Light::Type t, 
   glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), 
   glm::vec3 att = glm::vec3(1.0f, 0.014f, 0.0007f),
@@ -271,7 +307,7 @@ int main(int argc, char** argv){
     window->update();
     g_renderer.new_frame();
     editor.ShowWindows();
-    //And::DrawForward(entity_comp, g_renderer, l_manager);
+    And::DrawForward(entity_comp, g_renderer);
 
     //spot_light->position[0] = cosf(fps_count) * 6.0f;
     fps_count += 0.01f;

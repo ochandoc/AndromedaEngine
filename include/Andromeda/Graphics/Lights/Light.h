@@ -1,10 +1,11 @@
 #pragma once
 #include "Andromeda/Graphics/Shader.h"
+#include "Andromeda/ECS/ComponentBase.h"
 
 namespace And{
 
 class SpotLight;
-class Light{
+class Light : public ComponentBase{
 
     public:
         Light(){}

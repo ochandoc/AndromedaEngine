@@ -45,16 +45,18 @@ public:
 
   void draw_triangle(Triangle *t);
 
-  void draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* trans);
+  void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran);
 
   // Si castea sombras, precalculamos las matrices de la camara y pasamos ademas la view * projection de la luz
   //void draw_obj_shadows(MeshComponent* obj, OldShader* s, TransformComponent* trans, const Light& l);
-  void draw_deep_obj(MeshComponent* obj, OldShader* s, TransformComponent* tran,float* view, float* projection);
+  void draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran,float* view, float* projection);
 
-  void draw_scene(Scene& scene, OldShader* s);
+  void draw_scene(Scene& scene, Shader* s);
 
-  //void draw_shadows(Light l, MeshComponent* obj, TransformComponent* tran);
+  void draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran);
   std::shared_ptr<RenderTarget> get_shadow_buffer();
+
+  friend void DrawForward(EntityComponentSystem& entity, Renderer& renderer);
 
 
 protected:
@@ -66,10 +68,14 @@ private:
 
   FlyCamera m_Camera;
 
-  std::shared_ptr<OldShader> m_depth_shader;
-  std::shared_ptr<OldShader> m_shadow_shader;
+  //std::shared_ptr<OldShader> m_shadow_shader;
   std::shared_ptr<RenderTarget> m_shadows_buffer_;
 
+  
+
+  std::shared_ptr<Shader> m_shadow_shader;
+  std::shared_ptr<Shader> m_depth_shader;
+  
   std::shared_ptr<Shader> m_shader_ambient;
   std::shared_ptr<Shader> m_shader_directional;
   std::shared_ptr<Shader> m_shader_point;
