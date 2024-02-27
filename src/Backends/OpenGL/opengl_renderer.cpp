@@ -262,7 +262,7 @@ void Renderer::draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* tr
 
 }
 
-void Renderer::draw_obj_shadows(MeshComponent* obj, OldShader* s, TransformComponent* trans, const Light& l){
+/*void Renderer::draw_obj_shadows(MeshComponent* obj, OldShader* s, TransformComponent* trans, const Light& l) {
   //if(s){
     //s->use();
   //}
@@ -331,7 +331,7 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, OldShader* s, TransformCompo
   //glFlush();
   WAIT_GPU_LOAD();
 
-}
+}*/
 
 void Renderer::draw_scene(Scene& scene, OldShader* s)
 {
@@ -446,7 +446,7 @@ std::shared_ptr<RenderTarget> Renderer::get_shadow_buffer(){
   return m_shadows_buffer_;
 }
 
-void Renderer::draw_shadows(Light l, MeshComponent* obj, TransformComponent* tran){
+/*void Renderer::draw_shadows(Light l, MeshComponent* obj, TransformComponent* tran) {
 
   // Esto para la spot light
   glm::vec3 pos;
@@ -487,11 +487,10 @@ void Renderer::draw_shadows(Light l, MeshComponent* obj, TransformComponent* tra
 
 
 
-}
+}*/
 
-
-void DrawForward(EntityComponentSystem& entity, Renderer& renderer, LightManager& l_manager){
-  std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
+void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
+    /*/std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
 
     shadow_buffer->Activate();
     for (auto light : l_manager.get_lights()) {
@@ -536,7 +535,7 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer, LightManager
       //elapsed = end - start;
       //printf("Duration inner loop-> %f\n", elapsed.count() * 1000.0f);
 
-    }
+    }*/
 }
 
 }

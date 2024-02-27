@@ -5,10 +5,10 @@
 #include "ObjLoader.h"
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/FlyCamera.h"
-#include "Andromeda/Graphics/Light.h"
+#include "Andromeda/Graphics/LightOld.h"
 #include "Andromeda/ECS/Components/MeshComponent.h"
 #include "Andromeda/ECS/Scene.h"
-#include "Andromeda/Backends/OpenGL/uniform_buffer.h"
+#include "Backends/OpenGL/opengl_uniform_buffer.h"
 
 namespace And
 {
@@ -47,12 +47,12 @@ public:
   void draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* trans);
 
   // Si castea sombras, precalculamos las matrices de la camara y pasamos ademas la view * projection de la luz
-  void draw_obj_shadows(MeshComponent* obj, OldShader* s, TransformComponent* trans, const Light& l);
+  //void draw_obj_shadows(MeshComponent* obj, OldShader* s, TransformComponent* trans, const Light& l);
   void draw_deep_obj(MeshComponent* obj, OldShader* s, TransformComponent* tran,float* view, float* projection);
 
   void draw_scene(Scene& scene, OldShader* s);
 
-  void draw_shadows(Light l, MeshComponent* obj, TransformComponent* tran);
+  //void draw_shadows(Light l, MeshComponent* obj, TransformComponent* tran);
   std::shared_ptr<RenderTarget> get_shadow_buffer();
 
 
@@ -77,6 +77,6 @@ private:
 
 };
 
-void DrawForward(EntityComponentSystem& entity, Renderer& renderer, LightManager& l_manager);
+void DrawForward(EntityComponentSystem& entity, Renderer& renderer);
 
 }

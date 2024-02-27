@@ -270,7 +270,7 @@ namespace And{
       }
         
 
-      printf("Size of Spot in c++ %zu size in opengl %d\n", sizeof(SpotLight), size_block_lights);
+      //printf("Size of Spot in c++ %zu size in opengl %d\n", sizeof(SpotLight), size_block_lights);
 
       glUniformBlockBinding(id_program, id_block, 0);
 
@@ -310,10 +310,10 @@ namespace And{
         Oldshader->m_default_point = std::make_shared<PointLight>();
         break;
         case LightType::Spot: 
-        glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Spot);
-        Oldshader->m_Data->uniform_buffer_spot = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Spot, (unsigned int)size_block_lights);
-        Oldshader->m_Data->spot_size = size_block_lights;
-        Oldshader->m_default_spot = std::make_shared<SpotLight>();
+        //glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Spot);
+        //Oldshader->m_Data->uniform_buffer_spot = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Spot, (unsigned int)size_block_lights);
+        //Oldshader->m_Data->spot_size = size_block_lights;
+        //Oldshader->m_default_spot = std::make_shared<SpotLight>();
         break;
       }
 
@@ -381,7 +381,7 @@ namespace And{
     }
   }
 
-  void OldShader::set_default_light(SpotLight* light){
+  /*void OldShader::set_default_light(SpotLight* light) {
     m_default_spot->enabled = light->enabled;
     m_default_spot->specular_strength = light->specular_strength;
     m_default_spot->specular_shininess = light->specular_shininess;
@@ -396,7 +396,7 @@ namespace And{
       m_default_spot->specular_color[i] = light->specular_color[i];
       m_default_spot->direction[i] = light->direction[i];
     }
-  }
+  }*/
   
   void OldShader::set_light(AmbientLight* light){
     //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
@@ -488,8 +488,8 @@ namespace And{
         m_Data->uniform_buffer_point->bind();
         break;
       case LightType::Spot:
-        m_Data->uniform_buffer_spot->upload_data((void*)(m_default_spot.get()), (unsigned int)m_Data->spot_size);
-        m_Data->uniform_buffer_spot->bind();
+        //m_Data->uniform_buffer_spot->upload_data((void*)(m_default_spot.get()), (unsigned int)m_Data->spot_size);
+        //m_Data->uniform_buffer_spot->bind();
         break;
     }
 

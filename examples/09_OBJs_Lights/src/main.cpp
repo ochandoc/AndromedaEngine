@@ -150,7 +150,7 @@ int main(int argc, char** argv){
     And::Entity* obj_teapot_id2 = entity_comp.new_entity(MC_teapot2, tran_teapot2);
   //}
 
-  And::AmbientLight ambient;
+  /*And::AmbientLight ambient;
   ambient.enabled = 1.0f;
   ambient.diffuse_color[0] = 0.0f;
   ambient.diffuse_color[1] = 1.0f;
@@ -251,7 +251,7 @@ int main(int argc, char** argv){
   spot_light->outer_cut_off= 17.5f;
   l_manager.add_light(spot_light);
 
-
+  */
   /*Light(Light::Type t, 
   glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), 
   glm::vec3 att = glm::vec3(1.0f, 0.014f, 0.0007f),
@@ -269,9 +269,9 @@ int main(int argc, char** argv){
     window->update();
     g_renderer.new_frame();
     editor.ShowWindows();
-    And::DrawForward(entity_comp, g_renderer, l_manager);
+    //And::DrawForward(entity_comp, g_renderer, l_manager);
 
-    spot_light->position[0] = cosf(fps_count) * 6.0f;
+    //spot_light->position[0] = cosf(fps_count) * 6.0f;
     fps_count += 0.01f;
 
     g_renderer.end_frame();

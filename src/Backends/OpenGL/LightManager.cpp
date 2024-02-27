@@ -1,4 +1,4 @@
-#include "Andromeda/Graphics/Light.h"
+#include "Andromeda/Graphics/LightOld.h"
 #include "Andromeda/Graphics/Shader.h"
 #include "Backends/OpenGL/OpenGL.h"
 #include "Backends/OpenGL/opengl_uniform_buffer.h"
@@ -7,14 +7,14 @@ namespace And {
 
 
 
-    LightManager::LightManager() {
+    /*LightManager::LightManager() {
         m_ambient_OldShader = OldShader::make_default("lights/ambient.shader", "UniformAmbient", LightType::Ambient);
         m_directional_OldShader = OldShader::make_default("lights/directional.shader", "UniformDirectional", LightType::Directional);
         m_point_OldShader = OldShader::make_default("lights/point.shader", "UniformPoint", LightType::Point);
         m_spot_OldShader = OldShader::make_default("lights/spot.shader", "UniformSpot", LightType::Spot);
 
 
-        m_spot_Shader = Shader::MakeShader("lights/spot.shader");
+        m_spot_Shader = MakeShader("lights/spot.shader");
         int size = m_spot_Shader->GetUniformBlockSize(EUniformBlockType::UniformBuffer0);
         m_buffer_matrix = std::make_shared<UniformBuffer>(0,(unsigned int)size);
         
@@ -107,6 +107,6 @@ namespace And {
         }
 
         return nullptr;
-    }
+    }*/
 
 }

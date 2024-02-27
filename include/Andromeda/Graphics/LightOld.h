@@ -52,7 +52,8 @@ struct PointLight{
   float attenuation = 1.0f; // 64 bytes
 };
 
-struct SpotLight{
+/*
+struct SpotLight {
   float position[3] = {0.5f, 0.5f, 0.5f};
   float padding3 = -1.0f;
   float direction[3] = {0.5f, 0.5f, 0.5f};
@@ -69,6 +70,7 @@ struct SpotLight{
   float linear_att = 0.5f;
   float quadratic_att = 0.5f; // 80 bytes
 };
+
 
 struct Light{
   std::shared_ptr<AmbientLight> ambient;
@@ -116,5 +118,6 @@ class LightManager{
 
 
 };
+*/
 
 }
