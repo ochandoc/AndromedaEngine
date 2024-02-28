@@ -45,7 +45,7 @@ public:
 
   void draw_triangle(Triangle *t);
 
-  void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran);
+  void draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran);
 
   // Si castea sombras, precalculamos las matrices de la camara y pasamos ademas la view * projection de la luz
   void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, SpotLight* l);
@@ -81,6 +81,7 @@ private:
   std::shared_ptr<Shader> m_shader_directional;
   std::shared_ptr<Shader> m_shader_point;
   std::shared_ptr<Shader> m_shader_spot;
+  std::shared_ptr<Shader> m_shader_shadows_spot;
 
   std::shared_ptr<UniformBuffer> m_buffer_matrix; // 208 o 256
   std::shared_ptr<UniformBuffer> m_buffer_ambient_light; // 48

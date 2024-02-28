@@ -29,14 +29,14 @@ struct AmbientLight{
   float specular_shininess = 0.5f; // 48 bytes
 };
 
-struct DirectionalLight{
+/*struct DirectionalLight{
   float direction[3] = {0.5f, 0.5f, 0.5f};
   float enabled = 0.5f;
   float diffuse_color[3] = {0.5f, 0.5f, 0.5f};
   float specular_strength = 0.5f;
   float specular_color[3] = {0.5f, 0.5f, 0.5f};
   float specular_shininess = 0.5f; // 48 bytes
-};
+};*/
 
 struct PointLight{
   float position[3] = {0.5f, 0.5f, 0.5f};

@@ -5,10 +5,13 @@
 namespace And{
 
 class SpotLight;
+class DirectionalLight;
 class Light : public ComponentBase{
 
     public:
-        Light(){}
+        Light(){
+            m_cast_shadows = true;
+        }
         ~Light(){}
         Light(const Light&) = delete;
         Light(Light&&) = default;
@@ -24,16 +27,17 @@ class Light : public ComponentBase{
         bool GetCastShadows(){return m_cast_shadows;}
 
         friend class SpotLight;
+        friend class DirectionalLight;
 
     protected:
 
-        float m_enabled = -1.0f;
+        /*float m_enabled = -1.0f;
         float m_diffuse_color[3] = {0.5f, 0.5f, 0.5f};
         float m_specular_strength = 0.5f;
         float m_specular_color[3] = {0.5f, 0.5f, 0.5f};
-        float m_specular_shininess = 0.5f;
+        float m_specular_shininess = 0.5f;*/
 
-        bool m_cast_shadows = true;
+        bool m_cast_shadows;
 
     private:
 

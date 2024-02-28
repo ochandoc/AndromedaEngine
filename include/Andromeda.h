@@ -35,6 +35,8 @@
 
 #include "Andromeda/Graphics/LightOld.h"
 #include "Andromeda/Graphics/Texture.h"
+#include "Andromeda/Graphics/Lights/DirectionalLight.h"
+#include "Andromeda/Graphics/Lights/SpotLight.h"
 
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/Triangle.h"

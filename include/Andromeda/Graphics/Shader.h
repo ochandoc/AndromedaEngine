@@ -56,7 +56,7 @@ namespace And{
 
   struct UniformLights{
     AmbientLight light_ambient;
-    DirectionalLight light_directional;
+    //DirectionalLight light_directional;
     PointLight light_point;
     //SpotLight light_spot;
   };
@@ -90,7 +90,7 @@ namespace And{
     
     void set_default_light(AmbientLight* light);
     void set_default_light(PointLight* light);
-    void set_default_light(DirectionalLight* light);
+    //void set_default_light(DirectionalLight* light);
     //void set_default_light(SpotLight* light);
 
     void set_camera_position(const float position[3]);
@@ -111,7 +111,7 @@ namespace And{
     std::shared_ptr<UniformLights> m_uniform_block_lights;
 
     std::shared_ptr<AmbientLight> m_default_ambient;
-    std::shared_ptr<DirectionalLight> m_default_directional;
+    //std::shared_ptr<DirectionalLight> m_default_directional;
     std::shared_ptr<PointLight> m_default_point;
     //std::shared_ptr<SpotLight> m_default_spot;
     

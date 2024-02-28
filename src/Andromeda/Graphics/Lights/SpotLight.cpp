@@ -19,14 +19,17 @@ void* SpotLight::GetData(){
 SpotLight::SpotLight(const SpotLight& other){
     
     this->m_raw = other.m_raw;
+    this->m_cast_shadows = other.m_cast_shadows;
 }
 
 SpotLight::SpotLight(SpotLight&& other){
     this->m_raw = other.m_raw;
+    this->m_cast_shadows = other.m_cast_shadows;
 }
 
 SpotLight& SpotLight::operator=(const SpotLight& other){
     this->m_raw = other.m_raw;
+    this->m_cast_shadows = other.m_cast_shadows;
     return *this;
 }
 
@@ -34,7 +37,7 @@ SpotLight& SpotLight::operator=(const SpotLight& other){
 //std::shared_ptr<Shader> SpotLight::GetShader(){}
 
 float SpotLight::GetEnabled(){
-    return m_enabled;
+    return m_raw.enabled;;
 }
 
 float* SpotLight::GetDiffuseColor() {
