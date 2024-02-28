@@ -49,6 +49,7 @@ public:
 
   // Si castea sombras, precalculamos las matrices de la camara y pasamos ademas la view * projection de la luz
   void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, SpotLight* l);
+  void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, DirectionalLight* l);
   void draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran,float* view, float* projection);
 
   void draw_scene(Scene& scene, Shader* s);
@@ -80,7 +81,10 @@ private:
   
   std::shared_ptr<Shader> m_shader_ambient;
   std::shared_ptr<Shader> m_shader_directional;
+  std::shared_ptr<Shader> m_shader_shadows_directional;
+  
   std::shared_ptr<Shader> m_shader_point;
+
   std::shared_ptr<Shader> m_shader_spot;
   std::shared_ptr<Shader> m_shader_shadows_spot;
 

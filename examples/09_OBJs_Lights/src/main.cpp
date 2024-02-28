@@ -298,7 +298,7 @@ int main(int argc, char** argv){
   directional.SetDirection(1.0f, 1.0f, 0.0f);
   directional.SetDiffuseColor(0.4f, 0.4f, 0.4f);
   directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
-  directional.SetCastShadows(false);
+  directional.SetCastShadows(true);
   directional.SetEnabled(true);
   entity_comp.new_entity(directional);
 
