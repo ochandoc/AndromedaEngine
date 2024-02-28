@@ -88,6 +88,7 @@ int main(int argc, char** argv){
   entity_comp.add_component_class<And::MeshComponent>();
   entity_comp.add_component_class<And::TransformComponent>();
   entity_comp.add_component_class<And::SpotLight>();
+  entity_comp.add_component_class<And::DirectionalLight>();
 
   int num_obj = 10;
   float pos_x = 0.0f;
@@ -290,6 +291,17 @@ int main(int argc, char** argv){
   entity_comp.new_entity(spot);
 
 
+  enabled = 1.0f;
+
+
+  And::DirectionalLight directional{};
+  directional.SetDirection(1.0f, 1.0f, 0.0f);
+  directional.SetDiffuseColor(0.4f, 0.4f, 0.4f);
+  directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
+  directional.SetCastShadows(false);
+  directional.SetEnabled(true);
+  entity_comp.new_entity(directional);
+
   /*Light(Light::Type t, 
   glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), 
   glm::vec3 att = glm::vec3(1.0f, 0.014f, 0.0007f),
@@ -300,7 +312,7 @@ int main(int argc, char** argv){
 
 
 
-  float fps_count = 0.0f;
+  //float fps_count = 0.0f;
   g_renderer.set_draw_on_texture(true);
   while (window->is_open()){
 
@@ -310,7 +322,7 @@ int main(int argc, char** argv){
     And::DrawForward(entity_comp, g_renderer);
 
     //spot_light->position[0] = cosf(fps_count) * 6.0f;
-    fps_count += 0.01f;
+    //fps_count += 0.01f;
 
     g_renderer.end_frame();
     window->swap_buffers();

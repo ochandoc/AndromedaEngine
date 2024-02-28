@@ -23,6 +23,7 @@
 #include "Backends/OpenGL/opengl_uniform_buffer.h"
 #include "Backends/OpenGL/OpenGLShader.h"
 #include "Andromeda/Graphics/Lights/SpotLight.h"
+#include "Andromeda/Graphics/Lights/DirectionalLight.h"
 
 namespace And
 {
@@ -84,6 +85,7 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   m_shader_directional = MakeShader("lights/directional.shader");
   m_shader_point = MakeShader("lights/point.shader");
   m_shader_spot = MakeShader("lights/spot.shader");
+  m_shader_shadows_spot = MakeShader("lights/spot_shadows.shader");
 
   // Create uniform buffers for lights
   m_buffer_matrix = std::make_shared<UniformBuffer>(0, 208);
@@ -238,14 +240,9 @@ void CheckError(){
 }
 }
 
-void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
+void Renderer::draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran)
 {
-  //if(s){
-    //s->use();
-  //}
-  //auto start = std::chrono::high_resolution_clock::now();
-  s->Use();
-  
+  //auto start = std::chrono::high_resolution_clock::now(); 
     
   glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
@@ -261,11 +258,25 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
 
-  const float* cam_pos = m_Camera.GetPosition();
-
-  printf("Size of struct %zu\n", sizeof(UniformBlockMatrices));
-  //UniformBlockMatrices matrices_tmp;
+  //printf("Size of struct %zu\n", sizeof(UniformBlockMatrices));
   
+
+  glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
+  UniformBlockMatrices matrices_tmp = {modelMatrix, viewMatrix, projectionMatrix, cam_pos};
+  m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
+  m_buffer_matrix->bind();
+
+  //DirectionalLight spot = dynamic_cast<DirectionalLight>(*l);
+
+  SpotLight* spot = dynamic_cast<SpotLight*>(l);
+  if(spot){
+    m_buffer_spot_light->upload_data(spot->GetData(), 96);
+    m_buffer_spot_light->bind();
+  }
+  /*
+  m_buffer_spot_light->upload_data(l->GetData(), 96);
+  m_buffer_spot_light->bind();
+  */
 
   //m_buffer_matrix->upload_data();
 
@@ -278,7 +289,7 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   WAIT_GPU_LOAD();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindVertexArray(VAO); // Aqui salta el error en el 2
+  glBindVertexArray(VAO);
 
   const std::vector<Vertex_info>& vertices = obj->MeshOBJ->getVertexInfo();
 
@@ -301,12 +312,8 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
 }
 
 void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, SpotLight* l){
-  //if(s){
-    //s->use();
-  //}
-  //auto start = std::chrono::high_resolution_clock::now();
   
-    
+  //auto start = std::chrono::high_resolution_clock::now();
   glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
 
@@ -342,9 +349,10 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   float far = 310.0f;
   glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
   glm::mat4 projViewLight = projLight * viewLight;
-
+  WAIT_GPU_LOAD();
   
-  UniformBlockMatrices matrices_tmp = {modelMatrix, viewProjCam, projViewLight, glm::vec3(*(m_Camera.GetPosition()))};
+  glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
+  UniformBlockMatrices matrices_tmp = {modelMatrix, viewProjCam, projViewLight, cam_pos };
 
   //int32 size_matrix = shader_tmp->GetUniformBlockSize(EUniformBlockType::UniformBuffer0);
   m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
@@ -390,7 +398,7 @@ void Renderer::draw_scene(Scene& scene, Shader* s)
 
   for (auto [transform, obj] : ECS.get_components<TransformComponent, MeshComponent>())
   {
-    draw_obj(obj, s, transform);
+    draw_obj(obj, nullptr, transform);
   }
 }
 
@@ -562,8 +570,9 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
     /* Shadows */
     std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
     shadow_buffer->Activate();
-    for(auto [light] : entity.get_components<SpotLight>()){
 
+    /* Spot Lights*/
+    for(auto [light] : entity.get_components<SpotLight>()){
       if(light->GetCastShadows()){
         // Por cada luz que castea sombras guardamos textura de profundidad
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
@@ -571,7 +580,21 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
         }
       }
     }
+    
+    /* Directional Light (should be 1)*/
+    for(auto [light] : entity.get_components<DirectionalLight>()){
+      if(light->GetCastShadows()){
+        // Por cada luz que castea sombras guardamos textura de profundidad
+        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
+          //renderer.draw_shadows(light, obj, transform);
+        }
+      }
+    }
+
+    
     shadow_buffer->Desactivate();
+
+    //WAIT_GPU_LOAD();
 
 
 
@@ -579,20 +602,21 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
 
     for( auto [light] : entity.get_components<SpotLight>()){
 
-      renderer.m_shader_spot->Use();
       for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
 
         if(light->GetCastShadows()){
           std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
-          OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_spot.get());
+          OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_spot.get());
           OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
-          tex->Activate(0);
+
+          tmp->Use();
+          tex->Activate(0); 
           tmp->SetTexture("texShadow", 0);
 
-          
           renderer.draw_obj_shadows(obj, transform, light);
         }else{
-          //renderer.draw_obj(obj, s, transform);
+          renderer.m_shader_spot->Use();
+          renderer.draw_obj(obj, light, transform);
         }
       }
       

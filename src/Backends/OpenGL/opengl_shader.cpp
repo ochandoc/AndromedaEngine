@@ -298,10 +298,10 @@ namespace And{
         Oldshader->m_default_ambient = std::make_shared<AmbientLight>();
         break;
         case LightType::Directional: 
-        glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Directional);
+        /*glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Directional);
         Oldshader->m_Data->uniform_buffer_directional = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Directional, (unsigned int)size_block_lights);
         Oldshader->m_Data->directional_size = size_block_lights;
-        Oldshader->m_default_directional = std::make_shared<DirectionalLight>();
+        Oldshader->m_default_directional = std::make_shared<DirectionalLight>();*/
         break;
         case LightType::Point: 
         glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Point);
@@ -352,7 +352,7 @@ namespace And{
     }    
   }
   
-  void OldShader::set_default_light(DirectionalLight* light){
+  /*void OldShader::set_default_light(DirectionalLight* light){
     //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
 
     m_default_directional->enabled = light->enabled;
@@ -364,7 +364,7 @@ namespace And{
       m_default_directional->diffuse_color[i] = light->diffuse_color[i];
       m_default_directional->specular_color[i] = light->specular_color[i];
     }    
-  }
+  }*/
 
   void OldShader::set_default_light(PointLight* light){
     m_default_point->enabled = light->enabled;
@@ -480,8 +480,8 @@ namespace And{
         m_Data->uniform_buffer_ambient->bind();
         break;
       case LightType::Directional:
-        m_Data->uniform_buffer_directional->upload_data((void*)(m_default_directional.get()), (unsigned int)m_Data->directional_size);
-        m_Data->uniform_buffer_directional->bind();
+        /*m_Data->uniform_buffer_directional->upload_data((void*)(m_default_directional.get()), (unsigned int)m_Data->directional_size);
+        m_Data->uniform_buffer_directional->bind();*/
         break;
       case LightType::Point:
         m_Data->uniform_buffer_point->upload_data((void*)(m_default_point.get()), (unsigned int)m_Data->point_size);
