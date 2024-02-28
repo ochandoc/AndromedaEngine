@@ -273,6 +273,12 @@ void Renderer::draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran)
     m_buffer_spot_light->upload_data(spot->GetData(), 96);
     m_buffer_spot_light->bind();
   }
+
+  DirectionalLight* directional = dynamic_cast<DirectionalLight*>(l);
+  if(directional){
+    m_buffer_directional_light->upload_data(directional->GetData(), 48);
+    m_buffer_directional_light->bind();
+  }
   /*
   m_buffer_spot_light->upload_data(l->GetData(), 96);
   m_buffer_spot_light->bind();
@@ -407,7 +413,6 @@ void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, Tran
   OpenGLShader* shader_tmp = static_cast<OpenGLShader*>(s.get());
   shader_tmp->Use();
   
-
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
   glm::vec3 objectPosition = glm::vec3(tran->position[0], tran->position[1], tran->position[2]);
@@ -419,21 +424,8 @@ void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, Tran
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
 
-  // projection * view de la light
-  //glm::mat4 viewLight = glm::make_mat4(view);
-  //glm::mat4 projectionLight = glm::make_mat4(projection);
-  //glm::mat4 projViewLight = projectionLight * viewLight;
-
-  // Projection * view de la camara
-  //glm::mat4 viewCam = glm::make_mat4(m_Camera.GetViewMatrix());
-  //glm::mat4 projectionCam = glm::make_mat4(m_Camera.GetProjectionMatrix());
-  //glm::mat4 prjViewCam = projectionCam * viewCam;
-
-
   const float* tmp = m_Camera.GetPosition();
   glm::vec3 cam_pos(tmp[0], tmp[1], tmp[2]);
-
-  // glm::mat4 viewProjCam = 
 
   UniformBlockMatrices matrices_tmp = {modelMatrix, glm::make_mat4(view), glm::make_mat4(projection), cam_pos};
 
@@ -441,11 +433,6 @@ void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, Tran
 
   m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
   m_buffer_matrix->bind();
-
-  //s->set_camera_position();
-  //s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(projViewLight), glm::value_ptr(prjViewCam));
-  //s->setModelViewProj(glm::value_ptr(modelMatrix), view, projection);
-  //s->upload_data();
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
   unsigned int VAO = obj->MeshOBJ->get_vao();
@@ -467,10 +454,6 @@ void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, Tran
 
   const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-  //glFlush();
-  //WAIT_GPU_LOAD();
-  //s->un_configure_OldShader();
-  //err = glGetError();
 
 }
 
@@ -532,14 +515,6 @@ void Renderer::draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent
   float* direction = l->GetDirection(); 
   pos = glm::vec3(position[0],position[1],position[2]);
   dir = glm::vec3(direction[0],direction[1], direction[2]);
-  //pos = glm::vec3(l.spot->position[0],l.spot->position[1], l.spot->position[2]);
-  //dir = glm::vec3(l.spot->direction[0],l.spot->direction[1], l.spot->direction[2]);
-  
-
-  //if(l.directional){
-    //glm::vec3cam_pos = m_Camera.GetPosition();
-    //float middle = 
-  //}
   
   // Para la directional, la posicion tiene que estar en la mitad del flusthrum en z, y en x e y tengo que sacar la posicion segun la direccion a la que viene la luz,
   // y luego ir moviendola ligeramente hasta sacar los valores vorrectos
@@ -559,10 +534,39 @@ void Renderer::draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent
   
   glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);
 
-  //OpenGLShader* tmp = static_cast<OpenGLShader*>(m_depth_shader);
-  //tmp->Use();
   draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));
+}
 
+void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran) {
+
+  // Esto para la spot light
+  /*glm::vec3 pos;
+  glm::vec3 dir;
+
+  float* position = l->GetPosition(); 
+  float* direction = l->GetDirection(); 
+  pos = glm::vec3(position[0],position[1],position[2]);
+  dir = glm::vec3(direction[0],direction[1], direction[2]);
+  
+  // Para la directional, la posicion tiene que estar en la mitad del flusthrum en z, y en x e y tengo que sacar la posicion segun la direccion a la que viene la luz,
+  // y luego ir moviendola ligeramente hasta sacar los valores vorrectos
+
+
+  glm::vec3 up(0.0f, 1.0f, 0.0f);
+  glm::vec3 right = glm::normalize(glm::cross(up, dir));
+  up = glm::cross(dir, right);
+  glm::mat4 view = glm::lookAt(pos, pos + glm::normalize(dir), up);
+  int width = m_shadows_buffer_->GetCreationInfo().Width;
+  int height = m_shadows_buffer_->GetCreationInfo().Height;
+
+  float fov_radians = glm::radians(l->GetOuterCuttOff()) * 1.5f;
+  float aspect_ratio = (float)width / (float)height;
+  float near = 10.0f;
+  float far = 310.0f;
+  
+  glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);
+
+  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));*/
 }
 
 void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
@@ -572,14 +576,14 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
     shadow_buffer->Activate();
 
     /* Spot Lights*/
-    for(auto [light] : entity.get_components<SpotLight>()){
+    /*for(auto [light] : entity.get_components<SpotLight>()){
       if(light->GetCastShadows()){
         // Por cada luz que castea sombras guardamos textura de profundidad
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
           renderer.draw_shadows(light, obj, transform);
         }
       }
-    }
+    }*/
     
     /* Directional Light (should be 1)*/
     for(auto [light] : entity.get_components<DirectionalLight>()){
@@ -600,8 +604,7 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
 
     /* Render */
 
-    for( auto [light] : entity.get_components<SpotLight>()){
-
+    /*for( auto [light] : entity.get_components<SpotLight>()){
       for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
 
         if(light->GetCastShadows()){
@@ -619,8 +622,26 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
           renderer.draw_obj(obj, light, transform);
         }
       }
-      
+    }*/
+    
+    for( auto [light] : entity.get_components<DirectionalLight>()){
+      for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
 
+        if(light->GetCastShadows()){
+          std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+          OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_directional.get());
+          OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+
+          tmp->Use();
+          tex->Activate(0); 
+          tmp->SetTexture("texShadow", 0);
+
+          //renderer.draw_obj_shadows(obj, transform, light);
+        }else{
+          renderer.m_shader_directional->Use();
+          renderer.draw_obj(obj, light, transform);
+        }
+      }
     }
 
 

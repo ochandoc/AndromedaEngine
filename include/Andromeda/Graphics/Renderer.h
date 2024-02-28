@@ -54,6 +54,7 @@ public:
   void draw_scene(Scene& scene, Shader* s);
 
   void draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran);
+  void draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran);
 
   std::shared_ptr<RenderTarget> get_shadow_buffer();
 
