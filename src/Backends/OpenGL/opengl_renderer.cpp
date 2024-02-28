@@ -16,6 +16,7 @@
 
 #include "Andromeda/ECS/Components/TransformComponent.h"
 #include "Andromeda/ECS/Components/MeshComponent.h"
+#include "Backends/OpenGL/OpenGLTexture2D.h"
 
 namespace And
 {
@@ -42,11 +43,12 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   window.imgui_start();
   ImGui_ImplOpenGL3_Init("#version 430 core");
 
-  {
-    m_RenderTarget = std::make_shared<RenderTarget>(width, height);
+  /* {
+    std::vector<ETextureFormat> Formats = { ETextureFormat::RGBA8, ETextureFormat::RGBA8, ETextureFormat::Depth };
+    m_RenderTarget = std::make_shared<RenderTarget>(width, height, Formats);
     m_Window.OnWindowResize.AddDynamic(m_RenderTarget.get(), &RenderTarget::Resize);
     m_bDrawOnTexture = false;
-  }
+  }*/
 }
 
 Renderer::~Renderer(){
@@ -58,22 +60,30 @@ void Renderer::new_frame()
   ImGui_ImplOpenGL3_NewFrame(); 
 	m_Window.new_frame();
   ImGui::NewFrame();
-  glEnable(GL_DEPTH_TEST);
+
   //glDepthMask(GL_FALSE);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  glEnable(GL_DEPTH_TEST);
+  //glDepthFunc(GL_LEQUAL);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_ONE, GL_ZERO);
+
   if (m_bDrawOnTexture)
+
+  /*if (m_bDrawOnTexture)
   {
     m_RenderTarget->Bind();
-  }
+  }*/
   //glDepthFunc(GL_ALWAYS);
   //glClearDepthf(0.5f);
 }
 
 void Renderer::end_frame()
 {
-  m_RenderTarget->Unbind();
+  //m_RenderTarget->Unbind();
   //ImPlot::ShowDemoWindow();
   //ImGui::ShowDemoWindow();
 
@@ -107,7 +117,6 @@ std::shared_ptr<RenderTarget> Renderer::get_render_target() const
 {
   return m_RenderTarget;
 }
-
 
 void Renderer::draw_triangle(Triangle *t){
     
@@ -149,7 +158,6 @@ void Renderer::draw_triangle(Triangle *t){
   
 }
 
-
 void CheckError(){
   GLenum error = glGetError();
   switch (error) {
@@ -189,7 +197,55 @@ void CheckError(){
 
 void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
 {
-  if (s) {
+  //if(s){
+    //s->use();
+  //}
+  //auto start = std::chrono::high_resolution_clock::now();
+  
+    
+  glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
+  glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
+
+  glm::mat4 modelMatrix = glm::mat4(1.0f);
+
+  glm::vec3 objectPosition = glm::vec3(tran->position[0], tran->position[1], tran->position[2]);
+  glm::vec3 objectScale = glm::vec3(tran->scale[0], tran->scale[1], tran->scale[2]);
+  float rotationAngle = 0.0f;
+  glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
+
+  modelMatrix = glm::scale(modelMatrix, objectScale);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::translate(modelMatrix, objectPosition);
+
+  s->set_camera_position(m_Camera.GetPosition());
+  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
+  s->upload_data();
+
+  unsigned int VBO = obj->Mesh->get_vbo();
+  unsigned int VAO = obj->Mesh->get_vao();
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBindVertexArray(VAO);
+
+  const std::vector<Vertex_info>& vertices = obj->Mesh->getVertexInfo();
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glEnable(GL_DEPTH_TEST);
+
+  const std::vector<unsigned int>& indices = obj->Mesh->getIndices();
+  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+  //glFlush();
+  //WAIT_GPU_LOAD();
+}
+
+void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point, Texture* texture) {
+  if(s){
     s->use();
   }
 
@@ -207,89 +263,51 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
 
-  s->setMat4("view", glm::value_ptr(viewMatrix));
-  s->setMat4("projection", glm::value_ptr(projectionMatrix));
-  s->setMat4("model", glm::value_ptr(modelMatrix));
+  s->set_camera_position(m_Camera.GetPosition());
+  s->set_light(ambient);
+  s->set_light(point);
+  s->set_texture(texture);
+  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
+  s->upload_data();
+
 
   unsigned int VBO = obj->Mesh->get_vbo();
   unsigned int VAO = obj->Mesh->get_vao();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
-
-
-  std::vector<Vertex_info> vertices = obj->Mesh->getVertexInfo();
-
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-
-
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-  glEnable(GL_DEPTH_TEST);
-
-  const std::vector<unsigned int>& indices = obj->Mesh->getIndices();
-  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-}
-
-void Renderer::draw_obj(ObjLoader obj, Shader* s, Transform tran, AmbientLight* ambient, PointLight* point) {
-
-  if(s){
-    s->use();
-  }
-
-  glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
-  glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
-
-  glm::mat4 modelMatrix = glm::mat4(1.0f);
-
-  glm::vec3 objectPosition = glm::vec3(tran.position[0], tran.position[1], tran.position[2]);
-  glm::vec3 objectScale = glm::vec3(tran.scale[0], tran.scale[1], tran.scale[2]);
-  float rotationAngle = 0.0f;
-  glm::vec3 objectRotationAxis = glm::vec3(tran.rotation[0], tran.rotation[1], tran.rotation[2]);
-
-  modelMatrix = glm::scale(modelMatrix, objectScale);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
-  modelMatrix = glm::translate(modelMatrix, objectPosition);
-
-  s->set_camera_position(m_Camera.GetPosition());
-  s->set_light(ambient);
-  s->set_light(point);
-  s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
-  s->upload_data();
-
-
-  unsigned int VBO = obj.get_vbo();
-  unsigned int VAO = obj.get_vao();
-
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindVertexArray(VAO);
   //err = glGetError();
 
 
-  std::vector<Vertex_info> vertices = obj.getVertexInfo();  
-
-  glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex_info), &vertices[0], GL_STATIC_DRAW);
+  const std::vector<Vertex_info>& vertices = obj->Mesh->getVertexInfo();  
 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
   //err = glGetError();
 
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
   glEnable(GL_DEPTH_TEST);
 
-  std::vector<unsigned int> indices = obj.getIndices();
+  std::vector<unsigned int> indices = obj->Mesh->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
   s->un_configure_shader();
   //err = glGetError();
 
+}
+
+void Renderer::draw_scene(Scene& scene, Shader* s)
+{
+  EntityComponentSystem& ECS = scene.m_ECS;
+
+  for (auto [transform, obj] : ECS.get_components<TransformComponent, MeshComponent>())
+  {
+    draw_obj(obj, s, transform);
+  }
 }
 
 void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point) {

@@ -6,6 +6,8 @@
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/FlyCamera.h"
 #include "Andromeda/Graphics/Light.h"
+#include "Andromeda/ECS/Components/MeshComponent.h"
+#include "Andromeda/ECS/Scene.h"
 
 namespace And
 {
@@ -13,7 +15,6 @@ namespace And
   class Shader;
   class Triangle;
   class ObjLoader;
-  class MeshComponent;
   class TransformComponent;
   struct ShaderInfo;
 
@@ -45,6 +46,9 @@ public:
   void draw_obj(ObjLoader obj, Shader* s, Transform trans, AmbientLight* ambient, PointLight* point);
   void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans);
   void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point);
+  void draw_obj(MeshComponent* obj, Shader* s, TransformComponent* trans, AmbientLight* ambient, PointLight* point, Texture* texture);
+
+  void draw_scene(Scene& scene, Shader* s);
 
 protected:
   Window& m_Window;
