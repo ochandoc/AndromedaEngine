@@ -413,7 +413,6 @@ namespace And
       {
         shaderIds.push_back(shaderId);
       }
-      
     }
     
     for (uint32 shaderId : shaderIds)
@@ -428,7 +427,15 @@ namespace And
     glGetProgramiv(programId, GL_VALIDATE_STATUS, &value);
     if (value == GL_FALSE)
     {
-      // TODO: show error
+      int ErrorLength;
+      std::string Error;
+      glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &ErrorLength);
+      Error.reserve(ErrorLength);
+      glGetProgramInfoLog(programId, ErrorLength, &ErrorLength, &Error[0]);
+      printf("---------------------------------------------------------------------------------\n");
+      printf("\x1b[41mProgram Error\x1b[0m\n");
+      printf("%s\n", Error.c_str());
+      printf("---------------------------------------------------------------------------------\n");
       glDeleteProgram(programId);
       programId = 0;
     }
@@ -453,7 +460,8 @@ namespace And
     {
       return shaderID;
     }
-
+    
+    glDeleteShader(shaderID);
     return 0;
   }
 
@@ -464,11 +472,17 @@ namespace And
 
     if (value == GL_FALSE)
     {
-      int lenght;
-      char OldShader_error[1024];
-      glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &lenght);
-      glGetShaderInfoLog(ID, lenght, &lenght, OldShader_error);
-      printf("%s\n", OldShader_error);
+      std::string Error;
+      int ErrorLeght;
+      glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &ErrorLeght);
+
+      Error.reserve(ErrorLeght);
+
+      glGetShaderInfoLog(ID, ErrorLeght, &ErrorLeght, &Error[0]);
+      printf("---------------------------------------------------------------------------------\n");
+      printf("\x1b[41mShader Compile Error\x1b[0m\n");
+      printf("%s\n", Error.c_str());
+      printf("---------------------------------------------------------------------------------\n");
       return false;
     }
 
