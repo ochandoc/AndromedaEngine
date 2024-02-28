@@ -54,7 +54,7 @@ int main(int argc, char** argv){
 
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();
-  r_manager.AddGenerator<TextureGenerator>();
+  //r_manager.AddGenerator<TextureGenerator>();
   r_manager.AddGenerator<And::ShaderGenerator>();
   
   And::Editor editor{*window, &r_manager};
@@ -268,7 +268,7 @@ int main(int argc, char** argv){
     }
     
 
-    g_renderer.get_render_target()->Test();
+    //g_renderer.get_render_target()->Test();
     //l->diffuse_color[0] += 0.0001f;
 
 

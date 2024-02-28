@@ -71,7 +71,7 @@ void Renderer::new_frame()
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ZERO);
 
-  if (m_bDrawOnTexture)
+  //if (m_bDrawOnTexture)
 
   /*if (m_bDrawOnTexture)
   {

@@ -27,13 +27,13 @@ void And::FlyCamera::ProcessInput()
 
   const float speed = m_Speed * m_Window.get_delta_time();
 
-  if (m_Input.IsKeyPressed(KeyCode::W))
+  if (m_Input.IsKeyDown(KeyCode::W))
     position += speed * forward;
-  if (m_Input.IsKeyPressed(KeyCode::S))
+  if (m_Input.IsKeyDown(KeyCode::S))
     position -= speed * forward;
-  if (m_Input.IsKeyPressed(KeyCode::A))
+  if (m_Input.IsKeyDown(KeyCode::A))
     position += glm::normalize(glm::cross(forward, up)) * speed;
-  if (m_Input.IsKeyPressed(KeyCode::D))
+  if (m_Input.IsKeyDown(KeyCode::D))
     position -= glm::normalize(glm::cross(forward, up)) * speed;
 
   const float MouseX = static_cast<float>(m_Input.GetMouseX());

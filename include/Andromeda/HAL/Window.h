@@ -65,7 +65,6 @@ private:
 	void end_frame();
 
 	
-  KeyboardState m_KeyBoard;
 	std::unique_ptr<struct WindowData> m_Data;
 };
 

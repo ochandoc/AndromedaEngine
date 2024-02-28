@@ -21,9 +21,10 @@ public:
 
   bool check_action(const ActionInput& action);
 
-  bool IsKeyPressed(KeyCode key);
   bool IsKeyDown(KeyCode key);
   bool IsKeyRelease(KeyCode key);
+
+  KeyState GetKeyState(KeyCode key);
 
   bool IsMouseButtonPressed(MouseCode key);
   void GetMousePosition(double *x, double *y);
@@ -33,8 +34,6 @@ public:
     
 private:
   Window& m_window;
-  KeyboardState& m_KeyBoard;
-
 };
   
 };

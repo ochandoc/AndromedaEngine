@@ -184,7 +184,6 @@ namespace And
         default: break;
     }
 
-    window_data->keyboard->keys[key] = KeyState(action);
     //printf("Key: %d\n", key);
 
   }
@@ -225,20 +224,11 @@ namespace And
     window->m_Data->width = w;
     window->m_Data->height = h;
     window->m_Data->is_open = true;
-    window->m_Data->keyboard = &window->m_KeyBoard;
 
     glfwSetWindowUserPointer(window->m_Data->handle, window->m_Data.get());
     glfwSetWindowCloseCallback(window->m_Data->handle, close_window_callback);
     glfwSetWindowSizeCallback(window->m_Data->handle, resize_window_callback);
     glfwSetKeyCallback(window->m_Data->handle, PressedKey);
-   
-    for (KeyState& key : window->m_KeyBoard.keys){
-      key = KeyState::Default;
-    }
-  
-    for (KeyState& key : window->m_KeyBoard.keys_last_frame){
-      key = KeyState::Default;
-    }
 
     window->m_Data->m_Context = std::move(std::shared_ptr<GraphicsContext>(new GraphicsContext(*window)));
     window->set_vsync(false);
@@ -288,11 +278,6 @@ namespace And
       key = KeyState::Default;
     }*/
     
-
-    for(int i = 0; i < kNumKeys; i++){
-      m_KeyBoard.keys_last_frame[i] = m_KeyBoard.keys[i];
-      m_KeyBoard.keys[i] = KeyState::Default;
-    }
     glfwPollEvents();
     float CurrentTime = static_cast<float>(glfwGetTime());
     m_Data->DeltaTime = CurrentTime - m_Data->LastTime;
