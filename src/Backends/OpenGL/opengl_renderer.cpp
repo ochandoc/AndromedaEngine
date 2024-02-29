@@ -607,26 +607,28 @@ void Renderer::draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent
   draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));
 }
 
-void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran) {
-
-  // Esto para la spot light
-  /*glm::vec3 pos;
-  glm::vec3 dir;
-
-  float* position = l->GetPosition(); 
-  float* direction = l->GetDirection(); 
-  pos = glm::vec3(position[0],position[1],position[2]);
-  dir = glm::vec3(direction[0],direction[1], direction[2]);
+void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran) {  
   
-  // Para la directional, la posicion tiene que estar en la mitad del flusthrum en z, y en x e y tengo que sacar la posicion segun la direccion a la que viene la luz,
-  // y luego ir moviendola ligeramente hasta sacar los valores vorrectos
+  glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
+  glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
 
+  float x = cam_pos.x + ( (-1.0f * light_dir.x) * 50.0f);
+  float z = cam_pos.z + ( (-1.0f * light_dir.z) * 50.0f);
+  
+  glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
+
+  //glm::make_vec3(cam_pos + ( (-1.0f * light_dir) * 50.0f))
+  
 
   glm::vec3 up(0.0f, 1.0f, 0.0f);
-  glm::vec3 right = glm::normalize(glm::cross(up, dir));
-  up = glm::cross(dir, right);
-  glm::mat4 view = glm::lookAt(pos, pos + glm::normalize(dir), up);
-  int width = m_shadows_buffer_->GetCreationInfo().Width;
+  glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
+  up = glm::cross(light_dir, right);
+  glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
+
+  glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, m_Camera.GetNear(), m_Camera.GetFar());
+  //glm::mat4 projViewLight = orto * viewLight;
+
+  /*int width = m_shadows_buffer_->GetCreationInfo().Width;
   int height = m_shadows_buffer_->GetCreationInfo().Height;
 
   float fov_radians = glm::radians(l->GetOuterCuttOff()) * 1.5f;
@@ -634,9 +636,9 @@ void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformCo
   float near = 10.0f;
   float far = 310.0f;
   
-  glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);
+  glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);*/
 
-  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));*/
+  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(viewLight), glm::value_ptr(orto));
 }
 
 void DrawForward(EntityComponentSystem& entity, Renderer& renderer){

@@ -128,7 +128,12 @@ float ShadowCalculation(vec4 fragPosLightSpace){
   float currentDepth = projCoords.z;
   // calculate bias (based on depth map resolution and slope)
   vec3 normal = normalize(s_normal);
-  vec3 lightDir = normalize(spot.position - s_fragPos);
+
+  float x = camera_position.x + ( (-1.0f * directional_light.direction.x) * 50.0f);
+  float z = camera_position.z + ( (-1.0f * directional_light.direction.z) * 50.0f);
+  vec3 cam_pos = vec3(x, camera_position.y, z);
+
+  vec3 lightDir = normalize(cam_pos - s_fragPos);
   float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
   // check whether current frag pos is in shadow
   // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
