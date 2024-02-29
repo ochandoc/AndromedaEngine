@@ -96,7 +96,7 @@ vec3 CalculeDirLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 col
 
   /*---Difuse---*/
   //float diff = max(dot(normal, dir), 0.0);
-  float diff = max(dot(normal, light.direction), 0.0);
+  float diff = max(dot(normal, -light.direction), 0.0); // este -1 es un poco raro
   vec3 diffuse = diff * light.diffuse_color * color_base.xyz;
 
   /*---Specular---*/
@@ -109,6 +109,13 @@ vec3 CalculeDirLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 col
   //return (diffuse + specular * light.active);
   return (diffuse * light.enabled);
 }
+
+/*
+float LinearizeDepth(float depth){
+    float z = depth * 2.0 - 1.0; // Back to NDC 
+    return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));
+}
+*/
 
 float ShadowCalculation(vec4 fragPosLightSpace){
 
@@ -129,30 +136,28 @@ float ShadowCalculation(vec4 fragPosLightSpace){
   // calculate bias (based on depth map resolution and slope)
   vec3 normal = normalize(s_normal);
 
-  float x = camera_position.x + ( (-1.0f * directional_light.direction.x) * 50.0f);
-  float z = camera_position.z + ( (-1.0f * directional_light.direction.z) * 50.0f);
-  vec3 cam_pos = vec3(x, camera_position.y, z);
+  float x = camera_position.x + ( (-1.0 * directional_light.direction.x) * 50.0);
+  float z = camera_position.z + ( (-1.0 * directional_light.direction.z) * 50.0);
+  vec3 light_pos = vec3(x, camera_position.y, z);
 
-  vec3 lightDir = normalize(cam_pos - s_fragPos);
+  vec3 lightDir = normalize(light_pos - s_fragPos);
   float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
   // check whether current frag pos is in shadow
   // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
   // PCF
   float shadow = 0.0;
   vec2 texelSize = 1.0 / textureSize(texShadow, 0);
-  for(int x = -1; x <= 1; ++x)
-  {
-      for(int y = -1; y <= 1; ++y)
-      {
-          float pcfDepth = texture(texShadow, projCoords.xy + vec2(x, y) * texelSize).r; 
-          shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
-      }    
+  for(int x = -1; x <= 1; ++x){
+    for(int y = -1; y <= 1; ++y){
+      float pcfDepth = texture(texShadow, projCoords.xy + vec2(x, y) * texelSize).r; 
+      shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+    }    
   }
   shadow /= 9.0;
   
   // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
   if(projCoords.z > 1.0)
-      shadow = 0.0;
+    shadow = 0.0;
       
   return shadow;
 }
@@ -166,10 +171,14 @@ void main(){
   vec3 color_base = vec3(0.5, 0.5, 0.5);
 
   color = CalculeDirLight(directional_light, s_normal, view_direction, color_base);
-  float shadow = ShadowCalculation(lightSpace);
-  color = (1.0 - shadow) * color;
 
+  vec3 projCoords = lightSpace.xyz / lightSpace.w;
+
+  float shadow = ShadowCalculation(lightSpace);
+
+  color = (1.0 - shadow) * color;
   FragColor = vec4(color, 1.0);
+  
 
 
 }

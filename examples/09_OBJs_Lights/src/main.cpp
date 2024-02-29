@@ -121,9 +121,9 @@ int main(int argc, char** argv){
     tran.position[0] = 0.0f;
     tran.position[1] = 0.0f;
     tran.position[2] = 0.0f;
-    tran.rotation[0] = 0.0f;
+    tran.rotation[0] = 1.0f;
     tran.rotation[1] = 1.0f;
-    tran.rotation[2] = 0.0f;
+    tran.rotation[2] = 1.0f;
     tran.scale[0] = 1.0f;
     tran.scale[1] = 1.0f;
     tran.scale[2] = 1.0f;
@@ -295,8 +295,8 @@ int main(int argc, char** argv){
 
 
   And::DirectionalLight directional{};
-  directional.SetDirection(1.0f, 1.0f, 0.0f);
-  directional.SetDiffuseColor(0.4f, 0.4f, 0.4f);
+  directional.SetDirection(1.0f, 0.0f, 0.0f);
+  directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
   directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
   directional.SetCastShadows(true);
   directional.SetEnabled(true);
