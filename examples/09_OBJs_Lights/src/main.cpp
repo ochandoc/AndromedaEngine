@@ -288,9 +288,9 @@ int main(int argc, char** argv){
   spot.SetOuterCuttOff(outer_cut_off);
   spot.SetCastShadows(true);
   spot.SetEnabled(true);
-  //entity_comp.new_entity(spot);
+  entity_comp.new_entity(spot);
 
-
+    
   enabled = 1.0f;
 
 

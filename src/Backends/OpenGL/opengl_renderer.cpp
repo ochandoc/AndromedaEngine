@@ -41,9 +41,6 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
 
   m_Camera.SetPosition(0.0f, 14.0f, 11.0f);
-
-
-
   m_Camera.SetFov(90.0f);
   m_Camera.SetDirection(0.0f, 0.0f, -1.0f);
 
@@ -70,8 +67,6 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   info.Formats.push_back(ETextureFormat::Depth);
   info.Formats.push_back(ETextureFormat::RGBA8);
   m_shadows_buffer_ = MakeRenderTarget(info);
-
-
 
   // Crear shader de profundidad
   //m_depth_shader = OldShader::make_default("lights/depth_shader.shader", "none", LightType::None);
@@ -104,15 +99,19 @@ Renderer::~Renderer(){
 void Renderer::new_frame()
 {
   ImGui_ImplOpenGL3_NewFrame(); 
-	m_Window.new_frame();
+  m_Window.new_frame();
   ImGui::NewFrame();
 
   //glDepthMask(GL_FALSE);
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+   
+
   glEnable(GL_DEPTH_TEST);
-  //glDepthFunc(GL_LEQUAL);
+  glDepthFunc(GL_LEQUAL);
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ZERO);
@@ -388,9 +387,9 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
 
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-  glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_CULL_FACE);
+  //glCullFace(GL_BACK);
+  //glEnable(GL_DEPTH_TEST);
 
   const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
@@ -457,9 +456,9 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, D
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
 
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-  glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_CULL_FACE);
+  //glCullFace(GL_BACK);
+  //glEnable(GL_DEPTH_TEST);
 
   const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
@@ -518,9 +517,9 @@ void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, Tran
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
 
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-  glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_CULL_FACE);
+  //glCullFace(GL_BACK);
+  //glEnable(GL_DEPTH_TEST);
 
   const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
@@ -648,22 +647,14 @@ void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformCo
 
 void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
 
-    /* Shadows */
     std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
-    shadow_buffer->Activate();
 
+
+    /* Shadows */
+    shadow_buffer->Activate();
+    glDisable(GL_BLEND);
     /* Spot Lights*/
-    /*for(auto [light] : entity.get_components<SpotLight>()){
-      if(light->GetCastShadows()){
-        // Por cada luz que castea sombras guardamos textura de profundidad
-        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
-          renderer.draw_shadows(light, obj, transform);
-        }
-      }
-    }*/
-    
-    /* Directional Light (should be 1)*/
-    for(auto [light] : entity.get_components<DirectionalLight>()){
+    for(auto [light] : entity.get_components<SpotLight>()){
       if(light->GetCastShadows()){
         // Por cada luz que castea sombras guardamos textura de profundidad
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
@@ -671,104 +662,75 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
         }
       }
     }
-
-    
     shadow_buffer->Desactivate();
-
-    //WAIT_GPU_LOAD();
+    glEnable(GL_BLEND);
 
 
 
     /* Render */
+    for (auto [light] : entity.get_components<SpotLight>()) {
+        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+            if (light->GetCastShadows()) {
+                std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+                OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_spot.get());
+                OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
 
-    /*for( auto [light] : entity.get_components<SpotLight>()){
-      for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
+                tmp->Use();
+                tex->Activate(0);
+                tmp->SetTexture("texShadow", 0);
 
-        if(light->GetCastShadows()){
-          std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
-          OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_spot.get());
-          OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
-
-          tmp->Use();
-          tex->Activate(0); 
-          tmp->SetTexture("texShadow", 0);
-
-          renderer.draw_obj_shadows(obj, transform, light);
-        }else{
-          renderer.m_shader_spot->Use();
-          renderer.draw_obj(obj, light, transform);
+                renderer.draw_obj_shadows(obj, transform, light);
+            }
+            else {
+                renderer.m_shader_spot->Use();
+                renderer.draw_obj(obj, light, transform);
+            }
         }
-      }
-    }*/
-    
-    for( auto [light] : entity.get_components<DirectionalLight>()){
-      for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
-
-        if(light->GetCastShadows()){
-          std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
-          OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_directional.get());
-          OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
-
-          tmp->Use();
-          tex->Activate(0); 
-          tmp->SetTexture("texShadow", 0);
-
-          renderer.draw_obj_shadows(obj, transform, light);
-        }else{
-          renderer.m_shader_directional->Use();
-          renderer.draw_obj(obj, light, transform);
-        }
-      }
+        glBlendFunc(GL_ONE, GL_ONE);
     }
 
 
-    /*
-    
-
     shadow_buffer->Activate();
-    for (auto light : l_manager.get_lights()) {
-
-      //And::Shader* s = l_manager.bind_light(light);
-
-      if(light.type == And::LightType::Spot){
-
+    glDisable(GL_BLEND);
+    /* Directional Light (should be 1)*/
+    for(auto [light] : entity.get_components<DirectionalLight>()){ 
+      if(light->GetCastShadows()){
+        // Por cada luz que castea sombras guardamos textura de profundidad
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
           renderer.draw_shadows(light, obj, transform);
         }
       }
-
     }
+
+    
     shadow_buffer->Desactivate();
+    glEnable(GL_BLEND);
 
+    /* Render */
+    for (auto [light] : entity.get_components<DirectionalLight>()) {
+        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+            if (light->GetCastShadows()) {
+                std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+                OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_directional.get());
+                OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
 
+                tmp->Use();
+                tex->Activate(0);
+                tmp->SetTexture("texShadow", 0);
 
-     for (auto light : l_manager.get_lights()) {
-
-      And::OldShader* s = l_manager.bind_light(light);
-        
-        
-      //And::Shader* s = l_manager.bind_light(light);
-      
-      if(light.type == And::LightType::Spot){
-        std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
-        s->set_texture(shadow_texture[0].get());
-      }
-      //s->set_texture(texture.get());
-      
-      //start = std::chrono::high_resolution_clock::now();
-      for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
-        // A este draw obj, si es de la spot tengo que pasarle bien las matrices premultiplicadas, que esta llamando a la funcion normal y no las estoy precalculando
-        if(light.type == And::LightType::Spot){
-          renderer.draw_obj_shadows(obj, s, transform, light);
-        }else{
-          renderer.draw_obj(obj, s, transform);
+                renderer.draw_obj_shadows(obj, transform, light);
+            }
+            else {
+                renderer.m_shader_directional->Use();
+                renderer.draw_obj(obj, light, transform);
+            }
         }
-      }
-      //end = std::chrono::high_resolution_clock::now();
-      //elapsed = end - start;
-      //printf("Duration inner loop-> %f\n", elapsed.count() * 1000.0f);
+        glBlendFunc(GL_ONE, GL_ONE);
+    }
 
-    }*/
+    //WAIT_GPU_LOAD();
+
+    
 }
 
 }
