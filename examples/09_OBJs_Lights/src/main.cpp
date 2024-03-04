@@ -89,6 +89,7 @@ int main(int argc, char** argv){
   entity_comp.add_component_class<And::TransformComponent>();
   entity_comp.add_component_class<And::SpotLight>();
   entity_comp.add_component_class<And::DirectionalLight>();
+  entity_comp.add_component_class<And::PointLight>();
 
   int num_obj = 10;
   float pos_x = 0.0f;
@@ -290,6 +291,26 @@ int main(int argc, char** argv){
   spot.SetEnabled(true);
   entity_comp.new_entity(spot);
 
+  position[1] += 10.0f;
+  diffuse_color[0] = 0.0f;
+  diffuse_color[1] = 1.0f;
+
+  And::SpotLight spot2{};
+  spot2.SetPosition(position);
+  spot2.SetDirection(direction);
+  spot2.SetDiffuseColor(diffuse_color);
+  spot2.SetSpecularColor(specular_color);
+  spot2.SetSpecularStrength(specular_strength);
+  spot2.SetSpecularShininess(specular_shininess);
+  spot2.SetConstantAtt(constant_att);
+  spot2.SetLinearAtt(linear_att);
+  spot2.SetQuadraticAtt(quadratic_att);
+  spot2.SetCuttOff(cutt_off);
+  spot2.SetOuterCuttOff(outer_cut_off);
+  spot2.SetCastShadows(true);
+  spot2.SetEnabled(true);
+  entity_comp.new_entity(spot2);
+
     
   enabled = 1.0f;
 
@@ -301,6 +322,21 @@ int main(int argc, char** argv){
   directional.SetCastShadows(true);
   directional.SetEnabled(true);
   entity_comp.new_entity(directional);
+
+
+  position[2] += 2.0f;
+  position[1] = 5.0f;
+  diffuse_color[2] = 1.0f;
+  diffuse_color[1] = 0.0f;
+  And::PointLight point{};
+  point.SetPosition(position);
+  point.SetEnabled(1.0f);
+  point.SetDiffuseColor(diffuse_color);
+  point.SetSpecularStrength(specular_strength);
+  point.SetSpecularColor(specular_color);
+  point.SetSpecularShininess(specular_shininess);
+  point.SetCastShadows(false);
+  entity_comp.new_entity(point);
 
   /*Light(Light::Type t, 
   glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), 

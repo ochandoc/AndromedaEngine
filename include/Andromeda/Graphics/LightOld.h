@@ -38,7 +38,7 @@ struct AmbientLight{
   float specular_shininess = 0.5f; // 48 bytes
 };*/
 
-struct PointLight{
+/*struct PointLight{
   float position[3] = {0.5f, 0.5f, 0.5f};
   float specular_strength = 0.5f;
   float diffuse_color[3] = {0.5f, 0.5f, 0.5f};
@@ -49,7 +49,7 @@ struct PointLight{
   float quadratic_att = 0.5f;
   float enabled = 0.5f;
   float attenuation = 1.0f; // 64 bytes
-};
+};*/
 
 /*
 struct SpotLight {

@@ -84,6 +84,7 @@ private:
   std::shared_ptr<Shader> m_shader_shadows_directional;
   
   std::shared_ptr<Shader> m_shader_point;
+  std::shared_ptr<Shader> m_shader_shadows_point;
 
   std::shared_ptr<Shader> m_shader_spot;
   std::shared_ptr<Shader> m_shader_shadows_spot;

@@ -304,10 +304,10 @@ namespace And{
         Oldshader->m_default_directional = std::make_shared<DirectionalLight>();*/
         break;
         case LightType::Point: 
-        glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Point);
-        Oldshader->m_Data->uniform_buffer_point = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Point, (unsigned int)size_block_lights);
-        Oldshader->m_Data->point_size = size_block_lights;
-        Oldshader->m_default_point = std::make_shared<PointLight>();
+        //glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Point);
+        //Oldshader->m_Data->uniform_buffer_point = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Point, (unsigned int)size_block_lights);
+        //Oldshader->m_Data->point_size = size_block_lights;
+        //Oldshader->m_default_point = std::make_shared<PointLight>();
         break;
         case LightType::Spot: 
         //glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Spot);
@@ -366,7 +366,7 @@ namespace And{
     }    
   }*/
 
-  void OldShader::set_default_light(PointLight* light){
+  /*void OldShader::set_default_light(PointLight* light){
     m_default_point->enabled = light->enabled;
     m_default_point->specular_strength = light->specular_strength;
     m_default_point->specular_shininess = light->specular_shininess;
@@ -379,7 +379,7 @@ namespace And{
       m_default_point->diffuse_color[i] = light->diffuse_color[i];
       m_default_point->specular_color[i] = light->specular_color[i];
     }
-  }
+  }*/
 
   /*void OldShader::set_default_light(SpotLight* light) {
     m_default_spot->enabled = light->enabled;
@@ -412,7 +412,7 @@ namespace And{
     }    
   }
 
-  void OldShader::set_light(PointLight* light){
+  /*void OldShader::set_light(PointLight* light){
     m_uniform_block_lights->light_point.enabled = light->enabled;
     m_uniform_block_lights->light_point.specular_strength = light->specular_strength;
     m_uniform_block_lights->light_point.specular_shininess = light->specular_shininess;
@@ -425,7 +425,7 @@ namespace And{
       m_uniform_block_lights->light_point.diffuse_color[i] = light->diffuse_color[i];
       m_uniform_block_lights->light_point.specular_color[i] = light->specular_color[i];
     }
-  }
+  }*/
 
   void OldShader::setModelViewProj(const float model[16], const float view[16], const float projection[16]){
 
@@ -484,8 +484,8 @@ namespace And{
         m_Data->uniform_buffer_directional->bind();*/
         break;
       case LightType::Point:
-        m_Data->uniform_buffer_point->upload_data((void*)(m_default_point.get()), (unsigned int)m_Data->point_size);
-        m_Data->uniform_buffer_point->bind();
+        //m_Data->uniform_buffer_point->upload_data((void*)(m_default_point.get()), (unsigned int)m_Data->point_size);
+        //m_Data->uniform_buffer_point->bind();
         break;
       case LightType::Spot:
         //m_Data->uniform_buffer_spot->upload_data((void*)(m_default_spot.get()), (unsigned int)m_Data->spot_size);
