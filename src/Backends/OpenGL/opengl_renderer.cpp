@@ -262,15 +262,10 @@ void Renderer::draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran)
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
 
-  //printf("Size of struct %zu\n", sizeof(UniformBlockMatrices));
-  
-
   glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
   UniformBlockMatrices matrices_tmp = {modelMatrix, viewMatrix, projectionMatrix, cam_pos};
   m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
   m_buffer_matrix->bind();
-
-  //DirectionalLight spot = dynamic_cast<DirectionalLight>(*l);
 
   SpotLight* spot = dynamic_cast<SpotLight*>(l);
   if(spot){
@@ -289,20 +284,9 @@ void Renderer::draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran)
     m_buffer_directional_light->upload_data(directional->GetData(), 48);
     m_buffer_directional_light->bind();
   }
-  /*
-  m_buffer_spot_light->upload_data(l->GetData(), 96);
-  m_buffer_spot_light->bind();
-  */
-
-  //m_buffer_matrix->upload_data();
-
-  //s->set_camera_position(m_Camera.GetPosition());
-  //s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewMatrix), glm::value_ptr(projectionMatrix));
-  //s->upload_data();
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
   unsigned int VAO = obj->MeshOBJ->get_vao();
-  WAIT_GPU_LOAD();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
@@ -322,8 +306,6 @@ void Renderer::draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran)
 
   const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-  //glFlush();
-  WAIT_GPU_LOAD();
 
 }
 
@@ -345,9 +327,7 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   modelMatrix = glm::translate(modelMatrix, objectPosition);
   glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
 
-  // Projection & view of light
   // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
-  // Esto solo con la spot para probar
 
   // Cambiar lo de subir la luz al uniform buffer de ahora
 
@@ -365,7 +345,6 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   float far = 310.0f;
   glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
   glm::mat4 projViewLight = projLight * viewLight;
-  WAIT_GPU_LOAD();
   
   glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
   UniformBlockMatrices matrices_tmp = {modelMatrix, viewProjCam, projViewLight, cam_pos };
@@ -376,14 +355,8 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   m_buffer_spot_light->upload_data(l->GetData(), 96);
   m_buffer_spot_light->bind();
 
-
-  //s->set_camera_position(m_Camera.GetPosition());
-  //s->setModelViewProj(glm::value_ptr(modelMatrix), glm::value_ptr(viewProjCam), glm::value_ptr(projViewLight));
-  //s->upload_data();
-
   unsigned int VBO = obj->MeshOBJ->get_vbo();
   unsigned int VAO = obj->MeshOBJ->get_vao();
-  WAIT_GPU_LOAD();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
@@ -397,20 +370,12 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
 
-  //glEnable(GL_CULL_FACE);
-  //glCullFace(GL_BACK);
-  //glEnable(GL_DEPTH_TEST);
-
   const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-  //glFlush();
-  WAIT_GPU_LOAD();
-
 }
 
 void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, DirectionalLight* l){
   
-  // Me he engañao, esto va en el draw deep obj
   //auto start = std::chrono::high_resolution_clock::now();
   glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
@@ -452,7 +417,6 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, D
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
   unsigned int VAO = obj->MeshOBJ->get_vao();
-  WAIT_GPU_LOAD();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
@@ -466,15 +430,8 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, D
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
 
-  //glEnable(GL_CULL_FACE);
-  //glCullFace(GL_BACK);
-  //glEnable(GL_DEPTH_TEST);
-
   const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-  //glFlush();
-  WAIT_GPU_LOAD();
-
 }
 
 void Renderer::draw_scene(Scene& scene, Shader* s)
