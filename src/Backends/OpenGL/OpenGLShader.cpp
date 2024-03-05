@@ -209,6 +209,16 @@ namespace And
     }
   }
 
+  void OpenGLShader::SetTextureInArray(const std::string& Name, uint32 index, uint8 Slot)
+  {
+    std::string nameIndexed = Name + "[" + std::to_string(index) + "]";
+    int32 location = glGetUniformLocation(m_Id, nameIndexed.c_str());
+    if (location != -1)
+    {
+      glUniform1i(location, Slot);
+    }
+  }
+
   std::string OpenGLShader::ReadFile(const std::string& Path)
   {
     std::string source;

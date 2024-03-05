@@ -79,6 +79,7 @@ namespace And
     void SetMat3(const std::string& Name, const glm::mat3& mat);
     void SetMat4(const std::string& Name, const glm::mat4& mat);
     void SetTexture(const std::string& Name, int8 Slot);
+    void SetTextureInArray(const std::string& Name, uint32 index, uint8 Slot);
 
   private:
     static std::string ReadFile(const std::string& Path);
