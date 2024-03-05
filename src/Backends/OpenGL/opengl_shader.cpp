@@ -4,6 +4,7 @@
 
 #include "Backends/OpenGL/OpenGL.h"
 #include "Backends/OpenGL/opengl_uniform_buffer.h"
+#include "Backends/OpenGL/OpenGLTexture2D.h"
 
 #include "andpch.hpp"
 
@@ -176,7 +177,8 @@ namespace And{
       
       Oldshader->m_Data->buffer_size = size_block;
       Oldshader->m_Data->buffer_lights_size = size_block_lights;
-
+      Oldshader->m_texture = nullptr;
+      Oldshader->m_has_texture_ = false;
       //glFlush();
       return Oldshader;
     }
@@ -253,15 +255,22 @@ namespace And{
       unsigned int id_block = glGetUniformBlockIndex(id_program, "UniformBlock");
 
       // this block must be for ambient, directional, point or spotlight
-      unsigned int id_block_lights = glGetUniformBlockIndex(id_program, light_path.c_str());
+      unsigned int id_block_lights = -1;
+      if(type != LightType::None){
+        id_block_lights = glGetUniformBlockIndex(id_program, light_path.c_str());
+      }
 
       int size_block;
-      int size_block_lights;
+      int size_block_lights = -1;
 
       glGetActiveUniformBlockiv(id_program, id_block, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block);
-      glGetActiveUniformBlockiv(id_program, id_block_lights, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block_lights);
 
-      printf("Size of Spot in c++ %zu size in opengl %d\n", sizeof(SpotLight), size_block_lights);
+      if(type != LightType::None){
+        glGetActiveUniformBlockiv(id_program, id_block_lights, GL_UNIFORM_BLOCK_DATA_SIZE, &size_block_lights);
+      }
+        
+
+      //printf("Size of Spot in c++ %zu size in opengl %d\n", sizeof(SpotLight), size_block_lights);
 
       glUniformBlockBinding(id_program, id_block, 0);
 
@@ -289,27 +298,29 @@ namespace And{
         Oldshader->m_default_ambient = std::make_shared<AmbientLight>();
         break;
         case LightType::Directional: 
-        glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Directional);
+        /*glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Directional);
         Oldshader->m_Data->uniform_buffer_directional = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Directional, (unsigned int)size_block_lights);
         Oldshader->m_Data->directional_size = size_block_lights;
-        Oldshader->m_default_directional = std::make_shared<DirectionalLight>();
+        Oldshader->m_default_directional = std::make_shared<DirectionalLight>();*/
         break;
         case LightType::Point: 
-        glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Point);
-        Oldshader->m_Data->uniform_buffer_point = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Point, (unsigned int)size_block_lights);
-        Oldshader->m_Data->point_size = size_block_lights;
-        Oldshader->m_default_point = std::make_shared<PointLight>();
+        //glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Point);
+        //Oldshader->m_Data->uniform_buffer_point = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Point, (unsigned int)size_block_lights);
+        //Oldshader->m_Data->point_size = size_block_lights;
+        //Oldshader->m_default_point = std::make_shared<PointLight>();
         break;
         case LightType::Spot: 
-        glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Spot);
-        Oldshader->m_Data->uniform_buffer_spot = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Spot, (unsigned int)size_block_lights);
-        Oldshader->m_Data->spot_size = size_block_lights;
-        Oldshader->m_default_spot = std::make_shared<SpotLight>();
+        //glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Spot);
+        //Oldshader->m_Data->uniform_buffer_spot = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Spot, (unsigned int)size_block_lights);
+        //Oldshader->m_Data->spot_size = size_block_lights;
+        //Oldshader->m_default_spot = std::make_shared<SpotLight>();
         break;
       }
 
       Oldshader->m_uniform_block = std::make_shared<UniformBlockData>();
       Oldshader->m_Data->buffer_size = size_block;
+      Oldshader->m_texture = nullptr;
+      Oldshader->m_has_texture_ = false;
 
 
       //glFlush();
@@ -341,7 +352,7 @@ namespace And{
     }    
   }
   
-  void OldShader::set_default_light(DirectionalLight* light){
+  /*void OldShader::set_default_light(DirectionalLight* light){
     //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
 
     m_default_directional->enabled = light->enabled;
@@ -353,9 +364,9 @@ namespace And{
       m_default_directional->diffuse_color[i] = light->diffuse_color[i];
       m_default_directional->specular_color[i] = light->specular_color[i];
     }    
-  }
+  }*/
 
-  void OldShader::set_default_light(PointLight* light){
+  /*void OldShader::set_default_light(PointLight* light){
     m_default_point->enabled = light->enabled;
     m_default_point->specular_strength = light->specular_strength;
     m_default_point->specular_shininess = light->specular_shininess;
@@ -368,9 +379,9 @@ namespace And{
       m_default_point->diffuse_color[i] = light->diffuse_color[i];
       m_default_point->specular_color[i] = light->specular_color[i];
     }
-  }
+  }*/
 
-  void OldShader::set_default_light(SpotLight* light){
+  /*void OldShader::set_default_light(SpotLight* light) {
     m_default_spot->enabled = light->enabled;
     m_default_spot->specular_strength = light->specular_strength;
     m_default_spot->specular_shininess = light->specular_shininess;
@@ -385,7 +396,7 @@ namespace And{
       m_default_spot->specular_color[i] = light->specular_color[i];
       m_default_spot->direction[i] = light->direction[i];
     }
-  }
+  }*/
   
   void OldShader::set_light(AmbientLight* light){
     //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
@@ -401,7 +412,7 @@ namespace And{
     }    
   }
 
-  void OldShader::set_light(PointLight* light){
+  /*void OldShader::set_light(PointLight* light){
     m_uniform_block_lights->light_point.enabled = light->enabled;
     m_uniform_block_lights->light_point.specular_strength = light->specular_strength;
     m_uniform_block_lights->light_point.specular_shininess = light->specular_shininess;
@@ -414,7 +425,7 @@ namespace And{
       m_uniform_block_lights->light_point.diffuse_color[i] = light->diffuse_color[i];
       m_uniform_block_lights->light_point.specular_color[i] = light->specular_color[i];
     }
-  }
+  }*/
 
   void OldShader::setModelViewProj(const float model[16], const float view[16], const float projection[16]){
 
@@ -445,8 +456,15 @@ namespace And{
     //m_Data->uniform_buffer_lights->bind();
     //glFlush();
 
-    //m_texture->bind(0);
+   
+    if(m_has_texture_){
+      OpenGLTexture2D* text = static_cast<OpenGLTexture2D*>(m_texture);
+      if (text != nullptr) {
+          text->Activate(0);
+      }
+    }
     
+   
   }
 
   void OldShader::upload_default_data(LightType type){
@@ -462,16 +480,16 @@ namespace And{
         m_Data->uniform_buffer_ambient->bind();
         break;
       case LightType::Directional:
-        m_Data->uniform_buffer_directional->upload_data((void*)(m_default_directional.get()), (unsigned int)m_Data->directional_size);
-        m_Data->uniform_buffer_directional->bind();
+        /*m_Data->uniform_buffer_directional->upload_data((void*)(m_default_directional.get()), (unsigned int)m_Data->directional_size);
+        m_Data->uniform_buffer_directional->bind();*/
         break;
       case LightType::Point:
-        m_Data->uniform_buffer_point->upload_data((void*)(m_default_point.get()), (unsigned int)m_Data->point_size);
-        m_Data->uniform_buffer_point->bind();
+        //m_Data->uniform_buffer_point->upload_data((void*)(m_default_point.get()), (unsigned int)m_Data->point_size);
+        //m_Data->uniform_buffer_point->bind();
         break;
       case LightType::Spot:
-        m_Data->uniform_buffer_spot->upload_data((void*)(m_default_spot.get()), (unsigned int)m_Data->spot_size);
-        m_Data->uniform_buffer_spot->bind();
+        //m_Data->uniform_buffer_spot->upload_data((void*)(m_default_spot.get()), (unsigned int)m_Data->spot_size);
+        //m_Data->uniform_buffer_spot->bind();
         break;
     }
 
@@ -480,7 +498,12 @@ namespace And{
     //glFlush();
     
 
-    //m_texture->bind(0);
+    if(m_has_texture_){
+      OpenGLTexture2D* text = static_cast<OpenGLTexture2D*>(m_texture);
+      if (text != nullptr) {
+          text->Activate(0);
+      }
+    }
 
   }
 
@@ -490,11 +513,16 @@ namespace And{
 
   void OldShader::un_configure_OldShader(){
     m_Data->uniform_buffer->unbind();
-    m_Data->uniform_buffer_lights->unbind();
+    //m_Data->uniform_buffer_lights->unbind();
   }
 
   void OldShader::set_texture(Texture* texture){
-    m_texture = texture;
+    if(texture){
+      m_texture = texture;
+      m_has_texture_ = true;
+    }else{
+      m_has_texture_ = false;
+    }
   }
 
   //void OldShader::get_texture(){}

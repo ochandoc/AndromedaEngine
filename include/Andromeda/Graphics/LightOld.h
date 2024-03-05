@@ -1,6 +1,6 @@
 #pragma once
-#include "Andromeda/Misc/CoreMiscDefines.h"
-#include "Andromeda/Resources/ResourceManager.h"
+//#include "Andromeda/Misc/CoreMiscDefines.h"
+//#include "Andromeda/Resources/ResourceManager.h
 
 namespace And{
 
@@ -29,16 +29,16 @@ struct AmbientLight{
   float specular_shininess = 0.5f; // 48 bytes
 };
 
-struct DirectionalLight{
+/*struct DirectionalLight{
   float direction[3] = {0.5f, 0.5f, 0.5f};
   float enabled = 0.5f;
   float diffuse_color[3] = {0.5f, 0.5f, 0.5f};
   float specular_strength = 0.5f;
   float specular_color[3] = {0.5f, 0.5f, 0.5f};
   float specular_shininess = 0.5f; // 48 bytes
-};
+};*/
 
-struct PointLight{
+/*struct PointLight{
   float position[3] = {0.5f, 0.5f, 0.5f};
   float specular_strength = 0.5f;
   float diffuse_color[3] = {0.5f, 0.5f, 0.5f};
@@ -49,9 +49,10 @@ struct PointLight{
   float quadratic_att = 0.5f;
   float enabled = 0.5f;
   float attenuation = 1.0f; // 64 bytes
-};
+};*/
 
-struct SpotLight{
+/*
+struct SpotLight {
   float position[3] = {0.5f, 0.5f, 0.5f};
   float padding3 = -1.0f;
   float direction[3] = {0.5f, 0.5f, 0.5f};
@@ -68,6 +69,7 @@ struct SpotLight{
   float linear_att = 0.5f;
   float quadratic_att = 0.5f; // 80 bytes
 };
+
 
 struct Light{
   std::shared_ptr<AmbientLight> ambient;
@@ -105,6 +107,16 @@ class LightManager{
     std::shared_ptr<OldShader> m_spot_OldShader;
 
 
+    std::shared_ptr<UniformBuffer> m_buffer_matrix;
+    std::shared_ptr<UniformBuffer> m_buffer_spot;
+   
+    std::shared_ptr<OldShader> m_ambient_Shader;
+    std::shared_ptr<OldShader> m_directional_Shader;
+    std::shared_ptr<OldShader> m_point_Shader;
+    std::shared_ptr<OldShader> m_spot_Shader;
+
+
 };
+*/
 
 }

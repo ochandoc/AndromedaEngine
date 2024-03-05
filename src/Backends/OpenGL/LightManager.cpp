@@ -1,16 +1,27 @@
-#include "Andromeda/Graphics/Light.h"
-#include "Andromeda/Graphics/Shader.h"
-#include "Backends/OpenGL/OpenGL.h"
+//#include "Andromeda/Graphics/LightOld.h"
+//#include "Andromeda/Graphics/Shader.h"
+//#include "Backends/OpenGL/OpenGL.h"
+//#include "Backends/OpenGL/opengl_uniform_buffer.h"
 
 namespace And {
 
 
 
-    LightManager::LightManager() {
+    /*LightManager::LightManager() {
         m_ambient_OldShader = OldShader::make_default("lights/ambient.shader", "UniformAmbient", LightType::Ambient);
         m_directional_OldShader = OldShader::make_default("lights/directional.shader", "UniformDirectional", LightType::Directional);
         m_point_OldShader = OldShader::make_default("lights/point.shader", "UniformPoint", LightType::Point);
         m_spot_OldShader = OldShader::make_default("lights/spot.shader", "UniformSpot", LightType::Spot);
+
+
+        m_spot_Shader = MakeShader("lights/spot.shader");
+        int size = m_spot_Shader->GetUniformBlockSize(EUniformBlockType::UniformBuffer0);
+        m_buffer_matrix = std::make_shared<UniformBuffer>(0,(unsigned int)size);
+        
+        int size_light = m_spot_Shader->GetUniformBlockSize(EUniformBlockType::UniformBuffer5);
+        m_buffer_spot = std::make_shared<UniformBuffer>(5,(unsigned int)size_light);
+
+
     }
 
     LightManager::~LightManager() {
@@ -82,9 +93,12 @@ namespace And {
             return m_point_OldShader.get();
             break;
         case LightType::Spot:
-            m_spot_OldShader->use();
-            m_spot_OldShader->set_default_light(light.spot.get());
-            m_spot_OldShader->upload_default_data(light.type);
+            OpenGLShader* tmp = static_cast<OpenGLShader*>(m_spot_Shader.get());
+            //tmp->Use();
+            //m_buffer_spot->
+            //m_spot_OldShader->use();
+            //m_spot_OldShader->set_default_light(light.spot.get());
+            //m_spot_OldShader->upload_default_data(light.type);
             return m_spot_OldShader.get();
             break;
         
@@ -93,6 +107,6 @@ namespace And {
         }
 
         return nullptr;
-    }
+    }*/
 
 }

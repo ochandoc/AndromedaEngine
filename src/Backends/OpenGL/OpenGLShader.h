@@ -29,7 +29,7 @@ namespace And
   enum class EUniformBlockType : uint8
   {
     UniformBuffer0 = 1 << 0, /**  Uniform block for the matrices */
-    UniformBuffer1 = 1 << 1, /**  Already un used */
+    UniformBuffer1 = 1 << 1, /**  Uniform block for the point light cube map */
     UniformBuffer2 = 1 << 2, /**  Uniform buffer of the ambient light */
     UniformBuffer3 = 1 << 3, /**  Uniform buffer of the directional light */
     UniformBuffer4 = 1 << 4, /**  Uniform buffer of the point light */

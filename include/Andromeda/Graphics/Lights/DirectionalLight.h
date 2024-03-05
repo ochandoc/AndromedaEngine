@@ -1,0 +1,56 @@
+#pragma once
+#include "Light.h"
+#include "Andromeda/Graphics/Shader.h"
+
+namespace And{
+
+struct DirectionalLightRaw {
+  float direction[3] = {0.5f, 0.5f, 0.5f};
+  float enabled = 0.5f;
+  float diffuse_color[3] = {0.5f, 0.5f, 0.5f};
+  float specular_strength = 0.5f;
+  float specular_color[3] = {0.5f, 0.5f, 0.5f};
+  float specular_shininess = 0.5f; // 48 bytes
+};
+
+class DirectionalLight : public Light{
+
+    public:
+        DirectionalLight();
+        ~DirectionalLight();
+        DirectionalLight(const DirectionalLight&);
+        DirectionalLight(DirectionalLight&&);
+        DirectionalLight& operator=(const DirectionalLight& other);
+
+    private:
+    
+        // Aqui está toda la informacion en bruto, solo se modifica cuando se cambia algun valor y se devuelve en void* GetData
+        DirectionalLightRaw m_raw;
+
+    public:
+        
+        virtual void* GetData() override;
+
+        float  GetEnabled();
+        float* GetDiffuseColor();
+        float  GetSpecularStrength();
+        float* GetSpecularColor();
+        float  GetSpecularShininess();
+        float* GetDirection();
+        
+        void  SetEnabled(float e);
+
+        void  SetDiffuseColor(float color[3]);
+        void  SetDiffuseColor(float x, float y, float z);
+        
+        void  SetSpecularStrength(float strength);
+
+        void  SetSpecularColor(float color[3]);
+        void  SetSpecularColor(float x, float y, float z);
+        
+        void  SetSpecularShininess(float shininess);
+
+        void  SetDirection(float direction[3]);
+        void  SetDirection(float x, float y, float z);
+};
+}

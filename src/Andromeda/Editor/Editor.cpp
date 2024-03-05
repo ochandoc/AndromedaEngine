@@ -30,7 +30,7 @@ Editor::Editor(Window& window, ResourceManager* rm) : m_MainWindow(window), m_re
 	}
 
 	// Debug
-	std::static_pointer_cast<ShaderTextEditor>(m_Windows["OldShader Editor 1"])->Load("default/deafult_OldShader.OldShader");
+	//std::static_pointer_cast<ShaderTextEditor>(m_Windows["OldShader Editor 1"])->Load("default/deafult_OldShader.OldShader");
 }
 
 Editor::~Editor(){

@@ -13,5 +13,6 @@ namespace And
   {
   public:
     Resource<ObjLoader> Mesh;
+    std::shared_ptr<ObjLoader> MeshOBJ;
   };
 }

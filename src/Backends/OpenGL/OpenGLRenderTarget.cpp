@@ -46,6 +46,8 @@ namespace And
     if (Size == 0) return std::shared_ptr<OpenGLRenderTarget>();
 
     std::shared_ptr<OpenGLRenderTarget> Rendertarget(new OpenGLRenderTarget);
+    Rendertarget->m_CretionInfo.Width = CreationInfo.Width;
+    Rendertarget->m_CretionInfo.Height = CreationInfo.Height;
 
     for (ETextureFormat Format : CreationInfo.Formats)
     {

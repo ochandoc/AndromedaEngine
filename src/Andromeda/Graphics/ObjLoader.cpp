@@ -92,7 +92,7 @@ std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string bas
 
   ObjLoader obj{indices, vertex_info, mat};
 
-  printf("Init obj\n");
+  printf("Init obj %s \n", filename.c_str());
 
   unsigned int VAO;
   glGenVertexArrays(1, &VAO);
@@ -102,7 +102,7 @@ std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string bas
   glGenBuffers(1, &VBO);
   obj.set_VBO(VBO);
 
-  glBindVertexArray(obj.get_vao());
+  glBindVertexArray(VAO);
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
   glBufferData(GL_ARRAY_BUFFER, vertex_info.size() * sizeof(Vertex_info), &vertex_info[0], GL_STATIC_DRAW);
@@ -113,7 +113,7 @@ std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string bas
   obj.filename_ = std::string(filename);
 
   WAIT_GPU_LOAD()
-  return std::make_shared<ObjLoader>(obj);
+  return std::make_shared<ObjLoader>(std::move(obj));
 }
 
 ObjLoader::ObjLoader(std::vector<unsigned int> indices, std::vector<Vertex_info> vertex_info, Material_info mat) :
@@ -131,6 +131,8 @@ const std::vector<unsigned int>& ObjLoader::getIndices(){
 
 ObjLoader::~ObjLoader() {
   printf("Destruction %s\n", filename_.c_str());
+
+  //glDeleteVertexArrays(1,&m_VAO);
 
 }
 

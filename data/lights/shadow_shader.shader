@@ -5,17 +5,6 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normals;
 layout(location = 2) in vec2 TexCoord;
 
-struct AmbientLight{
-  vec3 direction;
-  float enabled;
-  vec3 diffuse_color;
-  float specular_strength;
-  vec3 specular_color;
-  float specular_shininess; // 48 bytes
-};
-
-
-
 
 layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
@@ -23,11 +12,6 @@ layout (std140, binding = 0) uniform UniformBlock{
   mat4 projection;
   vec3 camera_position;
 };
-
-layout (std140, binding = 2) uniform UniformAmbient{
-  AmbientLight ambient_light;
-};
-
 
 out vec3 blend_color;
 out vec3 s_normal;
@@ -38,7 +22,7 @@ out vec2 uv;
 
 void main(){
   gl_Position = projection * view * model * vec4(position, 1.0);
-  blend_color = vec3(camera_position.x/20.0, camera_position.y/20.0, camera_position.z/20.0);
+  //blend_color = vec3(camera_position.x/20.0, camera_position.y/20.0, camera_position.z/20.0);
   s_fragPos = vec3(model * vec4(position, 1.0));
   s_normal = normals;
   camera_pos = camera_position;
@@ -51,7 +35,7 @@ void main(){
 
 layout(location = 0) out vec4 FragColor;
 
-uniform sampler2D tex;
+uniform sampler2D texShadow;
 in vec2 TexCoord;
 
 in vec3 blend_color;
@@ -59,16 +43,6 @@ in vec3 s_normal;
 in vec3 s_fragPos;
 in vec3 camera_pos;
 in vec2 uv;
-
-struct AmbientLight{
-  vec3 direction;
-  float enabled;
-  vec3 diffuse_color;
-  float specular_strength;
-  vec3 specular_color;
-  float specular_shininess; // 48 bytes
-};
-
 
 
 layout (std140, binding = 0) uniform UniformBlock{
@@ -78,16 +52,21 @@ layout (std140, binding = 0) uniform UniformBlock{
   vec3 camera_position;
 };
 
-layout (std140, binding = 2) uniform UniformAmbient{
-  AmbientLight ambient_light;
-};
 
 
 
 void main(){
   vec3 view_direction = normalize(camera_pos - s_fragPos);
   float ambient_strength = 0.01;
-  vec3 color = ambient_strength * ambient_light.diffuse_color;
+  vec3 ambient_color = vec3(1.0);
+  //ambient_color = ambient_strength * ambient_color;
+  //vec3 color = ambient_color;
+  vec3 color_base = vec3(0.5, 0.5, 0.5);
+  
+  vec3 color = vec3(1.0);
+
 
   FragColor = vec4(color, 1.0);
+
+
 }

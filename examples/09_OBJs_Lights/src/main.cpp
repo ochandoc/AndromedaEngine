@@ -49,14 +49,14 @@ int main(int argc, char** argv){
   ts.AddWorker(workerCreationInfo);
 
   std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine");
+  //window->set_vsync(true);
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
 
   std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
 
   And::ResourceManager r_manager{*window, ts};
-  r_manager.AddGenerator<And::ObjGenerator>();
-  //r_manager.AddGenerator<TextureGenerator>();
+  //r_manager.AddGenerator<And::ObjGenerator>();
   r_manager.AddGenerator<And::ShaderGenerator>();
   
   And::Editor editor{*window, &r_manager};
@@ -70,7 +70,7 @@ int main(int argc, char** argv){
 
   // Creamos el OldShader
   //And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("default/deafult_OldShader.OldShader");
-  And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("default/deafult_shader.shader");
+  //And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("default/deafult_shader.shader");
   std::shared_ptr<And::Texture> texture = And::MakeTexture("teapot_texture.jpg");
   //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("teapot_texture.jpg")
   //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("missing_texture.png");
@@ -87,6 +87,9 @@ int main(int argc, char** argv){
     
   entity_comp.add_component_class<And::MeshComponent>();
   entity_comp.add_component_class<And::TransformComponent>();
+  entity_comp.add_component_class<And::SpotLight>();
+  entity_comp.add_component_class<And::DirectionalLight>();
+  entity_comp.add_component_class<And::PointLight>();
 
   int num_obj = 10;
   float pos_x = 0.0f;
@@ -105,38 +108,52 @@ int main(int argc, char** argv){
   }*/
 
   //for(int i = -5; i < 5; i++){
-    And::MeshComponent MC, MC_teapot;
-    MC.Mesh = r_manager.NewResource<And::ObjLoader>("sponza.obj");
-    MC_teapot.Mesh = r_manager.NewResource<And::ObjLoader>("teapot.obj");
+    And::MeshComponent MC, MC_teapot, MC_teapot2;
+    //MC.Mesh = r_manager.NewResource<And::ObjLoader>("sponza.obj");
+    MC.MeshOBJ = And::ObjLoader::load("sponza.obj");
+    MC_teapot.MeshOBJ = And::ObjLoader::load("teapot.obj");
+    MC_teapot2.MeshOBJ = And::ObjLoader::load("teapot.obj");
 
     //std::shared_ptr<And::ObjLoader> obj_teapot = And::ObjLoader::load("teapot.obj");
     //And::Transform tran = {{pos_x + (i*6.0f), pos_y, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f, 1.0f}};
     And::TransformComponent tran;
     And::TransformComponent tran_teapot;
+    And::TransformComponent tran_teapot2;
     tran.position[0] = 0.0f;
     tran.position[1] = 0.0f;
     tran.position[2] = 0.0f;
-    tran.rotation[0] = 0.0f;
+    tran.rotation[0] = 1.0f;
     tran.rotation[1] = 1.0f;
-    tran.rotation[2] = 0.0f;
+    tran.rotation[2] = 1.0f;
     tran.scale[0] = 1.0f;
     tran.scale[1] = 1.0f;
     tran.scale[2] = 1.0f;
     
     tran_teapot.position[0] = 0.0f;
-    tran_teapot.position[1] = 2.0f;
-    tran_teapot.position[2] = 0.0f;
+    tran_teapot.position[1] = 5.0f;
+    tran_teapot.position[2] = -5.0f;
     tran_teapot.rotation[0] = 0.0f;
     tran_teapot.rotation[1] = 1.0f;
     tran_teapot.rotation[2] = 0.0f;
     tran_teapot.scale[0] = 2.0f;
     tran_teapot.scale[1] = 2.0f;
     tran_teapot.scale[2] = 2.0f;
+    
+    tran_teapot2.position[0] = 3.0f;
+    tran_teapot2.position[1] = 5.0f;
+    tran_teapot2.position[2] = -5.0f;
+    tran_teapot2.rotation[0] = 0.0f;
+    tran_teapot2.rotation[1] = 1.0f;
+    tran_teapot2.rotation[2] = 0.0f;
+    tran_teapot2.scale[0] = 2.0f;
+    tran_teapot2.scale[1] = 2.0f;
+    tran_teapot2.scale[2] = 2.0f;
     And::Entity* obj_id = entity_comp.new_entity(MC, tran);
-    //And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
+    And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
+    And::Entity* obj_teapot_id2 = entity_comp.new_entity(MC_teapot2, tran_teapot2);
   //}
 
-  And::AmbientLight ambient;
+  /*And::AmbientLight ambient;
   ambient.enabled = 1.0f;
   ambient.diffuse_color[0] = 0.0f;
   ambient.diffuse_color[1] = 1.0f;
@@ -213,6 +230,8 @@ int main(int argc, char** argv){
   point_light->attenuation = 40.0f;
   //l_manager.add_light(point_light);
 
+  
+
 
   std::shared_ptr<And::SpotLight> spot_light = std::make_shared<And::SpotLight>();
   spot_light->enabled = 1.0f;
@@ -223,8 +242,8 @@ int main(int argc, char** argv){
   spot_light->specular_color[1] = 1.0f;
   spot_light->specular_color[2] = 1.0f;
   spot_light->position[0] = 0.0f;
-  spot_light->position[1] = 5.0f;
-  spot_light->position[2] = 0.0f;
+  spot_light->position[1] = 14.0f;
+  spot_light->position[2] = 11.0f;
   spot_light->direction[0] = 0.0f;
   spot_light->direction[1] = 0.0f;
   spot_light->direction[2] = -1.0f;
@@ -237,6 +256,90 @@ int main(int argc, char** argv){
   spot_light->outer_cut_off= 17.5f;
   l_manager.add_light(spot_light);
 
+  */
+
+
+  float enabled = 1.0f;
+  float diffuse_color[3] = {1.0f, 0.0f, 0.0f};
+  float specular_color[3] = {1.0f, 1.0f, 1.0f};
+  float position[3] = {0.0f, 14.0f, 11.0f};
+  float direction[3] = {0.0f, 0.0f, -1.0f};
+
+  float specular_strength = 0.003f;
+  float specular_shininess = 8.0f;
+  float constant_att = 1.0f;
+  float linear_att = 0.014f;
+  float quadratic_att = 0.0007f;
+  float cutt_off = 2.5f;
+  float outer_cut_off= 17.5f;
+
+
+
+  And::SpotLight spot{};
+  spot.SetPosition(position);
+  spot.SetDirection(direction);
+  spot.SetDiffuseColor(diffuse_color);
+  spot.SetSpecularColor(specular_color);
+  spot.SetSpecularStrength(specular_strength);
+  spot.SetSpecularShininess(specular_shininess);
+  spot.SetConstantAtt(constant_att);
+  spot.SetLinearAtt(linear_att);
+  spot.SetQuadraticAtt(quadratic_att);
+  spot.SetCuttOff(cutt_off);
+  spot.SetOuterCuttOff(outer_cut_off);
+  spot.SetCastShadows(true);
+  spot.SetEnabled(true);
+  //entity_comp.new_entity(spot);
+
+  position[1] += 10.0f;
+  diffuse_color[0] = 0.0f;
+  diffuse_color[1] = 1.0f;
+
+  And::SpotLight spot2{};
+  spot2.SetPosition(position);
+  spot2.SetDirection(direction);
+  spot2.SetDiffuseColor(diffuse_color);
+  spot2.SetSpecularColor(specular_color);
+  spot2.SetSpecularStrength(specular_strength);
+  spot2.SetSpecularShininess(specular_shininess);
+  spot2.SetConstantAtt(constant_att);
+  spot2.SetLinearAtt(linear_att);
+  spot2.SetQuadraticAtt(quadratic_att);
+  spot2.SetCuttOff(cutt_off);
+  spot2.SetOuterCuttOff(outer_cut_off);
+  spot2.SetCastShadows(true);
+  spot2.SetEnabled(true);
+  //entity_comp.new_entity(spot2);
+
+    
+  enabled = 1.0f;
+
+
+  And::DirectionalLight directional{};
+  directional.SetDirection(1.0f, 0.0f, 0.0f);
+  directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+  directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
+  directional.SetCastShadows(true);
+  directional.SetEnabled(true);
+  //entity_comp.new_entity(directional);
+
+
+  position[1] = 24.0f;
+  position[2] = -5.0f;
+  diffuse_color[2] = 1.0f;
+  diffuse_color[1] = 0.0f;
+  And::PointLight point{};
+  point.SetPosition(position);
+  point.SetEnabled(1.0f);
+  point.SetDiffuseColor(diffuse_color);
+  point.SetSpecularStrength(specular_strength);
+  point.SetSpecularColor(specular_color);
+  point.SetSpecularShininess(specular_shininess);
+  point.SetCastShadows(true);
+  point.SetLinearAtt(linear_att);
+  point.SetConstantAtt(constant_att);
+  point.SetQuadraticAtt(quadratic_att);
+  entity_comp.new_entity(point);
 
   /*Light(Light::Type t, 
   glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), 
@@ -248,34 +351,14 @@ int main(int argc, char** argv){
 
 
 
-
+  //float fps_count = 0.0f;
   g_renderer.set_draw_on_texture(true);
   while (window->is_open()){
 
     window->update();
     g_renderer.new_frame();
     editor.ShowWindows();
-
-     for (auto light : l_manager.get_lights()) {
-
-        And::OldShader* s = l_manager.bind_light(light);
-        
-        //start = std::chrono::high_resolution_clock::now();
-        for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
-          g_renderer.draw_obj(obj, s, transform);
-        }
-        //end = std::chrono::high_resolution_clock::now();
-        //elapsed = end - start;
-        //printf("Duration inner loop-> %f\n", elapsed.count() * 1000.0f);
-    }
-    
-
-    //g_renderer.get_render_target()->Test();
-    //l->diffuse_color[0] += 0.0001f;
-
-
-    //ambient.direction[0] -= 0.0001f;
-    //printf("Direction0: %f\n", ambient.direction[0]);
+    And::DrawForward(entity_comp, g_renderer);
 
     g_renderer.end_frame();
     window->swap_buffers();

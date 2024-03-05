@@ -31,9 +31,13 @@
 #include "Andromeda/Graphics/ObjGenerator.h"
 #include "Andromeda/Graphics/Shader.h"
 #include "Andromeda/Graphics/ShaderGenerator.h"
+#include "Andromeda/Graphics/RenderTarget.h"
 
-#include "Andromeda/Graphics/Light.h"
+#include "Andromeda/Graphics/LightOld.h"
 #include "Andromeda/Graphics/Texture.h"
+#include "Andromeda/Graphics/Lights/DirectionalLight.h"
+#include "Andromeda/Graphics/Lights/SpotLight.h"
+#include "Andromeda/Graphics/Lights/PointLight.h"
 
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/Triangle.h"
