@@ -360,9 +360,6 @@ int main(int argc, char** argv){
     editor.ShowWindows();
     And::DrawForward(entity_comp, g_renderer);
 
-    //spot_light->position[0] = cosf(fps_count) * 6.0f;
-    //fps_count += 0.01f;
-
     g_renderer.end_frame();
     window->swap_buffers();
   }
