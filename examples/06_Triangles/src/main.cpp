@@ -89,15 +89,15 @@ int main(int argc, char** argv) {
   g_context->create_info();
 
 
-  // Creamos el shader
-  And::ShaderInfo s_info;
-  s_info.path_fragment = "fshader.fs";
-  s_info.path_vertex = "vshader_tri.vs";
+  // Creamos el OldShader
+  And::OldShaderInfo s_info;
+  s_info.path_fragment = "fOldShader.fs";
+  s_info.path_vertex = "vOldShader_tri.vs";
 
 
-  std::shared_ptr<And::Shader> g_shader = And::Shader::make(s_info);
+  std::shared_ptr<And::OldShader> g_OldShader = And::OldShader::make(s_info);
 
-  And::Shader::make("default/deafult_shader.shader");
+  And::OldShader::make("default/deafult_OldShader.OldShader");
 
 
   float clear_color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -214,8 +214,8 @@ int main(int argc, char** argv) {
       printf("Space released!\n");
     }
 
-    if (g_shader) {
-      g_shader->use();
+    if (g_OldShader) {
+      g_OldShader->use();
     }
 
     //g_renderer.showDemo();

@@ -71,7 +71,7 @@ void Renderer::new_frame()
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ZERO);
 
-  if (m_bDrawOnTexture)
+  //if (m_bDrawOnTexture)
 
   /*if (m_bDrawOnTexture)
   {
@@ -195,7 +195,7 @@ void CheckError(){
 }
 }
 
-void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
+void Renderer::draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* tran)
 {
   //if(s){
     //s->use();
@@ -244,7 +244,7 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran)
   //WAIT_GPU_LOAD();
 }
 
-void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point, Texture* texture) {
+void Renderer::draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point, Texture* texture) {
   if(s){
     s->use();
   }
@@ -295,12 +295,12 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran,
 
   std::vector<unsigned int> indices = obj->Mesh->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-  s->un_configure_shader();
+  s->un_configure_OldShader();
   //err = glGetError();
 
 }
 
-void Renderer::draw_scene(Scene& scene, Shader* s)
+void Renderer::draw_scene(Scene& scene, OldShader* s)
 {
   EntityComponentSystem& ECS = scene.m_ECS;
 
@@ -310,7 +310,7 @@ void Renderer::draw_scene(Scene& scene, Shader* s)
   }
 }
 
-void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point) {
+void Renderer::draw_obj(MeshComponent* obj, OldShader* s, TransformComponent* tran, AmbientLight* ambient, PointLight* point) {
 
   if (s) {
     s->use();
@@ -361,7 +361,7 @@ void Renderer::draw_obj(MeshComponent* obj, Shader* s, TransformComponent* tran,
 
   std::vector<unsigned int> indices = obj->Mesh->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-  s->un_configure_shader();
+  s->un_configure_OldShader();
   //err = glGetError();
 
 }

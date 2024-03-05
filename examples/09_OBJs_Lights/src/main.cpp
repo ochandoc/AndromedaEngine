@@ -52,9 +52,11 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
 
+  std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
+
   And::ResourceManager r_manager{*window, ts};
   r_manager.AddGenerator<And::ObjGenerator>();
-  r_manager.AddGenerator<TextureGenerator>();
+  //r_manager.AddGenerator<TextureGenerator>();
   r_manager.AddGenerator<And::ShaderGenerator>();
   
   And::Editor editor{*window, &r_manager};
@@ -66,14 +68,14 @@ int main(int argc, char** argv){
   //And::Future<int> fi = ts.AddTaskInThread("Resource Thread", SlowTask);
   //ts.AddTaskInThread("Test", WaitTask, fi);
 
-  // Creamos el shader
-  //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
-  And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/deafult_shader.shader");
+  // Creamos el OldShader
+  //And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("default/deafult_OldShader.OldShader");
+  And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("default/deafult_shader.shader");
   std::shared_ptr<And::Texture> texture = And::MakeTexture("teapot_texture.jpg");
   //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("teapot_texture.jpg")
   //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("missing_texture.png");
-  //g_shader->set_texture(texture);
-  //And::Resource<And::Shader> g_shader = r_manager.NewResource<And::Shader>("default/default_shader_normals.shader");
+  //g_OldShader->set_texture(texture);
+  //And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("default/default_OldShader_normals.OldShader");
   
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -256,7 +258,7 @@ int main(int argc, char** argv){
 
      for (auto light : l_manager.get_lights()) {
 
-        And::Shader* s = l_manager.bind_light(light);
+        And::OldShader* s = l_manager.bind_light(light);
         
         //start = std::chrono::high_resolution_clock::now();
         for (auto [transform, obj] : entity_comp.get_components<And::TransformComponent, And::MeshComponent>()){
@@ -267,7 +269,7 @@ int main(int argc, char** argv){
         //printf("Duration inner loop-> %f\n", elapsed.count() * 1000.0f);
     }
 
-    g_renderer.get_render_target()->Test();
+    //g_renderer.get_render_target()->Test();
     //l->diffuse_color[0] += 0.0001f;
 
 
