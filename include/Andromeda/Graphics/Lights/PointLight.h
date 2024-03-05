@@ -42,6 +42,9 @@ class PointLight : public Light{
         float* GetSpecularColor();
         float  GetSpecularShininess();
         float* GetPosition();
+        float  GetConstantAtt();
+        float  GetLinearAtt();
+        float  GetQuadraticAtt();
         
         void  SetEnabled(float e);
         void  SetDiffuseColor(float color[3]);
@@ -49,5 +52,8 @@ class PointLight : public Light{
         void  SetSpecularColor(float color[3]);
         void  SetSpecularShininess(float shininess);
         void  SetPosition(float direction[3]);
+        void  SetConstantAtt(float constant);
+        void  SetLinearAtt(float linear);
+        void  SetQuadraticAtt(float quadratic);
 };
 }

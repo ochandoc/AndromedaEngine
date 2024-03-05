@@ -57,11 +57,24 @@ float* PointLight::GetPosition(){
     return &m_raw.position[0];
 }
 
+float PointLight::GetConstantAtt(){
+    return m_raw.constant_att;
+}
+
+float PointLight::GetLinearAtt(){
+    return m_raw.linear_att;
+}
+
+float PointLight::GetQuadraticAtt(){
+    return m_raw.quadratic_att;
+}
+
 void PointLight::SetPosition(float p[3]){
     for(int i = 0; i < 3; i++){
         m_raw.position[i] = p[i];
     }
 }
+
 void PointLight::SetEnabled(float e){
     m_raw.enabled = e;
 }
@@ -86,5 +99,16 @@ void PointLight::SetSpecularShininess(float shininess){
     m_raw.specular_shininess = shininess;
 }
 
+void PointLight::SetConstantAtt(float constant){
+    m_raw.constant_att = constant;
+}
+
+void PointLight::SetLinearAtt(float linear){
+    m_raw.linear_att = linear;
+}
+
+void PointLight::SetQuadraticAtt(float quadratic){
+    m_raw.quadratic_att = quadratic;
+}
 
 }

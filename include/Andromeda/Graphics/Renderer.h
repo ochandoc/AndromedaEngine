@@ -22,6 +22,7 @@ namespace And
   struct OldShaderInfo;
   class UniformBuffer;
 
+  struct Direction;
 
 class Renderer
 {
@@ -52,15 +53,17 @@ public:
   // Si castea sombras, precalculamos las matrices de la camara y pasamos ademas la view * projection de la luz
   void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, SpotLight* l);
   void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, DirectionalLight* l);
-  void draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection, bool pointLight = false);
+  void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, PointLight* l, float* dir);
+  void draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection);
 
   void draw_scene(Scene& scene, Shader* s);
 
   void draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran);
   void draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran);
-  void draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran);
+  void draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* dir);
 
   std::shared_ptr<RenderTarget> get_shadow_buffer();
+  std::vector<std::shared_ptr<RenderTarget>> get_shadow_buffer_pointLight();
 
   friend void DrawForward(EntityComponentSystem& entity, Renderer& renderer);
 
@@ -76,11 +79,15 @@ private:
 
   //std::shared_ptr<OldShader> m_shadow_shader;
   std::shared_ptr<RenderTarget> m_shadows_buffer_;
+  std::vector<std::shared_ptr<RenderTarget>> m_shadows_buffer_pointLight;
+ 
 
   
 
   std::shared_ptr<Shader> m_shadow_shader;
+
   std::shared_ptr<Shader> m_depth_shader;
+  //std::shared_ptr<Shader> m_depth_shader_pointLight;
   
   std::shared_ptr<Shader> m_shader_ambient;
   std::shared_ptr<Shader> m_shader_directional;
@@ -98,6 +105,8 @@ private:
   std::shared_ptr<UniformBuffer> m_buffer_directional_light; // 48
   std::shared_ptr<UniformBuffer> m_buffer_point_light; // 64
   std::shared_ptr<UniformBuffer> m_buffer_spot_light; // 96
+
+  std::shared_ptr<Direction> m_directions;
 
 };
 

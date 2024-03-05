@@ -39,10 +39,14 @@ namespace And
   
   struct UniformBlockMatricesPointLight{
     glm::mat4 model;
-    glm::mat4 view[6];
-    glm::mat4 projection; // 192
+    glm::mat4 proj_view_light[6];
+    glm::mat4 proj_view_cam; // 192
     glm::vec3 camera_position;
     //float padding; // 448 bytes, aligned to 28 blocks of 16 bytes
+  };
+
+  struct Direction {
+      glm::vec3 dir[6];
   };
 
 Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
@@ -77,9 +81,16 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   info.Formats.push_back(ETextureFormat::RGBA8);
   m_shadows_buffer_ = MakeRenderTarget(info);
 
+  // Shadow buffers for point light
+  for(int i = 0; i < 6; i++){
+    m_shadows_buffer_pointLight.push_back(MakeRenderTarget(info)); 
+  }
+
+
   // Crear shader de profundidad
   //m_depth_shader = OldShader::make_default("lights/depth_shader.shader", "none", LightType::None);
   m_depth_shader = MakeShader("lights/depth_shader.shader");
+  //m_depth_shader_pointLight = MakeShader("lights/depth_shader_pointLight.shader");
   //m_shadow_shader = Shader::make_default("lights/shadow_shader.shader", "none", LightType::None);
 
   // Primero creamos todos los shaders y luego cogemos los datos de los uniform buffers de cada uno
@@ -97,11 +108,20 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 
   // Create uniform buffers for lights
   m_buffer_matrix = std::make_shared<UniformBuffer>(0, 208);
-  m_buffer_matrix_pointLight = std::make_shared<UniformBuffer>(0, 208 + (16 * 5));
+  m_buffer_matrix_pointLight = std::make_shared<UniformBuffer>(1, 208 + (16 * 5));
   m_buffer_ambient_light = std::make_shared<UniformBuffer>(2, 48);
   m_buffer_directional_light = std::make_shared<UniformBuffer>(3, 48);
   m_buffer_point_light = std::make_shared<UniformBuffer>(4, 64);
   m_buffer_spot_light = std::make_shared<UniformBuffer>(5, 96);
+
+    
+   m_directions = std::make_shared<Direction>();
+   m_directions->dir[0] = glm::vec3(1.0f, 0.0f, 0.0f);
+   m_directions->dir[1] = glm::vec3(-1.0f, 0.0f, 0.0f);
+   m_directions->dir[2] = glm::vec3(0.0f, 1.0f, 0.0f);
+   m_directions->dir[3] = glm::vec3(0.0f, -1.0f, 0.0f);
+   m_directions->dir[4] = glm::vec3(0.0f, 0.0f, 1.0f);
+   m_directions->dir[5] = glm::vec3(0.0f, 0.0f, -1.0f);
 
 }
 
@@ -422,6 +442,84 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
 }
 
+void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, PointLight* l, float* dirLight){
+  
+   //auto start = std::chrono::high_resolution_clock::now();
+  glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
+  glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
+
+  glm::mat4 modelMatrix = glm::mat4(1.0f);
+
+  glm::vec3 objectPosition = glm::vec3(trans->position[0], trans->position[1], trans->position[2]);
+  glm::vec3 objectScale = glm::vec3(trans->scale[0], trans->scale[1], trans->scale[2]);
+  float rotationAngle = 0.0f;
+  glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
+
+  modelMatrix = glm::scale(modelMatrix, objectScale);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::translate(modelMatrix, objectPosition);
+  
+
+  // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
+
+  // Cambiar lo de subir la luz al uniform buffer de ahora
+  UniformBlockMatricesPointLight matrices_tmp;
+  matrices_tmp.proj_view_cam = projectionMatrix * viewMatrix;
+
+  glm::vec3 pos = glm::make_vec3(l->GetPosition());
+  float fov_radians = glm::radians(90.0f);
+  float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
+  float near = 10.0f;
+  float far = 310.0f;
+
+  for(int i = 0; i < 6; i++){
+    glm::vec3 dir = glm::make_vec3(m_directions->dir[i]);
+    glm::vec3 up(0.0f, 1.0f, 0.0f);
+
+    float dot = glm::dot(up, dir);
+    dot = glm::abs(dot);
+    if (dot == 1.0f) {
+      up = glm::vec3(0.0f, 0.0f, 1.0f);
+    }
+
+    glm::vec3 right = glm::normalize(glm::cross(up, dir));
+    up = glm::cross(dir, right);
+    glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(dir), up);
+    glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
+    
+    matrices_tmp.proj_view_light[i] = projLight * viewLight;
+  }
+  
+  matrices_tmp.camera_position = glm::make_vec3(m_Camera.GetPosition());
+   
+  //UniformBlockMatrices matrices_tmp = {modelMatrix, viewProjCam, projViewLight, cam_pos };
+
+  //int32 size_matrix = shader_tmp->GetUniformBlockSize(EUniformBlockType::UniformBuffer0);
+  // Cambiar el shader para que coincida con mi struct
+  m_buffer_matrix_pointLight->upload_data((void*)&matrices_tmp, 208 + (16 * 5));
+  m_buffer_matrix_pointLight->bind();
+  m_buffer_spot_light->upload_data(l->GetData(), 96);
+  m_buffer_spot_light->bind();
+
+  unsigned int VBO = obj->MeshOBJ->get_vbo();
+  unsigned int VAO = obj->MeshOBJ->get_vao();
+
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBindVertexArray(VAO);
+
+  const std::vector<Vertex_info>& vertices = obj->MeshOBJ->getVertexInfo();
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
+
+  const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
+  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+}
+
 void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, DirectionalLight* l){
   
   //auto start = std::chrono::high_resolution_clock::now();
@@ -492,7 +590,7 @@ void Renderer::draw_scene(Scene& scene, Shader* s)
   }
 }
 
-void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection, bool pointLight){
+void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection){
 
   OpenGLShader* shader_tmp = static_cast<OpenGLShader*>(s.get());
   shader_tmp->Use();
@@ -511,27 +609,10 @@ void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, Tran
   const float* tmp = m_Camera.GetPosition();
   glm::vec3 cam_pos(tmp[0], tmp[1], tmp[2]);
 
-  
-  if(!pointLight){
-    UniformBlockMatrices matrices_tmp = {modelMatrix, glm::make_mat4(view), glm::make_mat4(projection), cam_pos};
-    m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
-    m_buffer_matrix->bind();
-  }else{
-    UniformBlockMatricesPointLight matrices_tmp;
-    matrices_tmp.model = modelMatrix;
-    matrices_tmp.projection =glm::make_mat4(projection);
-    matrices_tmp.camera_position = cam_pos;
-
-    for(int i = 0; i < 6; i++){
-      matrices_tmp.view[i] = glm::make_mat4(view + (i * 16));
-    }
-
-    m_buffer_matrix_pointLight->upload_data((void*)&matrices_tmp, 208 + (16*5));
-    m_buffer_matrix_pointLight->bind();
-  }
-
-  //int32 size_matrix = shader_tmp->GetUniformBlockSize(EUniformBlockType::UniformBuffer0);
-
+ 
+  UniformBlockMatrices matrices_tmp = {modelMatrix, glm::make_mat4(view), glm::make_mat4(projection), cam_pos};
+  m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
+  m_buffer_matrix->bind();
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
   unsigned int VAO = obj->MeshOBJ->get_vao();
@@ -559,6 +640,10 @@ void Renderer::showImGuiDemoWindow()
 
 std::shared_ptr<RenderTarget> Renderer::get_shadow_buffer(){
   return m_shadows_buffer_;
+}
+
+std::vector<std::shared_ptr<RenderTarget>> Renderer::get_shadow_buffer_pointLight(){
+  return m_shadows_buffer_pointLight;
 }
 
 void Renderer::draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran) {
@@ -613,74 +698,44 @@ void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformCo
   draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(viewLight), glm::value_ptr(orto));
 }
 
-void Renderer::draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran){  
-  
-  glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
-  //glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
-
-  //float x = cam_pos.x + ( (-1.0f * light_dir.x) * 50.0f);
-  //float z = cam_pos.z + ( (-1.0f * light_dir.z) * 50.0f);
-  
-  glm::mat4 viewLights[6];
+void Renderer::draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* lightDir){  
   glm::vec3 pos = glm::make_vec3(l->GetPosition());
-  glm::vec3 up_original(0.0f, 1.0f, 0.0f);
-  
+  glm::vec3 dir = glm::make_vec3(lightDir);
+ 
+  // Para la directional, la posicion tiene que estar en la mitad del flusthrum en z, y en x e y tengo que sacar la posicion segun la direccion a la que viene la luz,
+  // y luego ir moviendola ligeramente hasta sacar los valores correctos
 
-  glm::vec3 dir1 = glm::vec3(1.0f, 0.0f, 0.0f);
-  glm::vec3 right = glm::normalize(glm::cross(up_original, dir1));
-  glm::vec3 new_up = glm::cross(dir1, right);
-  viewLights[0] = glm::lookAt(pos, pos + dir1, new_up); 
-  
+  glm::vec3 up(0.0f, 1.0f, 0.0f);
+  float dot = glm::dot(up, dir);
+  dot = glm::abs(dot);
+  if (dot == 1.0f) {
+      up = glm::vec3(0.0f, 0.0f, 1.0f);
+  }
 
-  glm::vec3 dir2 = glm::vec3(-1.0f, 0.0f, 0.0f);
-  right = glm::normalize(glm::cross(up_original, dir2));
-  new_up = glm::cross(dir2, right);
-  viewLights[1] = glm::lookAt(pos, pos + dir2, new_up); 
-
-  glm::vec3 dir3 = glm::vec3(0.0f, 1.0f, 0.0f);
-  right = glm::normalize(glm::cross(up_original, dir3));
-  new_up = glm::cross(dir3, right);
-  viewLights[2] = glm::lookAt(pos, pos + dir3, new_up); 
-
-  glm::vec3 dir4 = glm::vec3(0.0f, -1.0f, 0.0f);
-  right = glm::normalize(glm::cross(up_original, dir4));
-  new_up = glm::cross(dir4, right);
-  viewLights[3] = glm::lookAt(pos, pos + dir4, new_up); 
-
-  glm::vec3 dir5 = glm::vec3(0.0f, 0.0f, 1.0f);
-  right = glm::normalize(glm::cross(up_original, dir5));
-  new_up = glm::cross(dir5, right);
-  viewLights[4] = glm::lookAt(pos, pos + dir5, new_up); 
-
-  glm::vec3 dir6 = glm::vec3(0.0f, 0.0f, -1.0f);
-  right = glm::normalize(glm::cross(up_original, dir6));
-  new_up = glm::cross(dir6, right);
-  viewLights[5] = glm::lookAt(pos, pos + dir6, new_up); 
-  
-
+  glm::vec3 right = glm::normalize(glm::cross(up, dir));
+  up = glm::cross(dir, right);
+  glm::mat4 view = glm::lookAt(pos, pos + glm::normalize(dir), up);
   int width = m_shadows_buffer_->GetCreationInfo().Width;
   int height = m_shadows_buffer_->GetCreationInfo().Height;
 
-  float fov_radians = 90.0f;
+  float fov_radians = glm::radians(90.0f);
   float aspect_ratio = (float)width / (float)height;
-  float near = 1.0f;
+  float near = 10.0f;
   float far = 310.0f;
   
   glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);
 
-  //glm::mat4 viewLight_tmp = glm::lookAt(20.0f * cam_pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(viewLights[0]), glm::value_ptr(persp), true);
+  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));
 }
 
 void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
 
     std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
-
-    /* Shadows Directional */
+/*
+    // Shadows Directional 
     shadow_buffer->Activate();
     glDisable(GL_BLEND);
-    /* Directional Light (should be 1)*/
+    // Directional Light (should be 1)
     for(auto [light] : entity.get_components<DirectionalLight>()){ 
       if(light->GetCastShadows()){
         // Por cada luz que castea sombras guardamos textura de profundidad
@@ -692,7 +747,7 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
     shadow_buffer->Desactivate();
     glEnable(GL_BLEND);
 
-    /* Render Directional*/
+    // Render Directional
     for (auto [light] : entity.get_components<DirectionalLight>()) {
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
             if (light->GetCastShadows()) {
@@ -717,10 +772,10 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
     // -----------------------
 
 
-    /* Shadows spot light*/
+    // Shadows spot light
     shadow_buffer->Activate();
     glDisable(GL_BLEND);
-    /* Spot Lights*/
+    // Spot Lights
     for(auto [light] : entity.get_components<SpotLight>()){
       if(light->GetCastShadows()){
         // Por cada luz que castea sombras guardamos textura de profundidad
@@ -732,7 +787,7 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
     shadow_buffer->Desactivate();
     glEnable(GL_BLEND);
 
-    /* Render SpotLight */
+    // Render SpotLight 
     for (auto [light] : entity.get_components<SpotLight>()) {
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
             if (light->GetCastShadows()) {
@@ -751,33 +806,50 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
         }
         glBlendFunc(GL_ONE, GL_ONE);
     }
-    
+
+*/
+
+    // Coger vector de shadow buffer de la point light
     /* Shadows Point light*/
-    shadow_buffer->Activate();
+    std::vector<std::shared_ptr<And::RenderTarget>> render_targets = renderer.get_shadow_buffer_pointLight();
+      
     glDisable(GL_BLEND);
-    /* Spot Lights*/
     for(auto [light] : entity.get_components<PointLight>()){
       if(light->GetCastShadows()){
-        // Por cada luz que castea sombras guardamos textura de profundidad, aqui hay que hacerlo en 6 shadow buffers, uno por cada cara de la point
-        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
-          renderer.draw_shadows(light, obj, transform);
-        }
+          int index = 0;
+          for (auto& target : render_targets) {
+              target->Activate();
+              // Por cada luz que castea sombras guardamos textura de profundidad, aqui hay que hacerlo en 6 shadow buffers, uno por cada cara de la point
+              for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+                  renderer.draw_shadows(light, obj, transform, glm::value_ptr(renderer.m_directions->dir[index]));
+              }
+              index++;
+              target->Desactivate();
+          }
       }
     }
-    shadow_buffer->Desactivate();
-    glEnable(GL_BLEND);
 
+      
+    
+
+
+    glEnable(GL_BLEND);
     /* Render PointLight */
     for (auto [light] : entity.get_components<PointLight>()) {
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
             if (light->GetCastShadows()) {
-                std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
-                OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_point.get());
-                OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
-                tmp->Use();
-                tex->Activate(0);
-                tmp->SetTexture("texShadow", 0);
-                renderer.draw_obj_shadows(obj, transform, light);
+                int index = 0;
+                for(auto& target : render_targets){
+
+                  std::vector<std::shared_ptr<And::Texture>> shadow_texture = target->GetTextures();
+                  OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_point.get());
+                  OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+                  tmp->Use();
+                  tex->Activate(index);
+                  tmp->SetTexture("texShadow", index);
+                  index++;
+                }
+                renderer.draw_obj_shadows(obj, transform, light, glm::value_ptr(renderer.m_directions->dir[index]));
             
             }else {
                 renderer.m_shader_point->Use();
