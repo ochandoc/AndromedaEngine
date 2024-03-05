@@ -3,136 +3,136 @@
 namespace And
 {
   enum class KeyCode : int{
-    Space               = 1,
-    Apostrophe          = 2,  /* ' */
-    Comma               = 3,  /* , */
-    Minus               = 4,  /* - */
-    Period              = 5,  /* . */
-    Slash               = 6,  /* / */
+    Space = 32,
+    Apostrophe = 39, /* ' */
+    Comma = 44, /* , */
+    Minus = 45, /* - */
+    Period = 46, /* . */
+    Slash = 47, /* / */
 
-    D0                  = 7,  /* 0 */
-    D1                  = 8,  /* 1 */
-    D2                  = 9,  /* 2 */
-    D3                  = 10, /* 3 */
-    D4                  = 11, /* 4 */
-    D5                  = 12, /* 5 */
-    D6                  = 13, /* 6 */
-    D7                  = 14, /* 7 */
-    D8                  = 15, /* 8 */
-    D9                  = 16, /* 9 */
+    D0 = 48, /* 0 */
+    D1 = 49, /* 1 */
+    D2 = 50, /* 2 */
+    D3 = 51, /* 3 */
+    D4 = 52, /* 4 */
+    D5 = 53, /* 5 */
+    D6 = 54, /* 6 */
+    D7 = 55, /* 7 */
+    D8 = 56, /* 8 */
+    D9 = 57, /* 9 */
 
-    Semicolon           = 17, /* ; */
-    Equal               = 18, /* = */
+    Semicolon = 59, /* ; */
+    Equal = 61, /* = */
 
-    A                   = 19,
-    B                   = 20,
-    C                   = 21,
-    D                   = 22,
-    E                   = 23,
-    F                   = 24,
-    G                   = 25,
-    H                   = 26,
-    I                   = 27,
-    J                   = 28,
-    K                   = 29,
-    L                   = 30,
-    M                   = 31,
-    N                   = 32,
-    O                   = 33,
-    P                   = 34,
-    Q                   = 35,
-    R                   = 36,
-    S                   = 37,
-    T                   = 38,
-    U                   = 39,
-    V                   = 40,
-    W                   = 41,
-    X                   = 42,
-    Y                   = 43,
-    Z                   = 44,
+    A = 65,
+    B = 66,
+    C = 67,
+    D = 68,
+    E = 69,
+    F = 70,
+    G = 71,
+    H = 72,
+    I = 73,
+    J = 74,
+    K = 75,
+    L = 76,
+    M = 77,
+    N = 78,
+    O = 79,
+    P = 80,
+    Q = 81,
+    R = 82,
+    S = 83,
+    T = 84,
+    U = 85,
+    V = 86,
+    W = 87,
+    X = 88,
+    Y = 89,
+    Z = 90,
 
-    LeftBracket         = 45,  /* [ */
-    Backslash           = 46,  /* \ */
-    RightBracket        = 47,  /* ] */
-    GraveAccent         = 48,  /* ` */
+    LeftBracket = 91,  /* [ */
+    Backslash = 92,  /* \ */
+    RightBracket = 93,  /* ] */
+    GraveAccent = 96,  /* ` */
 
-    World1              = 49,  /* non-US #1 */
-    World2              = 50,  /* non-US #2 */
+    World1 = 161, /* non-US #1 */
+    World2 = 162, /* non-US #2 */
 
     /* Function keys */
-    Escape              = 51,
-    Enter               = 52,
-    Tab                 = 53,
-    Backspace           = 54,
-    Insert              = 55,
-    Delete              = 56,
-    Right               = 57,
-    Left                = 58,
-    Down                = 59,
-    Up                  = 60,
-    PageUp              = 61,
-    PageDown            = 62,
-    Home                = 63,
-    End                 = 64,
-    CapsLock            = 65,
-    ScrollLock          = 66,
-    NumLock             = 67,
-    PrintScreen         = 68,
-    Pause               = 69,
-    F1                  = 70,
-    F2                  = 71,
-    F3                  = 72,
-    F4                  = 73,
-    F5                  = 74,
-    F6                  = 75,
-    F7                  = 76,
-    F8                  = 77,
-    F9                  = 78,
-    F10                 = 79,
-    F11                 = 80,
-    F12                 = 81,
-    F13                 = 82,
-    F14                 = 83,
-    F15                 = 84,
-    F16                 = 85,
-    F17                 = 86,
-    F18                 = 87,
-    F19                 = 88,
-    F20                 = 89,
-    F21                 = 90,
-    F22                 = 91,
-    F23                 = 92,
-    F24                 = 93,
-    F25                 = 94,
+		Escape = 256,
+		Enter = 257,
+		Tab = 258,
+		Backspace = 259,
+		Insert = 260,
+		Delete = 261,
+		Right = 262,
+		Left = 263,
+		Down = 264,
+		Up = 265,
+		PageUp = 266,
+		PageDown = 267,
+		Home = 268,
+		End = 269,
+		CapsLock = 280,
+		ScrollLock = 281,
+		NumLock = 282,
+		PrintScreen = 283,
+		Pause = 284,
+		F1 = 290,
+		F2 = 291,
+		F3 = 292,
+		F4 = 293,
+		F5 = 294,
+		F6 = 295,
+		F7 = 296,
+		F8 = 297,
+		F9 = 298,
+		F10 = 299,
+		F11 = 300,
+		F12 = 301,
+		F13 = 302,
+		F14 = 303,
+		F15 = 304,
+		F16 = 305,
+		F17 = 306,
+		F18 = 307,
+		F19 = 308,
+		F20 = 309,
+		F21 = 310,
+		F22 = 311,
+		F23 = 312,
+		F24 = 313,
+		F25 = 314,
 
-    /* Keypad */
-    KP0                 = 95,
-    KP1                 = 96,
-    KP2                 = 97,
-    KP3                 = 98,
-    KP4                 = 99,
-    KP5                 = 100,
-    KP6                 = 101,
-    KP7                 = 102,
-    KP8                 = 103,
-    KP9                 = 104,
-    KPDecimal           = 105,
-    KPDivide            = 106,
-    KPMultiply          = 107,
-    KPSubtract          = 108,
-    KPAdd               = 109,
-    KPEnter             = 110,
-    KPEqual             = 111,
+		/* Keypad */
+		KP0 = 320,
+		KP1 = 321,
+		KP2 = 322,
+		KP3 = 323,
+		KP4 = 324,
+		KP5 = 325,
+		KP6 = 326,
+		KP7 = 327,
+		KP8 = 328,
+		KP9 = 329,
+		KPDecimal = 330,
+		KPDivide = 331,
+		KPMultiply = 332,
+		KPSubtract = 333,
+		KPAdd = 334,
+		KPEnter = 335,
+		KPEqual = 336,
 
-    LeftShift           = 112,
-    LeftControl         = 113,
-    LeftAlt             = 114,
-    LeftSuper           = 115,
-    RightShift          = 116,
-    RightControl        = 117,
-    RightAlt            = 118,
-    RightSuper          = 119,
-    Menu                = 120
+		LeftShift = 340,
+		LeftControl = 341,
+		LeftAlt = 342,
+		LeftSuper = 343,
+		RightShift = 344,
+		RightControl = 345,
+		RightAlt = 346,
+		RightSuper = 347,
+		Menu = 348
   };
 	
   const int kNumKeys = 123;
@@ -146,13 +146,7 @@ namespace And
   {
     Release,
     Press,
-    Repeat,
     Default
-  };
-
-  struct KeyboardState
-  {
-    KeyState keys[kNumKeys];
   };
 
 };

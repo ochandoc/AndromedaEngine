@@ -268,6 +268,7 @@ int main(int argc, char** argv){
         //elapsed = end - start;
         //printf("Duration inner loop-> %f\n", elapsed.count() * 1000.0f);
     }
+    
 
     //g_renderer.get_render_target()->Test();
     //l->diffuse_color[0] += 0.0001f;

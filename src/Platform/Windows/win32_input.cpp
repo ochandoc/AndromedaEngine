@@ -10,9 +10,9 @@
 #include "GLFW/glfw3.h"
 
 
-namespace And{
+namespace And {
 
-  Input::Input(Window& w) : m_window(w), m_KeyBoard(w.m_KeyBoard){}
+  Input::Input(Window& w) : m_window(w) {}
 
 
   bool Input::check_action(const ActionInput& action)
@@ -20,57 +20,68 @@ namespace And{
     bool activated = false;
     for (int32 i = 0; i < action.m_Keys.size() && !activated; i++)
     {
-      activated = (m_KeyBoard.keys[(int)action.m_Keys[i]] == action.m_State);
+      activated = (GetKeyState(action.m_Keys[i]) == action.m_State);
     }
-    return activated;
+   return activated;
   }
 
-  bool Input::IsKeyPressed(KeyCode key){
-    return m_KeyBoard.keys[(int)key] == KeyState::Repeat || m_KeyBoard.keys[(int)key] == KeyState::Press;
+  bool Input::IsKeyDown(KeyCode key) {
+    return glfwGetKey((GLFWwindow*)m_window.get_native_window(), (int)key) == GLFW_PRESS;
   }
 
-  bool Input::IsKeyDown(KeyCode key){
-    return m_KeyBoard.keys[(int)key] == KeyState::Press;
+  bool Input::IsKeyRelease(KeyCode key) {
+    return glfwGetKey((GLFWwindow*)m_window.get_native_window(), (int)key) == GLFW_RELEASE;
   }
 
-  bool Input::IsKeyRelease(KeyCode key){
-    return m_KeyBoard.keys[(int)key] == KeyState::Release;
+  KeyState Input::GetKeyState(KeyCode key)
+  {
+    int state = glfwGetKey((GLFWwindow*)m_window.get_native_window(), (int)key);
+    switch (state)
+    {
+    case GLFW_PRESS:
+      return KeyState::Press;
+      break;
+    case GLFW_RELEASE:
+      return KeyState::Release;
+      break;
+    }
 
+    return KeyState::Default;
   }
 
-  bool Input::IsMouseButtonPressed(MouseCode key){
+  bool Input::IsMouseButtonPressed(MouseCode key) {
 
     bool isPressed = false;
 
-    switch (key){
+    switch (key) {
     case MouseCode::Left: isPressed = GetAsyncKeyState(VK_LBUTTON) & 0x8000; break;
-      case MouseCode::Right: isPressed = GetAsyncKeyState(VK_RBUTTON) & 0x8000; break;
-      default: isPressed = false; break;
+    case MouseCode::Right: isPressed = GetAsyncKeyState(VK_RBUTTON) & 0x8000; break;
+    default: isPressed = false; break;
     }
 
     return isPressed;
   }
 
-  void Input::GetMousePosition(double *x, double *y){
+  void Input::GetMousePosition(double* x, double* y) {
 
     glfwGetCursorPos((GLFWwindow*)m_window.get_native_window(), x, y);
   }
-  
-  double Input::GetMouseX(){
-    double x,y;
+
+  double Input::GetMouseX() {
+    double x, y;
 
     glfwGetCursorPos((GLFWwindow*)m_window.get_native_window(), &x, &y);
     return x;
   }
 
-  double Input::GetMouseY(){
-    double x,y;
+  double Input::GetMouseY() {
+    double x, y;
 
     glfwGetCursorPos((GLFWwindow*)m_window.get_native_window(), &x, &y);
     return y;
   }
 
 
-  Input::~Input(){
+  Input::~Input() {
   }
 };
