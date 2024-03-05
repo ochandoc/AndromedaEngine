@@ -36,6 +36,14 @@ namespace And
     glm::vec3 camera_position;
     //float padding; // 448 bytes, aligned to 28 blocks of 16 bytes
   };
+  
+  struct UniformBlockMatricesPointLight{
+    glm::mat4 model;
+    glm::mat4 view[6];
+    glm::mat4 projection; // 192
+    glm::vec3 camera_position;
+    //float padding; // 448 bytes, aligned to 28 blocks of 16 bytes
+  };
 
 Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 {
@@ -89,6 +97,7 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 
   // Create uniform buffers for lights
   m_buffer_matrix = std::make_shared<UniformBuffer>(0, 208);
+  m_buffer_matrix_pointLight = std::make_shared<UniformBuffer>(0, 208 + (16 * 5));
   m_buffer_ambient_light = std::make_shared<UniformBuffer>(2, 48);
   m_buffer_directional_light = std::make_shared<UniformBuffer>(3, 48);
   m_buffer_point_light = std::make_shared<UniformBuffer>(4, 64);
@@ -242,6 +251,45 @@ void CheckError(){
         // Manejar cualquier otro error no reconocido.
         break;
 }
+}
+
+void Renderer::showDemo(){
+
+  float triangle[6] = {
+    -0.5f, -0.5f,
+    0.0f, 0.5f,
+    0.5f, -0.5f,
+  };
+  
+  // Bindeamos el vao
+  unsigned int VAO;
+  glGenVertexArrays(1, &VAO);
+  glBindVertexArray(VAO);
+
+  // Generamos los buffers de pintado
+  unsigned int VBO;
+  glGenBuffers(1, &VBO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_STATIC_DRAW);
+
+  // Pasamos el layout
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+
+  // Pintamos
+  unsigned int indices[3] = {2, 1, 0};
+  glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, indices);
+
+  // Desbindeamos el vao
+  glBindVertexArray(0);
+
+  // Desbindeamos el vbo
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  // Borramos los buffers
+  //glDeleteBuffers(1, &VAO);
+  //glDeleteBuffers(1, &VBO);
+
 }
 
 void Renderer::draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran)
@@ -444,7 +492,7 @@ void Renderer::draw_scene(Scene& scene, Shader* s)
   }
 }
 
-void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection){
+void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection, bool pointLight){
 
   OpenGLShader* shader_tmp = static_cast<OpenGLShader*>(s.get());
   shader_tmp->Use();
@@ -463,12 +511,27 @@ void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, Tran
   const float* tmp = m_Camera.GetPosition();
   glm::vec3 cam_pos(tmp[0], tmp[1], tmp[2]);
 
-  UniformBlockMatrices matrices_tmp = {modelMatrix, glm::make_mat4(view), glm::make_mat4(projection), cam_pos};
+  
+  if(!pointLight){
+    UniformBlockMatrices matrices_tmp = {modelMatrix, glm::make_mat4(view), glm::make_mat4(projection), cam_pos};
+    m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
+    m_buffer_matrix->bind();
+  }else{
+    UniformBlockMatricesPointLight matrices_tmp;
+    matrices_tmp.model = modelMatrix;
+    matrices_tmp.projection =glm::make_mat4(projection);
+    matrices_tmp.camera_position = cam_pos;
 
-  int32 size_matrix = shader_tmp->GetUniformBlockSize(EUniformBlockType::UniformBuffer0);
+    for(int i = 0; i < 6; i++){
+      matrices_tmp.view[i] = glm::make_mat4(view + (i * 16));
+    }
 
-  m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
-  m_buffer_matrix->bind();
+    m_buffer_matrix_pointLight->upload_data((void*)&matrices_tmp, 208 + (16*5));
+    m_buffer_matrix_pointLight->bind();
+  }
+
+  //int32 size_matrix = shader_tmp->GetUniformBlockSize(EUniformBlockType::UniformBuffer0);
+
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
   unsigned int VAO = obj->MeshOBJ->get_vao();
@@ -484,51 +547,8 @@ void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, Tran
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
 
-  //glEnable(GL_CULL_FACE);
-  //glCullFace(GL_BACK);
-  //glEnable(GL_DEPTH_TEST);
-
   const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
-
-}
-
-void Renderer::showDemo(){
-
-  float triangle[6] = {
-    -0.5f, -0.5f,
-    0.0f, 0.5f,
-    0.5f, -0.5f,
-  };
-  
-  // Bindeamos el vao
-  unsigned int VAO;
-  glGenVertexArrays(1, &VAO);
-  glBindVertexArray(VAO);
-
-  // Generamos los buffers de pintado
-  unsigned int VBO;
-  glGenBuffers(1, &VBO);
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_STATIC_DRAW);
-
-  // Pasamos el layout
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
-
-  // Pintamos
-  unsigned int indices[3] = {2, 1, 0};
-  glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, indices);
-
-  // Desbindeamos el vao
-  glBindVertexArray(0);
-
-  // Desbindeamos el vbo
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  // Borramos los buffers
-  //glDeleteBuffers(1, &VAO);
-  //glDeleteBuffers(1, &VBO);
 
 }
 
@@ -553,8 +573,7 @@ void Renderer::draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent
   dir = glm::vec3(direction[0],direction[1], direction[2]);
   
   // Para la directional, la posicion tiene que estar en la mitad del flusthrum en z, y en x e y tengo que sacar la posicion segun la direccion a la que viene la luz,
-  // y luego ir moviendola ligeramente hasta sacar los valores vorrectos
-
+  // y luego ir moviendola ligeramente hasta sacar los valores correctos
 
   glm::vec3 up(0.0f, 1.0f, 0.0f);
   glm::vec3 right = glm::normalize(glm::cross(up, dir));
@@ -582,40 +601,81 @@ void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformCo
   float z = cam_pos.z + ( (-1.0f * light_dir.z) * 50.0f);
   
   glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
-
-  //glm::make_vec3(cam_pos + ( (-1.0f * light_dir) * 50.0f))
   
-
   glm::vec3 up(0.0f, 1.0f, 0.0f);
   glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
   up = glm::cross(light_dir, right);
   glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
 
   glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 1.0f, 300.0f);
-  //glm::mat4 orto = glm::ortho(-35.0f, 35.0f, -35.0f, 35.0f, 0.1f, 75.0f);
   glm::mat4 viewLight_tmp = glm::lookAt(20.0f * cam_pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-  //orto *= viewLight;
-  
-  
-  //glm::mat4 projViewLight = orto * viewLight;
-
-  /*int width = m_shadows_buffer_->GetCreationInfo().Width;
-  int height = m_shadows_buffer_->GetCreationInfo().Height;
-
-  float fov_radians = glm::radians(l->GetOuterCuttOff()) * 1.5f;
-  float aspect_ratio = (float)width / (float)height;
-  float near = 10.0f;
-  float far = 310.0f;
-  
-  glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);*/
 
   draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(viewLight), glm::value_ptr(orto));
+}
+
+void Renderer::draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran){  
+  
+  glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
+  //glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
+
+  //float x = cam_pos.x + ( (-1.0f * light_dir.x) * 50.0f);
+  //float z = cam_pos.z + ( (-1.0f * light_dir.z) * 50.0f);
+  
+  glm::mat4 viewLights[6];
+  glm::vec3 pos = glm::make_vec3(l->GetPosition());
+  glm::vec3 up_original(0.0f, 1.0f, 0.0f);
+  
+
+  glm::vec3 dir1 = glm::vec3(1.0f, 0.0f, 0.0f);
+  glm::vec3 right = glm::normalize(glm::cross(up_original, dir1));
+  glm::vec3 new_up = glm::cross(dir1, right);
+  viewLights[0] = glm::lookAt(pos, pos + dir1, new_up); 
+  
+
+  glm::vec3 dir2 = glm::vec3(-1.0f, 0.0f, 0.0f);
+  right = glm::normalize(glm::cross(up_original, dir2));
+  new_up = glm::cross(dir2, right);
+  viewLights[1] = glm::lookAt(pos, pos + dir2, new_up); 
+
+  glm::vec3 dir3 = glm::vec3(0.0f, 1.0f, 0.0f);
+  right = glm::normalize(glm::cross(up_original, dir3));
+  new_up = glm::cross(dir3, right);
+  viewLights[2] = glm::lookAt(pos, pos + dir3, new_up); 
+
+  glm::vec3 dir4 = glm::vec3(0.0f, -1.0f, 0.0f);
+  right = glm::normalize(glm::cross(up_original, dir4));
+  new_up = glm::cross(dir4, right);
+  viewLights[3] = glm::lookAt(pos, pos + dir4, new_up); 
+
+  glm::vec3 dir5 = glm::vec3(0.0f, 0.0f, 1.0f);
+  right = glm::normalize(glm::cross(up_original, dir5));
+  new_up = glm::cross(dir5, right);
+  viewLights[4] = glm::lookAt(pos, pos + dir5, new_up); 
+
+  glm::vec3 dir6 = glm::vec3(0.0f, 0.0f, -1.0f);
+  right = glm::normalize(glm::cross(up_original, dir6));
+  new_up = glm::cross(dir6, right);
+  viewLights[5] = glm::lookAt(pos, pos + dir6, new_up); 
+  
+
+  int width = m_shadows_buffer_->GetCreationInfo().Width;
+  int height = m_shadows_buffer_->GetCreationInfo().Height;
+
+  float fov_radians = 90.0f;
+  float aspect_ratio = (float)width / (float)height;
+  float near = 1.0f;
+  float far = 310.0f;
+  
+  glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);
+
+  //glm::mat4 viewLight_tmp = glm::lookAt(20.0f * cam_pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(viewLights[0]), glm::value_ptr(persp), true);
 }
 
 void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
 
     std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
-
 
     /* Shadows Directional */
     shadow_buffer->Activate();
@@ -655,7 +715,6 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
     }
 
     // -----------------------
-
 
 
     /* Shadows spot light*/
@@ -699,9 +758,9 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
     /* Spot Lights*/
     for(auto [light] : entity.get_components<PointLight>()){
       if(light->GetCastShadows()){
-        // Por cada luz que castea sombras guardamos textura de profundidad
+        // Por cada luz que castea sombras guardamos textura de profundidad, aqui hay que hacerlo en 6 shadow buffers, uno por cada cara de la point
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
-          //renderer.draw_shadows(light, obj, transform);
+          renderer.draw_shadows(light, obj, transform);
         }
       }
     }
@@ -712,14 +771,14 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
     for (auto [light] : entity.get_components<PointLight>()) {
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
             if (light->GetCastShadows()) {
-            /*    std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+                std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
                 OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_point.get());
                 OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
                 tmp->Use();
                 tex->Activate(0);
                 tmp->SetTexture("texShadow", 0);
                 renderer.draw_obj_shadows(obj, transform, light);
-            */
+            
             }else {
                 renderer.m_shader_point->Use();
                 renderer.draw_obj(obj, light, transform);

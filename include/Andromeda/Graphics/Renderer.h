@@ -9,6 +9,8 @@
 #include "Andromeda/ECS/Components/MeshComponent.h"
 #include "Andromeda/ECS/Scene.h"
 #include "Andromeda/Graphics/Lights/SpotLight.h"
+#include "Andromeda/Graphics/Lights/DirectionalLight.h"
+#include "Andromeda/Graphics/Lights/PointLight.h"
 
 namespace And
 {
@@ -50,12 +52,13 @@ public:
   // Si castea sombras, precalculamos las matrices de la camara y pasamos ademas la view * projection de la luz
   void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, SpotLight* l);
   void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, DirectionalLight* l);
-  void draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran,float* view, float* projection);
+  void draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection, bool pointLight = false);
 
   void draw_scene(Scene& scene, Shader* s);
 
   void draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran);
   void draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran);
+  void draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran);
 
   std::shared_ptr<RenderTarget> get_shadow_buffer();
 
@@ -89,7 +92,8 @@ private:
   std::shared_ptr<Shader> m_shader_spot;
   std::shared_ptr<Shader> m_shader_shadows_spot;
 
-  std::shared_ptr<UniformBuffer> m_buffer_matrix; // 208 o 256
+  std::shared_ptr<UniformBuffer> m_buffer_matrix; // 208
+  std::shared_ptr<UniformBuffer> m_buffer_matrix_pointLight; // 208 + 16 * 5
   std::shared_ptr<UniformBuffer> m_buffer_ambient_light; // 48
   std::shared_ptr<UniformBuffer> m_buffer_directional_light; // 48
   std::shared_ptr<UniformBuffer> m_buffer_point_light; // 64

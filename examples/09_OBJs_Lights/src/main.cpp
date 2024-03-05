@@ -335,7 +335,7 @@ int main(int argc, char** argv){
   point.SetSpecularStrength(specular_strength);
   point.SetSpecularColor(specular_color);
   point.SetSpecularShininess(specular_shininess);
-  point.SetCastShadows(false);
+  point.SetCastShadows(true);
   entity_comp.new_entity(point);
 
   /*Light(Light::Type t, 

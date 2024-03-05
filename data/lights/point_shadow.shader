@@ -23,7 +23,7 @@ struct PointLight{
 
 layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
-  mat4 view;
+  mat4 view[6];
   mat4 projection;
   vec3 camera_position;
 };
@@ -80,7 +80,7 @@ struct PointLight{
 
 layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
-  mat4 view;
+  mat4 view[6];
   mat4 projection;
   vec3 camera_position;
 };
