@@ -23,5 +23,7 @@ namespace And
     inline uint32 GetId() const { return m_Id; }
   private:
     uint32 m_Id;
+    uint32 m_ColorBufferId;
+    uint32 m_DepthBufferId;
   };
 }

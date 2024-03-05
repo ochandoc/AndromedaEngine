@@ -171,7 +171,16 @@ namespace And
 		public:
 			tuple_iterator(bool finished, component_list_imp<comps_t>&... comps_lists) : m_IteratorBegin(comps_lists.begin()...), m_IteratorEnd(comps_lists.end()...), m_Finished(true)
 			{
-				next_result_fold result{ std::get<0>(m_IteratorBegin)->id, true, true };
+				uint64 id = 0;
+				bool finished_ = true;
+
+				if (std::get<0>(m_IteratorBegin) != std::get<0>(m_IteratorEnd))
+				{
+					id = std::get<0>(m_IteratorBegin)->id;
+					finished_ = false;
+				}
+
+				next_result_fold result{ id, true, finished_ };
 				do
 				{
 					result = next_all(std::make_integer_sequence<int, sizeof...(comps_t)>{}, result.max);
@@ -181,7 +190,16 @@ namespace And
 
 			tuple_iterator(component_list_imp<comps_t>&... comps_lists) : m_IteratorBegin(comps_lists.begin()...), m_IteratorEnd(comps_lists.end()...), m_Finished(false)
 			{
-				next_result_fold result{ std::get<0>(m_IteratorBegin)->id, true, false};
+				uint64 id = 0;
+				bool finished = true;
+
+				if (std::get<0>(m_IteratorBegin) != std::get<0>(m_IteratorEnd))
+				{
+					id = std::get<0>(m_IteratorBegin)->id;
+					finished = false;
+				}
+
+				next_result_fold result{ id, true, finished };
 				do
 				{
 					result = next_all(std::make_integer_sequence<int, sizeof...(comps_t)>{}, result.max);
