@@ -1,4 +1,5 @@
 #include "Backends/OpenGL/OpenGLShader.h"
+#include "Backends/OpenGL/OpenGLTexture2D.h"
 #include "Backends/OpenGL/OpenGL.h"
 
 #include <algorithm>
@@ -80,9 +81,10 @@ namespace And
     return shader;
   }
 
-  void OpenGLShader::Use() const
+  void OpenGLShader::Use()
   {
     glUseProgram(m_Id);
+    m_CurrentTextureSlot = 0;
   }
 
   void OpenGLShader::StopUsing() const
@@ -209,6 +211,22 @@ namespace And
     }
   }
 
+  void OpenGLShader::SetTexture(const std::string& Name, std::shared_ptr<Texture> tex)
+  {
+    std::shared_ptr<OpenGLTexture2D> glTex = std::dynamic_pointer_cast<OpenGLTexture2D>(tex);
+    if (glTex)
+    {
+      
+      int32 location = glGetUniformLocation(m_Id, Name.c_str());
+      if (location != -1)
+      {
+        glTex->Activate(m_CurrentTextureSlot);
+        glUniform1i(location, m_CurrentTextureSlot);
+        m_CurrentTextureSlot++;
+      }
+    }
+  }
+
   void OpenGLShader::SetTextureInArray(const std::string& Name, uint32 index, uint8 Slot)
   {
     std::string nameIndexed = Name + "[" + std::to_string(index) + "]";
@@ -216,6 +234,59 @@ namespace And
     if (location != -1)
     {
       glUniform1i(location, Slot);
+    }
+  }
+
+  void OpenGLShader::SetMaterial(const Material& m)
+  {
+    for (const MaterialParam& param : m.GetParams())
+    {
+      int32 location = glGetUniformLocation(m_Id, param.GetName().c_str());
+      if (location != -1)
+      {
+        switch (param.GetType())
+        {
+          case EMaterialParamType::Int:
+          {
+            glUniform1i(location, param.GetValueAsInt());
+          } break;
+          case EMaterialParamType::UInt:
+          {
+            glUniform1ui(location, param.GetValueAsUInt());
+          } break;
+          case EMaterialParamType::Float:
+          {
+            glUniform1f(location, param.GetValueAsFloat());
+          } break;
+          case EMaterialParamType::Vec2:
+          {
+            const float* vec = param.GetValueAsVec2();
+            glUniform2f(location, vec[0], vec[1]);
+          } break;
+          case EMaterialParamType::Vec3:
+          {
+            const float* vec = param.GetValueAsVec3();
+            glUniform3f(location, vec[0], vec[1], vec[3]);
+          } break;
+          case EMaterialParamType::Vec4:
+          {
+            const float* vec = param.GetValueAsVec4();
+            glUniform4f(location, vec[0], vec[1], vec[2], vec[3]);
+          } break;
+          case EMaterialParamType::Mat3:
+          {
+            glUniformMatrix3fv(location, 1, false, param.GetValueAsMat3());
+          } break;
+          case EMaterialParamType::Mat4:
+          {
+            glUniformMatrix4fv(location, 1, false, param.GetValueAsMat4());
+          } break;
+          case EMaterialParamType::Texture2D:
+          {
+
+          } break;
+        }
+      }
     }
   }
 

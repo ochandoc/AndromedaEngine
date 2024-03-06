@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Andromeda/Misc/CoreMiscDefines.h"
+#include "Andromeda/Graphics/Material.h"
 
 namespace And
 {
@@ -13,7 +14,7 @@ namespace And
 
     virtual ~Shader() = default;
 
-    virtual void Use() const = 0;
+    virtual void Use() = 0;
     virtual void StopUsing() const = 0;
 
     inline const std::string& GetPath() const { return m_Path; }

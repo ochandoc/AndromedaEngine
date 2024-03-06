@@ -1,4 +1,4 @@
-#include "Andromeda/Graphics/Mateial.h"
+#include "Andromeda/Graphics/Material.h"
 
 And::MaterialParam::MaterialParam(const std::string& Name)
   : m_Name(Name), m_Type(EMaterialParamType::None)
@@ -10,9 +10,6 @@ And::MaterialParam::MaterialParam(const MaterialParam& other)
 {
   switch (other.m_Type)
   {
-  case EMaterialParamType::Bool:
-    SetValueAsBool(other.boolValue);
-    break;
   case EMaterialParamType::Int:
     SetValueAsInt(other.intValue);
     break;
@@ -48,9 +45,6 @@ And::MaterialParam::MaterialParam(MaterialParam&& other)
 {
   switch (other.m_Type)
   {
-  case EMaterialParamType::Bool:
-    SetValueAsBool(other.boolValue);
-    break;
   case EMaterialParamType::Int:
     SetValueAsInt(other.intValue);
     break;
@@ -93,9 +87,6 @@ And::MaterialParam& And::MaterialParam::operator=(const MaterialParam& other)
     m_Type = other.m_Type;
     switch (other.m_Type)
     {
-    case EMaterialParamType::Bool:
-      SetValueAsBool(other.boolValue);
-      break;
     case EMaterialParamType::Int:
       SetValueAsInt(other.intValue);
       break;
@@ -136,9 +127,6 @@ And::MaterialParam& And::MaterialParam::operator=(MaterialParam&& other)
     m_Type = other.m_Type;
     switch (other.m_Type)
     {
-    case EMaterialParamType::Bool:
-      SetValueAsBool(other.boolValue);
-      break;
     case EMaterialParamType::Int:
       SetValueAsInt(other.intValue);
       break;
@@ -169,12 +157,6 @@ And::MaterialParam& And::MaterialParam::operator=(MaterialParam&& other)
     }
   }
   return *this;
-}
-
-void And::MaterialParam::SetValueAsBool(bool value)
-{
-  m_Type = EMaterialParamType::Bool;
-  boolValue = value;
 }
 
 void And::MaterialParam::SetValueAsInt(int value)
@@ -252,13 +234,6 @@ void And::Material::AddParam(const std::string& name)
 {
   m_MaterialParams.push_back(MaterialParam(name));
   m_ParamIndexs.insert({name, m_MaterialParams.size() - 1});
-}
-
-void And::Material::AddParamWithValueAsBool(const std::string& name, bool value)
-{
-  m_MaterialParams.push_back(MaterialParam(name));
-  m_MaterialParams.back().SetValueAsBool(value);
-  m_ParamIndexs.insert({ name, m_MaterialParams.size() - 1 });
 }
 
 void And::Material::AddParamWithValueAsInt(const std::string& name, int value)

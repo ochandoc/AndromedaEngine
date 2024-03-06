@@ -9,7 +9,6 @@ namespace And
   enum class EMaterialParamType
   {
     None,
-    Bool,
     Int,
     UInt,
     Float,
@@ -33,7 +32,6 @@ namespace And
     MaterialParam& operator=(const MaterialParam& other);
     MaterialParam& operator=(MaterialParam&& other);
 
-    void SetValueAsBool(bool value);
     void SetValueAsInt(int value);
     void SetValueAsUInt(uint32 value);
     void SetValueAsFloat(float value);
@@ -44,6 +42,16 @@ namespace And
     void SetValueAsMat4(const float* value);
     void SetValueAsTexture2D(std::shared_ptr<Texture> value);
     
+    inline int GetValueAsInt() const { return intValue; }
+    inline uint32 GetValueAsUInt() const { return uintValue; }
+    inline float GetValueAsFloat() const { return floatValue; }
+    inline const float* GetValueAsVec2() const { return vec2Value; }
+    inline const float* GetValueAsVec3() const { return vec3Value; }
+    inline const float* GetValueAsVec4() const { return vec4Value; }
+    inline const float* GetValueAsMat3() const { return mat3Value; }
+    inline const float* GetValueAsMat4() const { return mat4Value; }
+    inline std::shared_ptr<Texture> GetValueAsTexture2D() const { return texture2DValue; }
+
     inline EMaterialParamType GetType() const { return m_Type; }
     inline const std::string& GetName() const { return m_Name; }
 
@@ -52,7 +60,6 @@ namespace And
     EMaterialParamType m_Type;
     union
     {
-      bool boolValue;
       int intValue;
       uint32 uintValue;
       float floatValue;
@@ -73,7 +80,6 @@ namespace And
     ~Material();
 
     void AddParam(const std::string& name);
-    void AddParamWithValueAsBool(const std::string& name, bool value);
     void AddParamWithValueAsInt(const std::string& name, int value);
     void AddParamWithValueAsUInt(const std::string& name, uint32 value);
     void AddParamWithValueAsFloat(const std::string& name, float value);
@@ -89,6 +95,8 @@ namespace And
     
     inline uint64 GetNumParams() const { return m_MaterialParams.size(); }
     inline const std::string& GetName() const { return m_Name; }
+    inline std::vector<MaterialParam>& GetParams() { return m_MaterialParams; }
+    inline const std::vector<MaterialParam>& GetParams() const { return m_MaterialParams; }
 
   private:
     std::string m_Name;

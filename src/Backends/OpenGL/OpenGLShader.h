@@ -62,7 +62,7 @@ namespace And
 
     static std::shared_ptr<OpenGLShader> Make(const std::string& Path);
 
-    virtual void Use() const override;
+    virtual void Use() override;
     virtual void StopUsing() const override;
 
     inline uint8 GetUniformBlocks() const { return m_UniformBlocks; }
@@ -79,7 +79,9 @@ namespace And
     void SetMat3(const std::string& Name, const glm::mat3& mat);
     void SetMat4(const std::string& Name, const glm::mat4& mat);
     void SetTexture(const std::string& Name, int8 Slot);
+    void SetTexture(const std::string& Name, std::shared_ptr<Texture> tex);
     void SetTextureInArray(const std::string& Name, uint32 index, uint8 Slot);
+    void SetMaterial(const Material& m);
 
   private:
     static std::string ReadFile(const std::string& Path);
@@ -88,6 +90,7 @@ namespace And
     uint32 m_Id;
     uint8 m_UniformBlocks;
     uint8 m_NumTextures;
+    uint8 m_CurrentTextureSlot;
     std::unordered_map<std::string, UniformInfo> m_Uniforms;
     std::unordered_map<EUniformBlockType, int32> m_UniformBlocksSizes;
   };
