@@ -289,7 +289,7 @@ int main(int argc, char** argv){
   spot.SetOuterCuttOff(outer_cut_off);
   spot.SetCastShadows(true);
   spot.SetEnabled(true);
-  //entity_comp.new_entity(spot);
+  entity_comp.new_entity(spot);
 
   position[1] += 10.0f;
   diffuse_color[0] = 0.0f;
@@ -309,7 +309,7 @@ int main(int argc, char** argv){
   spot2.SetOuterCuttOff(outer_cut_off);
   spot2.SetCastShadows(true);
   spot2.SetEnabled(true);
-  //entity_comp.new_entity(spot2);
+  And::Entity* spot2_entity = entity_comp.new_entity(spot2);
 
     
   enabled = 1.0f;
@@ -321,7 +321,7 @@ int main(int argc, char** argv){
   directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
   directional.SetCastShadows(true);
   directional.SetEnabled(true);
-  //entity_comp.new_entity(directional);
+  entity_comp.new_entity(directional);
 
   float position2[3] = {0.0f, 34.0f, -5.0f};
   diffuse_color[2] = 1.0f;
@@ -338,6 +338,23 @@ int main(int argc, char** argv){
   point.SetConstantAtt(constant_att);
   point.SetQuadraticAtt(quadratic_att);
   And::Entity* point_entity = entity_comp.new_entity(point);
+  
+  position2[0] += 40.0f;
+  diffuse_color[2] = 0.0f;
+  diffuse_color[0] = 1.0f;
+
+  And::PointLight point2{};
+  point2.SetPosition(position2);
+  point2.SetEnabled(1.0f);
+  point2.SetDiffuseColor(diffuse_color);
+  point2.SetSpecularStrength(specular_strength);
+  point2.SetSpecularColor(specular_color);
+  point2.SetSpecularShininess(specular_shininess);
+  point2.SetCastShadows(true);
+  point2.SetLinearAtt(linear_att);
+  point2.SetConstantAtt(constant_att);
+  point2.SetQuadraticAtt(quadratic_att);
+  And::Entity* point_entity2 = entity_comp.new_entity(point2);
 
   /*Light(Light::Type t, 
   glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), 
@@ -358,8 +375,12 @@ int main(int argc, char** argv){
     editor.ShowWindows();
 
     position2[0] = cosf(fps_count) * 15.0f;
+    position[1] = cosf(fps_count) * 5.0f + 15.0f;
+    
     fps_count +=0.01f;
     point_entity->get_component<And::PointLight>()->SetPosition(position2);
+
+    spot2_entity->get_component<And::SpotLight>()->SetPosition(position);
     
 
     And::DrawForward(entity_comp, g_renderer);

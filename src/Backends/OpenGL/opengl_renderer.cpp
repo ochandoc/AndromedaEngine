@@ -728,7 +728,7 @@ void Renderer::draw_shadows(PointLight* l, MeshComponent* obj, TransformComponen
 void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
 
     std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
-/*
+
     // Shadows Directional 
     shadow_buffer->Activate();
     glDisable(GL_BLEND);
@@ -770,23 +770,22 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
 
 
     // Shadows spot light
-    shadow_buffer->Activate();
-    glDisable(GL_BLEND);
     // Spot Lights
     for(auto [light] : entity.get_components<SpotLight>()){
+      shadow_buffer->Activate();
+      glDisable(GL_BLEND);
       if(light->GetCastShadows()){
         // Por cada luz que castea sombras guardamos textura de profundidad
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
           renderer.draw_shadows(light, obj, transform);
         }
       }
-    }
-    shadow_buffer->Desactivate();
-    glEnable(GL_BLEND);
+      // Cuando saque la sombra de una spot, tengo que renderizar para que cuando saque la segunda no se sobreescriba el buffer
+      shadow_buffer->Desactivate();
+      glEnable(GL_BLEND);
 
-    // Render SpotLight 
-    for (auto [light] : entity.get_components<SpotLight>()) {
-        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+      // Render SpotLight 
+      for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
             if (light->GetCastShadows()) {
                 std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
                 OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_spot.get());
@@ -802,16 +801,15 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
             }
         }
         glBlendFunc(GL_ONE, GL_ONE);
-    }
 
-*/
+    }
 
     // Coger vector de shadow buffer de la point light
     /* Shadows Point light*/
     std::vector<std::shared_ptr<And::RenderTarget>> render_targets = renderer.get_shadow_buffer_pointLight();
       
-    glDisable(GL_BLEND);
     for(auto [light] : entity.get_components<PointLight>()){
+      glDisable(GL_BLEND);
       if(light->GetCastShadows()){
           int index = 0;
           for (auto& target : render_targets) {
@@ -824,13 +822,10 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
               target->Desactivate();
           }
       }
-    }
-    glEnable(GL_BLEND);
-
+      glEnable(GL_BLEND);
       
-    /* Render PointLight */
-    for (auto [light] : entity.get_components<PointLight>()) {
-        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+      /* Render PointLight */
+      for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
             if (light->GetCastShadows()) {
                 int index = 0;
                 for(auto& target : render_targets){
@@ -852,10 +847,6 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
         }
         glBlendFunc(GL_ONE, GL_ONE);
     }
-    
-
-
-
     
 }
 
