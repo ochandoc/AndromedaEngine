@@ -40,9 +40,8 @@ namespace And
   struct UniformBlockMatricesPointLight{
     glm::mat4 model;
     glm::mat4 proj_view_light[6];
-    glm::mat4 proj_view_cam; // 192
-    glm::vec3 camera_position;
-    //float padding; // 448 bytes, aligned to 28 blocks of 16 bytes
+    glm::mat4 proj_view_cam; 
+    glm::vec3 camera_position; // 524 bytes
   };
 
   struct Direction {
@@ -108,7 +107,7 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 
   // Create uniform buffers for lights
   m_buffer_matrix = std::make_shared<UniformBuffer>(0, 208);
-  m_buffer_matrix_pointLight = std::make_shared<UniformBuffer>(1, 208 + (16 * 5));
+  m_buffer_matrix_pointLight = std::make_shared<UniformBuffer>(1, 524);
   m_buffer_ambient_light = std::make_shared<UniformBuffer>(2, 48);
   m_buffer_directional_light = std::make_shared<UniformBuffer>(3, 48);
   m_buffer_point_light = std::make_shared<UniformBuffer>(4, 64);
@@ -458,9 +457,6 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, P
   modelMatrix = glm::scale(modelMatrix, objectScale);
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  
-
-  // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
 
   // Cambiar lo de subir la luz al uniform buffer de ahora
   UniformBlockMatricesPointLight matrices_tmp;
@@ -471,6 +467,7 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, P
   float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
   float near = 10.0f;
   float far = 310.0f;
+  glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
 
   for(int i = 0; i < 6; i++){
     glm::vec3 dir = glm::make_vec3(m_directions->dir[i]);
@@ -485,21 +482,21 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, P
     glm::vec3 right = glm::normalize(glm::cross(up, dir));
     up = glm::cross(dir, right);
     glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(dir), up);
-    glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
     
     matrices_tmp.proj_view_light[i] = projLight * viewLight;
   }
   
-  matrices_tmp.camera_position = glm::make_vec3(m_Camera.GetPosition());
+  matrices_tmp.model = modelMatrix;
+  matrices_tmp.camera_position = glm::make_vec3(m_Camera.GetPosition());  
    
   //UniformBlockMatrices matrices_tmp = {modelMatrix, viewProjCam, projViewLight, cam_pos };
 
   //int32 size_matrix = shader_tmp->GetUniformBlockSize(EUniformBlockType::UniformBuffer0);
   // Cambiar el shader para que coincida con mi struct
-  m_buffer_matrix_pointLight->upload_data((void*)&matrices_tmp, 208 + (16 * 5));
+  m_buffer_matrix_pointLight->upload_data((void*)&matrices_tmp, 524);
   m_buffer_matrix_pointLight->bind();
-  m_buffer_spot_light->upload_data(l->GetData(), 96);
-  m_buffer_spot_light->bind();
+  m_buffer_point_light->upload_data(l->GetData(), 64);
+  m_buffer_point_light->bind();
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
   unsigned int VAO = obj->MeshOBJ->get_vao();
@@ -616,7 +613,7 @@ void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, Tran
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
   unsigned int VAO = obj->MeshOBJ->get_vao();
-  WAIT_GPU_LOAD();
+  //WAIT_GPU_LOAD();
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBindVertexArray(VAO);
@@ -828,12 +825,9 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
           }
       }
     }
+    glEnable(GL_BLEND);
 
       
-    
-
-
-    glEnable(GL_BLEND);
     /* Render PointLight */
     for (auto [light] : entity.get_components<PointLight>()) {
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
@@ -846,7 +840,7 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
                   OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
                   tmp->Use();
                   tex->Activate(index);
-                  tmp->SetTexture("texShadow", index);
+                  tmp->SetTextureInArray("texShadow", index, index);
                   index++;
                 }
                 renderer.draw_obj_shadows(obj, transform, light, glm::value_ptr(renderer.m_directions->dir[index]));

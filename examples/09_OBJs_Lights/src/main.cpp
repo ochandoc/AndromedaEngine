@@ -323,13 +323,11 @@ int main(int argc, char** argv){
   directional.SetEnabled(true);
   //entity_comp.new_entity(directional);
 
-
-  position[1] = 24.0f;
-  position[2] = -5.0f;
+  float position2[3] = {0.0f, 34.0f, -5.0f};
   diffuse_color[2] = 1.0f;
   diffuse_color[1] = 0.0f;
   And::PointLight point{};
-  point.SetPosition(position);
+  point.SetPosition(position2);
   point.SetEnabled(1.0f);
   point.SetDiffuseColor(diffuse_color);
   point.SetSpecularStrength(specular_strength);
@@ -339,7 +337,7 @@ int main(int argc, char** argv){
   point.SetLinearAtt(linear_att);
   point.SetConstantAtt(constant_att);
   point.SetQuadraticAtt(quadratic_att);
-  entity_comp.new_entity(point);
+  And::Entity* point_entity = entity_comp.new_entity(point);
 
   /*Light(Light::Type t, 
   glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), 
@@ -351,15 +349,20 @@ int main(int argc, char** argv){
 
 
 
-  //float fps_count = 0.0f;
+  float fps_count = 0.0f;
   g_renderer.set_draw_on_texture(true);
   while (window->is_open()){
 
     window->update();
     g_renderer.new_frame();
     editor.ShowWindows();
-    And::DrawForward(entity_comp, g_renderer);
 
+    position2[0] = cosf(fps_count) * 15.0f;
+    fps_count +=0.01f;
+    point_entity->get_component<And::PointLight>()->SetPosition(position2);
+    
+
+    And::DrawForward(entity_comp, g_renderer);
     g_renderer.end_frame();
     window->swap_buffers();
   }
