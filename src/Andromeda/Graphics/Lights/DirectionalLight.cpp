@@ -26,7 +26,6 @@ DirectionalLight::DirectionalLight(DirectionalLight&& other){
 }
 
 DirectionalLight& DirectionalLight::operator=(const DirectionalLight& other){
-    // Guardar tambien cast shadows
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
     return *this;
@@ -57,13 +56,11 @@ float* DirectionalLight::GetDirection(){
 }
 
 void DirectionalLight::SetEnabled(float e){
-    //m_enabled = e;
     m_raw.enabled = e;
 }
 
 void DirectionalLight::SetDiffuseColor(float color[3]){
     for (int i = 0; i < 3; i++) {
-        //m_diffuse_color[i] = color[i];
         m_raw.diffuse_color[i] = color[i];
     }
 }
@@ -77,13 +74,11 @@ void DirectionalLight::SetDiffuseColor(float x, float y, float z){
 }
 
 void  DirectionalLight::SetSpecularStrength(float strength){
-    //m_specular_strength = strength;
     m_raw.specular_strength = strength;
 }
 
 void  DirectionalLight::SetSpecularColor(float color[3]){
     for (int i = 0; i < 3; i++) {
-        //m_specular_color[i] = color[i];
         m_raw.specular_color[i] = color[i];
     }
 
@@ -97,13 +92,11 @@ void  DirectionalLight::SetSpecularColor(float x, float y, float z){
 }
 
 void DirectionalLight::SetSpecularShininess(float shininess){
-    //m_specular_shininess = shininess;
     m_raw.specular_shininess = shininess;
 }
 
 void DirectionalLight::SetDirection(float direction[3]){
     for (int i = 0; i < 3; i++) {
-        //m_direction[i] = direction[i];
         m_raw.direction[i] = direction[i];
     }
 }
