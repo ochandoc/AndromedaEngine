@@ -32,11 +32,17 @@ class DirectionalLight : public Light{
         virtual void* GetData() override;
 
         float  GetEnabled();
+        void  GetEnabled(float& enabled);
         float* GetDiffuseColor();
+        void GetDiffuseColor(float& r, float& g, float& b);
         float  GetSpecularStrength();
+        void  GetSpecularStrength(float& strenght);
         float* GetSpecularColor();
+        void GetSpecularColor(float& r, float& g, float& b);
         float  GetSpecularShininess();
+        void  GetSpecularShininess(float& shininess);
         float* GetDirection();
+        void GetDirection(float& x, float& y, float& z);
         
         void  SetEnabled(float e);
 

@@ -111,4 +111,62 @@ void PointLight::SetQuadraticAtt(float quadratic){
     m_raw.quadratic_att = quadratic;
 }
 
+void PointLight::GetDiffuseColor(float &r, float& g, float& b){
+    r = m_raw.diffuse_color[0];
+    g = m_raw.diffuse_color[1];
+    b = m_raw.diffuse_color[2];
+}
+
+void PointLight::GetSpecularColor(float &r, float& g, float& b){
+    r = m_raw.specular_color[0];
+    g = m_raw.specular_color[1];
+    b = m_raw.specular_color[2];
+}
+
+void PointLight::GetPosition(float& x, float& y, float& z){
+    x = m_raw.position[0];
+    y = m_raw.position[1];
+    z = m_raw.position[2];
+}
+
+void PointLight::GetEnabled(float& e){
+
+    e = m_raw.enabled;
+}
+
+void PointLight::GetSpecularStrength(float& e){
+    e = m_raw.specular_strength;
+}
+
+void PointLight::GetSpecularShininess(float& e){
+    e = m_raw.specular_shininess;
+}
+
+void PointLight::GetConstantAtt(float& e){
+    e = m_raw.constant_att;
+}
+
+void PointLight::GetLinearAtt(float& e){
+    e = m_raw.linear_att;
+}
+
+void PointLight::GetQuadraticAtt(float& e){
+    e = m_raw.quadratic_att;
+}
+
+void PointLight::SetSpecularColor(float r, float g, float b){
+    m_raw.specular_color[0] = r;
+    m_raw.specular_color[1] = g;
+    m_raw.specular_color[2] = b;
+}
+
+void PointLight::SetPosition(float x, float y, float z){
+    m_raw.position[0] = x;
+    m_raw.position[1] = y;
+    m_raw.position[2] = z;
+}   
+
+
+
+
 }

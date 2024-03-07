@@ -32,42 +32,52 @@ class SpotLight : public Light{
         SpotLight(SpotLight&&);
         SpotLight& operator=(const SpotLight& other);
 
-        // Hay que crear el shader y puede fallar
-        //static std::shared_ptr<SpotLight> MakeSpotLight();
-
-
     private:
     
         // Aqui está toda la informacion en bruto, solo se modifica cuando se cambia algun valor y se devuelve en void* GetData
         SpotLightRaw m_raw;
-        //std::shared_ptr<Shader> m_shader;
     public:
         
-        //virtual std::shared_ptr<Shader> GetShader() override;
         virtual void* GetData() override;
 
         float  GetEnabled();
+        void   GetEnabled(float& enabled);
         float* GetDiffuseColor();
+        void   GetDiffuseColor(float& r, float& g, float& b);
         float  GetSpecularStrength();
+        void   GetSpecularStrength(float& strenght);
         float* GetSpecularColor();
+        void   GetSpecularColor(float& r, float& g, float& b);
         float  GetSpecularShininess();
+        void   GetSpecularShininess(float& shininess);
 
         float* GetPosition();
+        void   GetPosition(float& x, float& y, float& z);
         float* GetDirection();
+        void   GetDirection(float& x, float& y, float& z);
         float  GetCuttOff();
+        void   GetCuttOff(float& cutt);
         float  GetOuterCuttOff();
+        void   GetOuterCuttOff(float& outer);
         float  GetConstantAtt();
+        void   GetConstantAtt(float& constant);
         float  GetLinearAtt();
+        void   GetLinearAtt(float& linear);
         float  GetQuadraticAtt();
+        void   GetQuadraticAtt(float& quadratic);
         
         void  SetEnabled(float e);
         void  SetDiffuseColor(float color[3]);
+        void  SetDiffuseColor(float r, float g, float b);
         void  SetSpecularStrength(float strength);
         void  SetSpecularColor(float color[3]);
+        void  SetSpecularColor(float r, float g, float b);
         void  SetSpecularShininess(float shininess);
 
         void  SetPosition(float position[3]);
+        void  SetPosition(float x, float y, float z);
         void  SetDirection(float direction[3]);
+        void  SetDirection(float x, float y, float z);
         void  SetCuttOff(float cutt);
         void  SetOuterCuttOff(float outer);
         void  SetConstantAtt(float constant);

@@ -116,4 +116,35 @@ void DirectionalLight::SetDirection(float x, float y, float z){
     
 }
 
+void  DirectionalLight::GetEnabled(float& enabled){
+    enabled = m_raw.enabled;
+}
+
+void  DirectionalLight::GetDiffuseColor(float& r, float& g, float& b){
+    r = m_raw.diffuse_color[0];
+    g = m_raw.diffuse_color[1];
+    b = m_raw.diffuse_color[2];
+}
+
+void  DirectionalLight::GetSpecularStrength(float& strenght){
+    strenght = m_raw.specular_strength;
+}
+
+void  DirectionalLight::GetSpecularColor(float& r, float& g, float& b){
+    r = m_raw.specular_color[0];
+    g = m_raw.specular_color[1];
+    b = m_raw.specular_color[2];
+}
+
+void  DirectionalLight::GetSpecularShininess(float& shininess){
+    shininess = m_raw.specular_shininess;
+}
+
+void  DirectionalLight::GetDirection(float& x, float& y, float& z){
+    x = m_raw.direction[0];
+    y = m_raw.direction[1];
+    z = m_raw.direction[2];
+}
+
+
 }

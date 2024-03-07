@@ -33,9 +33,6 @@ SpotLight& SpotLight::operator=(const SpotLight& other){
     return *this;
 }
 
-
-//std::shared_ptr<Shader> SpotLight::GetShader(){}
-
 float SpotLight::GetEnabled(){
     return m_raw.enabled;;
 }
@@ -155,6 +152,87 @@ void  SpotLight::SetQuadraticAtt(float quadratic){
     //m_quadratic_att = quadratic;
     m_raw.quadratic_att = quadratic;
 }
+
+void  SpotLight::GetEnabled(float& enabled){
+    m_raw.enabled = enabled;
+}
+
+void SpotLight::GetDiffuseColor(float& r, float& g, float& b){
+    r = m_raw.diffuse_color[0];
+    g = m_raw.diffuse_color[1];
+    b = m_raw.diffuse_color[2];
+}
+
+void  SpotLight::GetSpecularStrength(float& strenght){
+    strenght = m_raw.specular_strength;
+}
+
+void SpotLight::GetSpecularColor(float& r, float& g, float& b){
+    r = m_raw.specular_color[0];
+    g = m_raw.specular_color[1];
+    b = m_raw.specular_color[2];
+}
+
+void  SpotLight::GetSpecularShininess(float& shininess){
+    shininess = m_raw.specular_shininess;
+}
+
+void SpotLight::GetPosition(float& x, float& y, float& z){
+    x = m_raw.position[0];
+    y = m_raw.position[1];
+    z = m_raw.position[2];
+}
+
+void SpotLight::GetDirection(float& x, float& y, float& z){
+    x = m_raw.direction[0];
+    y = m_raw.direction[1];
+    z = m_raw.direction[2];
+}
+
+void  SpotLight::GetCuttOff(float& cutt){
+    cutt = m_raw.cutt_off;
+}
+
+void  SpotLight::GetOuterCuttOff(float& outer){
+    outer = m_raw.outer_cut_off;
+}
+
+void  SpotLight::GetConstantAtt(float& constant){
+    constant = m_raw.constant_att;
+}
+
+void  SpotLight::GetLinearAtt(float& linear){
+    linear = m_raw.linear_att;
+}
+
+void  SpotLight::GetQuadraticAtt(float& quadratic){
+    quadratic = m_raw.quadratic_att;
+}
+
+void  SpotLight::SetDiffuseColor(float r, float g, float b){
+    m_raw.diffuse_color[0] = r;
+    m_raw.diffuse_color[1] = g;
+    m_raw.diffuse_color[2] = b;
+}
+
+void  SpotLight::SetSpecularColor(float r, float g, float b){
+    m_raw.specular_color[0] = r;
+    m_raw.specular_color[1] = g;
+    m_raw.specular_color[2] = b;
+}
+
+void  SpotLight::SetPosition(float x, float y, float z){
+    m_raw.position[0] = x;
+    m_raw.position[1] = y;
+    m_raw.position[2] = z;
+}
+
+void  SpotLight::SetDirection(float x, float y, float z){
+    m_raw.direction[0] = x;
+    m_raw.direction[1] = y;
+    m_raw.direction[2] = z;
+}
+
 
 
 }
