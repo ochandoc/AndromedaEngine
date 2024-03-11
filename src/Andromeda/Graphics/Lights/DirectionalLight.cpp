@@ -1,10 +1,20 @@
 #include "Andromeda/Graphics/Lights/DirectionalLight.h"
 #include "Andromeda/Graphics/Shader.h"
+#include "glm/glm.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace And{
 
+struct MatrixData{
+    glm::mat4 projection_view_matrix;
+    glm::mat4 projection_matrix;
+    glm::mat4 view_matrix;
+};
+
 DirectionalLight::DirectionalLight() : m_raw(){
     m_must_recalculate = true;
+    m_matrix = std::make_shared<MatrixData>();
 }
 
 DirectionalLight::~DirectionalLight(){}
@@ -19,19 +29,36 @@ DirectionalLight::DirectionalLight(const DirectionalLight& other){
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
     this->m_must_recalculate = other.m_must_recalculate;
+    this->m_matrix = other.m_matrix;
 }
 
 DirectionalLight::DirectionalLight(DirectionalLight&& other){
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
     this->m_must_recalculate = other.m_must_recalculate;
+    this->m_matrix = other.m_matrix;
 }
 
 DirectionalLight& DirectionalLight::operator=(const DirectionalLight& other){
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
     this->m_must_recalculate = other.m_must_recalculate;
+    this->m_matrix = other.m_matrix;
     return *this;
+}
+
+void DirectionalLight::SetCameraPosition(float x, float y, float z){
+    m_cam_pos[0] = x;
+    m_cam_pos[1] = y;
+    m_cam_pos[2] = z;
+    m_must_recalculate = true;
+}
+
+void DirectionalLight::SetCameraPosition(const float* pos){
+    for(int i = 0; i < 3; i++){
+        m_cam_pos[i] = pos[i];
+    }
+    m_must_recalculate = true;
 }
 
 float DirectionalLight::GetEnabled(){
@@ -102,6 +129,7 @@ void DirectionalLight::SetDirection(float direction[3]){
     for (int i = 0; i < 3; i++) {
         m_raw.direction[i] = direction[i];
     }
+    m_must_recalculate = true;
 }
 
 void DirectionalLight::SetDirection(float x, float y, float z){
@@ -109,6 +137,7 @@ void DirectionalLight::SetDirection(float x, float y, float z){
     m_raw.direction[0] = x;
     m_raw.direction[1] = y;
     m_raw.direction[2] = z;
+    m_must_recalculate = true;
     
 }
 
@@ -143,19 +172,46 @@ void  DirectionalLight::GetDirection(float& x, float& y, float& z){
 }
 
 void DirectionalLight::Recalculate(float aspect_ratio){
+    
+    if(m_must_recalculate){
+
+        glm::vec3 cam_pos = glm::make_vec3(m_cam_pos);
+        glm::vec3 light_dir = glm::make_vec3(m_raw.direction);
+
+        float x = cam_pos.x + ( (-1.0f * light_dir.x) * 50.0f);
+        float z = cam_pos.z + ( (-1.0f * light_dir.z) * 50.0f);
+        
+        glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
+        
+        glm::vec3 up(0.0f, 1.0f, 0.0f);
+        glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
+        up = glm::cross(light_dir, right);
+        glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
+
+        glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 1.0f, 300.0f);
+        glm::mat4 viewLight_tmp = glm::lookAt(20.0f * cam_pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        m_matrix->projection_matrix = orto;
+        m_matrix->view_matrix = viewLight_tmp;
+        m_matrix->projection_view_matrix = orto * viewLight_tmp;
+        m_must_recalculate = false;
+    }
+
 
 }
 
 float* DirectionalLight::GetProjectViewMatrix(float aspect_ratio){
-    return nullptr;
+    Recalculate(aspect_ratio);
+    return glm::value_ptr(m_matrix->projection_view_matrix);
 }
 
 float* DirectionalLight::GetProjectMatrix(float aspect_ratio){
-    return nullptr;
+    Recalculate(aspect_ratio);
+    return glm::value_ptr(m_matrix->projection_matrix);
 }
 
 float* DirectionalLight::GetViewMatrix(float aspect_ratio){
-    return nullptr;
+    Recalculate(aspect_ratio);
+    return glm::value_ptr(m_matrix->view_matrix);
 }
 
 

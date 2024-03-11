@@ -638,6 +638,7 @@ void Renderer::draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent
 
 void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran) {  
   
+  l->SetCameraPosition(m_Camera.GetPosition());
   glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
   glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
 
@@ -654,7 +655,7 @@ void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformCo
   glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 1.0f, 300.0f);
   glm::mat4 viewLight_tmp = glm::lookAt(20.0f * cam_pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(viewLight), glm::value_ptr(orto));
+  draw_deep_obj(obj, m_depth_shader, tran, l->GetViewMatrix(0.0f), l->GetProjectMatrix(0.0f));
 }
 
 void Renderer::draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* lightDir){  

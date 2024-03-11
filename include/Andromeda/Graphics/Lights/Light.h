@@ -1,6 +1,7 @@
 #pragma once
 #include "Andromeda/Graphics/Shader.h"
 #include "Andromeda/ECS/ComponentBase.h"
+#include "Andromeda/Graphics/Camera.h"
 
 namespace And{
 

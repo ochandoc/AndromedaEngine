@@ -13,6 +13,8 @@ struct DirectionalLightRaw {
   float specular_shininess = 0.5f; // 48 bytes
 };
 
+struct MatrixData;
+
 class DirectionalLight : public Light{
 
     public:
@@ -26,6 +28,9 @@ class DirectionalLight : public Light{
     
         // Aqui está toda la informacion en bruto, solo se modifica cuando se cambia algun valor y se devuelve en void* GetData
         DirectionalLightRaw m_raw;
+        std::shared_ptr<MatrixData> m_matrix;
+
+        float m_cam_pos[3];
 
     public:
         
@@ -34,6 +39,9 @@ class DirectionalLight : public Light{
         virtual float* GetProjectViewMatrix(float aspect_ratio) override;
         virtual float* GetProjectMatrix(float aspect_ratio) override;
         virtual float* GetViewMatrix(float aspect_ratio) override;
+
+        void SetCameraPosition(float x, float y, float z);
+        void SetCameraPosition(const float* pos);
 
         float  GetEnabled();
         void   GetEnabled(float& enabled);
