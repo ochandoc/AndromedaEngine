@@ -65,18 +65,7 @@ int main(int argc, char** argv){
   // Show pc info
   g_context->create_info();
 
-  //And::Future<int> fi = ts.AddTaskInThread("Resource Thread", SlowTask);
-  //ts.AddTaskInThread("Test", WaitTask, fi);
-
-  // Creamos el OldShader
-  //And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("default/deafult_OldShader.OldShader");
-  //And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("default/deafult_shader.shader");
   std::shared_ptr<And::Texture> texture = And::MakeTexture("teapot_texture.jpg");
-  //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("teapot_texture.jpg")
-  //And::Resource<OpenGLTexture2D> texture = r_manager.NewResource<OpenGLTexture2D>("missing_texture.png");
-  //g_OldShader->set_texture(texture);
-  //And::Resource<And::OldShader> g_OldShader = r_manager.NewResource<And::OldShader>("default/default_OldShader_normals.OldShader");
-  
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
@@ -152,111 +141,6 @@ int main(int argc, char** argv){
     And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
     And::Entity* obj_teapot_id2 = entity_comp.new_entity(MC_teapot2, tran_teapot2);
   //}
-
-  /*And::AmbientLight ambient;
-  ambient.enabled = 1.0f;
-  ambient.diffuse_color[0] = 0.0f;
-  ambient.diffuse_color[1] = 1.0f;
-  ambient.diffuse_color[2] = 0.0f;
-  ambient.specular_color[0] = 1.0f;
-  ambient.specular_color[1] = 1.0f;
-  ambient.specular_color[2] = 1.0f;
-  ambient.direction[0] = 1.0f;
-  ambient.direction[1] = 1.0f;
-  ambient.direction[2] = 0.0f;
-
-  ambient.specular_strength = 0.5f;
-  ambient.specular_shininess = 1.0f;
-
-  And::PointLight point;
-  point.enabled = 1.0f;
-  point.position[0] = -5.0f;
-  point.position[1] = 7.0f;
-  point.position[2] = 0.0f;
-  point.diffuse_color[0] = 1.0f;
-  point.diffuse_color[1] = 0.55f;
-  point.diffuse_color[2] = 0.0f;
-  point.specular_color[0] = 1.0f;
-  point.specular_color[1] = 1.0f;
-  point.specular_color[2] = 1.0f;
-  point.specular_strength = 0.5f;
-  point.specular_shininess = 1.0f;
-  point.constant_att = 1.0f;
-  point.linear_att = 0.7f;
-  point.quadratic_att = 1.8f;
-  point.attenuation = 40.0f;
-
-
-  And::LightManager l_manager;
-  std::shared_ptr<And::AmbientLight> l = std::make_shared<And::AmbientLight>();
-  l->enabled = 1.0f;
-  l->diffuse_color[0] = 0.4f;
-  l->diffuse_color[1] = 0.4f;
-  l->diffuse_color[2] = 0.4f;
-  l->specular_color[0] = 1.0f;
-  l->specular_color[1] = 1.0f;
-  l->specular_color[2] = 1.0f;
-  l->direction[0] = 1.0f;
-  l->direction[1] = 1.0f;
-  l->direction[2] = 0.0f;
-  //l_manager.add_light(l);
-  
-  std::shared_ptr<And::DirectionalLight> l2 = std::make_shared<And::DirectionalLight>();
-  l2->enabled = 1.0f;
-  l2->diffuse_color[0] = 1.0f;
-  l2->diffuse_color[1] = 1.0f;
-  l2->diffuse_color[2] = 1.0f;
-  l2->specular_color[0] = 1.0f;
-  l2->specular_color[1] = 1.0f;
-  l2->specular_color[2] = 1.0f;
-  l2->direction[0] = 1.0f;
-  l2->direction[1] = 1.0f;
-  l2->direction[2] = 0.0f;
-  //l_manager.add_light(l2);
-  
-  std::shared_ptr<And::PointLight> point_light = std::make_shared<And::PointLight>();
-  point_light->enabled = 1.0f;
-  point_light->diffuse_color[0] = 0.0f;
-  point_light->diffuse_color[1] = 1.0f;
-  point_light->diffuse_color[2] = 0.0f;
-  point_light->specular_color[0] = 1.0f;
-  point_light->specular_color[1] = 1.0f;
-  point_light->specular_color[2] = 1.0f;
-  point_light->specular_strength = 1.0f;
-  point_light->specular_shininess = 1.0f;
-  point_light->constant_att = 1.0f;
-  point_light->linear_att = 0.7f;
-  point_light->quadratic_att = 1.8f;
-  point_light->attenuation = 40.0f;
-  //l_manager.add_light(point_light);
-
-  
-
-
-  std::shared_ptr<And::SpotLight> spot_light = std::make_shared<And::SpotLight>();
-  spot_light->enabled = 1.0f;
-  spot_light->diffuse_color[0] = 1.0f;
-  spot_light->diffuse_color[1] = 0.0f;
-  spot_light->diffuse_color[2] = 0.0f;
-  spot_light->specular_color[0] = 1.0f;
-  spot_light->specular_color[1] = 1.0f;
-  spot_light->specular_color[2] = 1.0f;
-  spot_light->position[0] = 0.0f;
-  spot_light->position[1] = 14.0f;
-  spot_light->position[2] = 11.0f;
-  spot_light->direction[0] = 0.0f;
-  spot_light->direction[1] = 0.0f;
-  spot_light->direction[2] = -1.0f;
-  spot_light->specular_strength = 0.003f;
-  spot_light->specular_shininess = 8.0f;
-  spot_light->constant_att = 1.0f;
-  spot_light->linear_att = 0.014f;
-  spot_light->quadratic_att = 0.0007f;
-  spot_light->cutt_off = 2.5f;
-  spot_light->outer_cut_off= 17.5f;
-  l_manager.add_light(spot_light);
-
-  */
 
 
   float enabled = 1.0f;
@@ -355,16 +239,6 @@ int main(int argc, char** argv){
   point2.SetConstantAtt(constant_att);
   point2.SetQuadraticAtt(quadratic_att);
   And::Entity* point_entity2 = entity_comp.new_entity(point2);
-
-  /*Light(Light::Type t, 
-  glm::vec3 pos = glm::vec3(0.0f, 0.0f, 0.0f), 
-  glm::vec3 att = glm::vec3(1.0f, 0.014f, 0.0007f),
-  glm::vec3 col = glm::vec3(1.0f, 1.0f, 1.0f), 
-  glm::vec3 dir = glm::vec3(0.0f, 0.0f, -1.0f), 
-  float cut = 12.5f, 
-  float outer_cut = 17.5f);*/
-
-
 
   float fps_count = 0.0f;
   g_renderer.set_draw_on_texture(true);
