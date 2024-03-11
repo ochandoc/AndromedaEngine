@@ -22,6 +22,7 @@ struct SpotLightRaw {
     float quadratic_att = 0.5f; // 80 bytes
 };
 
+struct MatrixData;
 
 class SpotLight : public Light{
 
@@ -37,12 +38,15 @@ class SpotLight : public Light{
         // Aqui está toda la informacion en bruto, solo se modifica cuando se cambia algun valor y se devuelve en void* GetData
         SpotLightRaw m_raw;
 
-        float* m_proj_view_matrix;
+        std::shared_ptr<MatrixData> m_matrix;
+        
     public:
         
         virtual void* GetData() override;
-
+        virtual void Recalculate(float aspect_ratio) override;
         virtual float* GetProjectViewMatrix(float aspect_ratio) override;
+        virtual float* GetProjectMatrix(float aspect_ratio) override;
+        virtual float* GetViewMatrix(float aspect_ratio) override;
 
         float  GetEnabled();
         void   GetEnabled(float& enabled);

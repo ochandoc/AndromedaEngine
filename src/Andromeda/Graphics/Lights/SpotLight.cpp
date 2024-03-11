@@ -6,9 +6,15 @@
 
 namespace And{
 
-
+struct MatrixData{
+    glm::mat4 projection_view_matrix;
+    glm::mat4 projection_matrix;
+    glm::mat4 view_matrix;
+};
 
 SpotLight::SpotLight() : m_raw(){
+    m_must_recalculate = true;
+    m_matrix = std::make_shared<MatrixData>();
 
 }
 
@@ -23,16 +29,22 @@ SpotLight::SpotLight(const SpotLight& other){
     
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
+    this->m_must_recalculate = other.m_must_recalculate;
+    this->m_matrix = other.m_matrix;
 }
 
 SpotLight::SpotLight(SpotLight&& other){
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
+    this->m_must_recalculate = other.m_must_recalculate;
+    this->m_matrix = other.m_matrix;
 }
 
 SpotLight& SpotLight::operator=(const SpotLight& other){
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
+    this->m_must_recalculate = other.m_must_recalculate;
+    this->m_matrix = other.m_matrix;
     return *this;
 }
 
@@ -99,20 +111,20 @@ void SpotLight::SetDiffuseColor(float color[3]){
 
 void  SpotLight::SetSpecularStrength(float strength){
     m_raw.specular_strength = strength;
-    m_must_recalculate = true;
+    //m_must_recalculate = true;
 }
 
 void  SpotLight::SetSpecularColor(float color[3]){
     for (int i = 0; i < 3; i++) {
         m_raw.specular_color[i] = color[i];
     }
-    m_must_recalculate = true;
+    //m_must_recalculate = true;
 
 }
 
 void SpotLight::SetSpecularShininess(float shininess){
     m_raw.specular_shininess = shininess;
-    m_must_recalculate = true;
+    //m_must_recalculate = true;
 }
 
 void SpotLight::SetPosition(float position[3]){
@@ -141,17 +153,17 @@ void SpotLight::SetOuterCuttOff(float outer){
 
 void SpotLight::SetConstantAtt(float constant){
     m_raw.constant_att = constant;
-    m_must_recalculate = true;
+    //m_must_recalculate = true;
 }
 
 void SpotLight::SetLinearAtt(float linear){
     m_raw.linear_att = linear;
-    m_must_recalculate = true;
+    //m_must_recalculate = true;
 }
 
 void  SpotLight::SetQuadraticAtt(float quadratic){
     m_raw.quadratic_att = quadratic;
-    m_must_recalculate = true;
+    //m_must_recalculate = true;
 }
 
 void  SpotLight::GetEnabled(float& enabled){
@@ -214,14 +226,14 @@ void  SpotLight::SetDiffuseColor(float r, float g, float b){
     m_raw.diffuse_color[0] = r;
     m_raw.diffuse_color[1] = g;
     m_raw.diffuse_color[2] = b;
-    m_must_recalculate = true;
+    //m_must_recalculate = true;
 }
 
 void  SpotLight::SetSpecularColor(float r, float g, float b){
     m_raw.specular_color[0] = r;
     m_raw.specular_color[1] = g;
     m_raw.specular_color[2] = b;
-    m_must_recalculate = true;
+    //m_must_recalculate = true;
 }
 
 void  SpotLight::SetPosition(float x, float y, float z){
@@ -238,12 +250,11 @@ void  SpotLight::SetDirection(float x, float y, float z){
     m_must_recalculate = true;
 }
 
-float* SpotLight::GetProjectViewMatrix(float aspect_ratio){
-
+void SpotLight::Recalculate(float aspect_ratio){
     if (m_must_recalculate) {
 
-        glm::vec3 pos = glm::make_vec3(m_raw.position);
-        glm::vec3 dir = glm::make_vec3(m_raw.direction);
+        glm::vec3 pos = glm::make_vec3(&m_raw.position[0]);
+        glm::vec3 dir = glm::make_vec3(&m_raw.direction[0]);
 
         glm::vec3 up(0.0f, 1.0f, 0.0f);
         glm::vec3 right = glm::normalize(glm::cross(up, dir));
@@ -256,12 +267,31 @@ float* SpotLight::GetProjectViewMatrix(float aspect_ratio){
         glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
         glm::mat4 projViewLight = projLight * viewLight;
 
-        m_proj_view_matrix = glm::value_ptr(projViewLight);
+        m_matrix->projection_matrix = projLight;
+        m_matrix->view_matrix = viewLight;
+        m_matrix->projection_view_matrix = projViewLight;
+
         m_must_recalculate = false;
     }
-
-    return m_proj_view_matrix;
 }
+
+float* SpotLight::GetProjectViewMatrix(float aspect_ratio){
+
+    
+    Recalculate(aspect_ratio);
+    return glm::value_ptr(m_matrix->projection_view_matrix);
+}
+
+float* SpotLight::GetProjectMatrix(float aspect_ratio){
+    Recalculate(aspect_ratio);
+    return glm::value_ptr(m_matrix->projection_matrix);
+}
+
+float* SpotLight::GetViewMatrix(float aspect_ratio){
+    Recalculate(aspect_ratio);
+    return glm::value_ptr(m_matrix->view_matrix);
+}
+
 
 
 

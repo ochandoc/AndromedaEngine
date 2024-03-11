@@ -383,7 +383,6 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
   glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
 
-
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
   glm::vec3 objectPosition = glm::vec3(trans->position[0], trans->position[1], trans->position[2]);
@@ -395,25 +394,13 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
 
-  // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
-
-  // Cambiar lo de subir la luz al uniform buffer de ahora
-
-  glm::vec3 pos = glm::make_vec3(l->GetPosition());
-  glm::vec3 dir = glm::make_vec3(l->GetDirection());
-
-  glm::vec3 up(0.0f, 1.0f, 0.0f);
-  glm::vec3 right = glm::normalize(glm::cross(up, dir));
-  up = glm::cross(dir, right);
-  glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(dir), up);
-  
   float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
+
   glm::mat4 projViewLight = glm::make_mat4(l->GetProjectViewMatrix(aspect_ratio));
   
   glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
   UniformBlockMatrices matrices_tmp = {modelMatrix, viewProjCam, projViewLight, cam_pos };
 
-  //int32 size_matrix = shader_tmp->GetUniformBlockSize(EUniformBlockType::UniformBuffer0);
   m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
   m_buffer_matrix->bind();
   m_buffer_spot_light->upload_data(l->GetData(), 96);
@@ -642,31 +629,9 @@ std::vector<std::shared_ptr<RenderTarget>> Renderer::get_shadow_buffer_pointLigh
 
 void Renderer::draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran) {
 
-  // Esto para la spot light
-  glm::vec3 pos;
-  glm::vec3 dir;
-
-  float* position = l->GetPosition(); 
-  float* direction = l->GetDirection(); 
-  pos = glm::vec3(position[0],position[1],position[2]);
-  dir = glm::vec3(direction[0],direction[1], direction[2]);
-  
-  // Para la directional, la posicion tiene que estar en la mitad del flusthrum en z, y en x e y tengo que sacar la posicion segun la direccion a la que viene la luz,
-  // y luego ir moviendola ligeramente hasta sacar los valores correctos
-
-  glm::vec3 up(0.0f, 1.0f, 0.0f);
-  glm::vec3 right = glm::normalize(glm::cross(up, dir));
-  up = glm::cross(dir, right);
-  glm::mat4 view = glm::lookAt(pos, pos + glm::normalize(dir), up);
-  int width = m_shadows_buffer_->GetCreationInfo().Width;
-  int height = m_shadows_buffer_->GetCreationInfo().Height;
-
-  float fov_radians = glm::radians(l->GetOuterCuttOff()) * 1.5f;
-  float aspect_ratio = (float)width / (float)height;
-  float near = 10.0f;
-  float far = 310.0f;
-  
-  glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);
+  float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
+  glm::mat4 view = glm::make_mat4(l->GetViewMatrix(aspect_ratio));
+  glm::mat4 persp = glm::make_mat4(l->GetProjectMatrix(aspect_ratio));
 
   draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));
 }

@@ -4,7 +4,7 @@
 namespace And{
 
 DirectionalLight::DirectionalLight() : m_raw(){
-
+    m_must_recalculate = true;
 }
 
 DirectionalLight::~DirectionalLight(){}
@@ -18,16 +18,19 @@ DirectionalLight::DirectionalLight(const DirectionalLight& other){
     
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
+    this->m_must_recalculate = other.m_must_recalculate;
 }
 
 DirectionalLight::DirectionalLight(DirectionalLight&& other){
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
+    this->m_must_recalculate = other.m_must_recalculate;
 }
 
 DirectionalLight& DirectionalLight::operator=(const DirectionalLight& other){
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
+    this->m_must_recalculate = other.m_must_recalculate;
     return *this;
 }
 
@@ -139,9 +142,21 @@ void  DirectionalLight::GetDirection(float& x, float& y, float& z){
     z = m_raw.direction[2];
 }
 
-float* DirectionalLight::GetProjectViewMatrix(float aspect_ratio){
+void DirectionalLight::Recalculate(float aspect_ratio){
 
+}
+
+float* DirectionalLight::GetProjectViewMatrix(float aspect_ratio){
     return nullptr;
 }
+
+float* DirectionalLight::GetProjectMatrix(float aspect_ratio){
+    return nullptr;
+}
+
+float* DirectionalLight::GetViewMatrix(float aspect_ratio){
+    return nullptr;
+}
+
 
 }

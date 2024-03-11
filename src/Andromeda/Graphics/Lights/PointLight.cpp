@@ -6,7 +6,7 @@ namespace And{
 
 
 PointLight::PointLight() : m_raw(){
-
+    m_must_recalculate = true;
 }
 
 PointLight::~PointLight(){}
@@ -20,16 +20,19 @@ PointLight::PointLight(const PointLight& other){
     
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
+    this->m_must_recalculate = other.m_must_recalculate;
 }
 
 PointLight::PointLight(PointLight&& other){
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
+    this->m_must_recalculate = other.m_must_recalculate;
 }
 
 PointLight& PointLight::operator=(const PointLight& other){
     this->m_raw = other.m_raw;
     this->m_cast_shadows = other.m_cast_shadows;
+    this->m_must_recalculate = other.m_must_recalculate;
     return *this;
 }
 
@@ -166,11 +169,24 @@ void PointLight::SetPosition(float x, float y, float z){
     m_raw.position[2] = z;
 }   
 
+void PointLight::Recalculate(float aspect_ratio){
+
+}
 
 float* PointLight::GetProjectViewMatrix(float aspect_ratio){
 
     return nullptr;
 }
+
+float* PointLight::GetProjectMatrix(float aspect_ratio){
+
+    return nullptr;
+}
+
+float* PointLight::GetViewMatrix(float aspect_ratio){
+    return nullptr;
+}
+
 
 
 

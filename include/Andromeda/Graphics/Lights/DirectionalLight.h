@@ -30,7 +30,10 @@ class DirectionalLight : public Light{
     public:
         
         virtual void* GetData() override;
+        virtual void Recalculate(float aspect_ratio) override;
         virtual float* GetProjectViewMatrix(float aspect_ratio) override;
+        virtual float* GetProjectMatrix(float aspect_ratio) override;
+        virtual float* GetViewMatrix(float aspect_ratio) override;
 
         float  GetEnabled();
         void   GetEnabled(float& enabled);
