@@ -36,6 +36,8 @@ class SpotLight : public Light{
     
         // Aqui está toda la informacion en bruto, solo se modifica cuando se cambia algun valor y se devuelve en void* GetData
         SpotLightRaw m_raw;
+        virtual void Recalculate() override;
+        
     public:
         
         virtual void* GetData() override;

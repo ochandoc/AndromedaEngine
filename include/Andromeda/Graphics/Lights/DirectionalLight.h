@@ -26,37 +26,33 @@ class DirectionalLight : public Light{
     
         // Aqui está toda la informacion en bruto, solo se modifica cuando se cambia algun valor y se devuelve en void* GetData
         DirectionalLightRaw m_raw;
+        virtual void Recalculate() override;
 
     public:
         
         virtual void* GetData() override;
 
         float  GetEnabled();
-        void  GetEnabled(float& enabled);
+        void   GetEnabled(float& enabled);
         float* GetDiffuseColor();
-        void GetDiffuseColor(float& r, float& g, float& b);
+        void   GetDiffuseColor(float& r, float& g, float& b);
         float  GetSpecularStrength();
-        void  GetSpecularStrength(float& strenght);
+        void   GetSpecularStrength(float& strenght);
         float* GetSpecularColor();
-        void GetSpecularColor(float& r, float& g, float& b);
+        void   GetSpecularColor(float& r, float& g, float& b);
         float  GetSpecularShininess();
-        void  GetSpecularShininess(float& shininess);
+        void   GetSpecularShininess(float& shininess);
         float* GetDirection();
-        void GetDirection(float& x, float& y, float& z);
+        void   GetDirection(float& x, float& y, float& z);
         
-        void  SetEnabled(float e);
-
-        void  SetDiffuseColor(float color[3]);
-        void  SetDiffuseColor(float x, float y, float z);
-        
-        void  SetSpecularStrength(float strength);
-
-        void  SetSpecularColor(float color[3]);
-        void  SetSpecularColor(float x, float y, float z);
-        
-        void  SetSpecularShininess(float shininess);
-
-        void  SetDirection(float direction[3]);
-        void  SetDirection(float x, float y, float z);
+        void   SetEnabled(float e);
+        void   SetDiffuseColor(float color[3]);
+        void   SetDiffuseColor(float x, float y, float z);
+        void   SetSpecularStrength(float strength);
+        void   SetSpecularColor(float color[3]);
+        void   SetSpecularColor(float x, float y, float z);
+        void   SetSpecularShininess(float shininess);
+        void   SetDirection(float direction[3]);
+        void   SetDirection(float x, float y, float z);
 };
 }

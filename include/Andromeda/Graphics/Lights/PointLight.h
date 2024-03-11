@@ -31,6 +31,8 @@ class PointLight : public Light{
     
         // Aqui está toda la informacion en bruto, solo se modifica cuando se cambia algun valor y se devuelve en void* GetData
         PointLightRaw m_raw;
+
+        virtual void Recalculate() override;
         
     public:
         

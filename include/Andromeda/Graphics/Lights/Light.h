@@ -16,10 +16,6 @@ class Light : public ComponentBase{
         Light(const Light&) = delete;
         Light(Light&&) = default;
 
-
-
-        //virtual std::shared_ptr<Shader> GetShader() = 0;
-
         // Returns all light data in void*
         virtual void* GetData() = 0;
 
@@ -31,13 +27,9 @@ class Light : public ComponentBase{
 
     protected:
 
-        /*float m_enabled = -1.0f;
-        float m_diffuse_color[3] = {0.5f, 0.5f, 0.5f};
-        float m_specular_strength = 0.5f;
-        float m_specular_color[3] = {0.5f, 0.5f, 0.5f};
-        float m_specular_shininess = 0.5f;*/
-
+        virtual void Recalculate() = 0;
         bool m_cast_shadows;
+        bool m_must_recalculate;
 
     private:
 

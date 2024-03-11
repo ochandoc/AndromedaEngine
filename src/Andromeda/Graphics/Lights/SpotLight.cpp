@@ -84,7 +84,6 @@ float SpotLight::GetQuadraticAtt(){
 
 
 void SpotLight::SetEnabled(float e){
-    //m_enabled = e;
     m_raw.enabled = e;
 }
 
