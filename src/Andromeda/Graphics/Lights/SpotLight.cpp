@@ -1,5 +1,8 @@
 #include "Andromeda/Graphics/Lights/SpotLight.h"
 #include "Andromeda/Graphics/Shader.h"
+#include "glm/glm.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace And{
 
@@ -96,49 +99,59 @@ void SpotLight::SetDiffuseColor(float color[3]){
 
 void  SpotLight::SetSpecularStrength(float strength){
     m_raw.specular_strength = strength;
+    m_must_recalculate = true;
 }
 
 void  SpotLight::SetSpecularColor(float color[3]){
     for (int i = 0; i < 3; i++) {
         m_raw.specular_color[i] = color[i];
     }
+    m_must_recalculate = true;
 
 }
 
 void SpotLight::SetSpecularShininess(float shininess){
     m_raw.specular_shininess = shininess;
+    m_must_recalculate = true;
 }
 
 void SpotLight::SetPosition(float position[3]){
     for (int i = 0; i < 3; i++) {
         m_raw.position[i] = position[i];
     }
+    m_must_recalculate = true;
 }
 
 void SpotLight::SetDirection(float direction[3]){
     for (int i = 0; i < 3; i++) {
         m_raw.direction[i] = direction[i];
     }
+    m_must_recalculate = true;
 }
 
 void SpotLight::SetCuttOff(float cutt){
     m_raw.cutt_off = cutt;
+    m_must_recalculate = true;
 }
 
 void SpotLight::SetOuterCuttOff(float outer){
     m_raw.outer_cut_off = outer;
+    m_must_recalculate = true;
 }
 
 void SpotLight::SetConstantAtt(float constant){
     m_raw.constant_att = constant;
+    m_must_recalculate = true;
 }
 
 void SpotLight::SetLinearAtt(float linear){
     m_raw.linear_att = linear;
+    m_must_recalculate = true;
 }
 
 void  SpotLight::SetQuadraticAtt(float quadratic){
     m_raw.quadratic_att = quadratic;
+    m_must_recalculate = true;
 }
 
 void  SpotLight::GetEnabled(float& enabled){
@@ -201,24 +214,53 @@ void  SpotLight::SetDiffuseColor(float r, float g, float b){
     m_raw.diffuse_color[0] = r;
     m_raw.diffuse_color[1] = g;
     m_raw.diffuse_color[2] = b;
+    m_must_recalculate = true;
 }
 
 void  SpotLight::SetSpecularColor(float r, float g, float b){
     m_raw.specular_color[0] = r;
     m_raw.specular_color[1] = g;
     m_raw.specular_color[2] = b;
+    m_must_recalculate = true;
 }
 
 void  SpotLight::SetPosition(float x, float y, float z){
     m_raw.position[0] = x;
     m_raw.position[1] = y;
     m_raw.position[2] = z;
+    m_must_recalculate = true;
 }
 
 void  SpotLight::SetDirection(float x, float y, float z){
     m_raw.direction[0] = x;
     m_raw.direction[1] = y;
     m_raw.direction[2] = z;
+    m_must_recalculate = true;
+}
+
+float* SpotLight::GetProjectViewMatrix(float aspect_ratio){
+
+    if (m_must_recalculate) {
+
+        glm::vec3 pos = glm::make_vec3(m_raw.position);
+        glm::vec3 dir = glm::make_vec3(m_raw.direction);
+
+        glm::vec3 up(0.0f, 1.0f, 0.0f);
+        glm::vec3 right = glm::normalize(glm::cross(up, dir));
+        up = glm::cross(dir, right);
+        glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(dir), up);
+
+        float fov_radians = glm::radians(m_raw.outer_cut_off) * 1.5f;
+        float near = 10.0f;
+        float far = 310.0f;
+        glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
+        glm::mat4 projViewLight = projLight * viewLight;
+
+        m_proj_view_matrix = glm::value_ptr(projViewLight);
+        m_must_recalculate = false;
+    }
+
+    return m_proj_view_matrix;
 }
 
 

@@ -381,6 +381,8 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   //auto start = std::chrono::high_resolution_clock::now();
   glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
+  glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
+
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -392,7 +394,6 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   modelMatrix = glm::scale(modelMatrix, objectScale);
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
 
   // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
 
@@ -405,13 +406,9 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   glm::vec3 right = glm::normalize(glm::cross(up, dir));
   up = glm::cross(dir, right);
   glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(dir), up);
-
-  float fov_radians = glm::radians(l->GetOuterCuttOff()) * 1.5f;
+  
   float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
-  float near = 10.0f;
-  float far = 310.0f;
-  glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
-  glm::mat4 projViewLight = projLight * viewLight;
+  glm::mat4 projViewLight = glm::make_mat4(l->GetProjectViewMatrix(aspect_ratio));
   
   glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
   UniformBlockMatrices matrices_tmp = {modelMatrix, viewProjCam, projViewLight, cam_pos };

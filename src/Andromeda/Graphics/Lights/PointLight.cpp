@@ -167,6 +167,12 @@ void PointLight::SetPosition(float x, float y, float z){
 }   
 
 
+float* PointLight::GetProjectViewMatrix(float aspect_ratio){
+
+    return nullptr;
+}
+
+
 
 
 }

@@ -12,13 +12,15 @@ namespace And
     float d[16] = { 0.0f };
   };
 
-  class TransformComponent : public ComponentBase
-  {
+  class TransformComponent : public ComponentBase{
+
   public:
     float position[3] = { 0.0f };
     float rotation[3] = { 0.0f };
     float scale[3] = { 1.0f };
 
     Mat4 matrix;
+
+    Mat4 GetModelMatrix();
   };
 }

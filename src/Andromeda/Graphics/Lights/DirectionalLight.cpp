@@ -139,5 +139,9 @@ void  DirectionalLight::GetDirection(float& x, float& y, float& z){
     z = m_raw.direction[2];
 }
 
+float* DirectionalLight::GetProjectViewMatrix(float aspect_ratio){
+
+    return nullptr;
+}
 
 }
