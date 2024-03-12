@@ -2,7 +2,6 @@
 
 #include "Andromeda/Misc/CoreMiscDefines.h"
 #include "Andromeda/HAL/Types.h"
-
 #include "Andromeda/Misc/ID.h"
 
 namespace And
@@ -352,6 +351,10 @@ namespace And
 		{
 			assert(!m_Components.contains(typeid(comp_t).hash_code()) && "Component class already inserted!");
 			m_Components.insert({typeid(comp_t).hash_code(), std::make_unique<internal::component_list_imp<comp_t>>()});
+		}
+
+		void Initialize(){
+			
 		}
 
 		template<typename... comps_t>
