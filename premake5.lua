@@ -139,6 +139,7 @@ project "Andromeda"
 group ""
 
 group "Examples"
+  include "examples/00_Base"
   include "examples/01_Window"
   include "examples/02_Logger"
   include "examples/03_Memory"

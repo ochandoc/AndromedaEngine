@@ -1,0 +1,106 @@
+#include <assert.h>
+
+#include <stdio.h>
+#include <iostream>
+#include <fstream>
+
+#include <functional>
+#include <algorithm>
+#include <utility>
+
+#include <optional>
+#include <memory>
+
+#include <string>
+#include <vector>
+#include <queue>
+
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <future>
+#include <chrono>
+#include "Andromeda.h"
+
+
+int main(int argc, char** argv){
+
+  And::Engine e;
+  And::TaskSystem ts;
+
+  std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine");
+  std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
+  And::Renderer g_renderer(*window);  
+
+  And::ResourceManager r_manager{*window, ts};
+  And::Editor editor{*window, &r_manager};
+  editor.AddWindow(ts.GetEditorWindow());
+
+  And::EntityComponentSystem entity_comp;
+  And::AddBasicComponents(entity_comp);
+
+  And::MeshComponent MC;
+  MC.MeshOBJ = And::Geometry::load("teapot.obj");
+  
+  And::TransformComponent tran;
+  tran.position[0] = 0.0f;
+  tran.position[1] = -4.0f;
+  tran.position[2] = -10.0f;
+  tran.rotation[0] = 1.0f;
+  tran.rotation[1] = 1.0f;
+  tran.rotation[2] = 1.0f;
+  tran.scale[0] = 1.0f;
+  tran.scale[1] = 1.0f;
+  tran.scale[2] = 1.0f;
+
+  And::Entity* obj_id = entity_comp.new_entity(MC, tran);
+
+  And::DirectionalLight directional{};
+  directional.SetDirection(1.0f, 0.0f, 0.0f);
+  directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+  directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
+  directional.SetEnabled(true);
+  And::Entity* light_directional_entity = entity_comp.new_entity(directional);
+
+  And::SpotLight spot{};
+  spot.SetEnabled(true);
+  spot.SetPosition(0.0f, 0.0f, 0.0f);
+  spot.SetDirection(0.0f, 0.0f, -1.0f);
+  spot.SetDiffuseColor(1.0f, 0.0f, 0.0f);
+  spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+  spot.SetSpecularStrength(0.003f);
+  spot.SetSpecularShininess(8.0f);
+  spot.SetConstantAtt(1.0);
+  spot.SetLinearAtt(0.014f);
+  spot.SetQuadraticAtt(0.0007f);
+  spot.SetCuttOff(2.5f);
+  spot.SetOuterCuttOff(17.5f);
+  entity_comp.new_entity(spot);
+  
+
+  And::PointLight point{};
+  point.SetEnabled(1.0f);
+  point.SetPosition(14.0f, -4.0f, 4.0f);
+  point.SetDiffuseColor(0.0f, 1.0f, 0.0f);
+  point.SetSpecularStrength(0.003f);
+  point.SetSpecularColor(1.0f, 1.0f, 1.0f);
+  point.SetSpecularShininess(8.0f);
+  point.SetConstantAtt(1.0f);
+  point.SetLinearAtt(0.014f);
+  point.SetQuadraticAtt(0.0007f);
+  And::Entity* point_entity = entity_comp.new_entity(point);
+  
+  while (window->is_open()){
+    window->update();
+    g_renderer.new_frame();
+    editor.ShowWindows();
+
+    And::DrawForward(entity_comp, g_renderer);
+    
+
+    g_renderer.end_frame();
+    window->swap_buffers();
+  }
+
+  return 0;
+}

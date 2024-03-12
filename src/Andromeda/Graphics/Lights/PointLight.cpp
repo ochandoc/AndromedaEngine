@@ -88,6 +88,12 @@ void PointLight::SetDiffuseColor(float color[3]){
     }
 }
 
+void PointLight::SetDiffuseColor(float r, float g, float b){
+    m_raw.diffuse_color[0] = r;
+    m_raw.diffuse_color[1] = g;
+    m_raw.diffuse_color[2] = b;
+}
+
 void  PointLight::SetSpecularStrength(float strength){
     m_raw.specular_strength = strength;
 }

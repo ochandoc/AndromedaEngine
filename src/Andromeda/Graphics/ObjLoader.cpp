@@ -1,4 +1,4 @@
-#include "Andromeda/Graphics/ObjLoader.h"
+#include "Andromeda/Graphics/Geometry.h"
 #include "tiny_obj_loader.h"
 #include "Backends/OpenGL/OpenGL.h"
 #include <iostream>
@@ -6,7 +6,7 @@
 namespace And{
 
 
-std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string base_path){
+std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_path){
 
   std::cout << "Loading obj... " << filename << std::endl;
 
@@ -90,7 +90,7 @@ std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string bas
 
   }
 
-  ObjLoader obj{indices, vertex_info, mat};
+  Geometry obj{indices, vertex_info, mat};
 
   printf("Init obj %s \n", filename.c_str());
 
@@ -113,23 +113,23 @@ std::shared_ptr<ObjLoader> ObjLoader::load(std::string filename, std::string bas
   obj.filename_ = std::string(filename);
 
   WAIT_GPU_LOAD()
-  return std::make_shared<ObjLoader>(std::move(obj));
+  return std::make_shared<Geometry>(std::move(obj));
 }
 
-ObjLoader::ObjLoader(std::vector<unsigned int> indices, std::vector<Vertex_info> vertex_info, Material_info mat) :
+Geometry::Geometry(std::vector<unsigned int> indices, std::vector<Vertex_info> vertex_info, Material_info mat) :
  m_mat_info(mat), m_vertex_info(vertex_info),m_indices(indices){
 }
 
-const std::vector<Vertex_info>& ObjLoader::getVertexInfo(){
+const std::vector<Vertex_info>& Geometry::getVertexInfo(){
   return m_vertex_info;
 }
 
 
-const std::vector<unsigned int>& ObjLoader::getIndices(){
+const std::vector<unsigned int>& Geometry::getIndices(){
   return m_indices;
 }
 
-ObjLoader::~ObjLoader() {
+Geometry::~Geometry() {
   printf("Destruction %s\n", filename_.c_str());
 
   //glDeleteVertexArrays(1,&m_VAO);

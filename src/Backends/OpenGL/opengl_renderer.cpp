@@ -11,12 +11,12 @@
 
 #include "imgui_impl_opengl3.h"
 
-#include "Andromeda/Graphics/Shader.h"
 #include "Andromeda/Graphics/Triangle.h"
-#include "Andromeda/Graphics/ObjLoader.h"
+#include "Andromeda/Graphics/Geometry.h"
 
 #include "Andromeda/UI/Plot/implot.h"
 
+#include "Andromeda/Graphics/Shader.h"
 #include "Andromeda/ECS/Components/TransformComponent.h"
 #include "Andromeda/ECS/Components/MeshComponent.h"
 #include "Backends/OpenGL/OpenGLTexture2D.h"
@@ -52,7 +52,7 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 {
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
 
-  m_Camera.SetPosition(0.0f, 14.0f, 11.0f);
+  m_Camera.SetPosition(0.0f, 0.0f, 0.0f);
   m_Camera.SetFov(90.0f);
   m_Camera.SetDirection(0.0f, 0.0f, -1.0f);
 
@@ -61,18 +61,12 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   m_Camera.SetSize((float)width, (float)height);
 
   m_Camera.SetFar(1000.0f);
-  m_Camera.SetNear(10.0f);
+  m_Camera.SetNear(0.1f);
 
   set_clear_color(default_color);
   window.imgui_start();
   ImGui_ImplOpenGL3_Init("#version 430 core");
 
-  /* {
-    std::vector<ETextureFormat> Formats = { ETextureFormat::RGBA8, ETextureFormat::RGBA8, ETextureFormat::Depth };
-    m_RenderTarget = std::make_shared<RenderTarget>(width, height, Formats);
-    m_Window.OnWindowResize.AddDynamic(m_RenderTarget.get(), &RenderTarget::Resize);
-    m_bDrawOnTexture = false;
-  }*/
   RenderTargetCreationInfo info;
   info.Width = width;
   info.Height = height;
@@ -85,15 +79,8 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
     m_shadows_buffer_pointLight.push_back(MakeRenderTarget(info)); 
   }
 
-
   // Crear shader de profundidad
-  //m_depth_shader = OldShader::make_default("lights/depth_shader.shader", "none", LightType::None);
   m_depth_shader = MakeShader("lights/depth_shader.shader");
-  //m_depth_shader_pointLight = MakeShader("lights/depth_shader_pointLight.shader");
-  //m_shadow_shader = Shader::make_default("lights/shadow_shader.shader", "none", LightType::None);
-
-  // Primero creamos todos los shaders y luego cogemos los datos de los uniform buffers de cada uno
-  // Cada vez que quiera usar el shader los casteo a opengl shader
   m_shadow_shader = MakeShader("lights/shadow_shader.shader");
   m_shader_ambient = MakeShader("lights/ambient.shader");
   m_shader_directional = MakeShader("lights/directional.shader");
@@ -113,15 +100,13 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   m_buffer_point_light = std::make_shared<UniformBuffer>(4, 64);
   m_buffer_spot_light = std::make_shared<UniformBuffer>(5, 96);
 
-    
-   m_directions = std::make_shared<Direction>();
-   m_directions->dir[0] = glm::vec3(1.0f, 0.0f, 0.0f);
-   m_directions->dir[1] = glm::vec3(-1.0f, 0.0f, 0.0f);
-   m_directions->dir[2] = glm::vec3(0.0f, 1.0f, 0.0f);
-   m_directions->dir[3] = glm::vec3(0.0f, -1.0f, 0.0f);
-   m_directions->dir[4] = glm::vec3(0.0f, 0.0f, 1.0f);
-   m_directions->dir[5] = glm::vec3(0.0f, 0.0f, -1.0f);
-
+  m_directions = std::make_shared<Direction>();
+  m_directions->dir[0] = glm::vec3(1.0f, 0.0f, 0.0f);
+  m_directions->dir[1] = glm::vec3(-1.0f, 0.0f, 0.0f);
+  m_directions->dir[2] = glm::vec3(0.0f, 1.0f, 0.0f);
+  m_directions->dir[3] = glm::vec3(0.0f, -1.0f, 0.0f);
+  m_directions->dir[4] = glm::vec3(0.0f, 0.0f, 1.0f);
+  m_directions->dir[5] = glm::vec3(0.0f, 0.0f, -1.0f);
 }
 
 Renderer::~Renderer(){
@@ -180,19 +165,9 @@ void Renderer::end_frame()
 void Renderer::set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height){
   glViewport(x, y, width, height);
 }
-
-void Renderer::set_draw_on_texture(bool value)
-{
-  m_bDrawOnTexture = value;
-}
   
 void Renderer::set_clear_color(float* color){
   glClearColor(color[0], color[1], color[2], color[3]);
-}
-
-std::shared_ptr<RenderTarget> Renderer::get_render_target() const
-{
-  return m_RenderTarget;
 }
 
 void Renderer::draw_triangle(Triangle *t){
@@ -506,6 +481,7 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, D
   //auto start = std::chrono::high_resolution_clock::now();
   glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
+  glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -517,7 +493,6 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, D
   modelMatrix = glm::scale(modelMatrix, objectScale);
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
 
   // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
   
@@ -638,7 +613,6 @@ void Renderer::draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent
 
 void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran) {  
   
-  l->SetCameraPosition(m_Camera.GetPosition());
   glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
   glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
 
@@ -646,16 +620,13 @@ void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformCo
   float z = cam_pos.z + ( (-1.0f * light_dir.z) * 50.0f);
   
   glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
-  
   glm::vec3 up(0.0f, 1.0f, 0.0f);
   glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
   up = glm::cross(light_dir, right);
   glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
+  glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, m_Camera.GetNear(), m_Camera.GetFar());
 
-  glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 1.0f, 300.0f);
-  glm::mat4 viewLight_tmp = glm::lookAt(20.0f * cam_pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-  draw_deep_obj(obj, m_depth_shader, tran, l->GetViewMatrix(0.0f), l->GetProjectMatrix(0.0f));
+  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(viewLight), glm::value_ptr(orto));
 }
 
 void Renderer::draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* lightDir){  
@@ -693,42 +664,42 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
     std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
 
     // Shadows Directional 
-    shadow_buffer->Activate();
-    glDisable(GL_BLEND);
     // Directional Light (should be 1)
     for(auto [light] : entity.get_components<DirectionalLight>()){ 
+      shadow_buffer->Activate();
+      glDisable(GL_BLEND);
       if(light->GetCastShadows()){
         // Por cada luz que castea sombras guardamos textura de profundidad
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
           renderer.draw_shadows(light, obj, transform);
         }
       }
+      shadow_buffer->Desactivate();
+      glEnable(GL_BLEND);
+
+      // Render Directional
+      for (auto [light] : entity.get_components<DirectionalLight>()) {
+          for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+              if (light->GetCastShadows()) {
+                  std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+                  OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_directional.get());
+                  OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+
+                  tmp->Use();
+                  tex->Activate(0);
+                  tmp->SetTexture("texShadow", 0);
+
+                  renderer.draw_obj_shadows(obj, transform, light);
+              }
+              else {
+                  renderer.m_shader_directional->Use();
+                  renderer.draw_obj(obj, light, transform);
+              }
+          }
+          glBlendFunc(GL_ONE, GL_ONE);
+      }
+
     }
-    shadow_buffer->Desactivate();
-    glEnable(GL_BLEND);
-
-    // Render Directional
-    for (auto [light] : entity.get_components<DirectionalLight>()) {
-        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-            if (light->GetCastShadows()) {
-                std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
-                OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_directional.get());
-                OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
-
-                tmp->Use();
-                tex->Activate(0);
-                tmp->SetTexture("texShadow", 0);
-
-                renderer.draw_obj_shadows(obj, transform, light);
-            }
-            else {
-                renderer.m_shader_directional->Use();
-                renderer.draw_obj(obj, light, transform);
-            }
-        }
-        glBlendFunc(GL_ONE, GL_ONE);
-    }
-
     // -----------------------
 
 

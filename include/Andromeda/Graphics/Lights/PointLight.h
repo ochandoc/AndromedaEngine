@@ -61,6 +61,7 @@ class PointLight : public Light{
         
         void  SetEnabled(float e);
         void  SetDiffuseColor(float color[3]);
+        void  SetDiffuseColor(float r, float g, float b);
         void  SetSpecularStrength(float strength);
         void  SetSpecularColor(float color[3]);
         void  SetSpecularColor(float r, float g, float b);

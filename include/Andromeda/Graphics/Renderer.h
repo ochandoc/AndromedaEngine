@@ -2,7 +2,7 @@
 
 #include "Andromeda/Misc/CoreMiscDefines.h"
 #include "Andromeda/HAL/Types.h"
-#include "ObjLoader.h"
+#include "Geometry.h"
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/FlyCamera.h"
 #include "Andromeda/Graphics/LightOld.h"
@@ -17,7 +17,7 @@ namespace And
   class Window;
   class OldShader;
   class Triangle;
-  class ObjLoader;
+  class Geometry;
   class TransformComponent;
   struct OldShaderInfo;
   class UniformBuffer;
@@ -32,25 +32,58 @@ public:
   Renderer(Window& window);
   ~Renderer();
 
+  /**
+   * @brief Must called at begining after window->update
+   * 
+   */
   void new_frame();
+
+  /**
+   * @brief Must called at end of the frame before swap buffers
+   * 
+   */
   void end_frame();
 
+  /**
+   * @brief Set the viewport of the window
+   * 
+   * @param x position
+   * @param y position
+   * @param width size
+   * @param height size
+   */
   void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 
-  void set_draw_on_texture(bool value);
-
+  /**
+   * @brief Set clear color value 
+   * 
+   * @param color 
+   */
   void set_clear_color(float* color);
 
-  std::shared_ptr<RenderTarget> get_render_target() const;
-
+  /**
+   * @brief Show Demo window
+   * 
+   */
   void showDemo();
+
+  /**
+   * @brief Show Imgui Demo window
+   * 
+   */
   void showImGuiDemoWindow();
 
+  /**
+   * @brief Draw Forward Rendering
+   * 
+   * @param entity 
+   * @param renderer 
+   */
+  friend void DrawForward(EntityComponentSystem& entity, Renderer& renderer);
+
+  private:
   void draw_triangle(Triangle *t);
-
   void draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran);
-
-  // Si castea sombras, precalculamos las matrices de la camara y pasamos ademas la view * projection de la luz
   void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, SpotLight* l);
   void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, DirectionalLight* l);
   void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, PointLight* l, float* dir);
@@ -65,9 +98,6 @@ public:
   std::shared_ptr<RenderTarget> get_shadow_buffer();
   std::vector<std::shared_ptr<RenderTarget>> get_shadow_buffer_pointLight();
 
-  friend void DrawForward(EntityComponentSystem& entity, Renderer& renderer);
-
-
 protected:
   Window& m_Window;
   std::shared_ptr<RenderTarget> m_RenderTarget;
@@ -77,25 +107,17 @@ private:
 
   FlyCamera m_Camera;
 
-  //std::shared_ptr<OldShader> m_shadow_shader;
   std::shared_ptr<RenderTarget> m_shadows_buffer_;
   std::vector<std::shared_ptr<RenderTarget>> m_shadows_buffer_pointLight;
- 
-
-  
 
   std::shared_ptr<Shader> m_shadow_shader;
-
   std::shared_ptr<Shader> m_depth_shader;
-  //std::shared_ptr<Shader> m_depth_shader_pointLight;
   
   std::shared_ptr<Shader> m_shader_ambient;
   std::shared_ptr<Shader> m_shader_directional;
   std::shared_ptr<Shader> m_shader_shadows_directional;
-  
   std::shared_ptr<Shader> m_shader_point;
   std::shared_ptr<Shader> m_shader_shadows_point;
-
   std::shared_ptr<Shader> m_shader_spot;
   std::shared_ptr<Shader> m_shader_shadows_spot;
 

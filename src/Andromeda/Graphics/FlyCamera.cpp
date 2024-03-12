@@ -6,7 +6,7 @@
 
 And::FlyCamera::FlyCamera(Window& w) : Camera(w), m_Input(w), m_Window(w)
 {
-  m_Speed = 100.0f;
+  m_Speed = 10.0f;
   m_FirstMouse = true;
   m_LastMouseX = 0.0f;
   m_LastMouseY = 0.0f;
