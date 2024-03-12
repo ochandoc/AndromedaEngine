@@ -30,7 +30,11 @@ int main(int argc, char** argv){
 
   std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine");
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
-  And::Renderer g_renderer(*window);
+  And::Renderer g_renderer(*window);  
+
+  And::ResourceManager r_manager{*window, ts};
+  And::Editor editor{*window, &r_manager};
+  editor.AddWindow(ts.GetEditorWindow());
 
   And::EntityComponentSystem entity_comp;
   And::AddBasicComponents(entity_comp);
@@ -63,6 +67,7 @@ int main(int argc, char** argv){
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
+    editor.ShowWindows();
 
     And::DrawForward(entity_comp, g_renderer);
     
