@@ -52,7 +52,7 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 {
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
 
-  m_Camera.SetPosition(0.0f, 14.0f, 11.0f);
+  m_Camera.SetPosition(0.0f, 0.0f, 0.0f);
   m_Camera.SetFov(90.0f);
   m_Camera.SetDirection(0.0f, 0.0f, -1.0f);
 
@@ -61,7 +61,7 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   m_Camera.SetSize((float)width, (float)height);
 
   m_Camera.SetFar(1000.0f);
-  m_Camera.SetNear(10.0f);
+  m_Camera.SetNear(0.1f);
 
   set_clear_color(default_color);
   window.imgui_start();

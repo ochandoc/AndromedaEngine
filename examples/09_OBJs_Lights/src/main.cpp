@@ -38,7 +38,6 @@ void WaitTask(int num)
 int main(int argc, char** argv){
 
   And::Engine e;
-
   And::TaskSystem ts;
 
   And::WorkerCreationInfo workerCreationInfo;
