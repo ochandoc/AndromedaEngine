@@ -645,16 +645,13 @@ void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformCo
   float z = cam_pos.z + ( (-1.0f * light_dir.z) * 50.0f);
   
   glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
-  
   glm::vec3 up(0.0f, 1.0f, 0.0f);
   glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
   up = glm::cross(light_dir, right);
   glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
+  glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, m_Camera.GetNear(), m_Camera.GetFar());
 
-  glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 10.0f, 300.0f);
-  glm::mat4 viewLight_tmp = glm::lookAt(20.0f * cam_pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(viewLight_tmp), glm::value_ptr(orto));
+  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(viewLight), glm::value_ptr(orto));
 }
 
 void Renderer::draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* lightDir){  
