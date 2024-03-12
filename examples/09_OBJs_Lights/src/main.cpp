@@ -53,7 +53,7 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   And::Renderer g_renderer(*window);
 
-  std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
+  //std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
 
   And::ResourceManager r_manager{*window, ts};
   //r_manager.AddGenerator<And::ObjGenerator>();
@@ -62,6 +62,7 @@ int main(int argc, char** argv){
   And::Editor editor{*window, &r_manager};
 
   editor.AddWindow(ts.GetEditorWindow());
+
   // Show pc info
   g_context->create_info();
 
@@ -70,15 +71,8 @@ int main(int argc, char** argv){
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
   g_renderer.set_clear_color(clear_color);
 
-
-  
   And::EntityComponentSystem entity_comp;
-    
-  entity_comp.add_component_class<And::MeshComponent>();
-  entity_comp.add_component_class<And::TransformComponent>();
-  entity_comp.add_component_class<And::SpotLight>();
-  entity_comp.add_component_class<And::DirectionalLight>();
-  entity_comp.add_component_class<And::PointLight>();
+  And::AddBasicComponents(entity_comp);
 
   int num_obj = 10;
   float pos_x = 0.0f;
@@ -125,8 +119,6 @@ int main(int argc, char** argv){
   And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
   And::Entity* obj_teapot_id2 = entity_comp.new_entity(MC_teapot2, tran_teapot2);
  
-
-
   float enabled = 1.0f;
   float diffuse_color[3] = {1.0f, 0.0f, 0.0f};
   float specular_color[3] = {1.0f, 1.0f, 1.0f};
@@ -140,8 +132,6 @@ int main(int argc, char** argv){
   float quadratic_att = 0.0007f;
   float cutt_off = 2.5f;
   float outer_cut_off= 17.5f;
-
-
 
   And::SpotLight spot{};
   spot.SetPosition(position);
@@ -178,10 +168,8 @@ int main(int argc, char** argv){
   spot2.SetCastShadows(true);
   spot2.SetEnabled(true);
   And::Entity* spot2_entity = entity_comp.new_entity(spot2);
-
     
   enabled = 1.0f;
-
 
   And::DirectionalLight directional{};
   directional.SetDirection(1.0f, 0.0f, 0.0f);

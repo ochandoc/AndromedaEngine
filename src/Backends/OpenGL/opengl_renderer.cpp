@@ -67,12 +67,6 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   window.imgui_start();
   ImGui_ImplOpenGL3_Init("#version 430 core");
 
-  /* {
-    std::vector<ETextureFormat> Formats = { ETextureFormat::RGBA8, ETextureFormat::RGBA8, ETextureFormat::Depth };
-    m_RenderTarget = std::make_shared<RenderTarget>(width, height, Formats);
-    m_Window.OnWindowResize.AddDynamic(m_RenderTarget.get(), &RenderTarget::Resize);
-    m_bDrawOnTexture = false;
-  }*/
   RenderTargetCreationInfo info;
   info.Width = width;
   info.Height = height;
@@ -85,15 +79,8 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
     m_shadows_buffer_pointLight.push_back(MakeRenderTarget(info)); 
   }
 
-
   // Crear shader de profundidad
-  //m_depth_shader = OldShader::make_default("lights/depth_shader.shader", "none", LightType::None);
   m_depth_shader = MakeShader("lights/depth_shader.shader");
-  //m_depth_shader_pointLight = MakeShader("lights/depth_shader_pointLight.shader");
-  //m_shadow_shader = Shader::make_default("lights/shadow_shader.shader", "none", LightType::None);
-
-  // Primero creamos todos los shaders y luego cogemos los datos de los uniform buffers de cada uno
-  // Cada vez que quiera usar el shader los casteo a opengl shader
   m_shadow_shader = MakeShader("lights/shadow_shader.shader");
   m_shader_ambient = MakeShader("lights/ambient.shader");
   m_shader_directional = MakeShader("lights/directional.shader");
@@ -113,15 +100,13 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
   m_buffer_point_light = std::make_shared<UniformBuffer>(4, 64);
   m_buffer_spot_light = std::make_shared<UniformBuffer>(5, 96);
 
-    
-   m_directions = std::make_shared<Direction>();
-   m_directions->dir[0] = glm::vec3(1.0f, 0.0f, 0.0f);
-   m_directions->dir[1] = glm::vec3(-1.0f, 0.0f, 0.0f);
-   m_directions->dir[2] = glm::vec3(0.0f, 1.0f, 0.0f);
-   m_directions->dir[3] = glm::vec3(0.0f, -1.0f, 0.0f);
-   m_directions->dir[4] = glm::vec3(0.0f, 0.0f, 1.0f);
-   m_directions->dir[5] = glm::vec3(0.0f, 0.0f, -1.0f);
-
+  m_directions = std::make_shared<Direction>();
+  m_directions->dir[0] = glm::vec3(1.0f, 0.0f, 0.0f);
+  m_directions->dir[1] = glm::vec3(-1.0f, 0.0f, 0.0f);
+  m_directions->dir[2] = glm::vec3(0.0f, 1.0f, 0.0f);
+  m_directions->dir[3] = glm::vec3(0.0f, -1.0f, 0.0f);
+  m_directions->dir[4] = glm::vec3(0.0f, 0.0f, 1.0f);
+  m_directions->dir[5] = glm::vec3(0.0f, 0.0f, -1.0f);
 }
 
 Renderer::~Renderer(){
