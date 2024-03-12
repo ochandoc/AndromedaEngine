@@ -184,3 +184,13 @@ point.SetQuadraticAtt(0.0007f);
 And::Entity* point_entity = entity_comp.new_entity(point);
 ```
 ![point_light](./docs/point.png)
+
+
+## Shadows
+
+To make shadows with a light you have to enable *Cast Shadows* value in a light
+```C++
+directional.SetCastShadows(true);
+spot.SetCastShadows(true);
+point.SetCastShadows(true);
+```
