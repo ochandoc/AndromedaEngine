@@ -8,29 +8,52 @@
 
 namespace And
 {
-  class Camera
+  class CameraBase
   {
+  public:
+    CameraBase() = default;
+    
+    virtual ~CameraBase() = default;
+    
+    virtual void SetPosition(float* Position) = 0;
+    virtual void SetPosition(float x, float y, float z) = 0;
+    virtual void SetDirection(float* Direction) = 0;
+    virtual void SetDirection(float x, float y, float z) = 0;
+    virtual void SetNear(float Near) = 0;
+    virtual void SetFar(float Far) = 0;
+    
+    virtual const float* GetPosition() const  = 0;
+    virtual const float* GetDirection() const = 0;
+    virtual float GetNear() const = 0;
+    virtual float GetFar() const = 0;
+    
+    virtual const float* GetViewMatrix() = 0;
+    virtual const float* GetProjectionMatrix() = 0;
+    virtual const float* GetProjectionViewMatrix() = 0;
+  };
 
+  class Camera : public CameraBase
+  {
   public:
     Camera(Window& w);
 
-    ~Camera();
+    virtual ~Camera();
   
-    void SetPosition(float* Position);
-    void SetPosition(float x, float y, float z);
-    void SetDirection(float* Direction);
-    void SetDirection(float x, float y, float z);
+    virtual void SetPosition(float* Position) override;
+    virtual void SetPosition(float x, float y, float z) override;
+    virtual void SetDirection(float* Direction) override;
+    virtual void SetDirection(float x, float y, float z) override;
     void SetFov(float Fov);
     void SetSize(float width, float height);
-    void SetNear(float Near);
-    void SetFar(float Far);
+    virtual void SetNear(float Near) override;
+    virtual void SetFar(float Far) override;
 
-    const float* GetPosition() const { return m_Position; }
-    const float* GetDirection() const { return m_Direction; }
+    virtual const float* GetPosition() const override  { return m_Position; }
+    virtual const float* GetDirection() const override { return m_Direction; }
     float GetFov() const { return m_Fov; }
     float GetAspectRation() const { return m_AspectRatio; }
-    float GetNear() const { return m_Near; }
-    float GetFar() const { return m_Far; }
+    virtual float GetNear() const override { return m_Near; }
+    virtual float GetFar() const override { return m_Far; }
     const float* GetViewMatrix();
     const float* GetProjectionMatrix();
     const float* GetProjectionViewMatrix();
@@ -49,5 +72,41 @@ namespace And
     float m_Far;
 
     struct CameraData* m_Data;
+  };
+  
+  class OrthographicCamera : public CameraBase
+  {
+  public:
+    OrthographicCamera(Window& w);
+
+    virtual ~OrthographicCamera();
+  
+    virtual void SetPosition(float* Position) override;
+    virtual void SetPosition(float x, float y, float z) override;
+    virtual void SetDirection(float* Direction) override;
+    virtual void SetDirection(float x, float y, float z) override;
+    virtual void SetNear(float Near) override;
+    virtual void SetFar(float Far) override;
+    void SetQuad(float left, float rignt, float top, float bottom);
+
+    virtual const float* GetPosition() const override  { return m_Position; }
+    virtual const float* GetDirection() const override { return m_Direction; }
+    virtual float GetNear() const override { return m_Near; }
+    virtual float GetFar() const override { return m_Far; }
+    const float* GetViewMatrix();
+    const float* GetProjectionMatrix();
+    const float* GetProjectionViewMatrix();
+
+  private:
+    void RecalculeViewMatrix(bool bForce = false);
+    void RecalculeProjectionMatrix(bool bForce = false);
+
+    float m_Position[3];
+    float m_Direction[3];
+    float m_Left, m_Right, m_Top, m_Bottom;
+    float m_Near;
+    float m_Far;
+
+    struct OrthographicCameraData* m_Data;
   };
 }
