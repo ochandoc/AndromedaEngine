@@ -422,6 +422,9 @@ namespace And
 	{
 		if (!e) return nullptr;
 		size_t type_id = typeid(comp_t).hash_code();
+
+		if (!m_Components.contains(type_id)) return nullptr;
+
 		internal::component_list_imp<comp_t>* list = static_cast<internal::component_list_imp<comp_t>*>(m_Components[type_id].get());
 		return list->get_component(e->get_id());
 	}
