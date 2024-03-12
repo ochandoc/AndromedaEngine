@@ -15,7 +15,7 @@ __Authors__
 
 ``` 
 cd tools
-./Setup.bat
+./setup.bat
 ```
 Then follow the script instructions
 
@@ -146,3 +146,41 @@ editor.ShowWindows();
 
 You should see the *task system* window and *permormance window*. Change the order however you like pressing mouse button on window label and drop it
 ![floating_windows](./docs/floating_windows.png)
+
+## Multiple lights
+You can create *Directional light*, *Point light* or *Spot light*, the creation process is the same as Directional light
+
+- Spot Light
+```C++
+And::SpotLight spot{};
+spot.SetEnabled(true);
+spot.SetPosition(0.0f, 0.0f, 0.0f);
+spot.SetDirection(0.0f, 0.0f, -1.0f);
+spot.SetDiffuseColor(1.0f, 0.0f, 0.0f);
+spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+spot.SetSpecularStrength(0.003f);
+spot.SetSpecularShininess(8.0f);
+spot.SetConstantAtt(1.0);
+spot.SetLinearAtt(0.014f);
+spot.SetQuadraticAtt(0.0007f);
+spot.SetCuttOff(2.5f);
+spot.SetOuterCuttOff(17.5f);
+entity_comp.new_entity(spot);
+```
+![spot_light](./docs/spot.png)
+
+- Point Light
+```C++
+And::PointLight point{};
+point.SetEnabled(1.0f);
+point.SetPosition(14.0f, -4.0f, 4.0f);
+point.SetDiffuseColor(0.0f, 1.0f, 0.0f);
+point.SetSpecularStrength(0.003f);
+point.SetSpecularColor(1.0f, 1.0f, 1.0f);
+point.SetSpecularShininess(8.0f);
+point.SetConstantAtt(1.0f);
+point.SetLinearAtt(0.014f);
+point.SetQuadraticAtt(0.0007f);
+And::Entity* point_entity = entity_comp.new_entity(point);
+```
+![point_light](./docs/point.png)

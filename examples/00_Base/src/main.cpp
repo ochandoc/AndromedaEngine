@@ -61,8 +61,34 @@ int main(int argc, char** argv){
   directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
   directional.SetEnabled(true);
   And::Entity* light_directional_entity = entity_comp.new_entity(directional);
+
+  And::SpotLight spot{};
+  spot.SetEnabled(true);
+  spot.SetPosition(0.0f, 0.0f, 0.0f);
+  spot.SetDirection(0.0f, 0.0f, -1.0f);
+  spot.SetDiffuseColor(1.0f, 0.0f, 0.0f);
+  spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+  spot.SetSpecularStrength(0.003f);
+  spot.SetSpecularShininess(8.0f);
+  spot.SetConstantAtt(1.0);
+  spot.SetLinearAtt(0.014f);
+  spot.SetQuadraticAtt(0.0007f);
+  spot.SetCuttOff(2.5f);
+  spot.SetOuterCuttOff(17.5f);
+  entity_comp.new_entity(spot);
   
-  //directional.SetCastShadows(true);
+
+  And::PointLight point{};
+  point.SetEnabled(1.0f);
+  point.SetPosition(14.0f, -4.0f, 4.0f);
+  point.SetDiffuseColor(0.0f, 1.0f, 0.0f);
+  point.SetSpecularStrength(0.003f);
+  point.SetSpecularColor(1.0f, 1.0f, 1.0f);
+  point.SetSpecularShininess(8.0f);
+  point.SetConstantAtt(1.0f);
+  point.SetLinearAtt(0.014f);
+  point.SetQuadraticAtt(0.0007f);
+  And::Entity* point_entity = entity_comp.new_entity(point);
   
   while (window->is_open()){
     window->update();
@@ -76,6 +102,5 @@ int main(int argc, char** argv){
     window->swap_buffers();
   }
 
-    //And::DrawForward(entity_comp, g_renderer);
   return 0;
 }
