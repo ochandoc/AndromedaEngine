@@ -7,28 +7,17 @@
 
 namespace And{
 
-/*
-template <typename T>
-concept jsonFile = requires(T t) {
-  t.Save();
-  t.Load();
-};
-*/
-
-
-/*
-requires(T t){
-  t.Save();
-  t.Load();
-};
-*/
-
 // Guardar cualquier tipo de dato en memoria con un nombre identificador
 template <typename T>
 class SavedObject{
 
  public:
 
+  /**
+   * @brief Construct a new Saved Object
+   * 
+   * @param object 
+   */
   SavedObject(T object){
     m_obj = object;
   }
@@ -37,7 +26,13 @@ class SavedObject{
   ~SavedObject(){
   }
 
-
+  /**
+   * @brief Save in memory the T parameter recived in constructor
+   * 
+   * @param name 
+   * @return true if save is completed
+   * @return false if can't save the file
+   */
   bool save(std::string name){
 
     Threw<T> threw(name.c_str(), m_obj);
@@ -45,6 +40,14 @@ class SavedObject{
     return true;
   }
 
+  /**
+   * @brief Load in a T parameter the T object saved previously with a identifier
+   * 
+   * @param name 
+   * @param obj 
+   * @return true 
+   * @return false 
+   */
   bool load(std::string name, T& obj){
     Slurp slurp{name.c_str()};
 
