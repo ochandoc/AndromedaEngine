@@ -2,7 +2,7 @@
 
 #include "Andromeda/Misc/CoreMiscDefines.h"
 #include "Andromeda/HAL/Types.h"
-#include "ObjLoader.h"
+#include "Geometry.h"
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/FlyCamera.h"
 #include "Andromeda/Graphics/LightOld.h"
@@ -17,7 +17,7 @@ namespace And
   class Window;
   class OldShader;
   class Triangle;
-  class ObjLoader;
+  class Geometry;
   class TransformComponent;
   struct OldShaderInfo;
   class UniformBuffer;

@@ -1,21 +1,21 @@
 #pragma once
 #include "Andromeda/Resources/ResourceGenerator.h"
-#include "Andromeda/Graphics/ObjLoader.h"
+#include "Andromeda/Graphics/Geometry.h"
 
 namespace And{
 
-class ObjGenerator : public ResourceGenerator<ObjLoader>{
+class ObjGenerator : public ResourceGenerator<Geometry>{
 
   public:
 
   ObjGenerator(){
-   std::shared_ptr<ObjLoader> obj = ObjLoader::load("cube.obj");
+   std::shared_ptr<Geometry> obj = Geometry::load("cube.obj");
    m_Default = obj;
   }
 
 
-  virtual std::shared_ptr<ObjLoader> operator()(const std::string& Path) override{
-    std::shared_ptr<ObjLoader> tmp = ObjLoader::load(Path);
+  virtual std::shared_ptr<Geometry> operator()(const std::string& Path) override{
+    std::shared_ptr<Geometry> tmp = Geometry::load(Path);
     if(tmp)return tmp;
     
 
@@ -29,13 +29,13 @@ class ObjGenerator : public ResourceGenerator<ObjLoader>{
 		return std::hash<std::string>{}(Path);
 	}
 
-	virtual std::shared_ptr<ObjLoader> GetDefault() override{
+	virtual std::shared_ptr<Geometry> GetDefault() override{
 		return m_Default;
 	}
 
 
 private:
-	std::shared_ptr<ObjLoader> m_Default;
+	std::shared_ptr<Geometry> m_Default;
 
 
 };

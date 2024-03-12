@@ -27,7 +27,7 @@
 #include "Andromeda/Graphics/GraphicsContext.h"
 #include "Andromeda/Graphics/Renderer.h"
 
-#include "Andromeda/Graphics/ObjLoader.h"
+#include "Andromeda/Graphics/Geometry.h"
 #include "Andromeda/Graphics/ObjGenerator.h"
 #include "Andromeda/Graphics/Shader.h"
 #include "Andromeda/Graphics/ShaderGenerator.h"

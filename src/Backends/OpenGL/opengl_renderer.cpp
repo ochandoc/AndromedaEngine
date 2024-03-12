@@ -12,7 +12,7 @@
 #include "imgui_impl_opengl3.h"
 
 #include "Andromeda/Graphics/Triangle.h"
-#include "Andromeda/Graphics/ObjLoader.h"
+#include "Andromeda/Graphics/Geometry.h"
 
 #include "Andromeda/UI/Plot/implot.h"
 

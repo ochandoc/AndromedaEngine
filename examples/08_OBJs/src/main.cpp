@@ -79,7 +79,7 @@ int main(int argc, char** argv){
 
   for (int i = -5; i < (int)(num_obj / 2); i++) {
     And::MeshComponent MC;
-    MC.Mesh = r_manager.NewResource<And::ObjLoader>("teapot.obj");
+    MC.Mesh = r_manager.NewResource<And::Geometry>("teapot.obj");
     And::Entity* ett = scene.NewSceneEntity();
     ett->add_component(MC);
     And::TransformComponent* tran = ett->get_component<And::TransformComponent>();
@@ -96,7 +96,7 @@ int main(int argc, char** argv){
   pos_y = 5.0f;
   for (int i = -5; i < (int)(num_obj / 2); i++) {
     And::MeshComponent MC;
-    MC.Mesh = r_manager.NewResource<And::ObjLoader>("teapot.obj");
+    MC.Mesh = r_manager.NewResource<And::Geometry>("teapot.obj");
     And::Entity* ett = scene.NewSceneEntity();
     ett->add_component(MC);
     And::TransformComponent* tran = ett->get_component<And::TransformComponent>();

@@ -85,9 +85,9 @@ int main(int argc, char** argv){
   float pos_y = -5.0f;
 
   And::MeshComponent MC, MC_teapot, MC_teapot2;
-  MC.MeshOBJ = And::ObjLoader::load("sponza.obj");
-  MC_teapot.MeshOBJ = And::ObjLoader::load("teapot.obj");
-  MC_teapot2.MeshOBJ = And::ObjLoader::load("teapot.obj");
+  MC.MeshOBJ = And::Geometry::load("sponza.obj");
+  MC_teapot.MeshOBJ = And::Geometry::load("teapot.obj");
+  MC_teapot2.MeshOBJ = And::Geometry::load("teapot.obj");
 
   And::TransformComponent tran;
   And::TransformComponent tran_teapot;
