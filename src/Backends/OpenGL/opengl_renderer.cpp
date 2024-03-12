@@ -506,6 +506,7 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, D
   //auto start = std::chrono::high_resolution_clock::now();
   glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
+  glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -517,7 +518,6 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, D
   modelMatrix = glm::scale(modelMatrix, objectScale);
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
 
   // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
   
@@ -638,7 +638,6 @@ void Renderer::draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent
 
 void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran) {  
   
-  l->SetCameraPosition(m_Camera.GetPosition());
   glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
   glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
 
@@ -652,10 +651,10 @@ void Renderer::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformCo
   up = glm::cross(light_dir, right);
   glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
 
-  glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 1.0f, 300.0f);
+  glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 10.0f, 300.0f);
   glm::mat4 viewLight_tmp = glm::lookAt(20.0f * cam_pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-  draw_deep_obj(obj, m_depth_shader, tran, l->GetViewMatrix(0.0f), l->GetProjectMatrix(0.0f));
+  draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(viewLight_tmp), glm::value_ptr(orto));
 }
 
 void Renderer::draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* lightDir){  
@@ -693,42 +692,42 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
     std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
 
     // Shadows Directional 
-    shadow_buffer->Activate();
-    glDisable(GL_BLEND);
     // Directional Light (should be 1)
     for(auto [light] : entity.get_components<DirectionalLight>()){ 
+      shadow_buffer->Activate();
+      glDisable(GL_BLEND);
       if(light->GetCastShadows()){
         // Por cada luz que castea sombras guardamos textura de profundidad
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
           renderer.draw_shadows(light, obj, transform);
         }
       }
+      shadow_buffer->Desactivate();
+      glEnable(GL_BLEND);
+
+      // Render Directional
+      for (auto [light] : entity.get_components<DirectionalLight>()) {
+          for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+              if (light->GetCastShadows()) {
+                  std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+                  OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_directional.get());
+                  OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+
+                  tmp->Use();
+                  tex->Activate(0);
+                  tmp->SetTexture("texShadow", 0);
+
+                  renderer.draw_obj_shadows(obj, transform, light);
+              }
+              else {
+                  renderer.m_shader_directional->Use();
+                  renderer.draw_obj(obj, light, transform);
+              }
+          }
+          glBlendFunc(GL_ONE, GL_ONE);
+      }
+
     }
-    shadow_buffer->Desactivate();
-    glEnable(GL_BLEND);
-
-    // Render Directional
-    for (auto [light] : entity.get_components<DirectionalLight>()) {
-        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-            if (light->GetCastShadows()) {
-                std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
-                OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_directional.get());
-                OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
-
-                tmp->Use();
-                tex->Activate(0);
-                tmp->SetTexture("texShadow", 0);
-
-                renderer.draw_obj_shadows(obj, transform, light);
-            }
-            else {
-                renderer.m_shader_directional->Use();
-                renderer.draw_obj(obj, light, transform);
-            }
-        }
-        glBlendFunc(GL_ONE, GL_ONE);
-    }
-
     // -----------------------
 
 

@@ -173,7 +173,7 @@ void  DirectionalLight::GetDirection(float& x, float& y, float& z){
 
 void DirectionalLight::Recalculate(float aspect_ratio){
     
-    if(m_must_recalculate){
+    /*if(m_must_recalculate){
 
         glm::vec3 cam_pos = glm::make_vec3(m_cam_pos);
         glm::vec3 light_dir = glm::make_vec3(m_raw.direction);
@@ -194,7 +194,7 @@ void DirectionalLight::Recalculate(float aspect_ratio){
         m_matrix->view_matrix = viewLight_tmp;
         m_matrix->projection_view_matrix = orto * viewLight_tmp;
         m_must_recalculate = false;
-    }
+    }*/
 
 
 }
