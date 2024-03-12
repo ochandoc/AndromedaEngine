@@ -11,12 +11,12 @@
 
 #include "imgui_impl_opengl3.h"
 
-#include "Andromeda/Graphics/Shader.h"
 #include "Andromeda/Graphics/Triangle.h"
 #include "Andromeda/Graphics/ObjLoader.h"
 
 #include "Andromeda/UI/Plot/implot.h"
 
+#include "Andromeda/Graphics/Shader.h"
 #include "Andromeda/ECS/Components/TransformComponent.h"
 #include "Andromeda/ECS/Components/MeshComponent.h"
 #include "Backends/OpenGL/OpenGLTexture2D.h"
@@ -180,19 +180,9 @@ void Renderer::end_frame()
 void Renderer::set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height){
   glViewport(x, y, width, height);
 }
-
-void Renderer::set_draw_on_texture(bool value)
-{
-  m_bDrawOnTexture = value;
-}
   
 void Renderer::set_clear_color(float* color){
   glClearColor(color[0], color[1], color[2], color[3]);
-}
-
-std::shared_ptr<RenderTarget> Renderer::get_render_target() const
-{
-  return m_RenderTarget;
 }
 
 void Renderer::draw_triangle(Triangle *t){
