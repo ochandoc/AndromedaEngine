@@ -689,19 +689,17 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
                   tex->Activate(0);
                   tmp->SetTexture("texShadow", 0);
 
-                  if(obj->MeshOBJ->HasTexture()){
-                    obj->MeshOBJ->UseTexture(1);
-                    tmp->SetTexture("texMaterial",1);
-                  }
+                  obj->MeshOBJ->UseTexture(1);
+                  tmp->SetTexture("texMaterial",1);                  
 
                   renderer.draw_obj_shadows(obj, transform, light);
               }else {
                   renderer.m_shader_directional->Use();
-                  if(obj->MeshOBJ->HasTexture()){
-                    obj->MeshOBJ->UseTexture(1);
-                    OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_directional.get());
-                    tmp->SetTexture("texMaterial",1);
-                  }
+                  
+                  obj->MeshOBJ->UseTexture(1);
+                  OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_directional.get());
+                  tmp->SetTexture("texMaterial",1);
+                  
                   renderer.draw_obj(obj, light, transform);
               }
           }
@@ -736,19 +734,19 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
                 tmp->Use();
                 tex->Activate(0);
                 tmp->SetTexture("texShadow", 0);
-                if(obj->MeshOBJ->HasTexture()){
-                    obj->MeshOBJ->UseTexture(1);
-                    tmp->SetTexture("texMaterial",1);
-                  }
+                
+                obj->MeshOBJ->UseTexture(1);
+                tmp->SetTexture("texMaterial",1);
+                  
                 renderer.draw_obj_shadows(obj, transform, light);
             }
             else {
                 renderer.m_shader_spot->Use();
-                if(obj->MeshOBJ->HasTexture()){
-                  obj->MeshOBJ->UseTexture(1);
-                  OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_spot.get());
-                  tmp->SetTexture("texMaterial",1);
-                }
+                
+                obj->MeshOBJ->UseTexture(1);
+                OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_spot.get());
+                tmp->SetTexture("texMaterial",1);
+                
                 renderer.draw_obj(obj, light, transform);
             }
         }
@@ -790,19 +788,18 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
                   tmp->SetTextureInArray("texShadow", index, index);
                   index++;
                 }
-                if(obj->MeshOBJ->HasTexture()){
-                  obj->MeshOBJ->UseTexture(index);
-                  tmp->SetTexture("texMaterial",index);
-                }
+                obj->MeshOBJ->UseTexture(index);
+                tmp->SetTexture("texMaterial",index);
+                
                 renderer.draw_obj_shadows(obj, transform, light, glm::value_ptr(renderer.m_directions->dir[index]));
             
             }else {
                 renderer.m_shader_point->Use();
-                if(obj->MeshOBJ->HasTexture()){
-                  obj->MeshOBJ->UseTexture(1);
-                  OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_point.get());
-                  tmp->SetTexture("texMaterial",1);
-                }
+                
+                obj->MeshOBJ->UseTexture(1);
+                OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_point.get());
+                tmp->SetTexture("texMaterial",1);
+                
 
                 renderer.draw_obj(obj, light, transform);
             }

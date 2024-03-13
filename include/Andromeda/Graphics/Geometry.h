@@ -28,7 +28,7 @@ namespace And{
     float scale[3];
   };
 
-
+struct TextureCasted;
 class Geometry{
   public:
   Geometry(const Geometry&) = default;
@@ -97,8 +97,6 @@ class Geometry{
 
   bool SetTexture(std::shared_ptr<Texture> t);
 
-  inline bool HasTexture() const {return m_has_texture;}
-
   void UseTexture(unsigned int slot);
 
   private:
@@ -107,7 +105,6 @@ class Geometry{
 
   std::shared_ptr<Texture> m_texture;
   std::shared_ptr<Texture> m_error_texture;
-  bool m_has_texture;
 
   std::vector<unsigned int> m_indices;
 
@@ -116,6 +113,8 @@ class Geometry{
 
   unsigned int m_VAO = 0;
   unsigned int m_VBO = 0;
+
+  std::shared_ptr<TextureCasted> m_texture_casted;
 
 
 };

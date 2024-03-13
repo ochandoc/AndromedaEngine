@@ -6,6 +6,10 @@
 
 namespace And{
 
+  struct TextureCasted{
+    OpenGLTexture2D* tex;
+  };
+
 
 std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_path){
 
@@ -114,7 +118,8 @@ std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_
   obj.filename_ = std::string(filename);
   obj.m_texture = MakeTexture("default_texture.jpg");
   obj.m_error_texture = MakeTexture("error_texture.png");
-  obj.m_has_texture = true;
+  obj.m_texture_casted = std::make_shared<TextureCasted>();
+  obj.m_texture_casted->tex = static_cast<OpenGLTexture2D*>(obj.m_texture.get());
 
   WAIT_GPU_LOAD()
   return std::make_shared<Geometry>(std::move(obj));
@@ -137,7 +142,7 @@ bool Geometry::SetTexture(std::shared_ptr<Texture> t){
 
   if(t){
     m_texture = t;
-    m_has_texture = true;
+    m_texture_casted->tex = static_cast<OpenGLTexture2D*>(m_texture.get());
     return true;
   }else{
     m_texture = m_error_texture;
@@ -147,10 +152,10 @@ bool Geometry::SetTexture(std::shared_ptr<Texture> t){
 }
 
 void Geometry::UseTexture(unsigned int slot){
-  if(m_has_texture){
-    OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(m_texture.get());
-    tex->Activate(slot);
-  }
+
+  //OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(m_texture.get());
+  m_texture_casted->tex->Activate(slot);
+  
 }
 
 Geometry::~Geometry() {

@@ -42,7 +42,7 @@ int main(int argc, char** argv){
   And::MeshComponent MC;
   MC.MeshOBJ = And::Geometry::load("sponza.obj");
   std::shared_ptr<And::Texture> texture = And::MakeTexture("bricks.jpg");
-  //MC.MeshOBJ->SetTexture(texture);
+  MC.MeshOBJ->SetTexture(texture);
   
   
   And::TransformComponent tran;
