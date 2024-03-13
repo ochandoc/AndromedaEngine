@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "Andromeda/Graphics/Texture.h"
 
 
 
@@ -94,9 +95,19 @@ class Geometry{
    */
   std::string filename_;
 
+  bool SetTexture(std::shared_ptr<Texture> t);
+
+  inline bool HasTexture() const {return m_has_texture;}
+
+  void UseTexture(unsigned int slot);
+
   private:
 
   Geometry(std::vector<unsigned int> indices, std::vector<Vertex_info> vertex_info, Material_info mat);
+
+  std::shared_ptr<Texture> m_texture;
+  std::shared_ptr<Texture> m_error_texture;
+  bool m_has_texture;
 
   std::vector<unsigned int> m_indices;
 

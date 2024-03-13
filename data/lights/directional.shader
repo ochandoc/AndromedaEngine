@@ -50,7 +50,7 @@ void main(){
 
 layout(location = 0) out vec4 FragColor;
 
-uniform sampler2D tex;
+uniform sampler2D texMaterial;
 in vec2 TexCoord;
 
 in vec3 blend_color;
@@ -113,7 +113,8 @@ void main(){
 
   color = CalculeDirLight(directional_light, s_normal, view_direction, color_base);
 
-  FragColor = vec4(color, 1.0);
+  vec4 tex_color = texture(texMaterial, uv);
+  FragColor = vec4(color, 1.0) * tex_color;
 
 
 }

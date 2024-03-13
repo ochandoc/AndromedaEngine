@@ -51,7 +51,7 @@ void main(){
 
 layout(location = 0) out vec4 FragColor;
 
-uniform sampler2D tex;
+uniform sampler2D texMaterial;
 in vec2 TexCoord;
 
 in vec3 blend_color;
@@ -88,6 +88,7 @@ void main(){
   vec3 view_direction = normalize(camera_pos - s_fragPos);
   float ambient_strength = 0.01;
   vec3 color = ambient_strength * ambient_light.diffuse_color;
-
-  FragColor = vec4(color, 1.0);
+  
+  vec4 tex_color = texture(texMaterial, TexCoord); 
+  FragColor = vec4(color, 1.0) * tex_color;
 }

@@ -1,6 +1,7 @@
 #include "Andromeda/Graphics/Geometry.h"
 #include "tiny_obj_loader.h"
 #include "Backends/OpenGL/OpenGL.h"
+#include "Backends/OpenGL/OpenGLTexture2D.h"
 #include <iostream>
 
 namespace And{
@@ -111,6 +112,9 @@ std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_
   glBindVertexArray(0);  
 
   obj.filename_ = std::string(filename);
+  obj.m_texture = MakeTexture("default_texture.jpg");
+  obj.m_error_texture = MakeTexture("error_texture.png");
+  obj.m_has_texture = true;
 
   WAIT_GPU_LOAD()
   return std::make_shared<Geometry>(std::move(obj));
@@ -127,6 +131,26 @@ const std::vector<Vertex_info>& Geometry::getVertexInfo(){
 
 const std::vector<unsigned int>& Geometry::getIndices(){
   return m_indices;
+}
+
+bool Geometry::SetTexture(std::shared_ptr<Texture> t){
+
+  if(t){
+    m_texture = t;
+    m_has_texture = true;
+    return true;
+  }else{
+    m_texture = m_error_texture;
+  }
+
+  return false;
+}
+
+void Geometry::UseTexture(unsigned int slot){
+  if(m_has_texture){
+    OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(m_texture.get());
+    tex->Activate(slot);
+  }
 }
 
 Geometry::~Geometry() {

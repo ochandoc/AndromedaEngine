@@ -40,7 +40,10 @@ int main(int argc, char** argv){
   And::AddBasicComponents(entity_comp);
 
   And::MeshComponent MC;
-  MC.MeshOBJ = And::Geometry::load("teapot.obj");
+  MC.MeshOBJ = And::Geometry::load("sponza.obj");
+  std::shared_ptr<And::Texture> texture = And::MakeTexture("bricks.jpg");
+  //MC.MeshOBJ->SetTexture(texture);
+  
   
   And::TransformComponent tran;
   tran.position[0] = 0.0f;
