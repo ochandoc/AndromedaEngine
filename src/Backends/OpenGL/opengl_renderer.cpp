@@ -689,10 +689,17 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
                   tex->Activate(0);
                   tmp->SetTexture("texShadow", 0);
 
+                  obj->MeshOBJ->UseTexture(1);
+                  tmp->SetTexture("texMaterial",1);                  
+
                   renderer.draw_obj_shadows(obj, transform, light);
-              }
-              else {
+              }else {
                   renderer.m_shader_directional->Use();
+                  
+                  obj->MeshOBJ->UseTexture(1);
+                  OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_directional.get());
+                  tmp->SetTexture("texMaterial",1);
+                  
                   renderer.draw_obj(obj, light, transform);
               }
           }
@@ -727,10 +734,19 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
                 tmp->Use();
                 tex->Activate(0);
                 tmp->SetTexture("texShadow", 0);
+                
+                obj->MeshOBJ->UseTexture(1);
+                tmp->SetTexture("texMaterial",1);
+                  
                 renderer.draw_obj_shadows(obj, transform, light);
             }
             else {
                 renderer.m_shader_spot->Use();
+                
+                obj->MeshOBJ->UseTexture(1);
+                OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_spot.get());
+                tmp->SetTexture("texMaterial",1);
+                
                 renderer.draw_obj(obj, light, transform);
             }
         }
@@ -762,20 +778,29 @@ void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
       for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
             if (light->GetCastShadows()) {
                 int index = 0;
+                OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_point.get());
                 for(auto& target : render_targets){
 
                   std::vector<std::shared_ptr<And::Texture>> shadow_texture = target->GetTextures();
-                  OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_shadows_point.get());
                   OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
                   tmp->Use();
                   tex->Activate(index);
                   tmp->SetTextureInArray("texShadow", index, index);
                   index++;
                 }
+                obj->MeshOBJ->UseTexture(index);
+                tmp->SetTexture("texMaterial",index);
+                
                 renderer.draw_obj_shadows(obj, transform, light, glm::value_ptr(renderer.m_directions->dir[index]));
             
             }else {
                 renderer.m_shader_point->Use();
+                
+                obj->MeshOBJ->UseTexture(1);
+                OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_point.get());
+                tmp->SetTexture("texMaterial",1);
+                
+
                 renderer.draw_obj(obj, light, transform);
             }
         }

@@ -40,7 +40,10 @@ int main(int argc, char** argv){
   And::AddBasicComponents(entity_comp);
 
   And::MeshComponent MC;
-  MC.MeshOBJ = And::Geometry::load("teapot.obj");
+  MC.MeshOBJ = And::Geometry::load("sponza.obj");
+  std::shared_ptr<And::Texture> texture = And::MakeTexture("bricks.jpg");
+  MC.MeshOBJ->SetTexture(texture);
+  
   
   And::TransformComponent tran;
   tran.position[0] = 0.0f;
@@ -60,6 +63,7 @@ int main(int argc, char** argv){
   directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
   directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
   directional.SetEnabled(true);
+  directional.SetCastShadows(true);
   And::Entity* light_directional_entity = entity_comp.new_entity(directional);
 
   And::SpotLight spot{};
@@ -75,6 +79,7 @@ int main(int argc, char** argv){
   spot.SetQuadraticAtt(0.0007f);
   spot.SetCuttOff(2.5f);
   spot.SetOuterCuttOff(17.5f);
+  spot.SetCastShadows(true);
   entity_comp.new_entity(spot);
   
 
@@ -88,6 +93,7 @@ int main(int argc, char** argv){
   point.SetConstantAtt(1.0f);
   point.SetLinearAtt(0.014f);
   point.SetQuadraticAtt(0.0007f);
+  point.SetCastShadows(true);
   And::Entity* point_entity = entity_comp.new_entity(point);
   
   while (window->is_open()){

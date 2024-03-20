@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include "Andromeda/Graphics/Texture.h"
 
 
 
@@ -27,7 +28,7 @@ namespace And{
     float scale[3];
   };
 
-
+struct TextureCasted;
 class Geometry{
   public:
   Geometry(const Geometry&) = default;
@@ -94,9 +95,16 @@ class Geometry{
    */
   std::string filename_;
 
+  bool SetTexture(std::shared_ptr<Texture> t);
+
+  void UseTexture(unsigned int slot);
+
   private:
 
   Geometry(std::vector<unsigned int> indices, std::vector<Vertex_info> vertex_info, Material_info mat);
+
+  std::shared_ptr<Texture> m_texture;
+  std::shared_ptr<Texture> m_error_texture;
 
   std::vector<unsigned int> m_indices;
 
@@ -105,6 +113,8 @@ class Geometry{
 
   unsigned int m_VAO = 0;
   unsigned int m_VBO = 0;
+
+  std::shared_ptr<TextureCasted> m_texture_casted;
 
 
 };

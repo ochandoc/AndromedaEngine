@@ -61,6 +61,7 @@ void main(){
 
 layout(location = 0) out vec4 FragColor;
 
+uniform sampler2D texMaterial;
 in vec2 TexCoord;
 in vec3 blend_color;
 in vec3 s_normal;
@@ -205,7 +206,6 @@ void main(){
   
   vec3 color = CalculeSpotLightJou(spot);
   
-  FragColor = vec4(color,1.0);
-
-
+  vec4 tex_color = texture(texMaterial, uv);
+  FragColor = vec4(color, 1.0) * tex_color;
 }

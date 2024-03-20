@@ -293,7 +293,7 @@ namespace And
     while (pos != std::string::npos)
     {
       uint64 endOfLine = source.find_first_of("\r\n", pos);
-      uint64 begin = source.rfind("\r\n", pos);
+      uint64 begin = source.rfind("\n", pos);
       uint64 uniformTokenPos = pos;
 
 
@@ -332,7 +332,7 @@ namespace And
     while (pos != std::string::npos)
     {
       uint64 endOfLine = source.find_first_of("\r\n", pos);
-      uint64 begin = source.rfind("\r\n", pos);
+      uint64 begin = source.rfind("\n", pos);
       uint64 uniformTokenPos = pos;
 
       std::string UnformStr = source.substr(begin, (endOfLine - begin));

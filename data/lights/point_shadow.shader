@@ -61,6 +61,7 @@ void main(){
 layout(location = 0) out vec4 FragColor;
 
 uniform sampler2D texShadow[6];
+uniform sampler2D texMaterial;
 in vec2 TexCoord;
 
 in vec3 blend_color;
@@ -176,11 +177,9 @@ void main(){
   for(int i = 0; i < 6; i++){
     shadow += ShadowCalculation(lightSpace[i], texShadow[i]);
   }
-
+  
   color = (1.0 - shadow) * color;
 
-
-  FragColor = vec4(color, 1.0);
-
-
+  vec4 tex_color = texture(texMaterial, uv);
+  FragColor = vec4(color, 1.0) * tex_color;
 }
