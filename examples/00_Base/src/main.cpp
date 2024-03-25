@@ -100,6 +100,23 @@ int main(int argc, char** argv){
   And::Input input{*window};
   And::ActionInput jump{"Jump", And::KeyState::Press, { And::KeyCode::Space, And::KeyCode::J }};
 
+  struct ExampleStruct{
+    int a;
+    float b;
+    char c;
+  };
+
+  ExampleStruct test_save;
+  test_save.a = 3;
+  test_save.b = 3.3f;
+  test_save.c = 'F';
+
+  And::SavedObject save_object{};
+  bool result = save_object.save<ExampleStruct>("test", test_save);
+
+  ExampleStruct prueba;
+  save_object.load<ExampleStruct>("test", prueba); 
+
   double mouse_x, mouse_y;
   
   while (window->is_open()){

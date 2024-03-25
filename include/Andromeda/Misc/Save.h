@@ -8,7 +8,6 @@
 namespace And{
 
 // Guardar cualquier tipo de dato en memoria con un nombre identificador
-template <typename T>
 class SavedObject{
 
  public:
@@ -18,9 +17,10 @@ class SavedObject{
    * 
    * @param object 
    */
-  SavedObject(T object){
-    m_obj = object;
+  SavedObject(){
+    
   }
+  
   SavedObject(const SavedObject&) = delete;
   SavedObject(SavedObject&&) = delete;
   ~SavedObject(){
@@ -33,9 +33,10 @@ class SavedObject{
    * @return true if save is completed
    * @return false if can't save the file
    */
-  bool save(std::string name){
+  template <typename T>
+  bool save(std::string name, T obj){
 
-    Threw<T> threw(name.c_str(), m_obj);
+    Threw<T> threw(name.c_str(), obj);
 
     return true;
   }
@@ -48,7 +49,9 @@ class SavedObject{
    * @return true 
    * @return false 
    */
-  bool load(std::string name, T& obj){
+  template <typename T>
+  bool load(std::string filename, T& obj){
+    std::string name = std::string(filename) + ".and";
     Slurp slurp{name.c_str()};
 
     if(slurp.size() == sizeof(T)){
@@ -62,8 +65,6 @@ class SavedObject{
   }
 
  private:
-
-  T m_obj;
 };
 
 
