@@ -95,14 +95,33 @@ int main(int argc, char** argv){
   point.SetQuadraticAtt(0.0007f);
   point.SetCastShadows(true);
   //And::Entity* point_entity = entity_comp.new_entity(point);
+
+
+  And::Input input{*window};
+  And::ActionInput jump{"Jump", And::KeyState::Press, { And::KeyCode::Space, And::KeyCode::J }};
+
+  double mouse_x, mouse_y;
   
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
     editor.ShowWindows();
 
+
+    if (input.IsKeyDown(And::KeyCode::W)){
+      printf("W Pressed!\n");
+    }
+
+    if(input.check_action(jump)){
+      printf("Jump!\n");
+    }
+
+    input.GetMousePosition(&mouse_x, &mouse_y);
+
+    mouse_x = input.GetMouseX();
+    mouse_y = input.GetMouseY();
+
     And::DrawForward(entity_comp, g_renderer);
-    
 
     g_renderer.end_frame();
     window->swap_buffers();

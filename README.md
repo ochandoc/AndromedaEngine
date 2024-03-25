@@ -61,6 +61,9 @@ And we should see something like this
 
 ![window](./docs/main.png)
 
+## Camera
+Flying camera is present by default, you can move using WASD and rotate with mouse pressing right click
+
 ## How to draw a OBJ
 
 First, we have to create the __Entity Component System__ to manage all scene entities and create or modify
@@ -211,3 +214,42 @@ std::shared_ptr<And::Texture> texture = And::MakeTexture("bricks.jpg");
 MC.MeshOBJ->SetTexture(texture);
 ```
 ![sphere](./docs/sphere_texture.png)
+
+## Input
+To detect keyboard input you must create an Input object
+
+```C++
+And::Input input{*window};
+```
+
+In your principal loop you must detect the desired input
+```C++
+if (input.IsKeyDown(And::KeyCode::W)){
+    printf("W Pressed!\n");
+}
+```
+
+Also you can create Action Input and attach keyboard key or multiple keys
+```C++
+And::ActionInput jump{"Jump", And::KeyState::Press, { And::KeyCode::Space, And::KeyCode::J }};
+``` 
+
+In your principal loop
+```C++
+if(input.check_action(jump)){
+    printf("Jump!\n");
+}
+```
+
+To get mouse position you can get X and Y at same time using
+```C++
+double mouse_x, mouse_y;
+input.GetMousePosition(&mouse_x, &mouse_y);
+```
+
+Or get individual positions using
+```C++
+double mouse_x, mouse_y;
+mouse_x = input.GetMouseX();
+mouse_y = input.GetMouseY();
+```
