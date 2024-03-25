@@ -253,3 +253,35 @@ double mouse_x, mouse_y;
 mouse_x = input.GetMouseX();
 mouse_y = input.GetMouseY();
 ```
+
+
+# Advanced features
+
+## 💾 Save struct in disk
+
+You are able to save structs in disk in a simple way and load after or in other runtime
+
+```C++
+// Create a SavedObject object
+And::SavedObject save_object{};
+
+// Define a struct to save
+struct ExampleStruct{
+    int a;
+    float b;
+    char c;
+};
+
+// Creating a simple object
+ExampleStruct test_save;
+test_save.a = 3;
+test_save.b = 3.3f;
+test_save.c = 'F';
+
+// Save struct, return true if ok, false if something went wrong
+bool result = save_object.save<ExampleStruct>("test", test_save);
+
+// Load struct from disk
+ExampleStruct prueba;
+save_object.load<ExampleStruct>("test", prueba); 
+```
