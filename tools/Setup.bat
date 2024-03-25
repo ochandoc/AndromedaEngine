@@ -1,5 +1,5 @@
 @echo off
 
-python3 .\scripts\setup.py
+python .\scripts\setup.py
 
 pause

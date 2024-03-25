@@ -194,3 +194,20 @@ directional.SetCastShadows(true);
 spot.SetCastShadows(true);
 point.SetCastShadows(true);
 ```
+
+## Textures
+
+Add texture to a Geometry
+
+You must have a default texture in your obj
+![sphere](./docs/sphere.png)
+
+
+You can set your own texture creating a Texture object and setting to the Mesh
+```C++
+And::MeshComponent MC;
+MC.MeshOBJ = And::Geometry::load("sphere.obj");
+std::shared_ptr<And::Texture> texture = And::MakeTexture("bricks.jpg");
+MC.MeshOBJ->SetTexture(texture);
+```
+![sphere](./docs/sphere_texture.png)

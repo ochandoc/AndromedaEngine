@@ -14,7 +14,7 @@ def CheckPythonPackages(name):
       permission_garanted = (reply == 'y' or reply == 'Y' )
 
     print(f"Installing {name} module...")
-    subprocess.call(['python3', '-m', 'pip', 'install', name])
+    subprocess.call(['python', '-m', 'pip', 'install', name])
     return CheckPythonPackages(name)
   return True
 
