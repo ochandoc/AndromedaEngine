@@ -82,6 +82,10 @@ int main(int argc, char** argv){
   MC_teapot.MeshOBJ = And::Geometry::load("teapot.obj");
   MC_teapot2.MeshOBJ = And::Geometry::load("teapot.obj");
 
+  std::shared_ptr<And::Texture> texture_bricks = And::MakeTexture("bricks.jpg");
+  MC.MeshOBJ->SetTexture(texture_bricks);
+
+
   And::TransformComponent tran;
   And::TransformComponent tran_teapot;
   And::TransformComponent tran_teapot2;

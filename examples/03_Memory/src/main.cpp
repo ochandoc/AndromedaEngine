@@ -37,7 +37,7 @@ int main(int argc, char** argv){
 
   And::SavedObject<SPrueba> save_struct(prueba);
   bool result = save_struct.save("test");
-  save_struct.load("Test.and", prueba);
+  save_struct.load("test", prueba);
 
   return 0;
 }
