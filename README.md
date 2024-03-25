@@ -2,16 +2,16 @@
 
 Graphics library made in C++ with OpenGL
 
-__Authors__
+__Authors__ :pencil2:
 - Jose Maria Maestre
 - Hector Ochando 
 
-## Dependences
+## :package: Dependences
 - Python 3.11
 - Conan < 2 
 - Cmake
 
-## Set up instructions
+## :gear:  Set up instructions
 
 ``` 
 cd tools
@@ -22,7 +22,7 @@ Then follow the script instructions
 Open Visual Studio solution
 
 
-## Hello World tutorial
+## :bulb: Hello World tutorial
 
 In our main.cpp 
 
@@ -61,10 +61,10 @@ And we should see something like this
 
 ![window](./docs/main.png)
 
-## Camera
+## :camera: Camera
 Flying camera is present by default, you can move using WASD and rotate with mouse pressing right click
 
-## How to draw a OBJ
+## :bust_in_silhouette: How to draw a OBJ
 
 First, we have to create the __Entity Component System__ to manage all scene entities and create or modify
 
@@ -131,7 +131,7 @@ And now we should see something like this
 
 
 
-## Floating windows
+## :framed_picture: Floating windows
 
 You can change the floating windows were ever you want, similar to visual studio. You have to create the __Editor Window__ with the  __Resource Manager__ for that with system information
 
@@ -150,10 +150,10 @@ editor.ShowWindows();
 You should see the *task system* window and *permormance window*. Change the order however you like pressing mouse button on window label and drop it
 ![floating_windows](./docs/floating_windows.png)
 
-## Multiple lights
+## :high_brightness: Multiple lights
 You can create *Directional light*, *Point light* or *Spot light*, the creation process is the same as Directional light
 
-- Spot Light
+- Spot Light :flashlight:
 ```C++
 And::SpotLight spot{};
 spot.SetEnabled(true);
@@ -172,7 +172,7 @@ entity_comp.new_entity(spot);
 ```
 ![spot_light](./docs/spot.png)
 
-- Point Light
+- Point Light :bulb:
 ```C++
 And::PointLight point{};
 point.SetEnabled(1.0f);
@@ -189,7 +189,7 @@ And::Entity* point_entity = entity_comp.new_entity(point);
 ![point_light](./docs/point.png)
 
 
-## Shadows
+## :city_sunset: Shadows
 
 To make shadows with a light you have to enable *Cast Shadows* value in a light
 ```C++
@@ -198,7 +198,7 @@ spot.SetCastShadows(true);
 point.SetCastShadows(true);
 ```
 
-## Textures
+## :art: Textures
 
 Add texture to a Geometry
 
@@ -215,7 +215,7 @@ MC.MeshOBJ->SetTexture(texture);
 ```
 ![sphere](./docs/sphere_texture.png)
 
-## Input
+## Input :joystick:
 To detect keyboard input you must create an Input object
 
 ```C++
