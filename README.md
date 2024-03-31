@@ -64,6 +64,36 @@ And we should see something like this
 ## :camera: Camera
 Flying camera is present by default, you can move using WASD and rotate with mouse pressing right click
 
+You can get the Fly Camera using renderer
+```C++
+And::FlyCamera* cam = g_renderer.GetFlyCamera();
+```
+
+And use camera methods
+```C++
+void SetPosition(float* Position);
+void SetPosition(float x, float y, float z);
+void SetDirection(float* Direction);
+void SetDirection(float x, float y, float z);
+void SetFov(float Fov);
+void SetSize(float width, float height);
+void SetNear(float Near);
+void SetFar(float Far);
+const float* GetPosition();
+const float* GetDirection();
+float GetFov() const;
+float GetAspectRation() const;
+float GetNear() const;
+float GetFar() const;
+const float* GetViewMatrix();
+const float* GetProjectionMatrix();
+const float* GetProjectionViewMatrix();
+void ShowValues();
+void ProcessInput();
+void SetFixed(bool value);
+bool GetFixed();
+```
+
 ## :bust_in_silhouette: How to draw a OBJ
 
 First, we have to create the __Entity Component System__ to manage all scene entities and create or modify
@@ -151,7 +181,14 @@ You should see the *task system* window and *permormance window*. Change the ord
 ![floating_windows](./docs/floating_windows.png)
 
 ## :high_brightness: Multiple lights
-You can create *Directional light*, *Point light* or *Spot light*, the creation process is the same as Directional light
+You can create *Ambient light*, *Directional light*, *Point light* or *Spot light*, the creation process is the same as Directional light
+
+- Ambient light 
+```C++
+And::AmbientLight ambient{};
+ambient.SetDiffuseColor(0.1f, 0.1f, 0.1f);
+entity_comp.new_entity(ambient);
+```
 
 - Spot Light :flashlight:
 ```C++
@@ -254,6 +291,20 @@ mouse_x = input.GetMouseX();
 mouse_y = input.GetMouseY();
 ```
 
+## Modify Objects in scene
+
+You can change position, rotation and scale of the entity in scene:
+
+```C++
+// After creating an object
+And::Entity* obj_id = entity_comp.new_entity(MC, tran);
+
+// Get the component that you want
+And::TransformComponent* tr = obj_id->get_component<And::TransformComponent>();
+
+// Modify his values
+tr->position[0] = 20.0f;
+```
 
 # Advanced features
 

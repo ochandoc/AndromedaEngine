@@ -219,6 +219,8 @@ int main(int argc, char** argv){
   
   And::Entity* point_entity2 = entity_comp.new_entity(point2);
 
+
+
   float fps_count = 0.0f;
   while (window->is_open()){
 
@@ -233,7 +235,9 @@ int main(int argc, char** argv){
     //position2[0] = cosf(fps_count) * 15.0f;
     //position[1] = cosf(fps_count) * 5.0f + 15.0f;
     
-    //fps_count +=0.01f;
+    fps_count +=0.01f;
+
+    
     //point_entity->get_component<And::PointLight>()->SetPosition(position2);
 
     //spot2_entity->get_component<And::SpotLight>()->SetPosition(position);

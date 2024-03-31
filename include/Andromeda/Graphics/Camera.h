@@ -58,7 +58,7 @@ namespace And
     const float* GetProjectionMatrix();
     const float* GetProjectionViewMatrix();
 
-    virtual void ShowValues();
+    virtual void ShowValues();  
 
   private:
     void RecalculeViewMatrix(bool bForce = false);

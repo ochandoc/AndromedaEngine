@@ -40,7 +40,7 @@ int main(int argc, char** argv){
   And::AddBasicComponents(entity_comp);
 
   And::MeshComponent MC;
-  MC.MeshOBJ = And::Geometry::load("sphere.obj");
+  MC.MeshOBJ = And::Geometry::load("cube.obj");
   std::shared_ptr<And::Texture> texture = And::MakeTexture("bricks.jpg");
   MC.MeshOBJ->SetTexture(texture);
   
@@ -96,6 +96,9 @@ int main(int argc, char** argv){
   point.SetCastShadows(true);
   //And::Entity* point_entity = entity_comp.new_entity(point);
 
+  And::AmbientLight ambient{};
+  ambient.SetDiffuseColor(0.1f, 0.1f, 0.1f);
+  entity_comp.new_entity(ambient);
 
   And::Input input{*window};
   And::ActionInput jump{"Jump", And::KeyState::Press, { And::KeyCode::Space, And::KeyCode::J }};
@@ -118,11 +121,15 @@ int main(int argc, char** argv){
   save_object.load<ExampleStruct>("test", prueba); 
 
   double mouse_x, mouse_y;
+
+  And::TransformComponent* tr = obj_id->get_component<And::TransformComponent>();
   
   while (window->is_open()){
     window->update();
     g_renderer.new_frame();
     editor.ShowWindows();
+
+    tr->position[0] += 0.001f;
 
 
     if (input.IsKeyDown(And::KeyCode::W)){
