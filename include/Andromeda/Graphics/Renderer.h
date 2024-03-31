@@ -81,6 +81,9 @@ public:
    */
   friend void DrawForward(EntityComponentSystem& entity, Renderer& renderer);
 
+  FlyCamera* GetFlyCamera();
+
+
   private:
   void draw_triangle(Triangle *t);
   void draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran);

@@ -38,7 +38,7 @@ out vec2 uv;
 
 void main(){
   gl_Position = projection * view * model * vec4(position, 1.0);
-  blend_color = vec3(camera_position.x/20.0, camera_position.y/20.0, camera_position.z/20.0);
+  //blend_color = vec3(camera_position.x/20.0, camera_position.y/20.0, camera_position.z/20.0);
   s_fragPos = vec3(model * vec4(position, 1.0));
   s_normal = normals;
   camera_pos = camera_position;
@@ -86,9 +86,10 @@ layout (std140, binding = 2) uniform UniformAmbient{
 
 void main(){
   vec3 view_direction = normalize(camera_pos - s_fragPos);
-  float ambient_strength = 0.01;
+  float ambient_strength = 1.0;
   vec3 color = ambient_strength * ambient_light.diffuse_color;
   
-  vec4 tex_color = texture(texMaterial, TexCoord); 
+  vec4 tex_color = texture(texMaterial, uv); 
   FragColor = vec4(color, 1.0) * tex_color;
+  //FragColor = tex_color;
 }

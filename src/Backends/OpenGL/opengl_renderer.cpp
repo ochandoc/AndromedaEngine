@@ -23,6 +23,7 @@
 #include "Backends/OpenGL/opengl_uniform_buffer.h"
 #include "Backends/OpenGL/OpenGLShader.h"
 #include "Andromeda/Graphics/Lights/SpotLight.h"
+#include "Andromeda/Graphics/Lights/AmbientLight.h"
 #include "Andromeda/Graphics/Lights/DirectionalLight.h"
 #include "Andromeda/Graphics/Lights/PointLight.h"
 
@@ -111,6 +112,10 @@ Renderer::Renderer(Window& window) : m_Window(window), m_Camera(window)
 
 Renderer::~Renderer(){
 	m_Window.imgui_end();
+}
+
+FlyCamera* Renderer::GetFlyCamera(){
+  return &m_Camera;
 }
 
 void Renderer::new_frame()
@@ -325,6 +330,12 @@ void Renderer::draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran)
   if(directional){
     m_buffer_directional_light->upload_data(directional->GetData(), 48);
     m_buffer_directional_light->bind();
+  }
+  
+  AmbientLight* ambient = dynamic_cast<AmbientLight*>(l);
+  if(ambient){
+    m_buffer_ambient_light->upload_data(ambient->GetData(), 48);
+    m_buffer_ambient_light->bind();
   }
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
@@ -662,6 +673,24 @@ void Renderer::draw_shadows(PointLight* l, MeshComponent* obj, TransformComponen
 void DrawForward(EntityComponentSystem& entity, Renderer& renderer){
 
     std::shared_ptr<And::RenderTarget> shadow_buffer = renderer.get_shadow_buffer();
+
+    // Ambient light
+    glBlendFunc(GL_ONE, GL_ZERO);
+    for(auto [light] : entity.get_components<AmbientLight>()){
+
+      renderer.m_shader_ambient->Use();
+      for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+        obj->MeshOBJ->UseTexture(1);
+        OpenGLShader* tmp = static_cast<OpenGLShader*>(renderer.m_shader_ambient.get());
+        tmp->SetTexture("texMaterial",1);
+        renderer.draw_obj(obj, light, transform);
+      }
+      glBlendFunc(GL_ONE, GL_ONE);
+    }
+    //glEnable(GL_BLEND);
+
+
+
 
     // Shadows Directional 
     // Directional Light (should be 1)

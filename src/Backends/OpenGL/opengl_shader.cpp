@@ -292,10 +292,10 @@ namespace And{
       Oldshader->m_Data->uniform_buffer = std::make_unique<UniformBuffer>(0, (unsigned int)size_block);
       switch(type){
         case LightType::Ambient: 
-        glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Ambient);
+        /*glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Ambient);
         Oldshader->m_Data->uniform_buffer_ambient = std::make_unique<UniformBuffer>((unsigned int)LightBindingPoint::Ambient, (unsigned int)size_block_lights);
         Oldshader->m_Data->ambient_size = size_block_lights;
-        Oldshader->m_default_ambient = std::make_shared<AmbientLight>();
+        Oldshader->m_default_ambient = std::make_shared<AmbientLight>();*/
         break;
         case LightType::Directional: 
         /*glUniformBlockBinding(id_program, id_block_lights, (unsigned int)LightBindingPoint::Directional);
@@ -338,7 +338,7 @@ namespace And{
     glUniform3fv(glGetUniformLocation(m_Data->id, name.c_str()),1, &vector[0]);
   }
 
-  void OldShader::set_default_light(AmbientLight* light){
+  /*void OldShader::set_default_light(AmbientLight* light){
     //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
 
     m_default_ambient->enabled = light->enabled;
@@ -350,7 +350,7 @@ namespace And{
       m_default_ambient->diffuse_color[i] = light->diffuse_color[i];
       m_default_ambient->specular_color[i] = light->specular_color[i];
     }    
-  }
+  }*/
   
   /*void OldShader::set_default_light(DirectionalLight* light){
     //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
@@ -398,7 +398,7 @@ namespace And{
     }
   }*/
   
-  void OldShader::set_light(AmbientLight* light){
+  /*void OldShader::set_light(AmbientLight* light){
     //m_Data->uniform_buffer->upload_data((void*)(light), sizeof(AmbientLight));
 
     m_uniform_block_lights->light_ambient.enabled = light->enabled;
@@ -410,7 +410,7 @@ namespace And{
       m_uniform_block_lights->light_ambient.diffuse_color[i] = light->diffuse_color[i];
       m_uniform_block_lights->light_ambient.specular_color[i] = light->specular_color[i];
     }    
-  }
+  }*/
 
   /*void OldShader::set_light(PointLight* light){
     m_uniform_block_lights->light_point.enabled = light->enabled;
@@ -476,8 +476,8 @@ namespace And{
 
     switch(type){
       case LightType::Ambient:
-        m_Data->uniform_buffer_ambient->upload_data((void*)(m_default_ambient.get()), (unsigned int)m_Data->ambient_size);
-        m_Data->uniform_buffer_ambient->bind();
+        /*m_Data->uniform_buffer_ambient->upload_data((void*)(m_default_ambient.get()), (unsigned int)m_Data->ambient_size);
+        m_Data->uniform_buffer_ambient->bind();*/
         break;
       case LightType::Directional:
         /*m_Data->uniform_buffer_directional->upload_data((void*)(m_default_directional.get()), (unsigned int)m_Data->directional_size);

@@ -5,6 +5,7 @@
 #include "Andromeda/ECS/ComponentBase.h"
 #include "Andromeda/ECS/Components/MeshComponent.h"
 #include "Andromeda/ECS/Components/TransformComponent.h"
+#include "Andromeda/Graphics/Lights/AmbientLight.h"
 #include "Andromeda/Graphics/Lights/DirectionalLight.h"
 #include "Andromeda/Graphics/Lights/SpotLight.h"
 #include "Andromeda/Graphics/Lights/PointLight.h"
@@ -32,6 +33,7 @@ namespace And
 		e.add_component_class<And::MeshComponent>();
 		e.add_component_class<And::TransformComponent>();
 		e.add_component_class<And::SpotLight>();
+		e.add_component_class<And::AmbientLight>();
 		e.add_component_class<And::DirectionalLight>();
 		e.add_component_class<And::PointLight>();
 	}

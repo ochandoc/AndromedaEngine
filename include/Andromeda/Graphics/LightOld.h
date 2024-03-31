@@ -20,14 +20,14 @@ enum class LightBindingPoint : unsigned int{
   Spot = 5
 };
 
-struct AmbientLight{
+/*struct AmbientLight{
   float direction[3] = {0.5f, 0.5f, 0.5f};
   float enabled = 0.5f;
   float diffuse_color[3] = {0.5f, 0.5f, 0.5f};
   float specular_strength = 0.5f;
   float specular_color[3] = {0.5f, 0.5f, 0.5f};
   float specular_shininess = 0.5f; // 48 bytes
-};
+};*/
 
 /*struct DirectionalLight{
   float direction[3] = {0.5f, 0.5f, 0.5f};
