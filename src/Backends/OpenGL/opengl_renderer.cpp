@@ -300,9 +300,9 @@ void Renderer::draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran)
   float rotationAngle = 0.0f;
   glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
 
-  modelMatrix = glm::scale(modelMatrix, objectScale);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::scale(modelMatrix, objectScale);
 
   glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
   UniformBlockMatrices matrices_tmp = {modelMatrix, viewMatrix, projectionMatrix, cam_pos};
@@ -365,9 +365,9 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, S
   float rotationAngle = 0.0f;
   glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
 
-  modelMatrix = glm::scale(modelMatrix, objectScale);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::scale(modelMatrix, objectScale);
 
   float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
 
@@ -413,9 +413,9 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, P
   float rotationAngle = 0.0f;
   glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
 
-  modelMatrix = glm::scale(modelMatrix, objectScale);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::scale(modelMatrix, objectScale);
 
   // Cambiar lo de subir la luz al uniform buffer de ahora
   UniformBlockMatricesPointLight matrices_tmp;
@@ -490,9 +490,9 @@ void Renderer::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, D
   float rotationAngle = 0.0f;
   glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
 
-  modelMatrix = glm::scale(modelMatrix, objectScale);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::scale(modelMatrix, objectScale);
 
   // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
   
@@ -558,9 +558,9 @@ void Renderer::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, Tran
   float rotationAngle = 0.0f;
   glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
 
-  modelMatrix = glm::scale(modelMatrix, objectScale);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::translate(modelMatrix, objectPosition);
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::scale(modelMatrix, objectScale);
 
   const float* tmp = m_Camera.GetPosition();
   glm::vec3 cam_pos(tmp[0], tmp[1], tmp[2]);
