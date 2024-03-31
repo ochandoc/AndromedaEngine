@@ -119,7 +119,7 @@ int main(int argc, char** argv){
   tran_teapot2.scale[2] = 2.0f;
   And::Entity* obj_id = entity_comp.new_entity(MC, tran);
   And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
-  //And::Entity* obj_teapot_id2 = entity_comp.new_entity(MC_teapot2, tran_teapot2);
+  And::Entity* obj_teapot_id2 = entity_comp.new_entity(MC_teapot2, tran_teapot2);
  
   float enabled = 1.0f;
   float diffuse_color[3] = {1.0f, 0.0f, 0.0f};
@@ -149,7 +149,7 @@ int main(int argc, char** argv){
   spot.SetOuterCuttOff(outer_cut_off);
   spot.SetCastShadows(true);
   spot.SetEnabled(true);
-  //entity_comp.new_entity(spot);
+  entity_comp.new_entity(spot);
 
   position[1] += 10.0f;
   diffuse_color[0] = 0.0f;
@@ -169,7 +169,7 @@ int main(int argc, char** argv){
   spot2.SetOuterCuttOff(outer_cut_off);
   spot2.SetCastShadows(true);
   spot2.SetEnabled(true);
-  //And::Entity* spot2_entity = entity_comp.new_entity(spot2);
+  And::Entity* spot2_entity = entity_comp.new_entity(spot2);
     
   enabled = 1.0f;
 
@@ -199,7 +199,7 @@ int main(int argc, char** argv){
   point.SetLinearAtt(linear_att);
   point.SetConstantAtt(constant_att);
   point.SetQuadraticAtt(quadratic_att);
-  //And::Entity* point_entity = entity_comp.new_entity(point);
+  And::Entity* point_entity = entity_comp.new_entity(point);
   
   position2[0] += 40.0f;
   diffuse_color[2] = 0.0f;
@@ -217,7 +217,7 @@ int main(int argc, char** argv){
   point2.SetConstantAtt(constant_att);
   point2.SetQuadraticAtt(quadratic_att);
   
-  //And::Entity* point_entity2 = entity_comp.new_entity(point2);
+  And::Entity* point_entity2 = entity_comp.new_entity(point2);
 
   float fps_count = 0.0f;
   while (window->is_open()){
@@ -225,6 +225,10 @@ int main(int argc, char** argv){
     window->update();
     g_renderer.new_frame();
     editor.ShowWindows();
+
+    And::FlyCamera* cam = g_renderer.GetFlyCamera();
+    //cam->SetPosition(0.0f, 0.0f, 0.0f);
+   
 
     //position2[0] = cosf(fps_count) * 15.0f;
     //position[1] = cosf(fps_count) * 5.0f + 15.0f;

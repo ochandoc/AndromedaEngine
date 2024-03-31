@@ -154,7 +154,9 @@ void Renderer::end_frame()
   //ImPlot::ShowDemoWindow();
   //ImGui::ShowDemoWindow();
 
-  m_Camera.ProcessInput();
+  if(m_Camera.GetFixed()){
+    m_Camera.ProcessInput();
+  }
 
   if (ImGui::Begin("Camera"))
   {

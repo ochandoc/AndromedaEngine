@@ -11,6 +11,8 @@ namespace And
     ~FlyCamera();
 
     void ProcessInput();
+    void SetFixed(bool value);
+    bool GetFixed();
 
   private:
     Input m_Input;
@@ -22,5 +24,7 @@ namespace And
     bool m_FirstMouse;
     float m_LastMouseX;
     float m_LastMouseY;
+
+    bool m_can_move;
   };
 }

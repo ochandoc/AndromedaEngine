@@ -13,10 +13,19 @@ And::FlyCamera::FlyCamera(Window& w) : Camera(w), m_Input(w), m_Window(w)
   m_Pitch = 0.0f;
   m_Yaw = 0.0f;
   m_Sensitivity = 0.1f;
+  m_can_move = true;
 }
 
 And::FlyCamera::~FlyCamera()
 {
+}
+
+void And::FlyCamera::SetFixed(bool move){
+  m_can_move = move;
+}
+
+bool And::FlyCamera::GetFixed(){
+  return m_can_move;
 }
 
 void And::FlyCamera::ProcessInput()
