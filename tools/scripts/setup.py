@@ -11,10 +11,10 @@ def CheckPythonPackages(name):
       reply = str(input("Would you like to install Python package '{0:s}'? [Y/N]: ".format(name))).lower().strip()[:1]
       if reply == 'n':
         return False
-      permission_garanted = (reply == 'y')
+      permission_garanted = (reply == 'y' or reply == 'Y' )
 
     print(f"Installing {name} module...")
-    subprocess.call(['python3', '-m', 'pip', 'install', name])
+    subprocess.call(['python', '-m', 'pip', 'install', name])
     return CheckPythonPackages(name)
   return True
 
