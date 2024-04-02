@@ -40,6 +40,10 @@
 #include "Andromeda/Graphics/Lights/SpotLight.h"
 #include "Andromeda/Graphics/Lights/PointLight.h"
 
+#include "Andromeda/Audio/Audio.h"
+#include "Andromeda/Audio/AudioManager.h"
+#include "Andromeda/Audio/Song.h"
+
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/Triangle.h"
 
