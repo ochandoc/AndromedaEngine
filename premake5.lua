@@ -77,6 +77,7 @@ project "Andromeda"
     "AND_BUILD_LIB",
   }
 
+
   -- Directorios donde estan los include
   includedirs
   {
@@ -139,6 +140,7 @@ project "Andromeda"
 group ""
 
 group "Examples"
+
   include "examples/00_Base"
   include "examples/01_Window"
   include "examples/02_Logger"
@@ -149,6 +151,7 @@ group "Examples"
   include "examples/07_ResourceSystem"
   include "examples/08_OBJs"
   include "examples/09_OBJs_Lights"
+  include "examples/Audio"
 group ""
 
 newoption
