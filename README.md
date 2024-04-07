@@ -306,6 +306,42 @@ And::TransformComponent* tr = obj_id->get_component<And::TransformComponent>();
 tr->position[0] = 20.0f;
 ```
 
+
+## :speaker: Audio 
+
+You can create audio and play it during game execution
+
+```C++
+
+// Create audio manager
+And::AudioManager audio_manager{};
+
+// Create audio itself
+And::Audio dindindon_audio{};
+
+// Load audio.wav
+dindindon_audio.load("Audio/dindindon.wav");
+
+
+// Play audio using audio manager
+audio_manager.play(dindindon_audio);
+```
+
+You can play the audio in the main loop or wherever you want. You don't have to check if audio is currently playing before playing it. 
+
+You can stop, pause and replay the audio, in addittion, you can apply a lot of audio effects like pitch, gain, position, doppler effect and more (check Audio.h)
+
+```C++
+dindindon_audio.SetPitch(1.5f);
+dindindon_audio.SetGain(2.0f);
+dindindon_audio.SetPosition(5.0f, 0.0f, 0.0f);
+```
+
+If you want to set position and velocity in order to apply doppler factor, you must ensure the audio.wav is in __stereo__ instead of __mono__
+
+### :warning: Warning 
+Audio only works with .wav extension
+
 # Advanced features
 
 ## 💾 Save struct in disk

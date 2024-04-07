@@ -124,10 +124,20 @@ int main(int argc, char** argv){
 
   And::TransformComponent* tr = obj_id->get_component<And::TransformComponent>();
 
+
+
   And::AudioManager audio_manager{};
   And::Audio dindindon_audio{};
   dindindon_audio.load("Audio/dindindon.wav");
+
+  dindindon_audio.SetPitch(1.5f);
+  dindindon_audio.SetGain(2.0f);
+  dindindon_audio.SetPosition(5.0f, 0.0f, 0.0f);
+  
+  
   audio_manager.play(dindindon_audio);
+
+
   
   while (window->is_open()){
     window->update();
