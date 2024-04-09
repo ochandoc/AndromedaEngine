@@ -53,8 +53,16 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window)
 {
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
 
+  m_Camera.SetPosition(0.0f, 0.0f, 0.0f);
+  m_Camera.SetFov(90.0f);
+  m_Camera.SetDirection(0.0f, 0.0f, -1.0f);
+
   int width = m_Window.get_width();
   int height = m_Window.get_height();
+  m_Camera.SetSize((float)width, (float)height);
+
+  m_Camera.SetFar(1000.0f);
+  m_Camera.SetNear(0.1f);
 
 
   set_clear_color(default_color);
