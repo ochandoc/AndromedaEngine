@@ -24,6 +24,49 @@ namespace And
 
   struct Direction;
 
+  class Renderer
+  {
+    NON_COPYABLE_CLASS(Renderer)
+    NON_MOVABLE_CLASS(Renderer)
+  public:
+    Renderer() = default;
+    virtual ~Renderer() = default;
+
+    /**
+     * @brief Must called at begining after window->update
+     *
+     */
+    virtual void new_frame() = 0;
+
+    /**
+     * @brief Must called at end of the frame before swap buffers
+     *
+     */
+    virtual void end_frame() = 0;
+
+    /**
+     * @brief Set the viewport of the window
+     *
+     * @param x position
+     * @param y position
+     * @param width size
+     * @param height size
+     */
+    virtual void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) = 0;
+
+    /**
+     * @brief Set clear color value
+     *
+     * @param color
+     */
+    virtual void set_clear_color(float* color) = 0;
+
+    virtual void set_camera(CameraBase* cam) = 0;
+
+    virtual void draw_forward(EntityComponentSystem& entity) = 0;
+  };
+
+
 class Renderer
 {
   NON_COPYABLE_CLASS(Renderer)
