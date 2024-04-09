@@ -17,6 +17,7 @@ namespace And
 {
 class Engine;
 class Renderer;
+class RendererOpenGL;
 class GraphicsContext;
 
 enum class EGraphicsApiType : uint8
@@ -145,6 +146,7 @@ public:
 	OnWindowCloseSignature OnWindowClose;
 
 	friend class Renderer;
+	friend class RendererOpenGL;
 	friend class Input;
 private:
 	void imgui_start();

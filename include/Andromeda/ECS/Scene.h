@@ -17,6 +17,7 @@ namespace And
     Entity* NewEmptyEntity();
 
     friend class Renderer;
+    friend class RendererOpenGL;
   private:
     std::vector<Entity*> m_Entities;
     EntityComponentSystem m_ECS;

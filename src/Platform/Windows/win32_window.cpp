@@ -4,6 +4,8 @@
 #include "Andromeda/Graphics/Renderer.h"
 #include "Andromeda/Graphics/GraphicsContext.h"
 #include "Andromeda/HAL/KeyCodes.h"
+#include "Andromeda/HAL/Input.h"
+
 
 #include "GLFW/glfw3.h"
 
