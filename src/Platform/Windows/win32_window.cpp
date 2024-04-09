@@ -199,20 +199,23 @@ namespace And
     glfwDestroyWindow(m_Data->handle);
   }
 
-  std::shared_ptr<Window> Window::make(Engine& e, uint32 w, uint32 h, const char* title)
+  std::shared_ptr<Window> Window::make(Engine& e, uint32 w, uint32 h, const char* title, EGraphicsApiType api)
   {
     if (!e.is_initialized()) return std::shared_ptr<Window>();
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-#ifdef AND_OPENGL
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // Version principal de OpenGL
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);  // Version menor de OpenGL
-#   ifdef DEBUG
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); // Activar debug
-#   endif
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Perfil de OpenGL
-#endif
+    if (api == EGraphicsApiType::OpenGL)
+    {
+  #ifdef AND_OPENGL
+      glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+      glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // Version principal de OpenGL
+      glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);  // Version menor de OpenGL
+  #   ifdef DEBUG
+      glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE); // Activar debug
+  #   endif
+      glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Perfil de OpenGL
+  #endif
+    }
 
     GLFWwindow* handle = glfwCreateWindow(w, h, title, NULL, NULL);
 
@@ -224,6 +227,7 @@ namespace And
     window->m_Data->width = w;
     window->m_Data->height = h;
     window->m_Data->is_open = true;
+    window->m_ApiType = api;
 
     glfwSetWindowUserPointer(window->m_Data->handle, window->m_Data.get());
     glfwSetWindowCloseCallback(window->m_Data->handle, close_window_callback);

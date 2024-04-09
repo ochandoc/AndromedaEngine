@@ -32,6 +32,8 @@ namespace And
     Renderer() = default;
     virtual ~Renderer() = default;
 
+    static std::shared_ptr<Renderer> CreateShared(Window& window);
+
     /**
      * @brief Must called at begining after window->update
      *
@@ -65,7 +67,6 @@ namespace And
 
     virtual void draw_forward(EntityComponentSystem& entity) = 0;
   };
-
 
 class Renderer
 {

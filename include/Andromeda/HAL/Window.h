@@ -19,6 +19,12 @@ class Engine;
 class Renderer;
 class GraphicsContext;
 
+enum class EGraphicsApiType : uint8
+{
+	OpenGL,
+	DirectX11,
+};
+
 class Window
 {
 	NON_COPYABLE_CLASS(Window)
@@ -37,7 +43,7 @@ public:
 	 * @param title Window title
 	 * @return std::shared_ptr<Window> 
 	 */
-	static std::shared_ptr<Window> make(Engine& e, uint32 w, uint32 h, const char* title);
+	static std::shared_ptr<Window> make(Engine& e, uint32 w, uint32 h, const char* title, EGraphicsApiType api);
 
 	/**
 	 * @brief Return if window is open
@@ -110,6 +116,8 @@ public:
 	 */
 	float get_delta_time() const;
 
+	inline EGraphicsApiType get_api_type() const { return m_ApiType; }
+
 	/**
 	 * @brief Get the graphics context object
 	 * 
@@ -147,6 +155,7 @@ private:
 
 	
 	std::unique_ptr<struct WindowData> m_Data;
+	EGraphicsApiType m_ApiType;
 };
 
 }
