@@ -98,6 +98,7 @@ project "Andromeda"
     "src/Graphics/**.*",
     "include/andpch.hpp",
     "src/andpch.cpp",
+    "src/Backends/**.*",
     "premake5.lua"
   }
   
