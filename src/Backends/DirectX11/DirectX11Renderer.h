@@ -26,7 +26,16 @@ namespace And
 
     virtual void draw_forward(EntityComponentSystem& ecs) override;
 
+    static ID3D11Device* GetDevice();
+    static ID3D11DeviceContext* GetDeviceContext();
+
   private:
     float m_ClearColor[4];
+    ComPtr<IDXGISwapChain> m_SwapChain;
+    ComPtr<ID3D11Device> m_Device;
+    ComPtr<ID3D11DeviceContext> m_DeviceContext;
+    ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
+    ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
+    ComPtr<ID3D11RasterizerState> m_RasterizerState;
   };
 }

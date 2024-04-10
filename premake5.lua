@@ -51,7 +51,7 @@ workspace "AndromedEngine"
   flags
   {
     "MultiProcessorCompile",
-    "FatalWarnings",
+    --"FatalWarnings",
   }
 
 group "Core"
@@ -102,6 +102,13 @@ project "Andromeda"
     "premake5.lua"
   }
   
+  links
+  {
+    "d3d11",
+    "DXGI",
+    "D3DCompiler",
+  }
+
   conan_cfg = get_conan_config()
   setup_dependencies_lib(conan_cfg)
 
@@ -152,6 +159,7 @@ group "Examples"
   include "examples/07_ResourceSystem"
   include "examples/08_OBJs"
   include "examples/09_OBJs_Lights"
+  include "examples/10_DirectX11"
   include "examples/Audio"
 group ""
 

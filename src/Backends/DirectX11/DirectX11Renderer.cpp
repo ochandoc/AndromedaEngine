@@ -6,12 +6,15 @@
 
 namespace And
 {
+  static ID3D11Device* s_Device = nullptr;
+  static ID3D11DeviceContext* s_DeviceContext = nullptr;
+
   DirectX11Renderer::DirectX11Renderer() 
   {
-    m_ClearColor[0] = 0.0f;
+    m_ClearColor[0] = 1.0f;
     m_ClearColor[1] = 0.0f;
     m_ClearColor[2] = 0.0f;
-    m_ClearColor[3] = 0.0f;
+    m_ClearColor[3] = 1.0f;
   }
 
   DirectX11Renderer::~DirectX11Renderer() {}
@@ -57,31 +60,130 @@ namespace And
       deviceContext.GetAddressOf()
     );
 
-    return std::shared_ptr<DirectX11Renderer>();
+    assert(SUCCEEDED(result));
+
+    ID3D11Texture2D* BackTexture = nullptr;
+
+    result = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&BackTexture));
+
+    assert(SUCCEEDED(result));
+
+    ComPtr<ID3D11RenderTargetView> RenderTargetView;
+    result = device->CreateRenderTargetView(BackTexture, NULL, RenderTargetView.GetAddressOf());
+
+    assert(SUCCEEDED(result));
+
+    D3D11_TEXTURE2D_DESC DepthStencilDesc = {
+      .Width = window.get_width(),
+      .Height = window.get_height(),
+      .MipLevels = 1,
+      .ArraySize = 1,
+      .Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT,
+      .SampleDesc = { .Count = 1, .Quality = 0 },
+      .Usage = D3D11_USAGE_DEFAULT,
+      .BindFlags = D3D11_BIND_DEPTH_STENCIL,
+      .CPUAccessFlags = 0,
+      .MiscFlags = 0
+    };
+
+    ComPtr<ID3D11Texture2D> depthStencilTexture;
+    result = device->CreateTexture2D(&DepthStencilDesc, NULL, depthStencilTexture.GetAddressOf());
+
+    assert(SUCCEEDED(result));
+
+    ComPtr<ID3D11DepthStencilView> depthStencilView;
+    
+    result = device->CreateDepthStencilView(depthStencilTexture.Get(),  NULL, depthStencilView.GetAddressOf());
+
+    assert(SUCCEEDED(result));
+
+    deviceContext->OMSetRenderTargets(1, RenderTargetView.GetAddressOf(), depthStencilView.Get());
+
+    D3D11_RASTERIZER_DESC RasterizerStateDesc = {
+      .FillMode = D3D11_FILL_SOLID,
+      .CullMode = D3D11_CULL_BACK,
+      .FrontCounterClockwise = true,
+      .DepthBias = D3D11_DEFAULT_DEPTH_BIAS,
+      .DepthBiasClamp = D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
+      .SlopeScaledDepthBias = D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS,
+      .DepthClipEnable = TRUE,
+      .ScissorEnable = FALSE,
+      .MultisampleEnable = FALSE,
+      .AntialiasedLineEnable = FALSE
+    };
+
+    ComPtr<ID3D11RasterizerState> RasterizerState;
+    result = device->CreateRasterizerState(&RasterizerStateDesc, RasterizerState.GetAddressOf());
+
+    assert(SUCCEEDED(result));
+
+    std::shared_ptr<DirectX11Renderer> renderer(new DirectX11Renderer);
+    renderer->m_SwapChain = swapChain;
+    renderer->m_Device = device;
+    renderer->m_DeviceContext = deviceContext;
+    renderer->m_RasterizerState = RasterizerState;
+    renderer->m_DepthStencilView = depthStencilView;
+    renderer->m_RenderTargetView = RenderTargetView;
+
+    s_Device = device.Get();
+    s_DeviceContext = deviceContext.Get();
+
+    renderer->set_viewport(0, 0, window.get_width(), window.get_height());
+
+    return renderer;
   }
 
   void DirectX11Renderer::set_camera(CameraBase* camera)
   {
+
   }
 
   void DirectX11Renderer::set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
   {
+    D3D11_VIEWPORT viewport = {
+      .TopLeftX = (float)x,
+      .TopLeftY = (float)y,
+      .Width = (float)width,
+      .Height = (float)height,
+      .MinDepth = 0.0f,
+      .MaxDepth = 1.0f
+    };
+
+    m_DeviceContext->RSSetViewports(1, &viewport);
   }
 
   void DirectX11Renderer::set_clear_color(float* color)
   {
+    m_ClearColor[0] = color[0];
+    m_ClearColor[1] = color[1];
+    m_ClearColor[2] = color[2];
+    m_ClearColor[3] = color[3];
   }
 
   void DirectX11Renderer::new_frame()
   {
+    m_DeviceContext->RSSetState(m_RasterizerState.Get());
+    m_DeviceContext->ClearRenderTargetView(m_RenderTargetView.Get(), m_ClearColor);
+    m_DeviceContext->ClearDepthStencilView(m_DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
   }
 
   void DirectX11Renderer::end_frame()
   {
+    m_SwapChain->Present(1, NULL);
   }
 
   void DirectX11Renderer::draw_forward(EntityComponentSystem& ecs)
   {
+  }
+
+  ID3D11Device* DirectX11Renderer::GetDevice()
+  {
+    return s_Device;
+  }
+
+  ID3D11DeviceContext* DirectX11Renderer::GetDeviceContext()
+  {
+    return s_DeviceContext;
   }
 
 

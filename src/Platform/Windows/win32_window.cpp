@@ -16,6 +16,8 @@
 namespace And
 {
 
+  static EGraphicsApiType s_ApiType;
+
   struct WindowData
   {
     Window* class_instance;
@@ -190,6 +192,12 @@ namespace And
 
   }
 
+  EGraphicsApiType GetGraphicApiType()
+  {
+    return s_ApiType;
+  }
+
+
   Window::Window() : m_Data(new WindowData) 
   {
     m_Data->class_instance = this;
@@ -206,6 +214,7 @@ namespace And
     if (!e.is_initialized()) return std::shared_ptr<Window>();
 
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     if (api == EGraphicsApiType::OpenGL)
     {
   #ifdef AND_OPENGL
@@ -230,13 +239,17 @@ namespace And
     window->m_Data->height = h;
     window->m_Data->is_open = true;
     window->m_ApiType = api;
+    s_ApiType = api;
 
     glfwSetWindowUserPointer(window->m_Data->handle, window->m_Data.get());
     glfwSetWindowCloseCallback(window->m_Data->handle, close_window_callback);
     glfwSetWindowSizeCallback(window->m_Data->handle, resize_window_callback);
     glfwSetKeyCallback(window->m_Data->handle, PressedKey);
 
-    window->m_Data->m_Context = std::move(std::shared_ptr<GraphicsContext>(new GraphicsContext(*window)));
+    if (api == EGraphicsApiType::OpenGL)
+    {
+      window->m_Data->m_Context = std::move(std::shared_ptr<GraphicsContext>(new GraphicsContext(*window)));
+    }
     window->set_vsync(false);
 
     return window;

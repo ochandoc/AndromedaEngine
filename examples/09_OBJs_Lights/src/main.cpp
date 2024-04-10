@@ -46,7 +46,7 @@ int main(int argc, char** argv){
 
   ts.AddWorker(workerCreationInfo);
 
-  std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine", And::EGraphicsApiType::OpenGL);
+  std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine", And::EGraphicsApiType::DirectX11);
   //window->set_vsync(true);
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
@@ -80,7 +80,7 @@ int main(int argc, char** argv){
 
   std::shared_ptr<And::Texture> texture = And::MakeTexture("teapot_texture.jpg");
 
-  float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+  float clear_color[4] = {1.0f, 0.0f, 0.0f, 1.0f};
   g_renderer->set_clear_color(clear_color);
 
   And::EntityComponentSystem entity_comp;
@@ -240,7 +240,7 @@ int main(int argc, char** argv){
 
     window->update();
     g_renderer->new_frame();
-    editor.ShowWindows();
+    //editor.ShowWindows();
 
     fly_cam.ProcessInput();
 
