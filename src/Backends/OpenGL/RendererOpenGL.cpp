@@ -76,6 +76,12 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   info.Formats.push_back(ETextureFormat::RGBA8);
   m_shadows_buffer_ = MakeRenderTarget(info);
 
+  info.Formats.clear();
+  info.Formats.push_back(ETextureFormat::RGBA8);  // Color
+  info.Formats.push_back(ETextureFormat::RGB16F); // Normales
+  info.Formats.push_back(ETextureFormat::RGB16F); // Posicion
+  m_gBuffer_ = MakeRenderTarget(info);
+
   // Shadow buffers for point light
   for(int i = 0; i < 6; i++){
     m_shadows_buffer_pointLight.push_back(MakeRenderTarget(info)); 
@@ -93,6 +99,8 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
 
   m_shader_spot = MakeShader("lights/spot.shader");
   m_shader_shadows_spot = MakeShader("lights/spot_shadows.shader");
+
+  m_shader_geometry = MakeShader("default/geometry.shader");
 
   // Create uniform buffers for lights
   m_buffer_matrix = std::make_shared<UniformBuffer>(0, 208);
@@ -583,7 +591,6 @@ void RendererOpenGL::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s
 
 }
 
-
 std::shared_ptr<RenderTarget> RendererOpenGL::get_shadow_buffer(){
   return m_shadows_buffer_;
 }
@@ -668,8 +675,6 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
       glBlendFunc(GL_ONE, GL_ONE);
     }
     //glEnable(GL_BLEND);
-
-
 
 
     // Shadows Directional 
@@ -816,6 +821,23 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
         glBlendFunc(GL_ONE, GL_ONE);
     }
     
+}
+
+void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
+    
+    // Geometry Pass
+
+    m_shader_geometry->Use();
+    for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+        obj->MeshOBJ->UseTexture(1);
+        OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_ambient.get());
+        tmp->SetTexture("texMaterial", 1);
+        //draw_obj(obj, light, transform);
+    }
+    
+
+
+    // Lighting Pass
 }
 
 }

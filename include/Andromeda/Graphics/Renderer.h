@@ -66,6 +66,7 @@ namespace And
     virtual void set_camera(CameraBase* cam) = 0;
 
     virtual void draw_forward(EntityComponentSystem& entity) = 0;
+    virtual void draw_deferred(EntityComponentSystem& entity) = 0;
 
   };
 
