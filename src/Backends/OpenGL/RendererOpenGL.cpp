@@ -49,20 +49,20 @@ namespace And
       glm::vec3 dir[6];
   };
 
-RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window)
+RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(nullptr), m_DefaultCamera(window)
 {
   static float default_color[] = { 0.094f, 0.094f, 0.094f, 1.0f };
 
-  m_Camera.SetPosition(0.0f, 0.0f, 0.0f);
-  m_Camera.SetFov(90.0f);
-  m_Camera.SetDirection(0.0f, 0.0f, -1.0f);
+  m_DefaultCamera.SetPosition(0.0f, 0.0f, 0.0f);
+  m_DefaultCamera.SetFov(90.0f);
+  m_DefaultCamera.SetDirection(0.0f, 0.0f, -1.0f);
 
   int width = m_Window.get_width();
   int height = m_Window.get_height();
-  m_Camera.SetSize((float)width, (float)height);
+  m_DefaultCamera.SetSize((float)width, (float)height);
 
-  m_Camera.SetFar(1000.0f);
-  m_Camera.SetNear(0.1f);
+  m_DefaultCamera.SetFar(1000.0f);
+  m_DefaultCamera.SetNear(0.1f);
 
 
   set_clear_color(default_color);
@@ -117,7 +117,7 @@ RendererOpenGL::~RendererOpenGL(){
 
 
 void RendererOpenGL::set_camera(CameraBase* cam){
-    m_Camera = cam;
+    m_UserCamera = cam;
 }
 
 void RendererOpenGL::new_frame()
@@ -155,16 +155,21 @@ void RendererOpenGL::end_frame()
   //m_RenderTarget->Unbind();
   //ImPlot::ShowDemoWindow();
   //ImGui::ShowDemoWindow();
+  CameraBase* cam = &m_DefaultCamera;
+  if(m_UserCamera) cam = m_UserCamera;
 
-  if(m_Camera->GetFixed()){
-    m_Camera->ProcessInput();
-  }
+  if (!m_UserCamera) {
 
-  if (ImGui::Begin("Camera"))
-  {
-    m_Camera->ShowValues();
+      if(m_DefaultCamera.GetFixed()){
+          m_DefaultCamera.ProcessInput();
+      }
+
+      if (ImGui::Begin("Camera"))
+      {
+          m_DefaultCamera.ShowValues();
+      }
+      ImGui::End();
   }
-  ImGui::End();
 
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -259,9 +264,11 @@ void CheckError(){
 void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran)
 {
   //auto start = std::chrono::high_resolution_clock::now(); 
+  CameraBase* cam = &m_DefaultCamera;
+  if(m_UserCamera) cam = m_UserCamera;
     
-  glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
-  glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
+  glm::mat4 viewMatrix = glm::make_mat4(cam->GetViewMatrix());
+  glm::mat4 projectionMatrix = glm::make_mat4(cam->GetProjectionMatrix());
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -274,7 +281,7 @@ void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* 
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
-  glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
+  glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
   UniformBlockMatrices matrices_tmp = {modelMatrix, viewMatrix, projectionMatrix, cam_pos};
   m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
   m_buffer_matrix->bind();
@@ -330,8 +337,12 @@ void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* 
 void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, SpotLight* l){
   
   //auto start = std::chrono::high_resolution_clock::now();
-  glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
-  glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
+
+  CameraBase* cam = &m_DefaultCamera;
+  if(m_UserCamera) cam = m_UserCamera;
+
+  glm::mat4 viewMatrix = glm::make_mat4(cam->GetViewMatrix());
+  glm::mat4 projectionMatrix = glm::make_mat4(cam->GetProjectionMatrix());
   glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
@@ -349,7 +360,7 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
 
   glm::mat4 projViewLight = glm::make_mat4(l->GetProjectViewMatrix(aspect_ratio));
   
-  glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
+  glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
   UniformBlockMatrices matrices_tmp = {modelMatrix, viewProjCam, projViewLight, cam_pos };
 
   m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
@@ -378,9 +389,12 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
 
 void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, PointLight* l, float* dirLight){
   
-   //auto start = std::chrono::high_resolution_clock::now();
-  glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
-  glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
+  //auto start = std::chrono::high_resolution_clock::now();
+  CameraBase* cam = &m_DefaultCamera;
+  if(m_UserCamera) cam = m_UserCamera;
+
+  glm::mat4 viewMatrix = glm::make_mat4(cam->GetViewMatrix());
+  glm::mat4 projectionMatrix = glm::make_mat4(cam->GetProjectionMatrix());
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -422,7 +436,7 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   }
   
   matrices_tmp.model = modelMatrix;
-  matrices_tmp.camera_position = glm::make_vec3(m_Camera.GetPosition());  
+  matrices_tmp.camera_position = glm::make_vec3(cam->GetPosition());  
    
   //UniformBlockMatrices matrices_tmp = {modelMatrix, viewProjCam, projViewLight, cam_pos };
 
@@ -455,8 +469,10 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
 void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, DirectionalLight* l){
   
   //auto start = std::chrono::high_resolution_clock::now();
-  glm::mat4 viewMatrix = glm::make_mat4(m_Camera.GetViewMatrix());
-  glm::mat4 projectionMatrix = glm::make_mat4(m_Camera.GetProjectionMatrix());
+  CameraBase* cam = &m_DefaultCamera;
+  if(m_UserCamera) cam = m_UserCamera;
+  glm::mat4 viewMatrix = glm::make_mat4(cam->GetViewMatrix());
+  glm::mat4 projectionMatrix = glm::make_mat4(cam->GetProjectionMatrix());
   glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
 
   glm::mat4 modelMatrix = glm::mat4(1.0f);
@@ -472,7 +488,7 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
 
   // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
   
-  glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
+  glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
   glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
   glm::vec3 pos = glm::make_vec3(cam_pos + ( (-1.0f * light_dir) * 50.0f));
   
@@ -482,7 +498,7 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   up = glm::cross(light_dir, right);
   glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
 
-  glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, m_Camera.GetNear(), m_Camera.GetFar());
+  glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, cam->GetNear(), cam->GetFar());
   glm::mat4 projViewLight = orto * viewLight;
   
   UniformBlockMatrices matrices_tmp = {modelMatrix, viewProjCam, projViewLight, cam_pos };
@@ -523,6 +539,8 @@ void RendererOpenGL::draw_scene(Scene& scene, Shader* s)
 }
 
 void RendererOpenGL::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection){
+  CameraBase* cam = &m_DefaultCamera;
+  if(m_UserCamera) cam = m_UserCamera;
 
   OpenGLShader* shader_tmp = static_cast<OpenGLShader*>(s.get());
   shader_tmp->Use();
@@ -538,7 +556,7 @@ void RendererOpenGL::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s
   modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
-  const float* tmp = m_Camera.GetPosition();
+  const float* tmp = cam->GetPosition();
   glm::vec3 cam_pos(tmp[0], tmp[1], tmp[2]);
 
  
@@ -584,8 +602,9 @@ void RendererOpenGL::draw_shadows(SpotLight* l, MeshComponent* obj, TransformCom
 }
 
 void RendererOpenGL::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran) {  
-  
-  glm::vec3 cam_pos = glm::make_vec3(m_Camera.GetPosition());
+  CameraBase* cam = &m_DefaultCamera;
+  if(m_UserCamera) cam = m_UserCamera;
+  glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
   glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
 
   float x = cam_pos.x + ( (-1.0f * light_dir.x) * 50.0f);
@@ -596,7 +615,7 @@ void RendererOpenGL::draw_shadows(DirectionalLight* l, MeshComponent* obj, Trans
   glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
   up = glm::cross(light_dir, right);
   glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
-  glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, m_Camera.GetNear(), m_Camera.GetFar());
+  glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, cam->GetNear(), cam->GetFar());
 
   draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(viewLight), glm::value_ptr(orto));
 }

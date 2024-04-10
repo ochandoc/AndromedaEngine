@@ -242,6 +242,8 @@ int main(int argc, char** argv){
     g_renderer->new_frame();
     editor.ShowWindows();
 
+    fly_cam.ProcessInput();
+
     //And::FlyCamera* cam;
         
         //g_renderer->get_camera();

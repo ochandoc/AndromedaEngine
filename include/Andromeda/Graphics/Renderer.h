@@ -67,7 +67,6 @@ namespace And
 
     virtual void draw_forward(EntityComponentSystem& entity) = 0;
 
-    virtual Camera* get_camera() = 0;
   };
 
 }

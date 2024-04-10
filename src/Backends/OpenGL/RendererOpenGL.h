@@ -26,8 +26,6 @@ namespace And{
         RendererOpenGL(Window& window);
         virtual ~RendererOpenGL() override;
 
-        Camera* get_camera() override;
-
         void new_frame() override;
         void end_frame() override;
         void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) override;
@@ -54,7 +52,8 @@ namespace And{
 
         bool m_bDrawOnTexture;
 
-        CameraBase* m_Camera;
+        CameraBase* m_UserCamera;
+        FlyCamera m_DefaultCamera;
 
         std::shared_ptr<RenderTarget> m_shadows_buffer_;
         std::vector<std::shared_ptr<RenderTarget>> m_shadows_buffer_pointLight;
