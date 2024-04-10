@@ -46,10 +46,24 @@ int main(int argc, char** argv){
 
   ts.AddWorker(workerCreationInfo);
 
-  std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine");
+  std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine", And::EGraphicsApiType::OpenGL);
   //window->set_vsync(true);
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
-  And::Renderer g_renderer(*window);
+  std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
+
+  And::FlyCamera fly_cam{*window};
+  fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
+  fly_cam.SetSize(1920.0f, 1080.0f);
+
+  fly_cam.SetFar(1000.0f);
+  fly_cam.SetNear(0.1f);
+
+  fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
+  fly_cam.SetFov(90.0f);
+  fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
+
+  g_renderer->set_camera(&fly_cam);
+
 
   //std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
 
@@ -67,7 +81,7 @@ int main(int argc, char** argv){
   std::shared_ptr<And::Texture> texture = And::MakeTexture("teapot_texture.jpg");
 
   float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
-  g_renderer.set_clear_color(clear_color);
+  g_renderer->set_clear_color(clear_color);
 
   And::EntityComponentSystem entity_comp;
   And::AddBasicComponents(entity_comp);
@@ -225,10 +239,14 @@ int main(int argc, char** argv){
   while (window->is_open()){
 
     window->update();
-    g_renderer.new_frame();
+    g_renderer->new_frame();
     editor.ShowWindows();
 
-    And::FlyCamera* cam = g_renderer.GetFlyCamera();
+    fly_cam.ProcessInput();
+
+    //And::FlyCamera* cam;
+        
+        //g_renderer->get_camera();
     //cam->SetPosition(0.0f, 0.0f, 0.0f);
    
 
@@ -243,8 +261,8 @@ int main(int argc, char** argv){
     //spot2_entity->get_component<And::SpotLight>()->SetPosition(position);
     
 
-    And::DrawForward(entity_comp, g_renderer);
-    g_renderer.end_frame();
+    g_renderer->draw_forward(entity_comp);
+    g_renderer->end_frame();
     window->swap_buffers();
   }
 
