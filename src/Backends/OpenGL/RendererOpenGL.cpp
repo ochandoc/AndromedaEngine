@@ -825,19 +825,56 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 
 void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
     
-    // Geometry Pass
+  // Geometry Pass
+  
+  m_gBuffer_->Activate();
 
-    m_shader_geometry->Use();
-    for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-        obj->MeshOBJ->UseTexture(1);
-        OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_ambient.get());
-        tmp->SetTexture("texMaterial", 1);
-        //draw_obj(obj, light, transform);
-    }
+  // Le decimos el color attachment que vamos a usar en este framebuffer para el render
+  unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+  glDrawBuffers(3, attachments);
+
+  m_shader_geometry->Use();
+  for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+    obj->MeshOBJ->UseTexture(1);
+    OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_geometry.get());
+    tmp->Use();
     
+    draw_obj(obj, nullptr, transform);
+  }
+  m_gBuffer_->Desactivate();
+  
+
+  // Lighting Pass
+
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  // Cogemos todas las texturas del gbuffer y las activamos
+  std::vector<std::shared_ptr<And::Texture>> textures = m_gBuffer_->GetTextures();
+  int index = 0;
+  for (auto& tex_tmp : textures) {
+    OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(tex_tmp.get());
+    tex->Activate(index);
+    index++;
+  }
 
 
-    // Lighting Pass
+  // Render Directional
+  for (auto [light] : entity.get_components<DirectionalLight>()) {
+      
+    
+    m_shader_directional->Use();
+
+    obj->MeshOBJ->UseTexture(1);
+    OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_directional.get());
+    tmp->SetTexture("texMaterial", 1);
+
+    draw_obj(obj, light, transform);
+    
+      
+  }
+
+
+  
 }
 
 }

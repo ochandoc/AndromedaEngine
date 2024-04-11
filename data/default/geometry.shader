@@ -41,19 +41,18 @@ in vec3 s_normal;
 in vec3 s_fragPos;
 in vec2 s_texCoords;
 
+uniform sampler2D texMaterial;
+
 //uniform sampler2D colorTexture;
 //uniform sampler2D specularTexture;
 
 void main()
 {
   Position = s_fragPos;
-
   FragNormal = normalize(s_normal);
-
-  //FragColor.rgb = texture(colorTexture, s_texCoords).rgb;
-
-  FragColor.rgb = vec3(s_normal);
-
-  FragColor.a = 1.0;
-  //FragColor.a = texture(colorTexture, s_texCoords).r;
+  //FragColor.rgb = vec3(s_normal);
+  FragColor.rgb = texture(texMaterial, s_texCoords).rgb;
+  FragColor.a = 1.0; // specular
+  //FragColor.a = texture(specularTexture, s_texCoords).r;
+  
 }

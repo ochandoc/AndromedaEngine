@@ -261,7 +261,8 @@ int main(int argc, char** argv){
     //spot2_entity->get_component<And::SpotLight>()->SetPosition(position);
     
 
-    g_renderer->draw_forward(entity_comp);
+    //g_renderer->draw_forward(entity_comp);
+    g_renderer->draw_deferred(entity_comp);
     g_renderer->end_frame();
     window->swap_buffers();
   }
