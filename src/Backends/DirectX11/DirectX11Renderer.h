@@ -26,6 +26,8 @@ namespace And
 
     virtual void draw_forward(EntityComponentSystem& ecs) override;
 
+    virtual void Draw(VertexBuffer* vb, IndexBuffer* ib, Shader* s) override;
+
     static ID3D11Device* GetDevice();
     static ID3D11DeviceContext* GetDeviceContext();
 

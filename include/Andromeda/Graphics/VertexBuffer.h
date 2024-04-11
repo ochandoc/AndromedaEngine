@@ -8,6 +8,6 @@ namespace And
   class VertexBuffer
   {
   public:
-    static std::shared_ptr<VertexBuffer> CreateShare(uint64 NumVertices, const std::shared_ptr<Vertex> Vertices);
+    static std::shared_ptr<VertexBuffer> CreateShare(const std::vector<Vertex> Vertices);
   };
 }

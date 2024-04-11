@@ -14,7 +14,7 @@ namespace And
       return OpenGLShader::Make(Path);
       break;
     case EGraphicsApiType::DirectX11:
-      return DirectX11Shader::CreateShared();
+      return DirectX11Shader::CreateShared(Path);
       break;
     }
   }

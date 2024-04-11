@@ -2,7 +2,7 @@
 
 namespace And{
 
-struct Vertex{
+struct Vertext{
   float position[3]; 
   float normal[3]; 
   float color[4]; 
@@ -14,7 +14,7 @@ class Triangle{
   public:
 
 
-  Triangle(Vertex v[3]);
+  Triangle(Vertext v[3]);
   Triangle(){};
   Triangle(const Triangle&) = default;
   Triangle(Triangle&&) = default;
@@ -23,16 +23,16 @@ class Triangle{
 
   Triangle& operator=(const Triangle& other) = default;
 
-  Vertex* get_vertex();
+  Vertext* get_vertex();
 
-  const Vertex* get_vertex() const;
+  const Vertext* get_vertex() const;
 
   unsigned int m_vao;
   unsigned int m_vbo;
 
   private:
 
-  Vertex m_vertex[3];
+  Vertext m_vertex[3];
 
 
 };

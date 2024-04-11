@@ -4,6 +4,10 @@
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include "GLFW/glfw3native.h"
 
+#include "Backends/DirectX11/DirectX11IndexBuffer.h"
+#include "Backends/DirectX11/DriectX11VertexBuffer.h"
+#include "Backends/DirectX11/DirectX11Shader.h"
+
 namespace And
 {
   static ID3D11Device* s_Device = nullptr;
@@ -174,6 +178,27 @@ namespace And
 
   void DirectX11Renderer::draw_forward(EntityComponentSystem& ecs)
   {
+  }
+
+  void DirectX11Renderer::Draw(VertexBuffer* vb, IndexBuffer* ib, Shader* s)
+  {
+    DirectX11VertexBuffer* dx11_vb = static_cast<DirectX11VertexBuffer*>(vb);
+    DirectX11IndexBuffer* dx11_ib = static_cast<DirectX11IndexBuffer*>(ib);
+    DirectX11Shader* dx11_s = static_cast<DirectX11Shader*>(s);
+
+    m_DeviceContext->IASetInputLayout(dx11_s->GetVertexShader()->GetInputLayout());
+    m_DeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    m_DeviceContext->VSSetShader(dx11_s->GetVertexShader()->GetShader(), NULL, 0);
+    m_DeviceContext->PSSetShader(dx11_s->GetPixelShader()->GetShader(), NULL, 0);
+
+    ID3D11Buffer* VertexBuffers[] = { dx11_vb->GetBuffer(), };
+    uint32 stride = sizeof(Vertex);
+    uint32 offset = 0;
+    m_DeviceContext->IASetVertexBuffers(0, 1, VertexBuffers, &stride, &offset);
+    m_DeviceContext->IASetIndexBuffer(dx11_ib->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
+
+    m_DeviceContext->DrawIndexed((uint32)dx11_ib->GetNumIndices(), 0, 0);
   }
 
   ID3D11Device* DirectX11Renderer::GetDevice()

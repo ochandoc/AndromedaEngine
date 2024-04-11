@@ -5,7 +5,7 @@
 
 namespace And
 {
-  std::shared_ptr<VertexBuffer> VertexBuffer::CreateShare(uint64 NumVertices, const std::shared_ptr<Vertex> Vertices)
+  std::shared_ptr<VertexBuffer> VertexBuffer::CreateShare(const std::vector<Vertex> Vertices)
   {
     switch (GetGraphicApiType())
     {
@@ -14,7 +14,7 @@ namespace And
       break;
 
     case EGraphicsApiType::DirectX11:
-      return DirectX11VertexBuffer::CreateShare(NumVertices, Vertices);
+      return DirectX11VertexBuffer::CreateShare(Vertices);
       break;
     }
       return std::shared_ptr<VertexBuffer>();

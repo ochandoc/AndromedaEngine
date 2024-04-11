@@ -52,7 +52,18 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
-  
+  std::shared_ptr<And::Shader> shader = And::MakeShader("test.hlsl.shader");
+
+  std::vector<uint32> indices = { 0, 2, 1, 0, 3, 2 };
+  std::vector<And::Vertex> vertices = {
+    {-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f},
+    {-0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f},
+    {0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f}, // top right
+    {0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f} //
+  };
+
+  std::shared_ptr<And::VertexBuffer> vb = And::VertexBuffer::CreateShare(vertices);
+  std::shared_ptr<And::IndexBuffer> ib = And::IndexBuffer::CreateShared(indices);
 
   float fps_count = 0.0f;
   while (window->is_open()){
@@ -60,7 +71,7 @@ int main(int argc, char** argv){
     window->update();
     g_renderer->new_frame();
     
-
+    g_renderer->Draw(vb.get(), ib.get(), shader.get());
 
     g_renderer->end_frame();
     window->swap_buffers();

@@ -12,6 +12,9 @@
 #include "Andromeda/Graphics/Lights/DirectionalLight.h"
 #include "Andromeda/Graphics/Lights/PointLight.h"
 
+#include "Andromeda/Graphics/VertexBuffer.h"
+#include "Andromeda/Graphics/IndexBuffer.h"
+
 namespace And
 {
   class Window;
@@ -66,6 +69,8 @@ namespace And
     virtual void set_camera(CameraBase* cam) = 0;
 
     virtual void draw_forward(EntityComponentSystem& entity) = 0;
+
+    virtual void Draw(VertexBuffer* vb, IndexBuffer* ib, Shader* s) {}
 
   };
 
