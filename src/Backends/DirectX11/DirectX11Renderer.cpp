@@ -121,6 +121,13 @@ namespace And
 
     assert(SUCCEEDED(result));
 
+    s_Device = device.Get();
+    s_DeviceContext = deviceContext.Get();
+
+    std::shared_ptr<DirectX11ConstantBuffer> ObjectConstantBuffer = DirectX11ConstantBuffer::CreateShared(sizeof(DirectX11InputStruct::Object));
+
+    if (!ObjectConstantBuffer) return nullptr;
+
     std::shared_ptr<DirectX11Renderer> renderer(new DirectX11Renderer);
     renderer->m_SwapChain = swapChain;
     renderer->m_Device = device;
@@ -128,9 +135,7 @@ namespace And
     renderer->m_RasterizerState = RasterizerState;
     renderer->m_DepthStencilView = depthStencilView;
     renderer->m_RenderTargetView = RenderTargetView;
-
-    s_Device = device.Get();
-    s_DeviceContext = deviceContext.Get();
+    renderer->m_ObjectConstantBuffer = ObjectConstantBuffer;
 
     renderer->set_viewport(0, 0, window.get_width(), window.get_height());
 
@@ -139,7 +144,7 @@ namespace And
 
   void DirectX11Renderer::set_camera(CameraBase* camera)
   {
-
+    m_Camera = camera;
   }
 
   void DirectX11Renderer::set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
@@ -186,10 +191,38 @@ namespace And
     DirectX11IndexBuffer* dx11_ib = static_cast<DirectX11IndexBuffer*>(ib);
     DirectX11Shader* dx11_s = static_cast<DirectX11Shader*>(s);
 
+    glm::vec3 position(3.0f, 5.0f, -5.0f);
+    glm::vec3 rotation(0.0f, 0.0f, 0.0f);
+    glm::vec3 scale(1.0f, 1.0f, 1.0f);
+
+
+    glm::mat4 model = glm::identity<glm::mat4>();
+    model = glm::translate(model, position);
+    model = glm::rotate(model, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::rotate(model, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::rotate(model, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+    model = glm::scale(model, scale);
+
+    DirectX11InputStruct::Object Object;
+    Object.view = glm::transpose(glm::make_mat4(m_Camera->GetViewMatrix()));
+    Object.projection = glm::transpose(glm::make_mat4(m_Camera->GetProjectionMatrix()));
+    Object.model = glm::transpose(model);
+
+    D3D11_MAPPED_SUBRESOURCE ObjectBuffData;
+    HRESULT result = m_DeviceContext->Map(m_ObjectConstantBuffer->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ObjectBuffData);
+
+    memcpy(ObjectBuffData.pData, (void*)&Object, sizeof(Object));
+
+    m_DeviceContext->Unmap(m_ObjectConstantBuffer->GetBuffer(), 0);
+
     m_DeviceContext->IASetInputLayout(dx11_s->GetVertexShader()->GetInputLayout());
     m_DeviceContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     m_DeviceContext->VSSetShader(dx11_s->GetVertexShader()->GetShader(), NULL, 0);
+
+    ID3D11Buffer* VSConstantBuffers[] = { m_ObjectConstantBuffer->GetBuffer() };
+    m_DeviceContext->VSSetConstantBuffers(0, 1, VSConstantBuffers);
+
     m_DeviceContext->PSSetShader(dx11_s->GetPixelShader()->GetShader(), NULL, 0);
 
     ID3D11Buffer* VertexBuffers[] = { dx11_vb->GetBuffer(), };

@@ -13,10 +13,20 @@ struct VS_OUTPUT
   float2 UV : TEXCOORD;
 };
 
-VS_OUTPUT main(VS_INPUT input)
+cbuffer Object : register(b0)
 {
+  float4x4 view;
+  float4x4 projection;
+  float4x4 model;
+};
+
+VS_OUTPUT main(VS_INPUT input)
+{ 
+  float4x4 vpm = mul(view, projection);
+  vpm = mul(model, vpm);
+  
   VS_OUTPUT output;
-  output.Pos = float4(input.Pos, 1.0f);
+  output.Pos = mul(float4(input.Pos, 1.0f), vpm);
   output.UV = input.UV;
   return output;
 }
@@ -36,6 +46,6 @@ struct PS_OUTPUT
 PS_OUTPUT main(PS_INPUT input) : SV_TARGET
 {
   PS_OUTPUT output;
-  output.Color = float4(input.UV, 0.0f, 1.0f);
+  output.Color = float4(1.0f, 0.0f, 0.0f, 1.0f);
   return output;
 }

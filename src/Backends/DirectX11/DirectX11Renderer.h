@@ -3,6 +3,8 @@
 #include "Andromeda/Graphics/Renderer.h"
 
 #include "Backends/DirectX11/DirectX11.h"
+#include "Backends/DirectX11/DirectX11ConstantBuffer.h"
+#include "Backends/DirectX11/DirectX11ShaderInputStructs.h"
 
 namespace And
 {
@@ -39,5 +41,7 @@ namespace And
     ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
     ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
     ComPtr<ID3D11RasterizerState> m_RasterizerState;
+    std::shared_ptr<DirectX11ConstantBuffer> m_ObjectConstantBuffer;
+    CameraBase* m_Camera;
   };
 }

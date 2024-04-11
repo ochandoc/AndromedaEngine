@@ -25,6 +25,7 @@
 #include "Andromeda/Graphics/IndexBuffer.h"
 #include "Andromeda/Graphics/VertexBuffer.h"
 #include "Andromeda/Graphics/Shader.h"
+#include "Andromeda/Graphics/RawMesh.h"
 
 int SlowTask()
 {
@@ -62,13 +63,27 @@ int main(int argc, char** argv){
     {0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f} //
   };
 
-  std::shared_ptr<And::VertexBuffer> vb = And::VertexBuffer::CreateShare(vertices);
-  std::shared_ptr<And::IndexBuffer> ib = And::IndexBuffer::CreateShared(indices);
+  And::RawMesh cube = And::RawMesh::CreateCube();
+
+  std::shared_ptr<And::VertexBuffer> vb = And::VertexBuffer::CreateShare(cube.GetVertices());
+  std::shared_ptr<And::IndexBuffer> ib = And::IndexBuffer::CreateShared(cube.GetIndices());
+
+  And::FlyCamera fly_cam{ *window };
+  fly_cam.SetPosition(3.0f, 7.0f, 5.0f);
+
+  fly_cam.SetFar(1000.0f);
+  fly_cam.SetNear(0.1f);
+  fly_cam.SetFov(90.0f);
+  fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
+
+  g_renderer->set_camera(&fly_cam);
 
   float fps_count = 0.0f;
   while (window->is_open()){
 
     window->update();
+
+    fly_cam.ProcessInput();
     g_renderer->new_frame();
     
     g_renderer->Draw(vb.get(), ib.get(), shader.get());

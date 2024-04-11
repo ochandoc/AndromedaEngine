@@ -46,7 +46,7 @@ int main(int argc, char** argv){
 
   ts.AddWorker(workerCreationInfo);
 
-  std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine", And::EGraphicsApiType::DirectX11);
+  std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine", And::EGraphicsApiType::OpenGL);
   //window->set_vsync(true);
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
@@ -246,6 +246,7 @@ int main(int argc, char** argv){
 
     //And::FlyCamera* cam;
         
+    fly_cam.ShowValues();
         //g_renderer->get_camera();
     //cam->SetPosition(0.0f, 0.0f, 0.0f);
    
