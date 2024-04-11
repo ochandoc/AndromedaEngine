@@ -137,7 +137,8 @@ namespace And
     
     if (FAILED(result))
     {
-      // TODO (och): print compile error
+      std::string err = DirectX11Tools::BlobToString(ErrorBuff);
+      printf("Error: %s\n", err.c_str());
       return nullptr;
     }
 

@@ -15,7 +15,7 @@ namespace And
 
   DirectX11Renderer::DirectX11Renderer() 
   {
-    m_ClearColor[0] = 1.0f;
+    m_ClearColor[0] = 0.0f;
     m_ClearColor[1] = 0.0f;
     m_ClearColor[2] = 0.0f;
     m_ClearColor[3] = 1.0f;

@@ -48,11 +48,11 @@ int main(int argc, char** argv){
 
   ts.AddWorker(workerCreationInfo);
 
-  std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine", And::EGraphicsApiType::DirectX11);
+  std::shared_ptr<And::Window> window = And::Window::make(e, 1080, 720, "Andromeda Engine", And::EGraphicsApiType::DirectX11);
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
-  std::shared_ptr<And::Shader> shader = And::MakeShader("test.hlsl.shader");
+  std::shared_ptr<And::Shader> shader = And::MakeShader("shader.hlsl");
 
   std::vector<uint32> indices = { 0, 2, 1, 0, 3, 2 };
   std::vector<And::Vertex> vertices = {
