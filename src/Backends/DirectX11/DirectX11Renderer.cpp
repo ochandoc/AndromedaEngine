@@ -7,6 +7,7 @@
 #include "Backends/DirectX11/DirectX11IndexBuffer.h"
 #include "Backends/DirectX11/DriectX11VertexBuffer.h"
 #include "Backends/DirectX11/DirectX11Shader.h"
+#include "Backends/DirectX11/DirectX11Texture2D.h"
 
 namespace And
 {
@@ -139,6 +140,8 @@ namespace And
 
     renderer->set_viewport(0, 0, window.get_width(), window.get_height());
 
+    renderer->m_Tex = DirectX11Texture2D::CreateShared("jou.jpg");
+
     return renderer;
   }
 
@@ -224,6 +227,10 @@ namespace And
     m_DeviceContext->VSSetConstantBuffers(0, 1, VSConstantBuffers);
 
     m_DeviceContext->PSSetShader(dx11_s->GetPixelShader()->GetShader(), NULL, 0);
+    ID3D11ShaderResourceView* PSViews[] = { m_Tex->GetView() };
+    m_DeviceContext->PSSetShaderResources(0, 1, PSViews);
+    ID3D11SamplerState* PSSamplers[] = { m_Tex->GetSampler() };
+    m_DeviceContext->PSSetSamplers(0, 1, PSSamplers);
 
     ID3D11Buffer* VertexBuffers[] = { dx11_vb->GetBuffer(), };
     uint32 stride = sizeof(Vertex);

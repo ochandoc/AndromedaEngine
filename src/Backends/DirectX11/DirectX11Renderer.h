@@ -5,6 +5,7 @@
 #include "Backends/DirectX11/DirectX11.h"
 #include "Backends/DirectX11/DirectX11ConstantBuffer.h"
 #include "Backends/DirectX11/DirectX11ShaderInputStructs.h"
+#include "Backends/DirectX11/DirectX11Texture2D.h"
 
 namespace And
 {
@@ -42,6 +43,7 @@ namespace And
     ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
     ComPtr<ID3D11RasterizerState> m_RasterizerState;
     std::shared_ptr<DirectX11ConstantBuffer> m_ObjectConstantBuffer;
+    std::shared_ptr<DirectX11Texture2D> m_Tex;
     CameraBase* m_Camera;
   };
 }

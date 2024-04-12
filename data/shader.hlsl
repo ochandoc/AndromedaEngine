@@ -22,8 +22,7 @@ cbuffer Object : register(b0)
 
 VS_OUTPUT main(VS_INPUT input)
 { 
-  float4x4 vpm = mul(view, projection);
-  vpm = mul(model, vpm);
+  float4x4 vpm = mul(model, mul(view, projection));
   
   VS_OUTPUT output;
   output.Pos = mul(float4(input.Pos, 1.0f), vpm);
@@ -43,9 +42,13 @@ struct PS_OUTPUT
   float4 Color : SV_Target0;
 };
 
+Texture2D ColorTexture : COLOR_TEXTURE : register(t0);
+SamplerState ColorSampler : COLOR_SAMPLER : register(s0);
+
 PS_OUTPUT main(PS_INPUT input) : SV_TARGET
 {
   PS_OUTPUT output;
-  output.Color = float4(1.0f, 0.0f, 0.0f, 1.0f);
+  float3 PixelColor = ColorTexture.Sample(ColorSampler, input.UV);
+  output.Color = float4(PixelColor, 1.0f);
   return output;
 }

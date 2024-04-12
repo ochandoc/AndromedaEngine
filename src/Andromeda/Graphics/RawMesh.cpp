@@ -54,8 +54,8 @@ namespace And
       },
       {
         -0.5, 0.5, -0.5,           // v top left front
-        0.0f, 1.0f, 0.0f,             // vn
-        1.0f, 1.0f,                   // vt
+        0.0f, 1.0f, 0.0f,          // vn
+        1.0f, 1.0f,                // vt
       },
       {
         0.5, 0.5, -0.5,            // v top right front
