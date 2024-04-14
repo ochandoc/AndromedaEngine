@@ -51,18 +51,18 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
-  And::FlyCamera fly_cam{*window};
-  fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
-  fly_cam.SetSize(1920.0f, 1080.0f);
+  //And::FlyCamera fly_cam{*window};
+  //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
+  //fly_cam.SetSize(1920.0f, 1080.0f);
 
-  fly_cam.SetFar(1000.0f);
-  fly_cam.SetNear(0.1f);
+  //fly_cam.SetFar(1000.0f);
+  //fly_cam.SetNear(0.1f);
 
-  fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
-  fly_cam.SetFov(90.0f);
-  fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
+  //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
+  //fly_cam.SetFov(90.0f);
+  //fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
 
-  g_renderer->set_camera(&fly_cam);
+  //g_renderer->set_camera(&fly_cam);
 
 
   //std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
@@ -242,7 +242,7 @@ int main(int argc, char** argv){
     g_renderer->new_frame();
     editor.ShowWindows();
 
-    fly_cam.ProcessInput();
+    //fly_cam.ProcessInput();
 
     //And::FlyCamera* cam;
         

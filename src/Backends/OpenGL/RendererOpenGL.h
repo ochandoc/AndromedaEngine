@@ -43,6 +43,8 @@ namespace And{
         void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, PointLight* l, float* dir);
         void draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection);
 
+        void upload_light(Light* l);
+
         void draw_scene(Scene& scene, Shader* s);
 
         void draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran);
@@ -59,6 +61,8 @@ namespace And{
 
         std::shared_ptr<RenderTarget> m_shadows_buffer_;
         std::shared_ptr<RenderTarget> m_gBuffer_;
+        std::shared_ptr<RenderTarget> m_full_quad_;
+        
 
         std::vector<std::shared_ptr<RenderTarget>> m_shadows_buffer_pointLight;
 
@@ -74,6 +78,7 @@ namespace And{
         std::shared_ptr<Shader> m_shader_shadows_spot;
 
         std::shared_ptr<Shader> m_shader_geometry;
+        std::shared_ptr<Shader> m_shader_quad;
 
         std::shared_ptr<UniformBuffer> m_buffer_matrix; // 208
         std::shared_ptr<UniformBuffer> m_buffer_matrix_pointLight; // 208 + 16 * 5
@@ -82,6 +87,10 @@ namespace And{
         std::shared_ptr<UniformBuffer> m_buffer_point_light; // 64
         std::shared_ptr<UniformBuffer> m_buffer_spot_light; // 96
         std::shared_ptr<Direction> m_directions;
+
+
+        unsigned int m_quad_vao;
+        unsigned int m_quad_vbo;
 
 
 

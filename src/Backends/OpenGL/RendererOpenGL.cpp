@@ -16,6 +16,7 @@
 
 #include "Andromeda/UI/Plot/implot.h"
 
+#include "Backends/OpenGL/OpenGLRenderTarget.h"
 #include "Andromeda/Graphics/Shader.h"
 #include "Andromeda/ECS/Components/TransformComponent.h"
 #include "Andromeda/ECS/Components/MeshComponent.h"
@@ -77,9 +78,9 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   m_shadows_buffer_ = MakeRenderTarget(info);
 
   info.Formats.clear();
-  info.Formats.push_back(ETextureFormat::RGBA8);  // Color
-  info.Formats.push_back(ETextureFormat::RGB16F); // Normales
   info.Formats.push_back(ETextureFormat::RGB16F); // Posicion
+  info.Formats.push_back(ETextureFormat::RGB16F); // Normales
+  info.Formats.push_back(ETextureFormat::RGBA8);  // Color
   m_gBuffer_ = MakeRenderTarget(info);
 
   // Shadow buffers for point light
@@ -101,6 +102,11 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   m_shader_shadows_spot = MakeShader("lights/spot_shadows.shader");
 
   m_shader_geometry = MakeShader("default/geometry.shader");
+  m_shader_quad = MakeShader("lights/deferred/quad.shader");
+
+  glGenVertexArrays(1, &m_quad_vao);
+  glGenBuffers(1, &m_quad_vbo);
+
 
   // Create uniform buffers for lights
   m_buffer_matrix = std::make_shared<UniformBuffer>(0, 208);
@@ -122,7 +128,6 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
 RendererOpenGL::~RendererOpenGL(){
 	m_Window.imgui_end();
 }
-
 
 void RendererOpenGL::set_camera(CameraBase* cam){
     m_UserCamera = cam;
@@ -342,6 +347,65 @@ void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* 
 
 }
 
+void RendererOpenGL::upload_light(Light* l){
+
+    CameraBase* cam = &m_DefaultCamera;
+    if (m_UserCamera) cam = m_UserCamera;
+
+    glm::mat4 viewMatrix = glm::make_mat4(cam->GetViewMatrix());
+    glm::mat4 projectionMatrix = glm::make_mat4(cam->GetProjectionMatrix());
+    glm::mat4 modelMatrix = glm::mat4(1.0f);
+    glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
+    glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
+
+
+    glm::vec3 light_dir;
+    DirectionalLight* dir = static_cast<DirectionalLight*>(l);
+    if (dir) {
+        light_dir = glm::make_vec3(dir->GetDirection());
+    }
+
+    glm::vec3 pos = glm::make_vec3(cam_pos + ((-1.0f * light_dir) * 50.0f));
+
+
+    glm::vec3 up(0.0f, 1.0f, 0.0f);
+    glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
+    up = glm::cross(light_dir, right);
+    glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
+
+    glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, cam->GetNear(), cam->GetFar());
+    glm::mat4 projViewLight = orto * viewLight;
+    UniformBlockMatrices matrices_tmp = { modelMatrix, viewProjCam, projViewLight, cam_pos };
+
+    m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
+    m_buffer_matrix->bind();
+
+    SpotLight* spot = dynamic_cast<SpotLight*>(l);
+    if (spot) {
+        m_buffer_spot_light->upload_data(spot->GetData(), 96);
+        m_buffer_spot_light->bind();
+    }
+
+    PointLight* point = dynamic_cast<PointLight*>(l);
+    if (point) {
+        m_buffer_point_light->upload_data(point->GetData(), 64);
+        m_buffer_point_light->bind();
+    }
+
+    DirectionalLight* directional = dynamic_cast<DirectionalLight*>(l);
+    if (directional) {
+        m_buffer_directional_light->upload_data(directional->GetData(), 48);
+        m_buffer_directional_light->bind();
+    }
+
+    AmbientLight* ambient = dynamic_cast<AmbientLight*>(l);
+    if (ambient) {
+        m_buffer_ambient_light->upload_data(ambient->GetData(), 48);
+        m_buffer_ambient_light->bind();
+    }
+
+}
+
 void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, SpotLight* l){
   
   //auto start = std::chrono::high_resolution_clock::now();
@@ -536,8 +600,7 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
 }
 
-void RendererOpenGL::draw_scene(Scene& scene, Shader* s)
-{
+void RendererOpenGL::draw_scene(Scene& scene, Shader* s){
   EntityComponentSystem& ECS = scene.m_ECS;
 
   for (auto [transform, obj] : ECS.get_components<TransformComponent, MeshComponent>())
@@ -825,8 +888,7 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 
 void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
     
-  // Geometry Pass
-  
+  // Geometry Passs
   m_gBuffer_->Activate();
 
   // Le decimos el color attachment que vamos a usar en este framebuffer para el render
@@ -834,43 +896,96 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
   glDrawBuffers(3, attachments);
 
   m_shader_geometry->Use();
+  glDisable(GL_BLEND);
   for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-    obj->MeshOBJ->UseTexture(1);
+    obj->MeshOBJ->UseTexture(0);
     OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_geometry.get());
     tmp->Use();
     
     draw_obj(obj, nullptr, transform);
   }
   m_gBuffer_->Desactivate();
-  
-
-  // Lighting Pass
-
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  // Cogemos todas las texturas del gbuffer y las activamos
-  std::vector<std::shared_ptr<And::Texture>> textures = m_gBuffer_->GetTextures();
-  int index = 0;
-  for (auto& tex_tmp : textures) {
-    OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(tex_tmp.get());
-    tex->Activate(index);
-    index++;
-  }
 
+  // Lighting Pass
+  float dMesh[] = {
+      -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, // down-left
+      -1.0f, +1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // up-left
+      +1.0f, +1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // up-right
+      +1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // down-right
+  };
 
-  // Render Directional
+  unsigned int dIndices[] = {
+       0, 2, 1, 0, 3, 2
+  };
+
+  // Shadows directional
+  std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
   for (auto [light] : entity.get_components<DirectionalLight>()) {
-      
-    
-    m_shader_directional->Use();
+    shadow_buffer->Activate();
+    glDisable(GL_BLEND);
+    if (light->GetCastShadows()) {
+        // Por cada luz que castea sombras guardamos textura de profundidad
+        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+            draw_shadows(light, obj, transform);
+        }
+    }
+    shadow_buffer->Desactivate();
+    glEnable(GL_BLEND);
 
-    obj->MeshOBJ->UseTexture(1);
-    OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_directional.get());
-    tmp->SetTexture("texMaterial", 1);
 
-    draw_obj(obj, light, transform);
+    // Render Directional
+    OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_quad.get());
+    std::vector<std::shared_ptr<Texture>> tex_gbuffer = m_gBuffer_->GetTextures();
+    OpenGLTexture2D* position_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[0].get());
+    OpenGLTexture2D* normal_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[1].get());
+    OpenGLTexture2D* color_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[2].get());
     
+    std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+    OpenGLTexture2D* tex_shadow = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+
+    // posicion, normal, color
+    tmp->Use();
+
+    tmp->SetTexture("Position", 0);
+    position_tex->Activate(0);
+
+    tmp->SetTexture("Frag_Normal", 1);
+    normal_tex->Activate(1);
+
+    tmp->SetTexture("Frag_Color", 2);
+    color_tex->Activate(2);
+
+    //tmp->SetTexture("texShadow", 3);
+    //tex_shadow->Activate(3);
+
+    glBindVertexArray(m_quad_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
+    glBufferData(GL_ARRAY_BUFFER, (GLsizei)(sizeof(dMesh)), &dMesh[0], GL_STATIC_DRAW);
+
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
+
+    OpenGLRenderTarget* opengl_render_target = static_cast<OpenGLRenderTarget*>(m_gBuffer_.get());
+
+    glEnable(GL_BLEND);
+    
+    upload_light(light);
+    glBindVertexArray(m_quad_vao);
+    glDrawElements(GL_TRIANGLES, (GLsizei)(sizeof(dMesh)), GL_UNSIGNED_INT, &dIndices[0]);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, opengl_render_target->GetId());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(0, 0, 1920, 1080, 0, 0, 1920, 1080, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
       
+
   }
 
 

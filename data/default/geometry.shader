@@ -33,9 +33,9 @@ void main()
 #type Fragment
 #version 430 core
 
-layout(location = 0) out vec4 FragColor;
+layout(location = 0) out vec3 Position;
 layout(location = 1) out vec3 FragNormal;
-layout(location = 2) out vec3 Position;
+layout(location = 2) out vec4 FragColor;
 
 in vec3 s_normal;
 in vec3 s_fragPos;
