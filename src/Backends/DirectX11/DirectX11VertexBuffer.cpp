@@ -1,4 +1,4 @@
-#include "Backends/DirectX11/DriectX11VertexBuffer.h"
+#include "Backends/DirectX11/DirectX11VertexBuffer.h"
 
 #include "Backends/DirectX11/DirectX11Renderer.h"
 

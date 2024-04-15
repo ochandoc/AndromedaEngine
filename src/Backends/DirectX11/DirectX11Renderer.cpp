@@ -5,7 +5,7 @@
 #include "GLFW/glfw3native.h"
 
 #include "Backends/DirectX11/DirectX11IndexBuffer.h"
-#include "Backends/DirectX11/DriectX11VertexBuffer.h"
+#include "Backends/DirectX11/DirectX11VertexBuffer.h"
 #include "Backends/DirectX11/DirectX11Shader.h"
 #include "Backends/DirectX11/DirectX11Texture2D.h"
 
@@ -15,11 +15,15 @@ namespace And
   static ID3D11DeviceContext* s_DeviceContext = nullptr;
 
   DirectX11Renderer::DirectX11Renderer() 
+    : m_Camera(nullptr)
   {
     m_ClearColor[0] = 0.0f;
     m_ClearColor[1] = 0.0f;
     m_ClearColor[2] = 0.0f;
     m_ClearColor[3] = 1.0f;
+
+    m_PSObjectData = DirectX11ConstantBuffer::CreateShared(sizeof(DirectX11::VertexShader::ObjectData));
+    m_VSObjectData = DirectX11ConstantBuffer::CreateShared(sizeof(DirectX11::VertexShader::ObjectData));
   }
 
   DirectX11Renderer::~DirectX11Renderer() {}
@@ -141,10 +145,6 @@ namespace And
     s_Device = device.Get();
     s_DeviceContext = deviceContext.Get();
 
-    std::shared_ptr<DirectX11ConstantBuffer> ObjectConstantBuffer = DirectX11ConstantBuffer::CreateShared(sizeof(DirectX11InputStruct::Object));
-
-    if (!ObjectConstantBuffer) return nullptr;
-
     std::shared_ptr<DirectX11Renderer> renderer(new DirectX11Renderer);
     renderer->m_SwapChain = swapChain;
     renderer->m_Device = device;
@@ -152,11 +152,9 @@ namespace And
     renderer->m_RasterizerState = RasterizerState;
     renderer->m_DepthStencilView = depthStencilView;
     renderer->m_RenderTargetView = RenderTargetView;
-    renderer->m_ObjectConstantBuffer = ObjectConstantBuffer;
 
     renderer->set_viewport(0, 0, window.get_width(), window.get_height());
 
-    renderer->m_Skybox.Shader = DirectX11Shader::CreateShared("skybox/cubemap.hlsl");
     renderer->m_Skybox.DepStencilState = SkyboxDepthStencilState;
     renderer->m_Skybox.Mesh = std::make_shared<Mesh>(RawMesh::CreateSkybox());
     renderer->m_Skybox.Enabled = false;
@@ -205,14 +203,14 @@ namespace And
 
   void DirectX11Renderer::draw_forward(EntityComponentSystem& ecs)
   {
+    if (!m_Camera) return;
+
     SkyboxPass();
-    return;
 
-    for (auto& [mesh_component, transform] : ecs.get_components<MeshComponent, TransformComponent>())
+    for (auto& [mesh_component, transform, matComp] : ecs.get_components<MeshComponent, TransformComponent, MaterialComponent>())
     {
-      Draw(mesh_component->GetMesh().get(), m_Shader.get());
+      ObjectPass(mesh_component->GetMesh().get(), transform, matComp->GetMaterial().get());
     }
-
   }
 
   void DirectX11Renderer::SkyboxPass()
@@ -223,33 +221,30 @@ namespace And
     DirectX11SkyboxTexture* SkyboxTexture = static_cast<DirectX11SkyboxTexture*>(m_Skybox.Texture.get());
     DirectX11VertexBuffer* VB = static_cast<DirectX11VertexBuffer*>(m_Skybox.Mesh->GetVertexBuffer());
     DirectX11IndexBuffer* IB = static_cast<DirectX11IndexBuffer*>(m_Skybox.Mesh->GetIndexBuffer());
-
+    std::shared_ptr<DirectX11Shader> shader = m_ShaderLibrary.GetForwardShader("Skybox");
 
     /**  Upload object data into the constant buffer */
-    DirectX11InputStruct::Object ObjectInput;
-    ObjectInput.model = glm::mat4();
-    ObjectInput.projection = glm::transpose(glm::make_mat4(m_Camera->GetProjectionMatrix()));
-    ObjectInput.view = glm::transpose(glm::make_mat4(m_Camera->GetViewMatrix()));
+    DirectX11::VertexShader::ObjectData ObjectData;
+    ObjectData.projection = glm::transpose(glm::make_mat4(m_Camera->GetProjectionMatrix()));
+    ObjectData.view = glm::transpose(glm::make_mat4(m_Camera->GetViewMatrix()));
 
     D3D11_MAPPED_SUBRESOURCE ObjectBuffData;
-    HRESULT result = m_DeviceContext->Map(m_ObjectConstantBuffer->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ObjectBuffData);
-
-    memcpy(ObjectBuffData.pData, (void*)&ObjectInput, sizeof(DirectX11InputStruct::Object));
-
-    m_DeviceContext->Unmap(m_ObjectConstantBuffer->GetBuffer(), 0);
+    m_DeviceContext->Map(m_VSObjectData->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ObjectBuffData);
+    memcpy(ObjectBuffData.pData, (void*)&ObjectData, sizeof(DirectX11::VertexShader::ObjectData));
+    m_DeviceContext->Unmap(m_VSObjectData->GetBuffer(), 0);
 
     /**  Setup draw info */
 
-    m_DeviceContext->IASetInputLayout(m_Skybox.Shader->GetVertexShader()->GetInputLayout());
+    m_DeviceContext->IASetInputLayout(shader->GetVertexShader()->GetInputLayout());
     m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     /**  Vertex Shader */
-    m_DeviceContext->VSSetShader(m_Skybox.Shader->GetVertexShader()->GetShader(), nullptr, 0);
-    ID3D11Buffer* VSConstantBuffers[] = { m_ObjectConstantBuffer->GetBuffer() };
+    m_DeviceContext->VSSetShader(shader->GetVertexShader()->GetShader(), nullptr, 0);
+    ID3D11Buffer* VSConstantBuffers[] = { m_VSObjectData->GetBuffer() };
     m_DeviceContext->VSSetConstantBuffers(0, 1, VSConstantBuffers);
 
     /**  Pixel Shader */
-    m_DeviceContext->PSSetShader(m_Skybox.Shader->GetPixelShader()->GetShader(), nullptr, 0);
+    m_DeviceContext->PSSetShader(shader->GetPixelShader()->GetShader(), nullptr, 0);
     ID3D11ShaderResourceView* PSViews[] = { SkyboxTexture->GetView() };
     m_DeviceContext->PSSetShaderResources(0, 1, PSViews);
     ID3D11SamplerState* PSSamplerStates[] = { SkyboxTexture->GetSampler() };
@@ -266,6 +261,75 @@ namespace And
     m_DeviceContext->DrawIndexed((uint32)IB->GetNumIndices(), 0, 0);
   }
 
+  void DirectX11Renderer::ObjectPass(Mesh* mesh, TransformComponent* tr, Material* material)
+  {
+    DirectX11VertexBuffer* VB = static_cast<DirectX11VertexBuffer*>(mesh->GetVertexBuffer());
+    DirectX11IndexBuffer* IB = static_cast<DirectX11IndexBuffer*>(mesh->GetIndexBuffer());
+    DirectX11Texture2D* ColorTexture = static_cast<DirectX11Texture2D*>(material->GetColorTexture().get());
+    std::shared_ptr<DirectX11Shader> Shader = m_ShaderLibrary.GetForwardShader("Color");
+
+    /**  Upload vertex shader object data */
+    {
+      glm::vec3 position = glm::make_vec3(tr->position);
+      glm::vec3 rotation = glm::make_vec3(tr->rotation);
+      glm::vec3 scale = glm::make_vec3(tr->scale);
+
+      glm::mat4 model = glm::identity<glm::mat4>();
+      model = glm::translate(model, position);
+      model = glm::rotate(model, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+      model = glm::rotate(model, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+      model = glm::rotate(model, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+      model = glm::scale(model, scale);
+
+      DirectX11::VertexShader::ObjectData VSObjectData;
+      VSObjectData.model = glm::transpose(model);
+      VSObjectData.view = glm::transpose(glm::make_mat4(m_Camera->GetViewMatrix()));
+      VSObjectData.projection = glm::transpose(glm::make_mat4(m_Camera->GetProjectionMatrix()));
+
+      D3D11_MAPPED_SUBRESOURCE VSObjectMappedData;
+      m_DeviceContext->Map(m_VSObjectData->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &VSObjectMappedData);
+      memcpy(VSObjectMappedData.pData, &VSObjectData, sizeof(VSObjectData));
+      m_DeviceContext->Unmap(m_VSObjectData->GetBuffer(), 0);
+    }
+
+    /**  Upload pixel shader object buffer */
+    {
+      DirectX11::PixelShader::ObjectData PSObjectData;
+      PSObjectData.HasColorTxture = (ColorTexture) ? 1 : 0;
+      PSObjectData.Color = glm::make_vec4(material->GetColor());
+
+      D3D11_MAPPED_SUBRESOURCE PSObjectMappedData;
+      m_DeviceContext->Map(m_PSObjectData->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &PSObjectMappedData);
+      memcpy(PSObjectMappedData.pData, &PSObjectData, sizeof(PSObjectData));
+      m_DeviceContext->Unmap(m_PSObjectData->GetBuffer(), 0);
+    }
+
+    /**  Configure input assembly */
+    m_DeviceContext->IASetInputLayout(Shader->GetVertexShader()->GetInputLayout());
+    m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    ID3D11Buffer* VertexBuffers[] = { VB->GetBuffer(), };
+    uint32 stride = sizeof(Vertex);
+    uint32 offset = 0;
+    m_DeviceContext->IASetVertexBuffers(0, 1, VertexBuffers, &stride, &offset);
+    m_DeviceContext->IASetIndexBuffer(IB->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
+
+    /**  Configure vertex shader stage */
+    m_DeviceContext->VSSetShader(Shader->GetVertexShader()->GetShader(), nullptr, 0);
+    ID3D11Buffer* VSConstantBuffers[] = { m_VSObjectData->GetBuffer() };
+    m_DeviceContext->VSSetConstantBuffers(0, 1, VSConstantBuffers);
+
+    /**  Configure pixel shader stage */
+    m_DeviceContext->PSSetShader(Shader->GetPixelShader()->GetShader(), nullptr, 0);
+    ID3D11Buffer* PSConstantBuffers[] = { m_PSObjectData->GetBuffer() };
+    m_DeviceContext->PSSetConstantBuffers(0, 1, PSConstantBuffers);
+    ID3D11ShaderResourceView* PSViews[] = { (ColorTexture) ? ColorTexture->GetView() : nullptr };
+    m_DeviceContext->PSSetShaderResources(0, 1, PSViews);
+    ID3D11SamplerState* PSSamplers[] = { (ColorTexture) ? ColorTexture->GetSampler() : nullptr };
+    m_DeviceContext->PSSetSamplers(0, 1, PSSamplers);
+
+    m_DeviceContext->DrawIndexed((uint32)IB->GetNumIndices(), 0, 0);
+  }
+
   void DirectX11Renderer::enable_skybox(bool value)
   {
     m_Skybox.Enabled = value;
@@ -277,7 +341,8 @@ namespace And
   }
 
   void DirectX11Renderer::Draw(Mesh* mesh, Shader* s)
-  {
+  { 
+    /*
     DirectX11VertexBuffer* dx11_vb = static_cast<DirectX11VertexBuffer*>(mesh->GetVertexBuffer());
     DirectX11IndexBuffer* dx11_ib = static_cast<DirectX11IndexBuffer*>(mesh->GetIndexBuffer());
     DirectX11Shader* dx11_s = static_cast<DirectX11Shader*>(s);
@@ -326,6 +391,7 @@ namespace And
     m_DeviceContext->IASetIndexBuffer(dx11_ib->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
     m_DeviceContext->DrawIndexed((uint32)dx11_ib->GetNumIndices(), 0, 0);
+    */
   }
 
   ID3D11Device* DirectX11Renderer::GetDevice()

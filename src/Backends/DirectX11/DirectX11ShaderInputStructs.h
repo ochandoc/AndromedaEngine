@@ -6,13 +6,26 @@
 
 namespace And
 {
-	namespace DirectX11InputStruct
+	namespace DirectX11
 	{
-		struct Object
+		namespace VertexShader
 		{
-			glm::mat4 view;
-			glm::mat4 projection;
-			glm::mat4 model;
-		};
+			struct ObjectData
+			{
+				glm::mat4 view;
+				glm::mat4 projection;
+				glm::mat4 model;
+			};
+		}
+		namespace PixelShader
+		{
+			struct ObjectData
+			{
+				glm::vec4 Color;
+				uint32 HasColorTxture;
+				uint8 PADDING[12];
+			};
+		}
 	}
+
 }

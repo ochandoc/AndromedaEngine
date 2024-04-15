@@ -22,7 +22,7 @@ namespace And
     inline std::shared_ptr<DirectX11VertexShader> GetVertexShader() { return m_VertexShader; }
     inline std::shared_ptr<DirectX11PixelShader> GetPixelShader() { return m_PixelShader; }
 
-  private:
+  protected:
     std::shared_ptr<DirectX11VertexShader> m_VertexShader;
     std::shared_ptr<DirectX11PixelShader> m_PixelShader;
   };

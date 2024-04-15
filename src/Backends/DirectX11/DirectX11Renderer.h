@@ -2,14 +2,18 @@
 
 #include "Andromeda/Graphics/Renderer.h"
 
+#include "Andromeda/Graphics/Material.h"
+#include "Andromeda/ECS/Components/MaterialComponent.h"
+
 #include "Backends/DirectX11/DirectX11.h"
-#include "Backends/DirectX11/DriectX11VertexBuffer.h"
+#include "Backends/DirectX11/DirectX11VertexBuffer.h"
 #include "Backends/DirectX11/DirectX11IndexBuffer.h"
 #include "Backends/DirectX11/DirectX11ConstantBuffer.h"
 #include "Backends/DirectX11/DirectX11ShaderInputStructs.h"
 #include "Backends/DirectX11/DirectX11Texture2D.h"
 #include "Backends/DirectX11/DirectX11SkyboxTexture.h"
 #include "Backends/DirectX11/DirectX11Shader.h"
+#include "Backends/DirectX11/DirectX11ShaderLibrary.h"
 
 namespace And
 {
@@ -37,7 +41,7 @@ namespace And
     virtual void set_skybox_texture(std::shared_ptr<SkyboxTexture> texture) override;
 
     void SkyboxPass();
-    void ObjectPass();
+    void ObjectPass(Mesh* mesh, TransformComponent* tr, Material* material);
 
     virtual void Draw(Mesh* mesh, Shader* s) override;
 
@@ -52,16 +56,15 @@ namespace And
     ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
     ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
     ComPtr<ID3D11RasterizerState> m_RasterizerState;
-
     struct {
       bool Enabled;
       std::shared_ptr<Mesh> Mesh;
-      std::shared_ptr<DirectX11Shader> Shader;
       std::shared_ptr<SkyboxTexture> Texture;
       ComPtr<ID3D11DepthStencilState> DepStencilState;
     } m_Skybox;
-    std::shared_ptr<DirectX11ConstantBuffer> m_ObjectConstantBuffer;
-    std::shared_ptr<Shader> m_Shader;
+    DirectX11ShaderLibrary m_ShaderLibrary;
+    std::shared_ptr<DirectX11ConstantBuffer> m_VSObjectData;
+    std::shared_ptr<DirectX11ConstantBuffer> m_PSObjectData;
     std::shared_ptr<DirectX11Texture2D> m_Tex;
     CameraBase* m_Camera;
   };
