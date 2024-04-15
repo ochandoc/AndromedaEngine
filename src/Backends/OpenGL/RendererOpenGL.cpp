@@ -920,6 +920,8 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
        0, 2, 1, 0, 3, 2
   };
 
+  glBlendFunc(GL_ONE, GL_ZERO);
+
   // Shadows directional
   std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
   for (auto [light] : entity.get_components<DirectionalLight>()) {
@@ -984,7 +986,6 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(0, 0, 1920, 1080, 0, 0, 1920, 1080, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-      
 
   }
 

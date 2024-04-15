@@ -90,16 +90,20 @@ int main(int argc, char** argv){
   float pos_x = 0.0f;
   float pos_y = -5.0f;
 
-  And::MeshComponent MC, MC_teapot, MC_teapot2;
+  And::MeshComponent MC, MC_teapot, MC_teapot2, MC_cube;
   MC.MeshOBJ = And::Geometry::load("sponza.obj");
+  MC_cube.MeshOBJ = And::Geometry::load("cube.obj");
   MC_teapot.MeshOBJ = And::Geometry::load("teapot.obj");
   MC_teapot2.MeshOBJ = And::Geometry::load("teapot.obj");
 
   std::shared_ptr<And::Texture> texture_bricks = And::MakeTexture("bricks.jpg");
+  std::shared_ptr<And::Texture> texture_jou = And::MakeTexture("jou_cumple.png");
   MC.MeshOBJ->SetTexture(texture_bricks);
+  MC_cube.MeshOBJ->SetTexture(texture_jou);
 
 
   And::TransformComponent tran;
+  And::TransformComponent tran_cube;
   And::TransformComponent tran_teapot;
   And::TransformComponent tran_teapot2;
   tran.position[0] = 0.0f;
@@ -111,6 +115,16 @@ int main(int argc, char** argv){
   tran.scale[0] = 1.0f;
   tran.scale[1] = 1.0f;
   tran.scale[2] = 1.0f;
+  
+  tran_cube.position[0] = 0.0f;
+  tran_cube.position[1] = 0.0f;
+  tran_cube.position[2] = 0.0f;
+  tran_cube.rotation[0] = 1.0f;
+  tran_cube.rotation[1] = 1.0f;
+  tran_cube.rotation[2] = 1.0f;
+  tran_cube.scale[0] = 3.0f;
+  tran_cube.scale[1] = 3.0f;
+  tran_cube.scale[2] = 3.0f;
   
   tran_teapot.position[0] = 0.0f;
   tran_teapot.position[1] = 5.0f;
@@ -132,8 +146,9 @@ int main(int argc, char** argv){
   tran_teapot2.scale[1] = 2.0f;
   tran_teapot2.scale[2] = 2.0f;
   And::Entity* obj_id = entity_comp.new_entity(MC, tran);
-  And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
-  And::Entity* obj_teapot_id2 = entity_comp.new_entity(MC_teapot2, tran_teapot2);
+  And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube);
+  //And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
+  //And::Entity* obj_teapot_id2 = entity_comp.new_entity(MC_teapot2, tran_teapot2);
  
   float enabled = 1.0f;
   float diffuse_color[3] = {1.0f, 0.0f, 0.0f};
@@ -192,9 +207,10 @@ int main(int argc, char** argv){
   //entity_comp.new_entity(ambient);
 
   And::DirectionalLight directional{};
-  directional.SetDirection(1.0f, 0.0f, 0.0f);
+  directional.SetDirection(1.0f, -1.0f, 0.0f);
   directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
   directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
+  directional.SetSpecularShininess(32.0f);
   directional.SetCastShadows(true);
   directional.SetEnabled(true);
   entity_comp.new_entity(directional);
@@ -233,7 +249,9 @@ int main(int argc, char** argv){
   
   //And::Entity* point_entity2 = entity_comp.new_entity(point2);
 
+  And::Transform* tr_tmp = obj_id->get_component<And::Transform>();
 
+  
 
   float fps_count = 0.0f;
   while (window->is_open()){
@@ -249,7 +267,7 @@ int main(int argc, char** argv){
         //g_renderer->get_camera();
     //cam->SetPosition(0.0f, 0.0f, 0.0f);
    
-
+    //tr_tmp->position[0] = cosf(fps_count) * 5.0f;
     //position2[0] = cosf(fps_count) * 15.0f;
     //position[1] = cosf(fps_count) * 5.0f + 15.0f;
     
