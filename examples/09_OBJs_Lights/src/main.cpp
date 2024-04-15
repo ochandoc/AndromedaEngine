@@ -116,8 +116,8 @@ int main(int argc, char** argv){
   tran.scale[1] = 1.0f;
   tran.scale[2] = 1.0f;
   
-  tran_cube.position[0] = 0.0f;
-  tran_cube.position[1] = 0.0f;
+  tran_cube.position[0] = 50.0f;
+  tran_cube.position[1] = 5.0f;
   tran_cube.position[2] = 0.0f;
   tran_cube.rotation[0] = 1.0f;
   tran_cube.rotation[1] = 1.0f;
@@ -207,7 +207,7 @@ int main(int argc, char** argv){
   //entity_comp.new_entity(ambient);
 
   And::DirectionalLight directional{};
-  directional.SetDirection(1.0f, -1.0f, 0.0f);
+  directional.SetDirection(1.0f, 0.0f, 0.0f);
   directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
   directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
   directional.SetSpecularShininess(32.0f);

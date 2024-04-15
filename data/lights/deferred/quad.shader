@@ -155,13 +155,13 @@ void main(){
   vec3 frag_color = texture(Frag_Color, uv).rgb;
   vec3 frag_normal = texture(Frag_Normal, uv).rgb;
   vec3 frag_position = texture(Frag_Position, uv).rgb;
-  float specular = texture(Frag_Color, uv).a;
 
   vec3 view_direction = normalize(camera_pos - frag_position);
 
   vec3 color = CalculeDirLight(directional_light, frag_normal, view_direction, frag_color);
-  //float shadow = ShadowCalculation(lightSpace);
-  //color = (1.0 - shadow) * color;
-  FragColor = vec4(color, 1.0) * vec4(frag_color, 1.0 );
+  float shadow = ShadowCalculation(lightSpace);
+  color = (1.0 - shadow) * color;
+  
+  FragColor = vec4(color * frag_color, 1.0);
   //FragColor = vec4(frag_color, 1.0);
 }

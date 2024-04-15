@@ -920,7 +920,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
        0, 2, 1, 0, 3, 2
   };
 
-  glBlendFunc(GL_ONE, GL_ZERO);
+  //glBlendFunc(GL_ONE, GL_ZERO);
 
   // Shadows directional
   std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
@@ -934,7 +934,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
         }
     }
     shadow_buffer->Desactivate();
-    glEnable(GL_BLEND);
+    //glEnable(GL_BLEND);
 
 
     // Render Directional
