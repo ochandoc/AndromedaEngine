@@ -67,7 +67,7 @@ namespace And
   std::shared_ptr<Texture> MakeTexture(const std::string& Path);
 
   /**  You have to provide 6 paths to the function one per each face 
-  *    Right, Left, Top, Bottom, back, Front
+  *    Right, Left, Top, Bottom, Back, Front
   */
   std::shared_ptr<SkyboxTexture> MakeSkyboxTexture(const std::vector<std::string>& paths);
 }

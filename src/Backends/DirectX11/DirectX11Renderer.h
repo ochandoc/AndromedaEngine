@@ -61,6 +61,8 @@ namespace And
       ComPtr<ID3D11DepthStencilState> DepStencilState;
     } m_Skybox;
     std::shared_ptr<DirectX11ConstantBuffer> m_ObjectConstantBuffer;
+    std::shared_ptr<Shader> m_Shader;
+    std::shared_ptr<DirectX11Texture2D> m_Tex;
     CameraBase* m_Camera;
   };
 }

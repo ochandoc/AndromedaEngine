@@ -106,8 +106,8 @@ namespace And
 
     D3D11_RASTERIZER_DESC RasterizerStateDesc = {
       .FillMode = D3D11_FILL_SOLID,
-      .CullMode = D3D11_CULL_NONE,
-      .FrontCounterClockwise = false,
+      .CullMode = D3D11_CULL_BACK,
+      .FrontCounterClockwise = true,
       .DepthBias = D3D11_DEFAULT_DEPTH_BIAS,
       .DepthBiasClamp = D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
       .SlopeScaledDepthBias = D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS,
@@ -314,12 +314,10 @@ namespace And
     m_DeviceContext->VSSetConstantBuffers(0, 1, VSConstantBuffers);
     
     m_DeviceContext->PSSetShader(dx11_s->GetPixelShader()->GetShader(), NULL, 0);
-    ID3D11ShaderResourceView* PSViews[] = { m_CubeMapTex->GetView() };
+    ID3D11ShaderResourceView* PSViews[] = { m_Tex->GetView() };
     m_DeviceContext->PSSetShaderResources(0, 1, PSViews);
-    ID3D11SamplerState* PSSamplers[] = { m_CubeMapTex->GetSampler() };
+    ID3D11SamplerState* PSSamplers[] = { m_Tex->GetSampler() };
     m_DeviceContext->PSSetSamplers(0, 1, PSSamplers);
-
-    m_DeviceContext->OMSetDepthStencilState(m_DepthStencilState.Get(), 0);
 
     ID3D11Buffer* VertexBuffers[] = { dx11_vb->GetBuffer(), };
     uint32 stride = sizeof(Vertex);
