@@ -45,11 +45,10 @@ void main(){
 
 layout(location = 0) out vec4 FragColor;
 
-uniform sampler2D Position;
+uniform sampler2D Frag_Position;
 uniform sampler2D Frag_Normal;
 uniform sampler2D Frag_Color;
-
-//Suniform sampler2D texShadow;
+uniform sampler2D texShadow;
 
 in vec3 blend_color;
 in vec3 s_normal;
@@ -81,7 +80,7 @@ layout (std140, binding = 3) uniform UniformDirectional{
   DirectionalLight directional_light;
 };
 
-/*
+
 float ShadowCalculation(vec4 fragPosLightSpace){
 
   // perform perspective divide
@@ -127,7 +126,7 @@ float ShadowCalculation(vec4 fragPosLightSpace){
   return shadow;
 }
 
-*/
+
 vec3 CalculeDirLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 color_base) {
 
   //vec3 dir = vec3(0.5, 0.5, 0.0);  
@@ -144,17 +143,17 @@ vec3 CalculeDirLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 col
   float spec = pow(max(dot(normalize(viewDir), normalize(reflectDir)), 0.0), light.specular_shininess);
   vec3 specular = light.specular_strength * spec * light.specular_color * color_base.xyz;
 
-  //return (diffuse + specular * light.active);
-  return (diffuse * light.enabled);
+  return (diffuse + specular * light.enabled);
+  //return (diffuse * light.enabled);
 }
 
 
 void main(){
 
   // Get textures
-  vec3 frag_color = texture(Frag_Color, uv).rgb;
+  vec4 frag_color = texture(Frag_Color, uv);
   vec3 frag_normal = texture(Frag_Normal, uv).rgb;
-  vec3 frag_position = texture(Position, uv).rgb;
+  vec3 frag_position = texture(Frag_Position, uv).rgb;
 
   vec3 view_direction = normalize(camera_pos - frag_position);
   float ambient_strength = 0.01;
@@ -162,15 +161,17 @@ void main(){
   ambient_color = ambient_strength * ambient_color;
   vec3 color = ambient_color;
 
-  //vec3 color_base = vec3(0.5, 0.5, 0.5);
+  vec3 color_base = vec3(0.5, 0.5, 0.5);
   //vec3 color_base = frag_color;
 
-  //float shadow = ShadowCalculation(lightSpace);
-  color = CalculeDirLight(directional_light, frag_normal, view_direction, frag_color);
+  color = CalculeDirLight(directional_light, frag_normal, view_direction, color_base);
+  float shadow = ShadowCalculation(lightSpace);
   //color = (1.0 - shadow) * color;
 
   //vec4 tex_color = texture(texMaterial, uv);
-  FragColor = vec4(color, 1.0);
+  FragColor = vec4(color, 1.0) * frag_color;
+  //FragColor = vec4(shadow,shadow,shadow,1.0);
+  //FragColor = texture(Frag_Color, uv);
   //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 
 

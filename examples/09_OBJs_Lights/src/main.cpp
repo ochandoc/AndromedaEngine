@@ -163,7 +163,7 @@ int main(int argc, char** argv){
   spot.SetOuterCuttOff(outer_cut_off);
   spot.SetCastShadows(true);
   spot.SetEnabled(true);
-  entity_comp.new_entity(spot);
+  //entity_comp.new_entity(spot);
 
   position[1] += 10.0f;
   diffuse_color[0] = 0.0f;
@@ -183,13 +183,13 @@ int main(int argc, char** argv){
   spot2.SetOuterCuttOff(outer_cut_off);
   spot2.SetCastShadows(true);
   spot2.SetEnabled(true);
-  And::Entity* spot2_entity = entity_comp.new_entity(spot2);
+  //And::Entity* spot2_entity = entity_comp.new_entity(spot2);
     
   enabled = 1.0f;
 
   And::AmbientLight ambient{};
   ambient.SetDiffuseColor(0.1f, 0.1f, 0.1f);
-  entity_comp.new_entity(ambient);
+  //entity_comp.new_entity(ambient);
 
   And::DirectionalLight directional{};
   directional.SetDirection(1.0f, 0.0f, 0.0f);
@@ -213,7 +213,7 @@ int main(int argc, char** argv){
   point.SetLinearAtt(linear_att);
   point.SetConstantAtt(constant_att);
   point.SetQuadraticAtt(quadratic_att);
-  And::Entity* point_entity = entity_comp.new_entity(point);
+  //And::Entity* point_entity = entity_comp.new_entity(point);
   
   position2[0] += 40.0f;
   diffuse_color[2] = 0.0f;
@@ -231,7 +231,7 @@ int main(int argc, char** argv){
   point2.SetConstantAtt(constant_att);
   point2.SetQuadraticAtt(quadratic_att);
   
-  And::Entity* point_entity2 = entity_comp.new_entity(point2);
+  //And::Entity* point_entity2 = entity_comp.new_entity(point2);
 
 
 
@@ -261,6 +261,7 @@ int main(int argc, char** argv){
     //spot2_entity->get_component<And::SpotLight>()->SetPosition(position);
     
 
+    
     //g_renderer->draw_forward(entity_comp);
     g_renderer->draw_deferred(entity_comp);
     g_renderer->end_frame();

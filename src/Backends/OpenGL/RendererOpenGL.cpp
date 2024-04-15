@@ -948,7 +948,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
     // posicion, normal, color
     tmp->Use();
 
-    tmp->SetTexture("Position", 0);
+    tmp->SetTexture("Frag_Position", 0);
     position_tex->Activate(0);
 
     tmp->SetTexture("Frag_Normal", 1);
@@ -957,8 +957,8 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
     tmp->SetTexture("Frag_Color", 2);
     color_tex->Activate(2);
 
-    //tmp->SetTexture("texShadow", 3);
-    //tex_shadow->Activate(3);
+    tmp->SetTexture("texShadow", 3);
+    tex_shadow->Activate(3);
 
     glBindVertexArray(m_quad_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
