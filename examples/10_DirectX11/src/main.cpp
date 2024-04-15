@@ -53,6 +53,10 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
+  And::EntityComponentSystem ecs;
+  ecs.add_component_class<And::MeshComponent>();
+  ecs.add_component_class<And::TransformComponent>();
+
   std::shared_ptr<And::Shader> shader = And::MakeShader("shader.hlsl");
 
   std::vector<uint32> indices = { 0, 2, 1, 0, 3, 2 };
@@ -65,8 +69,38 @@ int main(int argc, char** argv){
 
   And::RawMesh cube = And::RawMesh::CreateCube();
 
-  std::shared_ptr<And::VertexBuffer> vb = And::VertexBuffer::CreateShare(cube.GetVertices());
-  std::shared_ptr<And::IndexBuffer> ib = And::IndexBuffer::CreateShared(cube.GetIndices());
+  std::shared_ptr<And::Mesh> cube_mesh = std::make_shared<And::Mesh>(cube);
+
+  std::vector<std::string> SkyboxPaths = {
+  "skybox/right.jpg",
+  "skybox/left.jpg",
+  "skybox/top.jpg",
+  "skybox/bottom.jpg",
+  "skybox/back.jpg",
+  "skybox/front.jpg",
+  };
+  std::shared_ptr<And::SkyboxTexture> SkyboxTexture = And::MakeSkyboxTexture(SkyboxPaths);
+
+  g_renderer->enable_skybox(true);
+  g_renderer->set_skybox_texture(SkyboxTexture);
+
+  And::MeshComponent CubeMeshComponent;
+  CubeMeshComponent.SetMesh(cube_mesh);
+
+  And::TransformComponent cube_transform;
+  cube_transform.position[0] = 3.0f;
+  cube_transform.position[1] = 5.0f;
+  cube_transform.position[2] = -5.0f;
+
+  cube_transform.rotation[0] = 0.0f;
+  cube_transform.rotation[1] = 0.0f;
+  cube_transform.rotation[2] = 0.0f;
+
+  cube_transform.scale[0] = 1.0f;
+  cube_transform.scale[1] = 1.0f;
+  cube_transform.scale[2] = 1.0f;
+
+  And::Entity* ett = ecs.new_entity(CubeMeshComponent, cube_transform);
 
   And::FlyCamera fly_cam{ *window };
   fly_cam.SetPosition(3.0f, 7.0f, 5.0f);
@@ -86,8 +120,9 @@ int main(int argc, char** argv){
     fly_cam.ProcessInput();
     g_renderer->new_frame();
     
-    g_renderer->Draw(vb.get(), ib.get(), shader.get());
+    //g_renderer->Draw(cube_mesh.get(), shader.get());
 
+    g_renderer->draw_forward(ecs);
     g_renderer->end_frame();
     window->swap_buffers();
   }

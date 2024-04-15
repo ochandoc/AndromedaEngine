@@ -106,8 +106,8 @@ namespace And
 
     D3D11_RASTERIZER_DESC RasterizerStateDesc = {
       .FillMode = D3D11_FILL_SOLID,
-      .CullMode = D3D11_CULL_BACK,
-      .FrontCounterClockwise = true,
+      .CullMode = D3D11_CULL_NONE,
+      .FrontCounterClockwise = false,
       .DepthBias = D3D11_DEFAULT_DEPTH_BIAS,
       .DepthBiasClamp = D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
       .SlopeScaledDepthBias = D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS,
@@ -119,6 +119,22 @@ namespace And
 
     ComPtr<ID3D11RasterizerState> RasterizerState;
     result = device->CreateRasterizerState(&RasterizerStateDesc, RasterizerState.GetAddressOf());
+
+    assert(SUCCEEDED(result));
+
+    D3D11_DEPTH_STENCIL_DESC SkyboxDSDesc = {
+      .DepthEnable = true,
+      .DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO,
+      .DepthFunc = D3D11_COMPARISON_LESS_EQUAL,
+      .StencilEnable = false,
+      .StencilReadMask = 0,
+      .StencilWriteMask = 0,
+      .FrontFace = {},
+      .BackFace = {}
+    };
+
+    ComPtr<ID3D11DepthStencilState> SkyboxDepthStencilState;
+    result = device->CreateDepthStencilState(&SkyboxDSDesc, SkyboxDepthStencilState.GetAddressOf());
 
     assert(SUCCEEDED(result));
 
@@ -140,7 +156,10 @@ namespace And
 
     renderer->set_viewport(0, 0, window.get_width(), window.get_height());
 
-    renderer->m_Tex = DirectX11Texture2D::CreateShared("jou.jpg");
+    renderer->m_Skybox.Shader = DirectX11Shader::CreateShared("skybox/cubemap.hlsl");
+    renderer->m_Skybox.DepStencilState = SkyboxDepthStencilState;
+    renderer->m_Skybox.Mesh = std::make_shared<Mesh>(RawMesh::CreateSkybox());
+    renderer->m_Skybox.Enabled = false;
 
     return renderer;
   }
@@ -186,18 +205,86 @@ namespace And
 
   void DirectX11Renderer::draw_forward(EntityComponentSystem& ecs)
   {
+    SkyboxPass();
+    return;
+
+    for (auto& [mesh_component, transform] : ecs.get_components<MeshComponent, TransformComponent>())
+    {
+      Draw(mesh_component->GetMesh().get(), m_Shader.get());
+    }
+
   }
 
-  void DirectX11Renderer::Draw(VertexBuffer* vb, IndexBuffer* ib, Shader* s)
+  void DirectX11Renderer::SkyboxPass()
   {
-    DirectX11VertexBuffer* dx11_vb = static_cast<DirectX11VertexBuffer*>(vb);
-    DirectX11IndexBuffer* dx11_ib = static_cast<DirectX11IndexBuffer*>(ib);
+    if (!m_Skybox.Enabled) return;
+    if (!m_Skybox.Texture) return;
+
+    DirectX11SkyboxTexture* SkyboxTexture = static_cast<DirectX11SkyboxTexture*>(m_Skybox.Texture.get());
+    DirectX11VertexBuffer* VB = static_cast<DirectX11VertexBuffer*>(m_Skybox.Mesh->GetVertexBuffer());
+    DirectX11IndexBuffer* IB = static_cast<DirectX11IndexBuffer*>(m_Skybox.Mesh->GetIndexBuffer());
+
+
+    /**  Upload object data into the constant buffer */
+    DirectX11InputStruct::Object ObjectInput;
+    ObjectInput.model = glm::mat4();
+    ObjectInput.projection = glm::transpose(glm::make_mat4(m_Camera->GetProjectionMatrix()));
+    ObjectInput.view = glm::transpose(glm::make_mat4(m_Camera->GetViewMatrix()));
+
+    D3D11_MAPPED_SUBRESOURCE ObjectBuffData;
+    HRESULT result = m_DeviceContext->Map(m_ObjectConstantBuffer->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &ObjectBuffData);
+
+    memcpy(ObjectBuffData.pData, (void*)&ObjectInput, sizeof(DirectX11InputStruct::Object));
+
+    m_DeviceContext->Unmap(m_ObjectConstantBuffer->GetBuffer(), 0);
+
+    /**  Setup draw info */
+
+    m_DeviceContext->IASetInputLayout(m_Skybox.Shader->GetVertexShader()->GetInputLayout());
+    m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    /**  Vertex Shader */
+    m_DeviceContext->VSSetShader(m_Skybox.Shader->GetVertexShader()->GetShader(), nullptr, 0);
+    ID3D11Buffer* VSConstantBuffers[] = { m_ObjectConstantBuffer->GetBuffer() };
+    m_DeviceContext->VSSetConstantBuffers(0, 1, VSConstantBuffers);
+
+    /**  Pixel Shader */
+    m_DeviceContext->PSSetShader(m_Skybox.Shader->GetPixelShader()->GetShader(), nullptr, 0);
+    ID3D11ShaderResourceView* PSViews[] = { SkyboxTexture->GetView() };
+    m_DeviceContext->PSSetShaderResources(0, 1, PSViews);
+    ID3D11SamplerState* PSSamplerStates[] = { SkyboxTexture->GetSampler() };
+
+    /** Depth Stencil State */
+    m_DeviceContext->OMSetDepthStencilState(m_Skybox.DepStencilState.Get(), 0);
+
+    ID3D11Buffer* VertexBuffers[] = { VB->GetBuffer(), };
+    uint32 stride = sizeof(Vertex);
+    uint32 offset = 0;
+    m_DeviceContext->IASetVertexBuffers(0, 1, VertexBuffers, &stride, &offset);
+    m_DeviceContext->IASetIndexBuffer(IB->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
+
+    m_DeviceContext->DrawIndexed((uint32)IB->GetNumIndices(), 0, 0);
+  }
+
+  void DirectX11Renderer::enable_skybox(bool value)
+  {
+    m_Skybox.Enabled = value;
+  }
+
+  void DirectX11Renderer::set_skybox_texture(std::shared_ptr<SkyboxTexture> texture)
+  {
+    m_Skybox.Texture = texture;
+  }
+
+  void DirectX11Renderer::Draw(Mesh* mesh, Shader* s)
+  {
+    DirectX11VertexBuffer* dx11_vb = static_cast<DirectX11VertexBuffer*>(mesh->GetVertexBuffer());
+    DirectX11IndexBuffer* dx11_ib = static_cast<DirectX11IndexBuffer*>(mesh->GetIndexBuffer());
     DirectX11Shader* dx11_s = static_cast<DirectX11Shader*>(s);
 
     glm::vec3 position(3.0f, 5.0f, -5.0f);
     glm::vec3 rotation(0.0f, 0.0f, 0.0f);
     glm::vec3 scale(1.0f, 1.0f, 1.0f);
-
 
     glm::mat4 model = glm::identity<glm::mat4>();
     model = glm::translate(model, position);
@@ -225,12 +312,14 @@ namespace And
 
     ID3D11Buffer* VSConstantBuffers[] = { m_ObjectConstantBuffer->GetBuffer() };
     m_DeviceContext->VSSetConstantBuffers(0, 1, VSConstantBuffers);
-
+    
     m_DeviceContext->PSSetShader(dx11_s->GetPixelShader()->GetShader(), NULL, 0);
-    ID3D11ShaderResourceView* PSViews[] = { m_Tex->GetView() };
+    ID3D11ShaderResourceView* PSViews[] = { m_CubeMapTex->GetView() };
     m_DeviceContext->PSSetShaderResources(0, 1, PSViews);
-    ID3D11SamplerState* PSSamplers[] = { m_Tex->GetSampler() };
+    ID3D11SamplerState* PSSamplers[] = { m_CubeMapTex->GetSampler() };
     m_DeviceContext->PSSetSamplers(0, 1, PSSamplers);
+
+    m_DeviceContext->OMSetDepthStencilState(m_DepthStencilState.Get(), 0);
 
     ID3D11Buffer* VertexBuffers[] = { dx11_vb->GetBuffer(), };
     uint32 stride = sizeof(Vertex);

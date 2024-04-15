@@ -28,6 +28,7 @@ namespace And
     inline const std::vector<uint32>& GetIndices() const { return m_Indices; }
 
     static RawMesh CreateCube();
+    static RawMesh CreateSkybox();
 
   private:
     std::vector<Vertex> m_Vertices;

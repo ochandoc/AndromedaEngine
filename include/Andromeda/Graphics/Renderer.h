@@ -14,6 +14,7 @@
 
 #include "Andromeda/Graphics/VertexBuffer.h"
 #include "Andromeda/Graphics/IndexBuffer.h"
+#include "Andromeda/Graphics/Mesh.h"
 
 namespace And
 {
@@ -70,7 +71,10 @@ namespace And
 
     virtual void draw_forward(EntityComponentSystem& entity) = 0;
 
-    virtual void Draw(VertexBuffer* vb, IndexBuffer* ib, Shader* s) {}
+    virtual void enable_skybox(bool value) {}
+    virtual void set_skybox_texture(std::shared_ptr<SkyboxTexture> texture) {}
+
+    virtual void Draw(Mesh* mesh, Shader* s) {}
 
   };
 

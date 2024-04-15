@@ -186,4 +186,153 @@ namespace And
 
     return rm;
   }
+
+  RawMesh RawMesh::CreateSkybox()
+  {
+    RawMesh rm;
+    rm.m_Vertices = {
+      {
+        -0.5, 0.5, -0.5,           // v top left front
+        0.0f, 0.0f, -1.0f,         // vn
+        0.0f, 1.0f,                // vt
+      },
+      {
+        -0.5, 0.5, -0.5,           // v top left front
+        -1.0f, 0.0f, 0.0f,         // vn
+        1.0f, 1.0f,                // vt
+      },
+      {
+        -0.5, 0.5, -0.5,           // v top left front
+        0.0f, 1.0f, 0.0f,          // vn
+        1.0f, 1.0f,                // vt
+      },
+      {
+        0.5, 0.5, -0.5,            // v top right front
+        0.0f, 0.0f, -1.0f,         // vn
+        1.0f, 1.0f,                // vt
+      },
+      {
+        0.5, 0.5, -0.5,            // v top right front
+        1.0f, 0.0f, 0.0f,          // vn
+        0.0f, 1.0f,                // vt
+      },
+      {
+        0.5, 0.5, -0.5,            // v top right front
+        0.0f, 1.0f, 0.0f,          // vn
+        0.0f, 1.0f,                // vt
+      },
+      {
+        -0.5, -0.5, -0.5,          // v down left front
+        0.0f, 0.0f, -1.0f,         // vn
+        0.0f, 0.0f,                // vt
+      },
+      {
+        -0.5, -0.5, -0.5,          // v down left front
+        -1.0f, 0.0f, 0.0f,         // vn
+        1.0f, 0.0f,                // vt
+      },
+      {
+        -0.5, -0.5, -0.5,          // v down left front
+        0.0f, -1.0f, 0.0f,         // vn
+        1.0f, 0.0f,                // vt
+      },
+      {
+        0.5, -0.5, -0.5,           // v down right front
+        0.0f, 0.0f, -1.0f,         // vn
+        1.0f, 0.0f,                // vt
+      },
+      {
+        0.5, -0.5, -0.5,           // v down right front
+        1.0f, 0.0f, 0.0f,          // vn
+        0.0f, 0.0f,                // vt
+      },
+      {
+        0.5, -0.5, -0.5,           // v down right front
+        0.0f, -1.0f, 0.0f,         // vn
+        0.0f, 0.0f,                // vt
+      },
+      {
+        -0.5, 0.5, 0.5,            // v top left back
+        -1.0f, 0.0f, 0.0f,         // vn
+        0.0f, 1.0f,                // vt
+      },
+      {
+        -0.5, 0.5, 0.5,            // v top left back
+        0.0f, 1.0f, 0.0f,          // vn
+        1.0f, 0.0f,                // vt
+      },
+      {
+        -0.5, 0.5, 0.5,            // v top left back
+        0.0f, 0.0f, 1.0f,          // vn
+        1.0f, 1.0f,                // vt
+      },
+      {
+        0.5, 0.5, 0.5,             // v top right back
+        1.0f, 0.0f, 0.0f,          // vn
+        1.0f, 1.0f,                // vt
+      },
+      {
+        0.5, 0.5, 0.5,             // v top right back
+        0.0f, 1.0f, 0.0f,          // vn
+        0.0f, 0.0f,                // vt
+      },
+      {
+        0.5, 0.5, 0.5,             // v top right back
+        0.0f, 0.0f, 1.0f,          // vn
+        0.0f, 1.0f,                // vt
+      },
+      {
+        -0.5, -0.5, 0.5,           // v down left back
+        -1.0f, 0.0f, 0.0f,         // vn
+        0.0f, 0.0f,                // vt
+      },
+      {
+        -0.5, -0.5, 0.5,           // v down left back
+        0.0f, -1.0f, 0.0f,         // vn
+        1.0f, 1.0f,                // vt
+      },
+      {
+        -0.5, -0.5, 0.5,           // v down left back
+        0.0f, 0.0f, 1.0f,          // vn
+        1.0f, 0.0f,                // vt
+      },
+      {
+        0.5, -0.5, 0.5,            // v down right back
+        1.0f, 0.0f, 0.0f,          // vn
+        1.0f, 0.0f,                // vt
+      },
+      {
+        0.5, -0.5, 0.5,            // v down right back
+        0.0f, -1.0f, 0.0f,         // vn
+        0.0f, 1.0f,                // vt
+      },
+      {
+        0.5, -0.5, 0.5,            // v down right back
+        0.0f, 0.0f, 1.0f,          // vn
+        0.0f, 0.0f                 // vt
+      },
+    };
+
+    rm.m_Indices = {
+      0, 6, 3,                    // f front
+      6, 9, 3,
+
+      3 + 1, 9 + 1, 15,          // f right
+      9 + 1, 21, 15,
+
+      12, 18, 0 + 1,              // f left
+      18, 6 + 1, 0 + 1,
+
+      12 + 1, 0 + 2, 15 + 1,      // f top
+      0 + 2, 3 + 2, 15 + 1,
+
+      6 + 2, 18 + 1, 21 + 1,      // f down 
+      9 + 2, 6 + 2, 21 + 1,
+
+      15 + 2, 21 + 2, 12 + 2,      // f back
+      21 + 2, 18 + 2, 12 + 2
+    };
+
+    return rm;
+  }
 }
