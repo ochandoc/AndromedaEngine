@@ -142,6 +142,22 @@ namespace And
 
     assert(SUCCEEDED(result));
 
+    D3D11_DEPTH_STENCIL_DESC DSDesc = {
+      .DepthEnable = true,
+      .DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO,
+      .DepthFunc = D3D11_COMPARISON_LESS,
+      .StencilEnable = false,
+      .StencilReadMask = 0,
+      .StencilWriteMask = 0,
+      .FrontFace = {},
+      .BackFace = {}
+    };
+
+    ComPtr<ID3D11DepthStencilState> DepthStencilState;
+    result = device->CreateDepthStencilState(&DSDesc, DepthStencilState.GetAddressOf());
+
+    assert(SUCCEEDED(result));
+
     s_Device = device.Get();
     s_DeviceContext = deviceContext.Get();
 
@@ -326,6 +342,9 @@ namespace And
     m_DeviceContext->PSSetShaderResources(0, 1, PSViews);
     ID3D11SamplerState* PSSamplers[] = { (ColorTexture) ? ColorTexture->GetSampler() : nullptr };
     m_DeviceContext->PSSetSamplers(0, 1, PSSamplers);
+
+    /**  Depth stencil state */
+    m_DeviceContext->OMSetDepthStencilState(m_DepthStencil.Get(), 0);
 
     m_DeviceContext->DrawIndexed((uint32)IB->GetNumIndices(), 0, 0);
   }

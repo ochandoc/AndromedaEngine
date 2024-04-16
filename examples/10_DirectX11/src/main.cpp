@@ -87,26 +87,30 @@ int main(int argc, char** argv){
   g_renderer->enable_skybox(true);
   g_renderer->set_skybox_texture(SkyboxTexture);
 
-  And::MeshComponent CubeMeshComponent;
-  CubeMeshComponent.SetMesh(cube_mesh);
+  for (int i = 0; i < 10; ++i)
+  {
+    And::MeshComponent CubeMeshComponent;
+    CubeMeshComponent.SetMesh(cube_mesh);
 
-  And::MaterialComponent MaterialComponent;
-  MaterialComponent.GetMaterial()->SetColorTexture(JouTexture);
+    And::MaterialComponent MaterialComponent;
+    MaterialComponent.GetMaterial()->SetColorTexture(JouTexture);
 
-  And::TransformComponent cube_transform;
-  cube_transform.position[0] = 3.0f;
-  cube_transform.position[1] = 5.0f;
-  cube_transform.position[2] = -5.0f;
+    And::TransformComponent cube_transform;
+    cube_transform.position[0] = 3.0f * (float)i;
+    cube_transform.position[1] = 5.0f;
+    cube_transform.position[2] = -5.0f;
 
-  cube_transform.rotation[0] = 0.0f;
-  cube_transform.rotation[1] = 0.0f;
-  cube_transform.rotation[2] = 0.0f;
+    cube_transform.rotation[0] = 0.0f;
+    cube_transform.rotation[1] = 0.0f;
+    cube_transform.rotation[2] = 0.0f;
 
-  cube_transform.scale[0] = 1.0f;
-  cube_transform.scale[1] = 1.0f;
-  cube_transform.scale[2] = 1.0f;
+    cube_transform.scale[0] = 1.0f;
+    cube_transform.scale[1] = 1.0f;
+    cube_transform.scale[2] = 1.0f;
 
-  And::Entity* ett = ecs.new_entity(CubeMeshComponent, cube_transform, MaterialComponent);
+    And::Entity* ett = ecs.new_entity(CubeMeshComponent, cube_transform, MaterialComponent);
+  }
+
 
   And::FlyCamera fly_cam{ *window };
   fly_cam.SetPosition(3.0f, 7.0f, 5.0f);

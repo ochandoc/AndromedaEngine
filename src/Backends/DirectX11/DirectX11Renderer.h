@@ -62,6 +62,7 @@ namespace And
       std::shared_ptr<SkyboxTexture> Texture;
       ComPtr<ID3D11DepthStencilState> DepStencilState;
     } m_Skybox;
+    ComPtr<ID3D11DepthStencilState> m_DepthStencil;
     DirectX11ShaderLibrary m_ShaderLibrary;
     std::shared_ptr<DirectX11ConstantBuffer> m_VSObjectData;
     std::shared_ptr<DirectX11ConstantBuffer> m_PSObjectData;
