@@ -22,8 +22,9 @@ namespace And
     m_ClearColor[2] = 0.0f;
     m_ClearColor[3] = 1.0f;
 
-    m_PSObjectData = DirectX11ConstantBuffer::CreateShared(sizeof(DirectX11::VertexShader::ObjectData));
     m_VSObjectData = DirectX11ConstantBuffer::CreateShared(sizeof(DirectX11::VertexShader::ObjectData));
+    m_PSObjectData = DirectX11ConstantBuffer::CreateShared(sizeof(DirectX11::VertexShader::ObjectData));
+    m_PSLightData = DirectX11ConstantBuffer::CreateShared(sizeof(DirectX11::PixelShader::LightData));
   }
 
   DirectX11Renderer::~DirectX11Renderer() {}
@@ -223,10 +224,29 @@ namespace And
 
     SkyboxPass();
 
-    for (auto& [mesh_component, transform, matComp] : ecs.get_components<MeshComponent, TransformComponent, MaterialComponent>())
+    for (auto& [light] : ecs.get_components<DirectionalLight>())
     {
-      ObjectPass(mesh_component->GetMesh().get(), transform, matComp->GetMaterial().get());
+      for (auto& [mesh_component, transform, matComp] : ecs.get_components<MeshComponent, TransformComponent, MaterialComponent>())
+      {
+        /**  Upload pixel shader light buffer */
+        {
+          DirectX11::PixelShader::LightData PSLightData;
+          memset(&PSLightData, 0, sizeof(PSLightData));
+          PSLightData.Direction = glm::make_vec3(light->GetDirection());
+          PSLightData.DiffuseColor = glm::make_vec3(light->GetDiffuseColor());
+          PSLightData.SpecularStrength = 0.5f;
+          PSLightData.SpecularShininess = 32.0f;
+
+          D3D11_MAPPED_SUBRESOURCE PSLightMappedData;
+          m_DeviceContext->Map(m_PSLightData->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &PSLightMappedData);
+          memcpy(PSLightMappedData.pData, &PSLightData, sizeof(DirectX11::PixelShader::LightData));
+          m_DeviceContext->Unmap(m_PSLightData->GetBuffer(), 0);
+        }
+
+        ObjectPass(mesh_component->GetMesh().get(), transform, matComp->GetMaterial().get(), "Light.Directional");
+      }
     }
+
   }
 
   void DirectX11Renderer::SkyboxPass()
@@ -250,7 +270,6 @@ namespace And
     m_DeviceContext->Unmap(m_VSObjectData->GetBuffer(), 0);
 
     /**  Setup draw info */
-
     m_DeviceContext->IASetInputLayout(shader->GetVertexShader()->GetInputLayout());
     m_DeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -277,12 +296,15 @@ namespace And
     m_DeviceContext->DrawIndexed((uint32)IB->GetNumIndices(), 0, 0);
   }
 
-  void DirectX11Renderer::ObjectPass(Mesh* mesh, TransformComponent* tr, Material* material)
+  void DirectX11Renderer::ObjectPass(Mesh* mesh, TransformComponent* tr, Material* material, const std::string& shader)
   {
     DirectX11VertexBuffer* VB = static_cast<DirectX11VertexBuffer*>(mesh->GetVertexBuffer());
     DirectX11IndexBuffer* IB = static_cast<DirectX11IndexBuffer*>(mesh->GetIndexBuffer());
     DirectX11Texture2D* ColorTexture = static_cast<DirectX11Texture2D*>(material->GetColorTexture().get());
-    std::shared_ptr<DirectX11Shader> Shader = m_ShaderLibrary.GetForwardShader("Color");
+    std::shared_ptr<DirectX11Shader> Shader = m_ShaderLibrary.GetForwardShader(shader);
+
+    m_VSConstantBuffers.clear();
+    m_PSConstantBuffers.clear();
 
     /**  Upload vertex shader object data */
     {
@@ -306,6 +328,8 @@ namespace And
       m_DeviceContext->Map(m_VSObjectData->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &VSObjectMappedData);
       memcpy(VSObjectMappedData.pData, &VSObjectData, sizeof(VSObjectData));
       m_DeviceContext->Unmap(m_VSObjectData->GetBuffer(), 0);
+
+      m_VSConstantBuffers.push_back(m_VSObjectData->GetBuffer());
     }
 
     /**  Upload pixel shader object buffer */
@@ -318,6 +342,14 @@ namespace And
       m_DeviceContext->Map(m_PSObjectData->GetBuffer(), 0, D3D11_MAP_WRITE_DISCARD, 0, &PSObjectMappedData);
       memcpy(PSObjectMappedData.pData, &PSObjectData, sizeof(PSObjectData));
       m_DeviceContext->Unmap(m_PSObjectData->GetBuffer(), 0);
+
+      m_PSConstantBuffers.push_back(m_PSObjectData->GetBuffer());
+    }
+
+    /**  Upload pixel shader buffer */
+    {
+      if (shader.find("Light") != std::string::npos)
+        m_PSConstantBuffers.push_back(m_PSLightData->GetBuffer());
     }
 
     /**  Configure input assembly */
@@ -331,13 +363,13 @@ namespace And
 
     /**  Configure vertex shader stage */
     m_DeviceContext->VSSetShader(Shader->GetVertexShader()->GetShader(), nullptr, 0);
-    ID3D11Buffer* VSConstantBuffers[] = { m_VSObjectData->GetBuffer() };
-    m_DeviceContext->VSSetConstantBuffers(0, 1, VSConstantBuffers);
+    //ID3D11Buffer* VSConstantBuffers[] = { m_VSObjectData->GetBuffer() };
+    m_DeviceContext->VSSetConstantBuffers(0, (uint32)m_VSConstantBuffers.size(), m_VSConstantBuffers.data());
 
     /**  Configure pixel shader stage */
     m_DeviceContext->PSSetShader(Shader->GetPixelShader()->GetShader(), nullptr, 0);
-    ID3D11Buffer* PSConstantBuffers[] = { m_PSObjectData->GetBuffer() };
-    m_DeviceContext->PSSetConstantBuffers(0, 1, PSConstantBuffers);
+    //ID3D11Buffer* PSConstantBuffers[] = { m_PSObjectData->GetBuffer() };
+    m_DeviceContext->PSSetConstantBuffers(0, (uint32)m_PSConstantBuffers.size(), m_PSConstantBuffers.data());
     ID3D11ShaderResourceView* PSViews[] = { (ColorTexture) ? ColorTexture->GetView() : nullptr };
     m_DeviceContext->PSSetShaderResources(0, 1, PSViews);
     ID3D11SamplerState* PSSamplers[] = { (ColorTexture) ? ColorTexture->GetSampler() : nullptr };

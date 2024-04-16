@@ -82,4 +82,9 @@ namespace And
   {
     m_ColorTexture = tex;
   }
+
+  void Material::SetNormalTexture(std::shared_ptr<Texture> tex)
+  {
+    m_NormalTexture = tex;
+  }
 }

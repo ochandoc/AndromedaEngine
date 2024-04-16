@@ -58,6 +58,7 @@ int main(int argc, char** argv){
   ecs.add_component_class<And::MeshComponent>();
   ecs.add_component_class<And::TransformComponent>();
   ecs.add_component_class<And::MaterialComponent>();
+  ecs.add_component_class<And::DirectionalLight>();
 
   std::shared_ptr<And::Shader> shader = And::MakeShader("shader.hlsl");
 
@@ -87,6 +88,14 @@ int main(int argc, char** argv){
   g_renderer->enable_skybox(true);
   g_renderer->set_skybox_texture(SkyboxTexture);
 
+  And::DirectionalLight directional{};
+  directional.SetDirection(1.0f, 0.0f, 0.0f);
+  directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+  directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
+  directional.SetCastShadows(true);
+  directional.SetEnabled(true);
+  ecs.new_entity(directional);
+
   for (int i = 0; i < 10; ++i)
   {
     And::MeshComponent CubeMeshComponent;
@@ -94,6 +103,7 @@ int main(int argc, char** argv){
 
     And::MaterialComponent MaterialComponent;
     MaterialComponent.GetMaterial()->SetColorTexture(JouTexture);
+    MaterialComponent.GetMaterial()->SetColor(1.0f, 0.0f, 0.0f, 1.0f);
 
     And::TransformComponent cube_transform;
     cube_transform.position[0] = 3.0f * (float)i;

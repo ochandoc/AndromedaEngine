@@ -41,7 +41,7 @@ namespace And
     virtual void set_skybox_texture(std::shared_ptr<SkyboxTexture> texture) override;
 
     void SkyboxPass();
-    void ObjectPass(Mesh* mesh, TransformComponent* tr, Material* material);
+    void ObjectPass(Mesh* mesh, TransformComponent* tr, Material* material, const std::string& shader);
 
     virtual void Draw(Mesh* mesh, Shader* s) override;
 
@@ -64,8 +64,11 @@ namespace And
     } m_Skybox;
     ComPtr<ID3D11DepthStencilState> m_DepthStencil;
     DirectX11ShaderLibrary m_ShaderLibrary;
+    std::vector<ID3D11Buffer*> m_VSConstantBuffers;
+    std::vector <ID3D11Buffer*> m_PSConstantBuffers;
     std::shared_ptr<DirectX11ConstantBuffer> m_VSObjectData;
     std::shared_ptr<DirectX11ConstantBuffer> m_PSObjectData;
+    std::shared_ptr<DirectX11ConstantBuffer> m_PSLightData;
     std::shared_ptr<DirectX11Texture2D> m_Tex;
     CameraBase* m_Camera;
   };
