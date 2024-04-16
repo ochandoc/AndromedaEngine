@@ -160,4 +160,5 @@ private:
 	EGraphicsApiType m_ApiType;
 };
 
+EGraphicsApiType GetGraphicApiType();
 }

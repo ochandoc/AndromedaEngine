@@ -54,6 +54,20 @@ namespace And
     TextureCreationInfo m_CreationInfo;
   };
 
+  class SkyboxTexture
+  {
+    NON_COPYABLE_CLASS(SkyboxTexture)
+    NON_MOVABLE_CLASS(SkyboxTexture)
+  public:
+    SkyboxTexture() = default;
+    virtual ~SkyboxTexture() = default;
+  };
+
   std::shared_ptr<Texture> MakeTexture(const TextureCreationInfo& CreationInfo);
   std::shared_ptr<Texture> MakeTexture(const std::string& Path);
+
+  /**  You have to provide 6 paths to the function one per each face 
+  *    Right, Left, Top, Bottom, Back, Front
+  */
+  std::shared_ptr<SkyboxTexture> MakeSkyboxTexture(const std::vector<std::string>& paths);
 }

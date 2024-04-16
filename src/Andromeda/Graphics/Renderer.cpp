@@ -2,6 +2,8 @@
 #include "Backends/OpenGL/RendererOpenGL.h"
 #include "Andromeda/HAL/Window.h"
 
+#include "Backends/DirectX11/DirectX11Renderer.h"
+
 namespace And
 {
 
@@ -13,8 +15,7 @@ namespace And
         return std::make_shared<RendererOpenGL>(window);
       break;
       case EGraphicsApiType::DirectX11:
-        return nullptr;
-        //return std::make_shared<RendererDirectX>(window);
+        return DirectX11Renderer::CreateShared(window);
       break;
       default:
           assert(false);

@@ -186,7 +186,7 @@ void RendererOpenGL::set_clear_color(float* color){
 
 void RendererOpenGL::draw_triangle(Triangle *t){
     
-  Vertex *v = t->get_vertex();
+  Vertext *v = t->get_vertex();
   const float vertices[9] = {
     v[0].position[0], v[0].position[1], v[0].position[2],
     v[1].position[0], v[1].position[1], v[1].position[2],

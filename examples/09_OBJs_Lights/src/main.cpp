@@ -80,7 +80,7 @@ int main(int argc, char** argv){
 
   std::shared_ptr<And::Texture> texture = And::MakeTexture("teapot_texture.jpg");
 
-  float clear_color[4] = {0.0f, 0.0f, 0.0f, 1.0f};
+  float clear_color[4] = {1.0f, 0.0f, 0.0f, 1.0f};
   g_renderer->set_clear_color(clear_color);
 
   And::EntityComponentSystem entity_comp;
@@ -240,12 +240,13 @@ int main(int argc, char** argv){
 
     window->update();
     g_renderer->new_frame();
-    editor.ShowWindows();
+    //editor.ShowWindows();
 
     fly_cam.ProcessInput();
 
     //And::FlyCamera* cam;
         
+    fly_cam.ShowValues();
         //g_renderer->get_camera();
     //cam->SetPosition(0.0f, 0.0f, 0.0f);
    
