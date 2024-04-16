@@ -910,10 +910,10 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
 
   // Lighting Pass
   float dMesh[] = {
-      -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, // down-left
-      -1.0f, +1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, // up-left
-      +1.0f, +1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, // up-right
-      +1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, // down-right
+      -1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, // down-left
+      -1.0f, +1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, // up-left
+      +1.0f, +1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f, // up-right
+      +1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // down-right
   };
 
   unsigned int dIndices[] = {
@@ -934,7 +934,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
         }
     }
     shadow_buffer->Desactivate();
-    //glEnable(GL_BLEND);
+    glEnable(GL_BLEND);
 
 
     // Render Directional
@@ -948,7 +948,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
     OpenGLTexture2D* tex_shadow = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
 
     // posicion, normal, color
-    tmp->Use();
+     tmp->Use();
 
     tmp->SetTexture("Frag_Position", 0);
     position_tex->Activate(0);
@@ -980,12 +980,14 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
     
     upload_light(light);
     glBindVertexArray(m_quad_vao);
+    glDepthMask(GL_FALSE);
     glDrawElements(GL_TRIANGLES, (GLsizei)(sizeof(dMesh)), GL_UNSIGNED_INT, &dIndices[0]);
     glBlendFunc(GL_ONE, GL_ONE);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, opengl_render_target->GetId());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, 1920, 1080, 0, 0, 1920, 1080, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    glBlitFramebuffer(0, 0, m_Window.get_width(), m_Window.get_height(), 0, 0, m_Window.get_width(), m_Window.get_height(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDepthMask(GL_TRUE);
 
   }
 
