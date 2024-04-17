@@ -55,6 +55,8 @@ namespace And
     m_VSObjectData = DirectX11ConstantBuffer::CreateShared(sizeof(DirectX11::VertexShader::ObjectData));
     m_PSObjectData = DirectX11ConstantBuffer::CreateShared(sizeof(DirectX11::VertexShader::ObjectData));
     m_PSLightData = DirectX11ConstantBuffer::CreateShared(sizeof(DirectX11::PixelShader::LightData));
+
+    m_LightTexture = DirectX11Texture2D::CreateShared("bulp_billboard.png");
   }
 
   DirectX11Renderer::~DirectX11Renderer() {}
@@ -189,6 +191,52 @@ namespace And
 
     assert(SUCCEEDED(result));
 
+    D3D11_BLEND_DESC LightBlendDesc = {
+      .AlphaToCoverageEnable = false,
+      .IndependentBlendEnable = false,
+      .RenderTarget = {
+        { // 0
+          .BlendEnable = true,
+          .SrcBlend = D3D11_BLEND_ONE,
+          .DestBlend = D3D11_BLEND_ONE,
+          .BlendOp = D3D11_BLEND_OP_ADD,
+          .SrcBlendAlpha = D3D11_BLEND_ONE,
+          .DestBlendAlpha = D3D11_BLEND_ONE,
+          .BlendOpAlpha = D3D11_BLEND_OP_ADD,
+          .RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL
+        }
+      },
+    };
+
+    ComPtr<ID3D11BlendState> LightBlendState;
+
+    result = device->CreateBlendState(&LightBlendDesc, LightBlendState.GetAddressOf());
+
+    assert(SUCCEEDED(result));
+
+    D3D11_BLEND_DESC ZeroBlendDesc = {
+      .AlphaToCoverageEnable = false,
+      .IndependentBlendEnable = false,
+      .RenderTarget = {
+        { // 0
+          .BlendEnable = false,
+          .SrcBlend = D3D11_BLEND_ONE,
+          .DestBlend = D3D11_BLEND_ZERO,
+          .BlendOp = D3D11_BLEND_OP_ADD,
+          .SrcBlendAlpha = D3D11_BLEND_ONE,
+          .DestBlendAlpha = D3D11_BLEND_ZERO,
+          .BlendOpAlpha = D3D11_BLEND_OP_ADD,
+          .RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL
+        }
+      },
+    };
+
+    ComPtr<ID3D11BlendState> ZeroBlendState;
+
+    result = device->CreateBlendState(&ZeroBlendDesc, ZeroBlendState.GetAddressOf());
+
+    assert(SUCCEEDED(result));
+
     s_Device = device.Get();
     s_DeviceContext = deviceContext.Get();
 
@@ -199,6 +247,9 @@ namespace And
     renderer->m_RasterizerState = RasterizerState;
     renderer->m_DepthStencilView = depthStencilView;
     renderer->m_RenderTargetView = RenderTargetView;
+    renderer->m_DepthStencil = DepthStencilState;
+    renderer->m_LightsBlendState = LightBlendState;
+    renderer->m_ZeroBlendState = ZeroBlendState;
 
     renderer->set_viewport(0, 0, window.get_width(), window.get_height());
 
@@ -252,8 +303,20 @@ namespace And
   {
     if (!m_Camera) return;
 
-    SkyboxPass();
+    //SkyboxPass();
 
+    /**  Ambient light */
+    {
+      /**  Enable Blend state */
+      m_DeviceContext->OMSetBlendState(m_ZeroBlendState.Get(), nullptr, 0xffffffff);
+      for (auto& [mesh_component, transform, matComp] : ecs.get_components<MeshComponent, TransformComponent, MaterialComponent>())
+      {
+        ObjectPass(mesh_component->GetMesh().get(), transform, matComp->GetMaterial().get(), "Light.Ambient");
+      }
+      /**  Disable Blend state */
+      m_DeviceContext->OMSetBlendState(m_LightsBlendState.Get(), nullptr, 0xffffffff);
+    }
+    
     /**  Directional light pass */
     for (auto& [light] : ecs.get_components<DirectionalLight>())
     {
@@ -313,7 +376,7 @@ namespace And
     {
       if (!light->GetEnabled()) continue;
 
-      BillboardPass(glm::make_vec3(light->GetPosition()), glm::vec2(0.0f), nullptr);
+      BillboardPass(glm::make_vec3(light->GetPosition()), glm::vec2(0.75f), m_LightTexture.get());
 
       for (auto& [mesh_component, transform, matComp] : ecs.get_components<MeshComponent, TransformComponent, MaterialComponent>())
       {
@@ -333,7 +396,7 @@ namespace And
           m_DeviceContext->Unmap(m_PSLightData->GetBuffer(), 0);
         }
 
-          ObjectPass(mesh_component->GetMesh().get(), transform, matComp->GetMaterial().get(), "Light.Point");
+        ObjectPass(mesh_component->GetMesh().get(), transform, matComp->GetMaterial().get(), "Light.Point");
       }
     }
   }
@@ -373,8 +436,10 @@ namespace And
     m_DeviceContext->PSSetShaderResources(0, 1, PSViews);
     ID3D11SamplerState* PSSamplerStates[] = { SkyboxTexture->GetSampler() };
 
-    /** Depth Stencil State */
+    /**  Depth Stencil State */
     m_DeviceContext->OMSetDepthStencilState(m_Skybox.DepStencilState.Get(), 0);
+    /**  Blend state */
+    m_DeviceContext->OMSetBlendState(m_ZeroBlendState.Get(), nullptr, 0xffffffff);
 
     ID3D11Buffer* VertexBuffers[] = { VB->GetBuffer(), };
     uint32 stride = sizeof(Vertex);
@@ -472,14 +537,15 @@ namespace And
   void DirectX11Renderer::BillboardPass(const glm::vec3& pos, const glm::vec2 size, Texture* tex)
   {
     std::shared_ptr<DirectX11Shader> shader = m_ShaderLibrary.GetForwardShader("Billboard");
-
-    m_VSConstantBuffers.clear();
-    m_PSConstantBuffers.clear();
+    DirectX11Texture2D* ColorTexture = static_cast<DirectX11Texture2D*>(tex);
+    ID3D11BlendState* LastBlendState = nullptr;
+    float LastBlendFactor[4];
+    uint32 LastBlendMask = 0xffffffff;
 
     /**  Upload vertex shader object buffer */
     {
       glm::vec3 rotation(0.0f, 0.0f, 0.0f);
-      glm::vec3 scale(1.0f, 1.0f, 1.0f);
+      glm::vec3 scale(size.x, size.y, 1.0f);
 
       glm::mat4 model = glm::identity<glm::mat4>();
       model = glm::translate(model, pos);
@@ -506,7 +572,7 @@ namespace And
       PSObjectData = (DirectX11::PixelShader::ObjectData*)PSObjectMappedData.pData;
       PSObjectData->Color = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
       PSObjectData->CameraPos = glm::make_vec3(m_Camera->GetPosition());
-      PSObjectData->HasColorTxture = 0;
+      PSObjectData->HasColorTxture = (ColorTexture) ? 1 : 0;
       m_DeviceContext->Unmap(m_PSObjectData->GetBuffer(), 0);
     }
 
@@ -528,15 +594,21 @@ namespace And
     m_DeviceContext->PSSetShader(shader->GetPixelShader()->GetShader(), nullptr, 0);
     ID3D11Buffer* PSConstantBuffers[] = { m_PSObjectData->GetBuffer() };
     m_DeviceContext->PSSetConstantBuffers(0, 1, PSConstantBuffers);
-    //ID3D11ShaderResourceView* PSViews[] = { (ColorTexture) ? ColorTexture->GetView() : nullptr };
-    //m_DeviceContext->PSSetShaderResources(0, 1, PSViews);
-    //ID3D11SamplerState* PSSamplers[] = { (ColorTexture) ? ColorTexture->GetSampler() : nullptr };
-    //m_DeviceContext->PSSetSamplers(0, 1, PSSamplers);
+    ID3D11ShaderResourceView* PSViews[] = { (ColorTexture) ? ColorTexture->GetView() : nullptr };
+    m_DeviceContext->PSSetShaderResources(0, 1, PSViews);
+    ID3D11SamplerState* PSSamplers[] = { (ColorTexture) ? ColorTexture->GetSampler() : nullptr };
+    m_DeviceContext->PSSetSamplers(0, 1, PSSamplers);
 
     /**  Depth stencil state */
     m_DeviceContext->OMSetDepthStencilState(m_DepthStencil.Get(), 0);
+    /**  Blend state */
+    m_DeviceContext->OMGetBlendState(&LastBlendState, LastBlendFactor, &LastBlendMask);
+    m_DeviceContext->OMSetBlendState(m_ZeroBlendState.Get(), nullptr, 0xffffffff);
 
     m_DeviceContext->DrawIndexed((uint32)m_Billboard.IndexBuffer->GetNumIndices(), 0, 0);
+
+    /**  Restore blend state */
+    m_DeviceContext->OMSetBlendState(LastBlendState, LastBlendFactor, LastBlendMask);
   }
 
   void DirectX11Renderer::enable_skybox(bool value)

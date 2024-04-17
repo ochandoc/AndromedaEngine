@@ -55,6 +55,8 @@ namespace And
     ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
     ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
     ComPtr<ID3D11RasterizerState> m_RasterizerState;
+    ComPtr<ID3D11BlendState> m_ZeroBlendState;
+    ComPtr<ID3D11BlendState> m_LightsBlendState;
     struct {
       bool Enabled;
       std::shared_ptr<Mesh> Mesh;
@@ -67,6 +69,7 @@ namespace And
     } m_Billboard;
     ComPtr<ID3D11DepthStencilState> m_DepthStencil;
     DirectX11ShaderLibrary m_ShaderLibrary;
+    std::shared_ptr<DirectX11Texture2D> m_LightTexture;
     std::vector<ID3D11Buffer*> m_VSConstantBuffers;
     std::vector <ID3D11Buffer*> m_PSConstantBuffers;
     std::shared_ptr<DirectX11ConstantBuffer> m_VSObjectData;

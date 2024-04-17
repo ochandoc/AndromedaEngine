@@ -7,5 +7,6 @@ And::DirectX11ShaderLibrary::DirectX11ShaderLibrary()
   m_ForwardShaders["Light.Directional"] = DirectX11Shader::CreateShared("shaders/directional.hlsl");
   m_ForwardShaders["Light.Spot"] = DirectX11Shader::CreateShared("shaders/spot.hlsl");
   m_ForwardShaders["Light.Point"] = DirectX11Shader::CreateShared("shaders/point.hlsl");
+  m_ForwardShaders["Light.Ambient"] = DirectX11Shader::CreateShared("shaders/ambient.hlsl");
   m_ForwardShaders["Billboard"] = DirectX11Shader::CreateShared("shaders/billboard.hlsl");
 }

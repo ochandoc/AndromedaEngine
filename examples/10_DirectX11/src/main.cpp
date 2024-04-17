@@ -92,10 +92,10 @@ int main(int argc, char** argv){
 
   And::DirectionalLight directional{};
   directional.SetDirection(1.0f, 0.0f, 0.0f);
-  directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+  directional.SetDiffuseColor(1.0f, 0.0f, 0.0f);
   directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
   directional.SetCastShadows(true);
-  directional.SetEnabled(false);
+  directional.SetEnabled(true);
   ecs.new_entity(directional);
 
   float diffuse_color[3] = { 1.0f, 1.0f, 1.0f };
@@ -113,7 +113,7 @@ int main(int argc, char** argv){
   And::SpotLight spot{};
   spot.SetPosition(6.0f, 5.0f, -5.0f);
   spot.SetDirection(-1.0f, 0.0f, 0.0f);
-  spot.SetDiffuseColor(diffuse_color);
+  spot.SetDiffuseColor(0.0f, 1.0f, 0.0f);
   spot.SetSpecularColor(specular_color);
   spot.SetSpecularStrength(specular_strength);
   spot.SetSpecularShininess(specular_shininess);
@@ -123,13 +123,13 @@ int main(int argc, char** argv){
   spot.SetCuttOff(cutt_off);
   spot.SetOuterCuttOff(outer_cut_off);
   spot.SetCastShadows(true);
-  spot.SetEnabled(false);
+  spot.SetEnabled(true);
   ecs.new_entity(spot);
 
   And::PointLight point{};
   point.SetPosition(6.0f, 5.0f, -5.0f);
   point.SetEnabled(1.0f);
-  point.SetDiffuseColor(diffuse_color);
+  point.SetDiffuseColor(0.0f, 0.0f, 1.0f);
   point.SetSpecularStrength(specular_strength);
   point.SetSpecularColor(specular_color);
   point.SetSpecularShininess(specular_shininess);
