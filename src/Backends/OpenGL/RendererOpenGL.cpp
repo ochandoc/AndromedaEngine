@@ -287,11 +287,14 @@ void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* 
 
   glm::vec3 objectPosition = glm::vec3(tran->position[0], tran->position[1], tran->position[2]);
   glm::vec3 objectScale = glm::vec3(tran->scale[0], tran->scale[1], tran->scale[2]);
+
   float rotationAngle = 0.0f;
   glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::rotate(modelMatrix, tran->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, tran->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, tran->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
   glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
@@ -425,7 +428,9 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::rotate(modelMatrix, trans->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, trans->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, trans->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
   float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
@@ -476,7 +481,9 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::rotate(modelMatrix, trans->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, trans->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, trans->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
   // Cambiar lo de subir la luz al uniform buffer de ahora
@@ -555,7 +562,9 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::rotate(modelMatrix, trans->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, trans->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, trans->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
   // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
@@ -624,7 +633,9 @@ void RendererOpenGL::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s
   glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  modelMatrix = glm::rotate(modelMatrix, tran->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, tran->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, tran->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
   const float* tmp = cam->GetPosition();
@@ -718,6 +729,73 @@ void RendererOpenGL::draw_shadows(PointLight* l, MeshComponent* obj, TransformCo
   glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);
 
   draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));
+}
+
+
+void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffer, Light* light) {
+
+    float dMesh[] = {
+      -1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, // down-left
+      -1.0f, +1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, // up-left
+      +1.0f, +1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f, // up-right
+      +1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // down-right
+    };
+
+    unsigned int dIndices[] = {
+         0, 2, 1, 0, 3, 2
+    };
+
+
+    OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_quad.get());
+    std::vector<std::shared_ptr<Texture>> tex_gbuffer = m_gBuffer_->GetTextures();
+    OpenGLTexture2D* position_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[0].get());
+    OpenGLTexture2D* normal_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[1].get());
+    OpenGLTexture2D* color_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[2].get());
+
+    std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+    OpenGLTexture2D* tex_shadow = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+
+    // posicion, normal, color
+    tmp->Use();
+
+    tmp->SetTexture("Frag_Position", 0);
+    position_tex->Activate(0);
+
+    tmp->SetTexture("Frag_Normal", 1);
+    normal_tex->Activate(1);
+
+    tmp->SetTexture("Frag_Color", 2);
+    color_tex->Activate(2);
+
+    tmp->SetTexture("texShadow", 3);
+    tex_shadow->Activate(3);
+
+    glBindVertexArray(m_quad_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
+    glBufferData(GL_ARRAY_BUFFER, (GLsizei)(sizeof(dMesh)), &dMesh[0], GL_STATIC_DRAW);
+
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
+
+    OpenGLRenderTarget* opengl_render_target = static_cast<OpenGLRenderTarget*>(m_gBuffer_.get());
+
+    glEnable(GL_BLEND);
+
+    upload_light(light);
+    glBindVertexArray(m_quad_vao);
+    glDepthMask(GL_FALSE);
+    glDrawElements(GL_TRIANGLES, (GLsizei)(sizeof(dMesh)), GL_UNSIGNED_INT, &dIndices[0]);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, opengl_render_target->GetId());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(0, 0, m_Window.get_width(), m_Window.get_height(), 0, 0, m_Window.get_width(), m_Window.get_height(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDepthMask(GL_TRUE);
 }
 
 void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
@@ -909,17 +987,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
 
 
   // Lighting Pass
-  float dMesh[] = {
-      -1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, // down-left
-      -1.0f, +1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, // up-left
-      +1.0f, +1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f, // up-right
-      +1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // down-right
-  };
-
-  unsigned int dIndices[] = {
-       0, 2, 1, 0, 3, 2
-  };
-
+  
   //glBlendFunc(GL_ONE, GL_ZERO);
 
   // Shadows directional
@@ -938,56 +1006,8 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
 
 
     // Render Directional
-    OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_quad.get());
-    std::vector<std::shared_ptr<Texture>> tex_gbuffer = m_gBuffer_->GetTextures();
-    OpenGLTexture2D* position_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[0].get());
-    OpenGLTexture2D* normal_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[1].get());
-    OpenGLTexture2D* color_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[2].get());
+    RenderLight(shadow_buffer, light);
     
-    std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
-    OpenGLTexture2D* tex_shadow = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
-
-    // posicion, normal, color
-     tmp->Use();
-
-    tmp->SetTexture("Frag_Position", 0);
-    position_tex->Activate(0);
-
-    tmp->SetTexture("Frag_Normal", 1);
-    normal_tex->Activate(1);
-
-    tmp->SetTexture("Frag_Color", 2);
-    color_tex->Activate(2);
-
-    tmp->SetTexture("texShadow", 3);
-    tex_shadow->Activate(3);
-
-    glBindVertexArray(m_quad_vao);
-    glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
-    glBufferData(GL_ARRAY_BUFFER, (GLsizei)(sizeof(dMesh)), &dMesh[0], GL_STATIC_DRAW);
-
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
-
-    OpenGLRenderTarget* opengl_render_target = static_cast<OpenGLRenderTarget*>(m_gBuffer_.get());
-
-    glEnable(GL_BLEND);
-    
-    upload_light(light);
-    glBindVertexArray(m_quad_vao);
-    glDepthMask(GL_FALSE);
-    glDrawElements(GL_TRIANGLES, (GLsizei)(sizeof(dMesh)), GL_UNSIGNED_INT, &dIndices[0]);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, opengl_render_target->GetId());
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, m_Window.get_width(), m_Window.get_height(), 0, 0, m_Window.get_width(), m_Window.get_height(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDepthMask(GL_TRUE);
 
   }
 

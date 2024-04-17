@@ -109,9 +109,9 @@ int main(int argc, char** argv){
   tran.position[0] = 0.0f;
   tran.position[1] = 0.0f;
   tran.position[2] = 0.0f;
-  tran.rotation[0] = 1.0f;
-  tran.rotation[1] = 1.0f;
-  tran.rotation[2] = 1.0f;
+  tran.rotation[0] = 0.0f;
+  tran.rotation[1] = 0.0f;
+  tran.rotation[2] = 0.0f;
   tran.scale[0] = 1.0f;
   tran.scale[1] = 1.0f;
   tran.scale[2] = 1.0f;
@@ -119,9 +119,9 @@ int main(int argc, char** argv){
   tran_cube.position[0] = 50.0f;
   tran_cube.position[1] = 5.0f;
   tran_cube.position[2] = 0.0f;
-  tran_cube.rotation[0] = 1.0f;
-  tran_cube.rotation[1] = 1.0f;
-  tran_cube.rotation[2] = 1.0f;
+  tran_cube.rotation[0] = 0.0f;
+  tran_cube.rotation[1] = 0.0f;
+  tran_cube.rotation[2] = 0.0f;
   tran_cube.scale[0] = 3.0f;
   tran_cube.scale[1] = 3.0f;
   tran_cube.scale[2] = 3.0f;
@@ -130,7 +130,7 @@ int main(int argc, char** argv){
   tran_teapot.position[1] = 5.0f;
   tran_teapot.position[2] = -5.0f;
   tran_teapot.rotation[0] = 0.0f;
-  tran_teapot.rotation[1] = 1.0f;
+  tran_teapot.rotation[1] = 0.0f;
   tran_teapot.rotation[2] = 0.0f;
   tran_teapot.scale[0] = 2.0f;
   tran_teapot.scale[1] = 5.0f;
@@ -140,7 +140,7 @@ int main(int argc, char** argv){
   tran_teapot2.position[1] = 5.0f;
   tran_teapot2.position[2] = -5.0f;
   tran_teapot2.rotation[0] = 0.0f;
-  tran_teapot2.rotation[1] = 1.0f;
+  tran_teapot2.rotation[1] = 0.0f;
   tran_teapot2.rotation[2] = 0.0f;
   tran_teapot2.scale[0] = 2.0f;
   tran_teapot2.scale[1] = 2.0f;

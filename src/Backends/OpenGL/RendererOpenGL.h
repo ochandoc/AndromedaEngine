@@ -43,6 +43,8 @@ namespace And{
         void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, PointLight* l, float* dir);
         void draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection);
 
+        void RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffer, Light* light);
+
         void upload_light(Light* l);
 
         void draw_scene(Scene& scene, Shader* s);
