@@ -97,7 +97,7 @@ int main(int argc, char** argv){
   MC_teapot2.MeshOBJ = And::Geometry::load("teapot.obj");
 
   std::shared_ptr<And::Texture> texture_bricks = And::MakeTexture("bricks.jpg");
-  std::shared_ptr<And::Texture> texture_jou = And::MakeTexture("jou_cumple.png");
+  std::shared_ptr<And::Texture> texture_jou = And::MakeTexture("sphere_basecolor.png");
   MC.MeshOBJ->SetTexture(texture_bricks);
   MC_cube.MeshOBJ->SetTexture(texture_jou);
 
@@ -109,19 +109,19 @@ int main(int argc, char** argv){
   tran.position[0] = 0.0f;
   tran.position[1] = 0.0f;
   tran.position[2] = 0.0f;
-  tran.rotation[0] = 0.0f;
-  tran.rotation[1] = 0.0f;
-  tran.rotation[2] = 0.0f;
+  tran.rotation[0] = 1.0f;
+  tran.rotation[1] = 1.0f;
+  tran.rotation[2] = 1.0f;
   tran.scale[0] = 1.0f;
   tran.scale[1] = 1.0f;
   tran.scale[2] = 1.0f;
   
-  tran_cube.position[0] = 50.0f;
-  tran_cube.position[1] = 5.0f;
-  tran_cube.position[2] = 0.0f;
-  tran_cube.rotation[0] = 0.0f;
-  tran_cube.rotation[1] = 0.0f;
-  tran_cube.rotation[2] = 0.0f;
+  tran_cube.position[0] = 0.0f;
+  tran_cube.position[1] = 15.0f;
+  tran_cube.position[2] = -15.0f;
+  tran_cube.rotation[0] = 1.0f;
+  tran_cube.rotation[1] = 1.0f;
+  tran_cube.rotation[2] = 1.0f;
   tran_cube.scale[0] = 3.0f;
   tran_cube.scale[1] = 3.0f;
   tran_cube.scale[2] = 3.0f;
@@ -130,7 +130,7 @@ int main(int argc, char** argv){
   tran_teapot.position[1] = 5.0f;
   tran_teapot.position[2] = -5.0f;
   tran_teapot.rotation[0] = 0.0f;
-  tran_teapot.rotation[1] = 0.0f;
+  tran_teapot.rotation[1] = 1.0f;
   tran_teapot.rotation[2] = 0.0f;
   tran_teapot.scale[0] = 2.0f;
   tran_teapot.scale[1] = 5.0f;
@@ -140,7 +140,7 @@ int main(int argc, char** argv){
   tran_teapot2.position[1] = 5.0f;
   tran_teapot2.position[2] = -5.0f;
   tran_teapot2.rotation[0] = 0.0f;
-  tran_teapot2.rotation[1] = 0.0f;
+  tran_teapot2.rotation[1] = 1.0f;
   tran_teapot2.rotation[2] = 0.0f;
   tran_teapot2.scale[0] = 2.0f;
   tran_teapot2.scale[1] = 2.0f;
@@ -153,7 +153,7 @@ int main(int argc, char** argv){
   float enabled = 1.0f;
   float diffuse_color[3] = {1.0f, 0.0f, 0.0f};
   float specular_color[3] = {1.0f, 1.0f, 1.0f};
-  float position[3] = {0.0f, 14.0f, 11.0f};
+  float position[3] = {0.0f, 14.0f, 0.0f};
   float direction[3] = {0.0f, 0.0f, -1.0f};
 
   float specular_strength = 0.003f;
@@ -178,7 +178,7 @@ int main(int argc, char** argv){
   spot.SetOuterCuttOff(outer_cut_off);
   spot.SetCastShadows(true);
   spot.SetEnabled(true);
-  //entity_comp.new_entity(spot);
+  entity_comp.new_entity(spot);
 
   position[1] += 10.0f;
   diffuse_color[0] = 0.0f;
@@ -204,7 +204,7 @@ int main(int argc, char** argv){
 
   And::AmbientLight ambient{};
   ambient.SetDiffuseColor(0.1f, 0.1f, 0.1f);
-  //entity_comp.new_entity(ambient);
+  entity_comp.new_entity(ambient);
 
   And::DirectionalLight directional{};
   directional.SetDirection(1.0f, 0.0f, 0.0f);

@@ -102,7 +102,9 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   m_shader_shadows_spot = MakeShader("lights/spot_shadows.shader");
 
   m_shader_geometry = MakeShader("default/geometry.shader");
-  m_shader_quad = MakeShader("lights/deferred/quad.shader");
+  m_shader_quad_directional = MakeShader("lights/deferred/quad_directional.shader");
+  m_shader_quad_ambient = MakeShader("lights/deferred/quad_ambient.shader");
+  m_shader_quad_spot = MakeShader("lights/deferred/quad_spot.shader");
 
   glGenVertexArrays(1, &m_quad_vao);
   glGenBuffers(1, &m_quad_vbo);
@@ -292,9 +294,10 @@ void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* 
   glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, tran->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  /*modelMatrix = glm::rotate(modelMatrix, tran->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
   modelMatrix = glm::rotate(modelMatrix, tran->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, tran->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
+  modelMatrix = glm::rotate(modelMatrix, tran->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));*/
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
   glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
@@ -361,50 +364,90 @@ void RendererOpenGL::upload_light(Light* l){
     glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
     glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
 
+    UniformBlockMatrices matrices_tmp;
 
-    glm::vec3 light_dir;
-    DirectionalLight* dir = static_cast<DirectionalLight*>(l);
-    if (dir) {
-        light_dir = glm::make_vec3(dir->GetDirection());
+    AmbientLight* ambient = dynamic_cast<AmbientLight*>(l);
+    if (ambient) {
+        m_buffer_ambient_light->upload_data(ambient->GetData(), 48);
+        m_buffer_ambient_light->bind();
     }
 
-    glm::vec3 pos = glm::make_vec3(cam_pos + ((-1.0f * light_dir) * 50.0f));
+
+    glm::vec3 light_dir;
+    DirectionalLight* directional = dynamic_cast<DirectionalLight*>(l);
+    if (directional) {
+        light_dir = glm::make_vec3(directional->GetDirection());
+
+        glm::vec3 pos = glm::make_vec3(cam_pos + ((-1.0f * light_dir) * 50.0f));
 
 
-    glm::vec3 up(0.0f, 1.0f, 0.0f);
-    glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
-    up = glm::cross(light_dir, right);
-    glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
+        glm::vec3 up(0.0f, 1.0f, 0.0f);
+        glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
+        up = glm::cross(light_dir, right);
+        glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
 
-    glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, cam->GetNear(), cam->GetFar());
-    glm::mat4 projViewLight = orto * viewLight;
-    UniformBlockMatrices matrices_tmp = { modelMatrix, viewProjCam, projViewLight, cam_pos };
+        glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, cam->GetNear(), cam->GetFar());
+        glm::mat4 projViewLight = orto * viewLight;
+        matrices_tmp = { modelMatrix, viewProjCam, projViewLight, cam_pos };
 
-    m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
-    m_buffer_matrix->bind();
+        m_buffer_directional_light->upload_data(directional->GetData(), 48);
+        m_buffer_directional_light->bind();
+    }
 
     SpotLight* spot = dynamic_cast<SpotLight*>(l);
     if (spot) {
+        CameraBase* cam = &m_DefaultCamera;
+        if (m_UserCamera) cam = m_UserCamera;
+
+        float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
+        glm::mat4 projViewLight = glm::make_mat4(l->GetProjectViewMatrix(aspect_ratio));
+        glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
+
+        matrices_tmp = { modelMatrix, viewProjCam, projViewLight, cam_pos };
+
         m_buffer_spot_light->upload_data(spot->GetData(), 96);
         m_buffer_spot_light->bind();
     }
 
     PointLight* point = dynamic_cast<PointLight*>(l);
     if (point) {
-        m_buffer_point_light->upload_data(point->GetData(), 64);
+        UniformBlockMatricesPointLight matrices_tmp_point;
+        matrices_tmp_point.proj_view_cam = projectionMatrix * viewMatrix;
+
+        glm::vec3 pos = glm::make_vec3(point->GetPosition());
+        float fov_radians = glm::radians(90.0f);
+        float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
+        float near = 10.0f;
+        float far = 310.0f;
+        glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
+
+        for (int i = 0; i < 6; i++) {
+            glm::vec3 dir = glm::make_vec3(m_directions->dir[i]);
+            glm::vec3 up(0.0f, 1.0f, 0.0f);
+
+            float dot = glm::dot(up, dir);
+            dot = glm::abs(dot);
+            if (dot == 1.0f) {
+                up = glm::vec3(0.0f, 0.0f, 1.0f);
+            }
+
+            glm::vec3 right = glm::normalize(glm::cross(up, dir));
+            up = glm::cross(dir, right);
+            glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(dir), up);
+
+            matrices_tmp_point.proj_view_light[i] = projLight * viewLight;
+        }
+
+        matrices_tmp_point.model = modelMatrix;
+        matrices_tmp_point.camera_position = glm::make_vec3(cam->GetPosition());
+
+        m_buffer_matrix_pointLight->upload_data((void*)&matrices_tmp_point, 524);
+        m_buffer_matrix_pointLight->bind();
+        m_buffer_point_light->upload_data(point->GetData(), 64); // 64 antes
         m_buffer_point_light->bind();
-    }
-
-    DirectionalLight* directional = dynamic_cast<DirectionalLight*>(l);
-    if (directional) {
-        m_buffer_directional_light->upload_data(directional->GetData(), 48);
-        m_buffer_directional_light->bind();
-    }
-
-    AmbientLight* ambient = dynamic_cast<AmbientLight*>(l);
-    if (ambient) {
-        m_buffer_ambient_light->upload_data(ambient->GetData(), 48);
-        m_buffer_ambient_light->bind();
+    }else 
+        m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
+        m_buffer_matrix->bind();
     }
 
 }
@@ -428,9 +471,10 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, trans->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  /*modelMatrix = glm::rotate(modelMatrix, trans->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
   modelMatrix = glm::rotate(modelMatrix, trans->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, trans->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
+  modelMatrix = glm::rotate(modelMatrix, trans->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));*/
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
   float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
@@ -481,9 +525,10 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, trans->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  /*modelMatrix = glm::rotate(modelMatrix, trans->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
   modelMatrix = glm::rotate(modelMatrix, trans->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, trans->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
+  modelMatrix = glm::rotate(modelMatrix, trans->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));*/
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
   // Cambiar lo de subir la luz al uniform buffer de ahora
@@ -562,9 +607,10 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, trans->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  /*modelMatrix = glm::rotate(modelMatrix, trans->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
   modelMatrix = glm::rotate(modelMatrix, trans->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, trans->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
+  modelMatrix = glm::rotate(modelMatrix, trans->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));*/
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
   // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
@@ -633,9 +679,10 @@ void RendererOpenGL::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s
   glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
 
   modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, tran->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
+  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
+  /*modelMatrix = glm::rotate(modelMatrix, tran->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
   modelMatrix = glm::rotate(modelMatrix, tran->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, tran->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
+  modelMatrix = glm::rotate(modelMatrix, tran->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));*/
   modelMatrix = glm::scale(modelMatrix, objectScale);
 
   const float* tmp = cam->GetPosition();
@@ -745,15 +792,30 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
          0, 2, 1, 0, 3, 2
     };
 
+    OpenGLShader* tmp;
 
-    OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_quad.get());
+    DirectionalLight* directional = dynamic_cast<DirectionalLight*>(light);
+    if (directional) {
+        tmp = static_cast<OpenGLShader*>(m_shader_quad_directional.get());
+    }
+    
+    SpotLight* spot= dynamic_cast<SpotLight*>(light);
+    if (spot) {
+        tmp = static_cast<OpenGLShader*>(m_shader_quad_spot.get());
+    }
+    
+    AmbientLight* ambient = dynamic_cast<AmbientLight*>(light);
+    if (ambient) {
+        tmp = static_cast<OpenGLShader*>(m_shader_quad_ambient.get());
+    }else {
+
+    }
+
     std::vector<std::shared_ptr<Texture>> tex_gbuffer = m_gBuffer_->GetTextures();
     OpenGLTexture2D* position_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[0].get());
     OpenGLTexture2D* normal_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[1].get());
     OpenGLTexture2D* color_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[2].get());
 
-    std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
-    OpenGLTexture2D* tex_shadow = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
 
     // posicion, normal, color
     tmp->Use();
@@ -767,8 +829,13 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     tmp->SetTexture("Frag_Color", 2);
     color_tex->Activate(2);
 
-    tmp->SetTexture("texShadow", 3);
-    tex_shadow->Activate(3);
+    if (!ambient) {
+        std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+        OpenGLTexture2D* tex_shadow = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+
+        tmp->SetTexture("texShadow", 3);
+        tex_shadow->Activate(3);
+    }
 
     glBindVertexArray(m_quad_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
@@ -987,8 +1054,13 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
 
 
   // Lighting Pass
-  
-  //glBlendFunc(GL_ONE, GL_ZERO);
+
+  // Ambient light
+  glBlendFunc(GL_ONE, GL_ZERO);
+  for (auto [light] : entity.get_components<AmbientLight>()) {
+      RenderLight(nullptr, light);
+      glBlendFunc(GL_ONE, GL_ONE);
+  }
 
   // Shadows directional
   std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
@@ -1007,9 +1079,30 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
 
     // Render Directional
     RenderLight(shadow_buffer, light);
+    glBlendFunc(GL_ONE, GL_ONE);
     
 
   }
+
+  // Shadows spot
+  for (auto [light] : entity.get_components<SpotLight>()) {
+      shadow_buffer->Activate();
+      glDisable(GL_BLEND);
+      if (light->GetCastShadows()) {
+          // Por cada luz que castea sombras guardamos textura de profundidad
+          for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+              draw_shadows(light, obj, transform);
+          }
+      }
+      shadow_buffer->Desactivate();
+      glEnable(GL_BLEND);
+
+      // Render spot
+      RenderLight(shadow_buffer, light);
+      glBlendFunc(GL_ONE, GL_ONE);
+  }
+
+
 
 
   
