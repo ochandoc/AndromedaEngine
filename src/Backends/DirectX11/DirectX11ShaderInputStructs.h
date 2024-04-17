@@ -22,8 +22,8 @@ namespace And
 			struct ObjectData
 			{
 				glm::vec4 Color;
+				glm::vec3 CameraPos;
 				uint32 HasColorTxture;
-				uint8 PADDING[12];
 			};
 
 			struct LightData

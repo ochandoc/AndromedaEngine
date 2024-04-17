@@ -59,6 +59,8 @@ int main(int argc, char** argv){
   ecs.add_component_class<And::TransformComponent>();
   ecs.add_component_class<And::MaterialComponent>();
   ecs.add_component_class<And::DirectionalLight>();
+  ecs.add_component_class<And::SpotLight>();
+  ecs.add_component_class<And::PointLight>();
 
   std::shared_ptr<And::Shader> shader = And::MakeShader("shader.hlsl");
 
@@ -93,9 +95,52 @@ int main(int argc, char** argv){
   directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
   directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
   directional.SetCastShadows(true);
-  directional.SetEnabled(true);
+  directional.SetEnabled(false);
   ecs.new_entity(directional);
 
+  float diffuse_color[3] = { 1.0f, 1.0f, 1.0f };
+  float specular_color[3] = { 1.0f, 1.0f, 1.0f };
+
+  float specular_strength = 0.003f;
+  float specular_shininess = 8.0f;
+  float constant_att = 1.0f;
+  float linear_att = 0.09f;
+  float quadratic_att = 0.032f;
+  float cutt_off = 2.5f;
+  float outer_cut_off = 17.5f;
+
+
+  And::SpotLight spot{};
+  spot.SetPosition(6.0f, 5.0f, -5.0f);
+  spot.SetDirection(-1.0f, 0.0f, 0.0f);
+  spot.SetDiffuseColor(diffuse_color);
+  spot.SetSpecularColor(specular_color);
+  spot.SetSpecularStrength(specular_strength);
+  spot.SetSpecularShininess(specular_shininess);
+  spot.SetConstantAtt(constant_att);
+  spot.SetLinearAtt(linear_att);
+  spot.SetQuadraticAtt(quadratic_att);
+  spot.SetCuttOff(cutt_off);
+  spot.SetOuterCuttOff(outer_cut_off);
+  spot.SetCastShadows(true);
+  spot.SetEnabled(false);
+  ecs.new_entity(spot);
+
+  And::PointLight point{};
+  point.SetPosition(6.0f, 5.0f, -5.0f);
+  point.SetEnabled(1.0f);
+  point.SetDiffuseColor(diffuse_color);
+  point.SetSpecularStrength(specular_strength);
+  point.SetSpecularColor(specular_color);
+  point.SetSpecularShininess(specular_shininess);
+  point.SetCastShadows(true);
+  point.SetLinearAtt(linear_att);
+  point.SetConstantAtt(constant_att);
+  point.SetQuadraticAtt(quadratic_att);
+  point.SetEnabled(true);
+  And::Entity* point_ett = ecs.new_entity(point);
+  
+  And::Entity* ett;
   for (int i = 0; i < 10; ++i)
   {
     And::MeshComponent CubeMeshComponent;
@@ -118,7 +163,9 @@ int main(int argc, char** argv){
     cube_transform.scale[1] = 1.0f;
     cube_transform.scale[2] = 1.0f;
 
-    And::Entity* ett = ecs.new_entity(CubeMeshComponent, cube_transform, MaterialComponent);
+    And::Entity* ett1 = ecs.new_entity(CubeMeshComponent, cube_transform, MaterialComponent);
+    if (i == 1)
+      ett = ett1;
   }
 
 
@@ -132,13 +179,20 @@ int main(int argc, char** argv){
 
   g_renderer->set_camera(&fly_cam);
 
-  float fps_count = 0.0f;
+  float time = 0.0f;
   while (window->is_open()){
 
     window->update();
+    time += window->get_delta_time();
 
     fly_cam.ProcessInput();
     g_renderer->new_frame();
+
+    float* pos = point_ett->get_component<And::PointLight>()->GetPosition();
+    point_ett->get_component<And::PointLight>()->SetPosition(cosf(time * 0.01f) * 7.0f, pos[1], pos[2]);
+
+    ett->get_component<And::TransformComponent>()->rotation[0] += window->get_delta_time();
+    ett->get_component<And::TransformComponent>()->rotation[1] -= window->get_delta_time();
 
     g_renderer->draw_forward(ecs);
     g_renderer->end_frame();

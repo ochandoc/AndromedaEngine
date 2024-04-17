@@ -29,6 +29,7 @@ namespace And
       int width;
       int height;
       int channels;
+      stbi_set_flip_vertically_on_load_thread(0);
       uint8* pixels = stbi_load(path.c_str(), &width, &height, &channels, 4);
 
       if (pixels)
