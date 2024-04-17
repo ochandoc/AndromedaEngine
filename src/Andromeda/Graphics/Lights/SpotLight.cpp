@@ -98,8 +98,8 @@ float SpotLight::GetQuadraticAtt(){
 }
 
 
-void SpotLight::SetEnabled(float e){
-    m_raw.enabled = e;
+void SpotLight::SetEnabled(bool e){
+    e ? m_raw.enabled = 1.0f : m_raw.enabled = 0.0f;
 }
 
 void SpotLight::SetDiffuseColor(float color[3]){

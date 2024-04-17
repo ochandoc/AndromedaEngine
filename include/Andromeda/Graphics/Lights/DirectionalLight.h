@@ -56,7 +56,7 @@ class DirectionalLight : public Light{
         float* GetDirection();
         void   GetDirection(float& x, float& y, float& z);
         
-        void   SetEnabled(float e);
+        void   SetEnabled(bool e);
         void   SetDiffuseColor(float color[3]);
         void   SetDiffuseColor(float x, float y, float z);
         void   SetSpecularStrength(float strength);

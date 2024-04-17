@@ -78,8 +78,8 @@ void PointLight::SetPosition(float p[3]){
     }
 }
 
-void PointLight::SetEnabled(float e){
-    m_raw.enabled = e;
+void PointLight::SetEnabled(bool e){
+    e ? m_raw.enabled = 1.0f : m_raw.enabled = 0.0f;
 }
 
 void PointLight::SetDiffuseColor(float color[3]){
