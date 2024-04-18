@@ -105,6 +105,7 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   m_shader_quad_directional = MakeShader("lights/deferred/quad_directional.shader");
   m_shader_quad_ambient = MakeShader("lights/deferred/quad_ambient.shader");
   m_shader_quad_spot = MakeShader("lights/deferred/quad_spot.shader");
+  m_shader_quad_point = MakeShader("lights/deferred/quad_point.shader");
 
   glGenVertexArrays(1, &m_quad_vao);
   glGenBuffers(1, &m_quad_vbo);
@@ -804,6 +805,11 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
         tmp = static_cast<OpenGLShader*>(m_shader_quad_spot.get());
     }
     
+    PointLight* point= dynamic_cast<PointLight*>(light);
+    if (point) {
+        tmp = static_cast<OpenGLShader*>(m_shader_quad_point.get());
+    }
+    
     AmbientLight* ambient = dynamic_cast<AmbientLight*>(light);
     if (ambient) {
         tmp = static_cast<OpenGLShader*>(m_shader_quad_ambient.get());
@@ -829,7 +835,7 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     tmp->SetTexture("Frag_Color", 2);
     color_tex->Activate(2);
 
-    if (!ambient) {
+    if (!ambient && !point) {
         std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
         OpenGLTexture2D* tex_shadow = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
 

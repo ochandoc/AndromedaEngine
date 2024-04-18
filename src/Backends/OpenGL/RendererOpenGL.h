@@ -83,6 +83,7 @@ namespace And{
         std::shared_ptr<Shader> m_shader_quad_directional;
         std::shared_ptr<Shader> m_shader_quad_ambient;
         std::shared_ptr<Shader> m_shader_quad_spot;
+        std::shared_ptr<Shader> m_shader_quad_point;
 
         std::shared_ptr<UniformBuffer> m_buffer_matrix; // 208
         std::shared_ptr<UniformBuffer> m_buffer_matrix_pointLight; // 208 + 16 * 5
