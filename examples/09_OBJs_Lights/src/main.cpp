@@ -178,7 +178,7 @@ int main(int argc, char** argv){
   spot.SetOuterCuttOff(outer_cut_off);
   spot.SetCastShadows(true);
   spot.SetEnabled(true);
-  entity_comp.new_entity(spot);
+  //entity_comp.new_entity(spot);
 
   position[1] += 10.0f;
   diffuse_color[0] = 0.0f;
@@ -215,7 +215,7 @@ int main(int argc, char** argv){
   directional.SetEnabled(true);
   entity_comp.new_entity(directional);
 
-  float position2[3] = {0.0f, 34.0f, -5.0f};
+  float position2[3] = {0.0f, 8.0f, 0.0f};
   diffuse_color[2] = 1.0f;
   diffuse_color[1] = 0.0f;
   And::PointLight point{};
@@ -226,14 +226,15 @@ int main(int argc, char** argv){
   point.SetSpecularColor(specular_color);
   point.SetSpecularShininess(specular_shininess);
   point.SetCastShadows(true);
+  point.SetEnabled(true);
   point.SetLinearAtt(linear_att);
   point.SetConstantAtt(constant_att);
   point.SetQuadraticAtt(quadratic_att);
-  //And::Entity* point_entity = entity_comp.new_entity(point);
+  And::Entity* point_entity = entity_comp.new_entity(point);
   
-  position2[0] += 40.0f;
-  diffuse_color[2] = 0.0f;
-  diffuse_color[0] = 1.0f;
+  //position2[0] += 40.0f;
+  //diffuse_color[2] = 0.0f;
+  //diffuse_color[0] = 1.0f;
 
   And::PointLight point2{};
   point2.SetPosition(position2);
@@ -280,8 +281,8 @@ int main(int argc, char** argv){
     
 
     
-    //g_renderer->draw_forward(entity_comp);
-    g_renderer->draw_deferred(entity_comp);
+    g_renderer->draw_forward(entity_comp);
+    //g_renderer->draw_deferred(entity_comp);
     g_renderer->end_frame();
     window->swap_buffers();
   }

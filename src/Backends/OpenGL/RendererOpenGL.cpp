@@ -445,7 +445,7 @@ void RendererOpenGL::upload_light(Light* l){
         m_buffer_matrix_pointLight->bind();
         m_buffer_point_light->upload_data(point->GetData(), 64); // 64 antes
         m_buffer_point_light->bind();
-    }else 
+    }else{ 
         m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
         m_buffer_matrix->bind();
     }
@@ -1092,6 +1092,24 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
           // Por cada luz que castea sombras guardamos textura de profundidad
           for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
               draw_shadows(light, obj, transform);
+          }
+      }
+      shadow_buffer->Desactivate();
+      glEnable(GL_BLEND);
+
+      // Render spot
+      RenderLight(shadow_buffer, light);
+      glBlendFunc(GL_ONE, GL_ONE);
+  }
+  
+  // Shadows point
+  for (auto [light] : entity.get_components<PointLight>()) {
+      shadow_buffer->Activate();
+      glDisable(GL_BLEND);
+      if (light->GetCastShadows()) {
+          // Por cada luz que castea sombras guardamos textura de profundidad
+          for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+              //draw_shadows(light, obj, transform);
           }
       }
       shadow_buffer->Desactivate();

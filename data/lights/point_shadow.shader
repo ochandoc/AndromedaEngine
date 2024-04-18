@@ -21,14 +21,14 @@ struct PointLight{
 
 
 
-layout (std140, binding = 1) uniform UniformBlockPointLight{
+layout (std140, binding = 1) uniform UniformBlockPoivvntLight{
   mat4 model;
   mat4 ProjViewLight[6];
   mat4 ProjViewCam;
   vec3 camera_position;
 };
 
-layout (std140, binding = 4) uniform UniformPoint{
+layout (std140, binding = 4) uniform UniformPoivvnt{
   PointLight point;
 };
 
@@ -85,14 +85,14 @@ struct PointLight{
   float attenuation; // 64 bytes
 };
 
-layout (std140, binding = 1) uniform UniformBlockPointLight{
+layout (std140, binding = 1) uniform UniformBlockPoivvntLight{
   mat4 model;
   mat4 ProjViewLight[6];
   mat4 ProjViewCam;
   vec3 camera_position;
 };
 
-layout (std140, binding = 4) uniform UniformPoint{
+layout (std140, binding = 4) uniform UniformPoivvnt{
   PointLight point;
 };
 
