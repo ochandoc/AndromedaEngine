@@ -19,7 +19,7 @@ namespace And
     float rotation[3] = { 0.0f };
     float scale[3] = { 1.0f };
 
-    TransformComponent* m_parent;
+    TransformComponent* m_parent = nullptr;
 
     // hijo  * padre
 
@@ -27,5 +27,17 @@ namespace And
 
     float* GetModelMatrix();
     void SetParent(TransformComponent* parent);
+    void SetPosition(float* p);
+    void SetPosition(float x, float y, float z);
+
+    void SetRotation(float* r);
+    void SetRotation(float x, float y, float z);
+
+    void SetScale(float* t);
+    void SetScale(float x, float y, float z);
+
+  private:
+      bool m_should_recalculate = true;
+      float* m_model_matrix = nullptr;
   };
 }

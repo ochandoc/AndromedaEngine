@@ -90,9 +90,10 @@ int main(int argc, char** argv){
   float pos_x = 0.0f;
   float pos_y = -5.0f;
 
-  And::MeshComponent MC, MC_teapot, MC_teapot2, MC_cube;
+  And::MeshComponent MC, MC_teapot, MC_teapot2, MC_cube, MC_cube2;
   MC.MeshOBJ = And::Geometry::load("sponza.obj");
   MC_cube.MeshOBJ = And::Geometry::load("cube.obj");
+  MC_cube2.MeshOBJ = And::Geometry::load("cube.obj");
   MC_teapot.MeshOBJ = And::Geometry::load("teapot.obj");
   MC_teapot2.MeshOBJ = And::Geometry::load("teapot.obj");
 
@@ -147,6 +148,15 @@ int main(int argc, char** argv){
   tran_teapot2.scale[2] = 2.0f;
   And::Entity* obj_id = entity_comp.new_entity(MC, tran);
   And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube);
+
+  tran_cube.position[0] = 3.0f;
+  tran_cube.position[1] = 0.0f;
+  tran_cube.position[2] = 0.0f;
+  And::Entity* obj_cube_id2 = entity_comp.new_entity(MC_cube2, tran_cube);
+
+  And::TransformComponent* tr_cube = obj_cube_id->get_component<And::TransformComponent>();
+  And::TransformComponent* tr_cube2 = obj_cube_id2->get_component<And::TransformComponent>();
+  tr_cube2->SetParent(tr_cube);
   //And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
   //And::Entity* obj_teapot_id2 = entity_comp.new_entity(MC_teapot2, tran_teapot2);
  
@@ -251,7 +261,7 @@ int main(int argc, char** argv){
   //And::Entity* point_entity2 = entity_comp.new_entity(point2);
 
   And::Transform* tr_tmp = obj_id->get_component<And::Transform>();
-  And::TransformComponent* tr_cube = obj_cube_id->get_component<And::TransformComponent>();
+
   
 
   float fps_count = 0.0f;
@@ -261,7 +271,7 @@ int main(int argc, char** argv){
     g_renderer->new_frame();
     editor.ShowWindows();
 
-    tr_cube->rotation[1] = fps_count;
+    tr_cube->SetRotation(0.0f, fps_count, 0.0f);
 
     //fly_cam.ProcessInput();
 
