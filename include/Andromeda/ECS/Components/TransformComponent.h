@@ -19,8 +19,13 @@ namespace And
     float rotation[3] = { 0.0f };
     float scale[3] = { 1.0f };
 
+    TransformComponent* m_parent;
+
+    // hijo  * padre
+
     Mat4 matrix;
 
-    Mat4 GetModelMatrix();
+    float* GetModelMatrix();
+    void SetParent(TransformComponent* parent);
   };
 }

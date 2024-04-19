@@ -285,21 +285,7 @@ void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* 
     
   glm::mat4 viewMatrix = glm::make_mat4(cam->GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(cam->GetProjectionMatrix());
-
-  glm::mat4 modelMatrix = glm::mat4(1.0f);
-
-  glm::vec3 objectPosition = glm::vec3(tran->position[0], tran->position[1], tran->position[2]);
-  glm::vec3 objectScale = glm::vec3(tran->scale[0], tran->scale[1], tran->scale[2]);
-
-  float rotationAngle = 0.0f;
-  glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
-
-  modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
-  /*modelMatrix = glm::rotate(modelMatrix, tran->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, tran->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, tran->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));*/
-  modelMatrix = glm::scale(modelMatrix, objectScale);
+  glm::mat4 modelMatrix = glm::make_mat4(tran->GetModelMatrix());
 
   glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
   UniformBlockMatrices matrices_tmp = {modelMatrix, viewMatrix, projectionMatrix, cam_pos};
@@ -463,20 +449,8 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   glm::mat4 viewMatrix = glm::make_mat4(cam->GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(cam->GetProjectionMatrix());
   glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
+  glm::mat4 modelMatrix = glm::make_mat4(trans->GetModelMatrix());
 
-  glm::mat4 modelMatrix = glm::mat4(1.0f);
-
-  glm::vec3 objectPosition = glm::vec3(trans->position[0], trans->position[1], trans->position[2]);
-  glm::vec3 objectScale = glm::vec3(trans->scale[0], trans->scale[1], trans->scale[2]);
-  float rotationAngle = 0.0f;
-  glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
-
-  modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
-  /*modelMatrix = glm::rotate(modelMatrix, trans->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, trans->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, trans->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));*/
-  modelMatrix = glm::scale(modelMatrix, objectScale);
 
   float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
 
@@ -517,22 +491,8 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
 
   glm::mat4 viewMatrix = glm::make_mat4(cam->GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(cam->GetProjectionMatrix());
+  glm::mat4 modelMatrix = glm::make_mat4(trans->GetModelMatrix());
 
-  glm::mat4 modelMatrix = glm::mat4(1.0f);
-
-  glm::vec3 objectPosition = glm::vec3(trans->position[0], trans->position[1], trans->position[2]);
-  glm::vec3 objectScale = glm::vec3(trans->scale[0], trans->scale[1], trans->scale[2]);
-  float rotationAngle = 0.0f;
-  glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
-
-  modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
-  /*modelMatrix = glm::rotate(modelMatrix, trans->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, trans->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, trans->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));*/
-  modelMatrix = glm::scale(modelMatrix, objectScale);
-
-  // Cambiar lo de subir la luz al uniform buffer de ahora
   UniformBlockMatricesPointLight matrices_tmp;
   matrices_tmp.proj_view_cam = projectionMatrix * viewMatrix;
 
@@ -599,23 +559,8 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   glm::mat4 viewMatrix = glm::make_mat4(cam->GetViewMatrix());
   glm::mat4 projectionMatrix = glm::make_mat4(cam->GetProjectionMatrix());
   glm::mat4 viewProjCam = projectionMatrix * viewMatrix;
+  glm::mat4 modelMatrix = glm::make_mat4(trans->GetModelMatrix());
 
-  glm::mat4 modelMatrix = glm::mat4(1.0f);
-
-  glm::vec3 objectPosition = glm::vec3(trans->position[0], trans->position[1], trans->position[2]);
-  glm::vec3 objectScale = glm::vec3(trans->scale[0], trans->scale[1], trans->scale[2]);
-  float rotationAngle = 0.0f;
-  glm::vec3 objectRotationAxis = glm::vec3(trans->rotation[0], trans->rotation[1], trans->rotation[2]);
-
-  modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
-  /*modelMatrix = glm::rotate(modelMatrix, trans->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, trans->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, trans->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));*/
-  modelMatrix = glm::scale(modelMatrix, objectScale);
-
-  // TODO add campo en lights para las matrices asi solo tengo que hacerlo una vez y me lo guardo
-  
   glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
   glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
   glm::vec3 pos = glm::make_vec3(cam_pos + ( (-1.0f * light_dir) * 50.0f));
@@ -671,21 +616,8 @@ void RendererOpenGL::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s
 
   OpenGLShader* shader_tmp = static_cast<OpenGLShader*>(s.get());
   shader_tmp->Use();
-  
-  glm::mat4 modelMatrix = glm::mat4(1.0f);
 
-  glm::vec3 objectPosition = glm::vec3(tran->position[0], tran->position[1], tran->position[2]);
-  glm::vec3 objectScale = glm::vec3(tran->scale[0], tran->scale[1], tran->scale[2]);
-  float rotationAngle = 0.0f;
-  glm::vec3 objectRotationAxis = glm::vec3(tran->rotation[0], tran->rotation[1], tran->rotation[2]);
-
-  modelMatrix = glm::translate(modelMatrix, objectPosition);
-  modelMatrix = glm::rotate(modelMatrix, rotationAngle, objectRotationAxis);
-  /*modelMatrix = glm::rotate(modelMatrix, tran->rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, tran->rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-  modelMatrix = glm::rotate(modelMatrix, tran->rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));*/
-  modelMatrix = glm::scale(modelMatrix, objectScale);
-
+  glm::mat4 modelMatrix = glm::make_mat4(tran->GetModelMatrix());
   const float* tmp = cam->GetPosition();
   glm::vec3 cam_pos(tmp[0], tmp[1], tmp[2]);
 
@@ -778,7 +710,6 @@ void RendererOpenGL::draw_shadows(PointLight* l, MeshComponent* obj, TransformCo
 
   draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));
 }
-
 
 void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffer, Light* light) {
 

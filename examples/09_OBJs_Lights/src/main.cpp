@@ -109,9 +109,9 @@ int main(int argc, char** argv){
   tran.position[0] = 0.0f;
   tran.position[1] = 0.0f;
   tran.position[2] = 0.0f;
-  tran.rotation[0] = 1.0f;
-  tran.rotation[1] = 1.0f;
-  tran.rotation[2] = 1.0f;
+  tran.rotation[0] = 0.0f;
+  tran.rotation[1] = 0.0f;
+  tran.rotation[2] = 0.0f;
   tran.scale[0] = 1.0f;
   tran.scale[1] = 1.0f;
   tran.scale[2] = 1.0f;
@@ -119,9 +119,9 @@ int main(int argc, char** argv){
   tran_cube.position[0] = 0.0f;
   tran_cube.position[1] = 15.0f;
   tran_cube.position[2] = -15.0f;
-  tran_cube.rotation[0] = 1.0f;
-  tran_cube.rotation[1] = 1.0f;
-  tran_cube.rotation[2] = 1.0f;
+  tran_cube.rotation[0] = 0.0f;
+  tran_cube.rotation[1] = 0.0f;
+  tran_cube.rotation[2] = 0.0f;
   tran_cube.scale[0] = 3.0f;
   tran_cube.scale[1] = 3.0f;
   tran_cube.scale[2] = 3.0f;
@@ -130,7 +130,7 @@ int main(int argc, char** argv){
   tran_teapot.position[1] = 5.0f;
   tran_teapot.position[2] = -5.0f;
   tran_teapot.rotation[0] = 0.0f;
-  tran_teapot.rotation[1] = 1.0f;
+  tran_teapot.rotation[1] = 0.0f;
   tran_teapot.rotation[2] = 0.0f;
   tran_teapot.scale[0] = 2.0f;
   tran_teapot.scale[1] = 5.0f;
@@ -140,7 +140,7 @@ int main(int argc, char** argv){
   tran_teapot2.position[1] = 5.0f;
   tran_teapot2.position[2] = -5.0f;
   tran_teapot2.rotation[0] = 0.0f;
-  tran_teapot2.rotation[1] = 1.0f;
+  tran_teapot2.rotation[1] = 0.0f;
   tran_teapot2.rotation[2] = 0.0f;
   tran_teapot2.scale[0] = 2.0f;
   tran_teapot2.scale[1] = 2.0f;
@@ -178,7 +178,7 @@ int main(int argc, char** argv){
   spot.SetOuterCuttOff(outer_cut_off);
   spot.SetCastShadows(true);
   spot.SetEnabled(true);
-  //entity_comp.new_entity(spot);
+  entity_comp.new_entity(spot);
 
   position[1] += 10.0f;
   diffuse_color[0] = 0.0f;
@@ -251,7 +251,7 @@ int main(int argc, char** argv){
   //And::Entity* point_entity2 = entity_comp.new_entity(point2);
 
   And::Transform* tr_tmp = obj_id->get_component<And::Transform>();
-
+  And::TransformComponent* tr_cube = obj_cube_id->get_component<And::TransformComponent>();
   
 
   float fps_count = 0.0f;
@@ -260,6 +260,8 @@ int main(int argc, char** argv){
     window->update();
     g_renderer->new_frame();
     editor.ShowWindows();
+
+    tr_cube->rotation[1] = fps_count;
 
     //fly_cam.ProcessInput();
 
