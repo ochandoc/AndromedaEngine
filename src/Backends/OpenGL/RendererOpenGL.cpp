@@ -189,7 +189,7 @@ void RendererOpenGL::end_frame()
 
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	m_Window.end_frame();
+  m_Window.end_frame();
 }
 
 void RendererOpenGL::set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height){
@@ -802,6 +802,14 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     glDepthMask(GL_TRUE);
 }
 
+
+void RendererOpenGL::ResetTransforms(EntityComponentSystem& ecs) {
+
+    for (auto [tr] : ecs.get_components<TransformComponent>()) {
+        tr->Reset();
+    }
+
+}
 void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 
     std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
@@ -1059,7 +1067,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
 
 
 
-
+  ResetTransforms(entity);
   
 }
 

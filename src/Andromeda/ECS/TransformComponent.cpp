@@ -5,34 +5,40 @@
 
 namespace And {
 
+	struct Mat4 {
+		glm::mat4 model;
+	};
+
+	TransformComponent::TransformComponent() : m_matrix(){
+		m_matrix = std::make_shared<Mat4>();
+	}
+
+	TransformComponent::~TransformComponent(){}
+
 	float* TransformComponent::GetModelMatrix() {
 
-		glm::mat4 modelMatrix = glm::mat4(1.0f);
-		//if (m_should_recalculate) {
+		if (m_should_recalculate) {
+			m_matrix->model = glm::mat4(1.0f);
 
 			glm::vec3 objPosition = glm::vec3(position[0], position[1], position[2]);
 			glm::vec3 objScale = glm::vec3(scale[0], scale[1], scale[2]);
-			float rotationAngle = 0.0f;
-			glm::vec3 objRotationAxis = glm::vec3(rotation[0], rotation[1], rotation[2]);
 
-			modelMatrix = glm::translate(modelMatrix, objPosition);
-			//modelMatrix = glm::rotate(modelMatrix, rotationAngle, objRotationAxis);
-			modelMatrix = glm::rotate(modelMatrix, rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
-			modelMatrix = glm::rotate(modelMatrix, rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-			modelMatrix = glm::rotate(modelMatrix, rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
-			modelMatrix = glm::scale(modelMatrix, objScale);
+			m_matrix->model = glm::translate(m_matrix->model, objPosition);
+			m_matrix->model = glm::rotate(m_matrix->model, rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
+			m_matrix->model = glm::rotate(m_matrix->model, rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
+			m_matrix->model = glm::rotate(m_matrix->model, rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
+			m_matrix->model = glm::scale(m_matrix->model, objScale);
 
 			if (m_parent) {
-				//modelMatrix = modelMatrix * glm::make_mat4(m_parent->GetModelMatrix());
+				m_matrix->model = glm::make_mat4(m_parent->GetModelMatrix()) * m_matrix->model;
 			}
 
-			m_model_matrix = glm::value_ptr(modelMatrix);
+			
 			m_should_recalculate = false;
 
-		//}
+		}
 		
-	//return
-		return m_model_matrix;
+		return glm::value_ptr(m_matrix->model);
 
 
 	}
@@ -88,6 +94,10 @@ namespace And {
 		scale[1] = y;
 		scale[2] = z;
 
+		m_should_recalculate = true;
+	}
+
+	void TransformComponent::Reset(){
 		m_should_recalculate = true;
 	}
 

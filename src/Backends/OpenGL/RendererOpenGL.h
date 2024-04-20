@@ -52,6 +52,8 @@ namespace And{
         void draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran);
         void draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran);
         void draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* dir);
+        
+        void ResetTransforms(EntityComponentSystem& ecs);
 
         std::shared_ptr<RenderTarget> get_shadow_buffer();
         std::vector<std::shared_ptr<RenderTarget>> get_shadow_buffer_pointLight();

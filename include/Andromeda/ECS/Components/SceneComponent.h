@@ -9,6 +9,6 @@ namespace And
   {
   public:
     SceneComponent* Parent = nullptr;
-    Mat4 matrix;
+    //Mat4 matrix;
   };
 }

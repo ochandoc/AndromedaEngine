@@ -7,10 +7,7 @@
 
 namespace And
 {
-  struct Mat4
-  {
-    float d[16] = { 0.0f };
-  };
+  struct Mat4;
 
   class TransformComponent : public ComponentBase{
 
@@ -19,11 +16,13 @@ namespace And
     float rotation[3] = { 0.0f };
     float scale[3] = { 1.0f };
 
+    TransformComponent();
+    ~TransformComponent();
+
     TransformComponent* m_parent = nullptr;
 
     // hijo  * padre
 
-    Mat4 matrix;
 
     float* GetModelMatrix();
     void SetParent(TransformComponent* parent);
@@ -36,8 +35,10 @@ namespace And
     void SetScale(float* t);
     void SetScale(float x, float y, float z);
 
+    void Reset();
   private:
       bool m_should_recalculate = true;
-      float* m_model_matrix = nullptr;
+      //float* m_model_matrix = nullptr;
+      std::shared_ptr<Mat4> m_matrix;
   };
 }

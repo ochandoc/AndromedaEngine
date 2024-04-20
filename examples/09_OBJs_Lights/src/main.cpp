@@ -99,12 +99,15 @@ int main(int argc, char** argv){
 
   std::shared_ptr<And::Texture> texture_bricks = And::MakeTexture("bricks.jpg");
   std::shared_ptr<And::Texture> texture_jou = And::MakeTexture("sphere_basecolor.png");
+  std::shared_ptr<And::Texture> texture_cara_de_jou = And::MakeTexture("jou_cumple.png");
   MC.MeshOBJ->SetTexture(texture_bricks);
   MC_cube.MeshOBJ->SetTexture(texture_jou);
+  MC_cube2.MeshOBJ->SetTexture(texture_cara_de_jou);
 
 
   And::TransformComponent tran;
   And::TransformComponent tran_cube;
+  And::TransformComponent tran_cube2;
   And::TransformComponent tran_teapot;
   And::TransformComponent tran_teapot2;
   tran.position[0] = 0.0f;
@@ -123,9 +126,9 @@ int main(int argc, char** argv){
   tran_cube.rotation[0] = 0.0f;
   tran_cube.rotation[1] = 0.0f;
   tran_cube.rotation[2] = 0.0f;
-  tran_cube.scale[0] = 3.0f;
-  tran_cube.scale[1] = 3.0f;
-  tran_cube.scale[2] = 3.0f;
+  tran_cube.scale[0] = 2.0f;
+  tran_cube.scale[1] = 2.0f;
+  tran_cube.scale[2] = 2.0f;
   
   tran_teapot.position[0] = 0.0f;
   tran_teapot.position[1] = 5.0f;
@@ -147,12 +150,19 @@ int main(int argc, char** argv){
   tran_teapot2.scale[1] = 2.0f;
   tran_teapot2.scale[2] = 2.0f;
   And::Entity* obj_id = entity_comp.new_entity(MC, tran);
+
   And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube);
 
-  tran_cube.position[0] = 3.0f;
-  tran_cube.position[1] = 0.0f;
-  tran_cube.position[2] = 0.0f;
-  And::Entity* obj_cube_id2 = entity_comp.new_entity(MC_cube2, tran_cube);
+  tran_cube2.position[0] = 3.0f;
+  tran_cube2.position[1] = 0.0f;
+  tran_cube2.position[2] = 0.0f;
+  tran_cube2.rotation[0] = 0.0f;
+  tran_cube2.rotation[1] = 0.0f;
+  tran_cube2.rotation[2] = 0.0f;
+  tran_cube2.scale[0] = 1.0f;
+  tran_cube2.scale[1] = 1.0f;
+  tran_cube2.scale[2] = 1.0f;
+  And::Entity* obj_cube_id2 = entity_comp.new_entity(MC_cube2, tran_cube2);
 
   And::TransformComponent* tr_cube = obj_cube_id->get_component<And::TransformComponent>();
   And::TransformComponent* tr_cube2 = obj_cube_id2->get_component<And::TransformComponent>();
