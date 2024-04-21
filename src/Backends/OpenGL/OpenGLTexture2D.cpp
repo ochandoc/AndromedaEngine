@@ -149,6 +149,7 @@ namespace And
 	{
 		TextureCreationInfo CreationInfo;
 		int TextureChannels = 0;
+		stbi_set_flip_vertically_on_load_thread(1);
 		uint8* pixels = stbi_load(Path.c_str(), (int*)&CreationInfo.Width, (int*)&CreationInfo.Height, (int*)&TextureChannels, STBI_default);
 
 		std::shared_ptr<OpenGLTexture2D> Texture;

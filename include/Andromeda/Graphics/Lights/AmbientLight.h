@@ -46,7 +46,7 @@ class AmbientLight : public Light{
         float* GetDiffuseColor();
         void   GetDiffuseColor(float& r, float& g, float& b);
         
-        void   SetEnabled(float e);
+        void   SetEnabled(bool e);
         void   SetDiffuseColor(float color[3]);
         void   SetDiffuseColor(float x, float y, float z);
       

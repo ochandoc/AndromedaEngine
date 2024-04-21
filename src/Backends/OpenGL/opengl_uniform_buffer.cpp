@@ -9,7 +9,7 @@ namespace And {
 
     glGenBuffers(1, &id_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, id_ubo);
-    printf("Size del buffer antes de hacer buffer data: %u\n", size);
+    //printf("Size del buffer antes de hacer buffer data: %u\n", size);
     glBufferData(GL_UNIFORM_BUFFER, size, 0, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 

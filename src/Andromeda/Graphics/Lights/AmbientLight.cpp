@@ -55,8 +55,8 @@ float* AmbientLight::GetDiffuseColor() {
     return &m_raw.diffuse_color[0];
 }
 
-void AmbientLight::SetEnabled(float e){
-    m_raw.enabled = e;
+void AmbientLight::SetEnabled(bool e){
+    e ? m_raw.enabled = 1.0f : m_raw.enabled = 0.0f;
 }
 
 void AmbientLight::SetDiffuseColor(float color[3]){

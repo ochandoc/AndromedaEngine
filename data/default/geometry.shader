@@ -5,6 +5,7 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normals;
 layout(location = 2) in vec2 TexCoord;
 
+
 layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
   mat4 view;
@@ -40,13 +41,15 @@ void main()
 #type Fragment
 #version 430 core
 
-layout(location = 0) out vec4 FragColor;
+layout(location = 0) out vec3 Position;
 layout(location = 1) out vec3 FragNormal;
-layout(location = 2) out vec3 Position;
+layout(location = 2) out vec4 FragColor;
 
 in vec3 s_normal;
 in vec3 s_fragPos;
 in vec2 s_texCoords;
+
+uniform sampler2D texMaterial;
 
 //uniform sampler2D colorTexture;
 //uniform sampler2D specularTexture;
@@ -54,13 +57,10 @@ in vec2 s_texCoords;
 void main()
 {
   Position = s_fragPos;
-
   FragNormal = normalize(s_normal);
-
-  //FragColor.rgb = texture(colorTexture, s_texCoords).rgb;
-
-  FragColor.rgb = vec3(s_normal);
-
-  FragColor.a = 1.0;
-  //FragColor.a = texture(colorTexture, s_texCoords).r;
+  //FragColor.rgb = vec3(s_normal);
+  FragColor.rgb = texture(texMaterial, s_texCoords).rgb;
+  FragColor.a = 1.0; // specular
+  //FragColor.a = texture(specularTexture, s_texCoords).r;
+  
 }

@@ -31,7 +31,9 @@ namespace And{
         void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) override;
         void set_clear_color(float* color) override;
         void set_camera(CameraBase* cam) override;
+
         void draw_forward(EntityComponentSystem& entity) override;
+        void draw_deferred(EntityComponentSystem& entity) override;
 
     private:
         void draw_triangle(Triangle* t);
@@ -41,11 +43,17 @@ namespace And{
         void draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, PointLight* l, float* dir);
         void draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection);
 
+        void RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffer, Light* light);
+
+        void upload_light(Light* l);
+
         void draw_scene(Scene& scene, Shader* s);
 
         void draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran);
         void draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran);
         void draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* dir);
+        
+        void ResetTransforms(EntityComponentSystem& ecs);
 
         std::shared_ptr<RenderTarget> get_shadow_buffer();
         std::vector<std::shared_ptr<RenderTarget>> get_shadow_buffer_pointLight();
@@ -56,6 +64,10 @@ namespace And{
         FlyCamera m_DefaultCamera;
 
         std::shared_ptr<RenderTarget> m_shadows_buffer_;
+        std::shared_ptr<RenderTarget> m_gBuffer_;
+        std::shared_ptr<RenderTarget> m_full_quad_;
+        
+
         std::vector<std::shared_ptr<RenderTarget>> m_shadows_buffer_pointLight;
 
         std::shared_ptr<Shader> m_shadow_shader;
@@ -69,14 +81,25 @@ namespace And{
         std::shared_ptr<Shader> m_shader_spot;
         std::shared_ptr<Shader> m_shader_shadows_spot;
 
+        std::shared_ptr<Shader> m_shader_geometry;
+        std::shared_ptr<Shader> m_shader_quad_directional;
+        std::shared_ptr<Shader> m_shader_quad_ambient;
+        std::shared_ptr<Shader> m_shader_quad_spot;
+        std::shared_ptr<Shader> m_shader_quad_point;
+
         std::shared_ptr<UniformBuffer> m_buffer_matrix; // 208
         std::shared_ptr<UniformBuffer> m_buffer_matrix_pointLight; // 208 + 16 * 5
         std::shared_ptr<UniformBuffer> m_buffer_ambient_light; // 48
         std::shared_ptr<UniformBuffer> m_buffer_directional_light; // 48
         std::shared_ptr<UniformBuffer> m_buffer_point_light; // 64
         std::shared_ptr<UniformBuffer> m_buffer_spot_light; // 96
-
         std::shared_ptr<Direction> m_directions;
+
+
+        unsigned int m_quad_vao;
+        unsigned int m_quad_vbo;
+
+
 
     protected:
 

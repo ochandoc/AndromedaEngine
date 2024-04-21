@@ -85,8 +85,8 @@ float* DirectionalLight::GetDirection(){
     return &m_raw.direction[0];
 }
 
-void DirectionalLight::SetEnabled(float e){
-    m_raw.enabled = e;
+void DirectionalLight::SetEnabled(bool e){
+    e ? m_raw.enabled = 1.0f : m_raw.enabled = 0.0f;
 }
 
 void DirectionalLight::SetDiffuseColor(float color[3]){

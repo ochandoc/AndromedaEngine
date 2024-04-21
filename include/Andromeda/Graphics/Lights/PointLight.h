@@ -59,7 +59,7 @@ class PointLight : public Light{
         float  GetQuadraticAtt();
         void   GetQuadraticAtt(float& quadratic);
         
-        void  SetEnabled(float e);
+        void  SetEnabled(bool e);
         void  SetDiffuseColor(float color[3]);
         void  SetDiffuseColor(float r, float g, float b);
         void  SetSpecularStrength(float strength);
