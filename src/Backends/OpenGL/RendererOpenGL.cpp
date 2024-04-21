@@ -724,6 +724,11 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
          0, 2, 1, 0, 3, 2
     };
 
+    std::vector<std::shared_ptr<Texture>> tex_gbuffer = m_gBuffer_->GetTextures();
+    OpenGLTexture2D* position_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[0].get());
+    OpenGLTexture2D* normal_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[1].get());
+    OpenGLTexture2D* color_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[2].get());
+
     OpenGLShader* tmp;
 
     DirectionalLight* directional = dynamic_cast<DirectionalLight*>(light);
@@ -748,10 +753,7 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
 
     }
 
-    std::vector<std::shared_ptr<Texture>> tex_gbuffer = m_gBuffer_->GetTextures();
-    OpenGLTexture2D* position_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[0].get());
-    OpenGLTexture2D* normal_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[1].get());
-    OpenGLTexture2D* color_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[2].get());
+    
 
 
     // posicion, normal, color
@@ -773,6 +775,21 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
         tmp->SetTexture("texShadow", 3);
         tex_shadow->Activate(3);
     }
+
+    if (ambient) {
+        int index = 0;
+        std::vector<std::shared_ptr<And::RenderTarget>> render_targets = get_shadow_buffer_pointLight();
+        for (auto& target : render_targets) {
+
+            std::vector<std::shared_ptr<And::Texture>> shadow_texture = target->GetTextures();
+            OpenGLTexture2D* tex_shadows = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+            tmp->Use();
+            tex_shadows->Activate(index);
+            tmp->SetTextureInArray("texShadow", index, index);
+            index++;
+        }
+    }
+
 
     glBindVertexArray(m_quad_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
@@ -1047,17 +1064,21 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
       glBlendFunc(GL_ONE, GL_ONE);
   }
   
-  // Shadows point
+  std::vector<std::shared_ptr<And::RenderTarget>> render_targets = get_shadow_buffer_pointLight();
   for (auto [light] : entity.get_components<PointLight>()) {
-      shadow_buffer->Activate();
       glDisable(GL_BLEND);
       if (light->GetCastShadows()) {
-          // Por cada luz que castea sombras guardamos textura de profundidad
-          for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-              //draw_shadows(light, obj, transform);
+          int index = 0;
+          for (auto& target : render_targets) {
+              target->Activate();
+              // Por cada luz que castea sombras guardamos textura de profundidad, aqui hay que hacerlo en 6 shadow buffers, uno por cada cara de la point
+              for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+                  draw_shadows(light, obj, transform, glm::value_ptr(m_directions->dir[index]));
+              }
+              index++;
+              target->Desactivate();
           }
       }
-      shadow_buffer->Desactivate();
       glEnable(GL_BLEND);
 
       // Render spot
