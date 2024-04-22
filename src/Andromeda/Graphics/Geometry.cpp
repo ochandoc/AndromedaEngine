@@ -13,7 +13,7 @@ namespace And{
 
 std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_path){
 
-  std::cout << "Loading obj... " << filename << std::endl;
+  //std::cout << "Loading obj... " << filename << std::endl;
 
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
@@ -33,7 +33,7 @@ std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_
     printf("Obj not loaded correctly %s\n", err.c_str());
     return nullptr;
   }else{
-    printf("Obj loaded correctly\n");
+    //printf("Obj loaded correctly\n");
 
     int inner = 0;
     int outer = 0;
@@ -97,7 +97,7 @@ std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_
 
   Geometry obj{indices, vertex_info, mat};
 
-  printf("Init obj %s \n", filename.c_str());
+  //printf("Init obj %s \n", filename.c_str());
 
   unsigned int VAO;
   glGenVertexArrays(1, &VAO);
@@ -159,7 +159,7 @@ void Geometry::UseTexture(unsigned int slot){
 }
 
 Geometry::~Geometry() {
-  printf("Destruction %s\n", filename_.c_str());
+  //printf("Destruction %s\n", filename_.c_str());
 
   //glDeleteVertexArrays(1,&m_VAO);
 
