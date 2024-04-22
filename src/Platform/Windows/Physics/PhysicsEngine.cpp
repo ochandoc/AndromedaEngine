@@ -1,12 +1,19 @@
 #include "Andromeda/Physics/PhysicsEngine.h"
-//#include <PxPhysics.h>
-#include <PxPhysicsAPI.h>
 
-#include <PxFoundation.h>
+
+#define PX_PHYSX_STATIC_LIB 1
+#include "PxPhysicsAPI.h"
+
+
 
 namespace And {
 
 	struct PhysicsEngineData {
+
+		PhysicsEngineData() : default_allocator_callback(), error_callback(), cpu_dispatcher(nullptr),
+							  tolerance_scale(), foundation(nullptr), physics(nullptr), scene(nullptr),
+							  material(nullptr), pvd(nullptr), transport(nullptr), client(nullptr){}
+
 		physx::PxDefaultAllocator			default_allocator_callback;
 		physx::PxDefaultErrorCallback		error_callback;
 		physx::PxDefaultCpuDispatcher*		cpu_dispatcher = nullptr; // Multithreading
@@ -22,30 +29,36 @@ namespace And {
 		
 		physx::PxPvd*						pvd = nullptr;
 		physx::PxPvdTransport*				transport = nullptr;
-		physx::PxSceneDesc					sceneDesc;
+		physx::PxSceneDesc*					sceneDesc; // Esto no era un puntero
 		physx::PxPvdSceneClient*			client;
 	};
 
 
 
 std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
-	PhysicsEngine engine;
+	
+	std::shared_ptr<PhysicsEngine> engine(new PhysicsEngine);
+	engine->m_physics_data = std::make_shared<PhysicsEngineData>();
 	//std::shared_ptr<PhysicsEngine> engine = std::make_shared<PhysicsEngine>(std::move(e));
 	//engine.m_physics_data = std::make_shared<PhysicsEngineData>();
-	std::shared_ptr<PhysicsEngineData> data;
+	//engine.m_physics_data = std::make_shared<PhysicsEngineData>();
 
-	physx::PxDefaultAllocator allocator_tmp;
-	physx::PxDefaultErrorCallback error_callback_tmp;
-	physx::PxFoundation* foundation = PxCreateFoundation(PX_PHYSICS_VERSION, allocator_tmp, error_callback_tmp);
-	//data->foundation = PxCreateFoundation(PX_PHYSICS_VERSION, allocator_tmp, error_callback_tmp);
+
 	
-	//engine.m_physics_data->foundation = PxCreateFoundation(PX_PHYSICS_VERSION, engine.m_physics_data->default_allocator_callback, engine.m_physics_data->error_callback);
-	/*if (!data->foundation) {
+
+
+
+
+	engine->m_physics_data->foundation = PxCreateFoundation(PX_PHYSICS_VERSION, engine->m_physics_data->default_allocator_callback, engine->m_physics_data->error_callback);
+	
+	if (!engine->m_physics_data->foundation) {
 		printf("\n*** Error creating physics foundation ***\n");
 		return nullptr;
-	}*/
+	}
 
-	/*
+
+
+	
 	engine->m_physics_data->pvd = PxCreatePvd(*(engine->m_physics_data->foundation));
 	engine->m_physics_data->transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10); // ip, port, timeout
 	engine->m_physics_data->pvd->connect(*(engine->m_physics_data->transport), physx::PxPvdInstrumentationFlag::eALL);
@@ -53,22 +66,33 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
 	engine->m_physics_data->tolerance_scale.length = 100; // typical lenght of an object
 	engine->m_physics_data->tolerance_scale.speed = 981; // speed of and object in earth gravity
 
-	engine->m_physics_data->physics = PxCreatePhysics(PX_PHYSICS_VERSION, *(engine->m_physics_data->foundation), engine->m_physics_data->tolerance_scale, true, engine->m_physics_data->pvd);
+	physx::PxFoundation* foundation_tmp;
+	physx::PxTolerancesScale scale_tmp;
+
+
+	
+	engine->m_physics_data->physics = PxCreateBasePhysics(PX_PHYSICS_VERSION, *(engine->m_physics_data->foundation), engine->m_physics_data->tolerance_scale, true, engine->m_physics_data->pvd);
+	
+	
 	if (engine->m_physics_data->physics == nullptr) {
 		printf("\n*** Error creating physics ***\n");
 		return nullptr;
 	}
-
 	// Gravity
-	engine->m_physics_data->sceneDesc = physx::PxSceneDesc(engine->m_physics_data->physics->getTolerancesScale());
-	engine->m_physics_data->sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
+	//physx::PxSceneDesc scene_desc_tmp(physx::PxSceneDesc(engine->m_physics_data->physics->getTolerancesScale()));
+
+
+
+	//*(engine->m_physics_data->sceneDesc) = ;
+	(engine->m_physics_data->sceneDesc) = new physx::PxSceneDesc(engine->m_physics_data->physics->getTolerancesScale());
+	engine->m_physics_data->sceneDesc->gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 
 	// Threads
 	engine->m_physics_data->cpu_dispatcher = physx::PxDefaultCpuDispatcherCreate(2); // Num threads
-	engine->m_physics_data->sceneDesc.cpuDispatcher = engine->m_physics_data->cpu_dispatcher;
+	engine->m_physics_data->sceneDesc->cpuDispatcher = engine->m_physics_data->cpu_dispatcher;
 
-	engine->m_physics_data->sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
-	engine->m_physics_data->scene = engine->m_physics_data->physics->createScene(engine->m_physics_data->sceneDesc);
+	engine->m_physics_data->sceneDesc->filterShader = physx::PxDefaultSimulationFilterShader;
+	engine->m_physics_data->scene = engine->m_physics_data->physics->createScene(*(engine->m_physics_data->sceneDesc));
 
 	engine->m_physics_data->client = engine->m_physics_data->scene->getScenePvdClient();
 	if (!engine->m_physics_data->client) {
@@ -84,11 +108,11 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
 	// Create simulation
 	engine->m_physics_data->material = engine->m_physics_data->physics->createMaterial(0.5f, 0.5f, 0.0f); // static friction, dynamic friction, restitution
 	physx::PxRigidStatic* groundPlane = PxCreatePlane(*(engine->m_physics_data->physics), physx::PxPlane(0,1,0,1), *(engine->m_physics_data->material));
-	engine->m_physics_data->scene->addActor(*groundPlane);*/
+	engine->m_physics_data->scene->addActor(*groundPlane);
 	
-	std::shared_ptr<PhysicsEngine> e = std::make_shared<PhysicsEngine>(std::move(engine));
-	return e;
-
+	//std::shared_ptr<PhysicsEngine> e = std::make_shared<PhysicsEngine>(std::move(engine));
+	//return std::move(engine);
+	return engine;
 }
 
 PhysicsEngine::PhysicsEngine() : m_physics_data(){
