@@ -287,7 +287,7 @@ int main(int argc, char** argv){
 
     //And::FlyCamera* cam;
         
-    fly_cam.ShowValues();
+    //fly_cam.ShowValues();
         //g_renderer->get_camera();
     //cam->SetPosition(0.0f, 0.0f, 0.0f);
    
