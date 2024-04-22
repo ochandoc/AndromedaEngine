@@ -83,6 +83,8 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   info.Formats.push_back(ETextureFormat::RGBA8);  // Color
   m_gBuffer_ = MakeRenderTarget(info);
 
+  info.Formats.clear();
+  info.Formats.push_back(ETextureFormat::Depth);
   // Shadow buffers for point light
   for(int i = 0; i < 6; i++){
     m_shadows_buffer_pointLight.push_back(MakeRenderTarget(info)); 
@@ -991,6 +993,8 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
         }
         glBlendFunc(GL_ONE, GL_ONE);
     }
+
+    ResetTransforms(entity);
     
 }
 

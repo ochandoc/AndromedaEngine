@@ -357,6 +357,7 @@ namespace And
 
   EUniformType OpenGLShaderPreProcessor::GetUniformTypeFromString(const std::string& uniform)
   {
+    // TODO (och): check the name if the uniform blocks contains a name of a type
     const uint32 NumUniformTypesStr = 11;
 
     for (int i = 0; i < NumUniformTypesStr; ++i)

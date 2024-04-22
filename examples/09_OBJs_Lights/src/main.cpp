@@ -304,8 +304,8 @@ int main(int argc, char** argv){
     
 
     
-    //g_renderer->draw_forward(entity_comp);
-    g_renderer->draw_deferred(entity_comp);
+    g_renderer->draw_forward(entity_comp);
+    //g_renderer->draw_deferred(entity_comp);
     g_renderer->end_frame();
     window->swap_buffers();
   }
