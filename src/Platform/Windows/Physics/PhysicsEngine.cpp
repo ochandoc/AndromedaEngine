@@ -1,5 +1,8 @@
 #include "Andromeda/Physics/PhysicsEngine.h"
-#include "PxPhysicsAPI.h"
+//#include <PxPhysics.h>
+#include <PxPhysicsAPI.h>
+
+#include <PxFoundation.h>
 
 namespace And {
 
@@ -23,17 +26,26 @@ namespace And {
 		physx::PxPvdSceneClient*			client;
 	};
 
-std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
-	PhysicsEngine e;
-	std::shared_ptr<PhysicsEngine> engine = std::make_shared<PhysicsEngine>(e);
-	//engine->m_physics_data = std::make_shared<PhysicsEngineData>();
 
-	m_physics_data->foundation = PxCreateFoundation(PX_PHYSICS_VERSION, engine->m_physics_data->default_allocator_callback, engine->m_physics_data->error_callback);
-	if (!engine->m_physics_data->foundation) {
+
+std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
+	PhysicsEngine engine;
+	//std::shared_ptr<PhysicsEngine> engine = std::make_shared<PhysicsEngine>(std::move(e));
+	//engine.m_physics_data = std::make_shared<PhysicsEngineData>();
+	std::shared_ptr<PhysicsEngineData> data;
+
+	physx::PxDefaultAllocator allocator_tmp;
+	physx::PxDefaultErrorCallback error_callback_tmp;
+	physx::PxFoundation* foundation = PxCreateFoundation(PX_PHYSICS_VERSION, allocator_tmp, error_callback_tmp);
+	//data->foundation = PxCreateFoundation(PX_PHYSICS_VERSION, allocator_tmp, error_callback_tmp);
+	
+	//engine.m_physics_data->foundation = PxCreateFoundation(PX_PHYSICS_VERSION, engine.m_physics_data->default_allocator_callback, engine.m_physics_data->error_callback);
+	/*if (!data->foundation) {
 		printf("\n*** Error creating physics foundation ***\n");
 		return nullptr;
-	}
+	}*/
 
+	/*
 	engine->m_physics_data->pvd = PxCreatePvd(*(engine->m_physics_data->foundation));
 	engine->m_physics_data->transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10); // ip, port, timeout
 	engine->m_physics_data->pvd->connect(*(engine->m_physics_data->transport), physx::PxPvdInstrumentationFlag::eALL);
@@ -72,9 +84,10 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
 	// Create simulation
 	engine->m_physics_data->material = engine->m_physics_data->physics->createMaterial(0.5f, 0.5f, 0.0f); // static friction, dynamic friction, restitution
 	physx::PxRigidStatic* groundPlane = PxCreatePlane(*(engine->m_physics_data->physics), physx::PxPlane(0,1,0,1), *(engine->m_physics_data->material));
-	engine->m_physics_data->scene->addActor(*groundPlane);
+	engine->m_physics_data->scene->addActor(*groundPlane);*/
 	
-	return engine;
+	std::shared_ptr<PhysicsEngine> e = std::make_shared<PhysicsEngine>(std::move(engine));
+	return e;
 
 }
 
@@ -84,6 +97,11 @@ PhysicsEngine::PhysicsEngine() : m_physics_data(){
 
 PhysicsEngine::~PhysicsEngine(){
 
+}
+
+PhysicsEngine::PhysicsEngine(PhysicsEngine&& other){
+
+	this->m_physics_data = other.m_physics_data;
 }
 
 void PhysicsEngine::GetError(){

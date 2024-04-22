@@ -62,4 +62,8 @@
 #include "Andromeda/Editor/Editor.h"
 #include "Andromeda/Editor/ShaderTextEditor.h"
 
+#include "Andromeda/Physics/PhysicsEngine.h"
+#include "Andromeda/Physics/PhysicsBase.h"
+#include "Andromeda/Physics/Physics.h"
+
 #include "andpch.hpp"

@@ -11,10 +11,11 @@ class PhysicsEngine final{
 
     public:
 
-    std::shared_ptr<PhysicsEngine> Init();
+    static std::shared_ptr<PhysicsEngine> Init();
     ~PhysicsEngine();
+    PhysicsEngine(PhysicsEngine&&);
     NON_COPYABLE_CLASS(PhysicsEngine)
-        NON_MOVABLE_CLASS(PhysicsEngine)
+    
 
     void Simulate(double dt, bool fetch = true);
     void SetGravity(float x, float y, float z);

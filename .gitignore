@@ -43,6 +43,9 @@
 bin
 build
 
+# others
+*.log
+
 deps/Soloud
 
 examples/**/bin
