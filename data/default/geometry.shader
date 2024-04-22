@@ -17,13 +17,6 @@ out vec3 s_normal;
 out vec3 s_fragPos;
 out vec2 s_texCoords;
 
-vec2 points[] = {
-  -1,-1,
-  -1, 1,
-  1, 1,
-  1, -1
-}
-
 void main()
 {
   vec4 worldPos = model * vec4(position, 1.0);
@@ -35,7 +28,6 @@ void main()
   s_normal = normalMatrix * normals;
 
   gl_Position = projection * view * worldPos;
-  gl_Position = vec4(points[i], 0.0, 1.0);
 }
 
 #type Fragment

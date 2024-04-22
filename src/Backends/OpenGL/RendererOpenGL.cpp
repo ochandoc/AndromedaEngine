@@ -827,6 +827,7 @@ void RendererOpenGL::ResetTransforms(EntityComponentSystem& ecs) {
     }
 
 }
+
 void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 
     std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
