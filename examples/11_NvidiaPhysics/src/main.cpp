@@ -99,6 +99,12 @@ int main(int argc, char** argv){
   MC_cube2.MeshOBJ = And::Geometry::load("cube.obj");
   MC_teapot.MeshOBJ = And::Geometry::load("teapot.obj");
   MC_teapot2.MeshOBJ = And::Geometry::load("teapot.obj");
+  
+  //std::shared_ptr<And::Physics> e_tmp(And::Physics(physics_engine));
+  //std::shared_ptr<And::Physics> e_tmp = std::make_shared<And::Physics>(physics_tmp);
+  
+  MC_cube.Physics = std::shared_ptr<And::Physics>();
+
 
   std::shared_ptr<And::Texture> texture_bricks = And::MakeTexture("bricks.jpg");
   std::shared_ptr<And::Texture> texture_jou = And::MakeTexture("sphere_basecolor.png");

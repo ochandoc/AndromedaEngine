@@ -38,6 +38,7 @@ namespace And
     void Reset();
   private:
       bool m_should_recalculate = true;
+    
       //float* m_model_matrix = nullptr;
       std::shared_ptr<Mat4> m_matrix;
   };
