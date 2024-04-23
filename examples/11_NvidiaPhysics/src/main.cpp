@@ -103,8 +103,6 @@ int main(int argc, char** argv){
   //std::shared_ptr<And::Physics> e_tmp(And::Physics(physics_engine));
   //std::shared_ptr<And::Physics> e_tmp = std::make_shared<And::Physics>(physics_tmp);
   
-  MC_cube.Physics = std::shared_ptr<And::Physics>();
-
 
   std::shared_ptr<And::Texture> texture_bricks = And::MakeTexture("bricks.jpg");
   std::shared_ptr<And::Texture> texture_jou = And::MakeTexture("sphere_basecolor.png");
@@ -160,7 +158,10 @@ int main(int argc, char** argv){
   tran_teapot2.scale[2] = 2.0f;
   And::Entity* obj_id = entity_comp.new_entity(MC, tran);
 
-  And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube);
+  And::RigidBody rb = physics_engine->CreateRigidBody();
+  rb.AddBoxCollider(tran_cube.position, tran_cube.scale);
+  rb.AffectsGravity(true);
+  And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube, rb);
 
   tran_cube2.position[0] = 3.0f;
   tran_cube2.position[1] = 0.0f;
@@ -176,6 +177,8 @@ int main(int argc, char** argv){
   And::TransformComponent* tr_cube = obj_cube_id->get_component<And::TransformComponent>();
   And::TransformComponent* tr_cube2 = obj_cube_id2->get_component<And::TransformComponent>();
   tr_cube2->SetParent(tr_cube);
+
+ 
   //And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
   //And::Entity* obj_teapot_id2 = entity_comp.new_entity(MC_teapot2, tran_teapot2);
  
@@ -290,7 +293,7 @@ int main(int argc, char** argv){
     g_renderer->new_frame();
     editor.ShowWindows();
 
-    tr_cube->SetRotation(0.0f, fps_count, 0.0f);
+    //tr_cube->SetRotation(0.0f, fps_count, 0.0f);
 
     //fly_cam.ProcessInput();
 
@@ -313,12 +316,18 @@ int main(int argc, char** argv){
     
 
     
-    physics_engine->Simulate(window->get_delta_time());
+    //physics_engine->Simulate(window->get_delta_time());
+    physics_engine->Simulate(1.0f/60.0f);
+    physics_engine->Apply(entity_comp);
+    
+
     //g_renderer->draw_forward(entity_comp);
     g_renderer->draw_deferred(entity_comp);
     g_renderer->end_frame();
     window->swap_buffers();
   }
+
+  physics_engine->Release(entity_comp);
 
   return 0;
 }

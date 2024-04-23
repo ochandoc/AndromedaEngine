@@ -3,12 +3,19 @@
 
 #define PX_PHYSX_STATIC_LIB 1
 #include "PxPhysicsAPI.h"
+#include "Andromeda/ECS/Components/TransformComponent.h"
+
 
 
 
 namespace And {
 
-	struct PhysicsEngineData {
+struct PhysicsData {
+	physx::PxPhysics* physics;
+	physx::PxRigidDynamic* actor;
+	physx::PxScene* scene;
+};
+struct PhysicsEngineData {
 
 		PhysicsEngineData() : default_allocator_callback(), error_callback(), cpu_dispatcher(nullptr),
 							  tolerance_scale(), foundation(nullptr), physics(nullptr), scene(nullptr),
@@ -33,32 +40,17 @@ namespace And {
 		physx::PxPvdSceneClient*			client;
 	};
 
-
-
 std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
 	
 	std::shared_ptr<PhysicsEngine> engine(new PhysicsEngine);
 	engine->m_physics_data = std::make_shared<PhysicsEngineData>();
-	//std::shared_ptr<PhysicsEngine> engine = std::make_shared<PhysicsEngine>(std::move(e));
-	//engine.m_physics_data = std::make_shared<PhysicsEngineData>();
-	//engine.m_physics_data = std::make_shared<PhysicsEngineData>();
-
-
-	
-
-
-
 
 	engine->m_physics_data->foundation = PxCreateFoundation(PX_PHYSICS_VERSION, engine->m_physics_data->default_allocator_callback, engine->m_physics_data->error_callback);
-	
 	if (!engine->m_physics_data->foundation) {
 		printf("\n*** Error creating physics foundation ***\n");
 		return nullptr;
 	}
 
-
-
-	
 	engine->m_physics_data->pvd = PxCreatePvd(*(engine->m_physics_data->foundation));
 	engine->m_physics_data->transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10); // ip, port, timeout
 	engine->m_physics_data->pvd->connect(*(engine->m_physics_data->transport), physx::PxPvdInstrumentationFlag::eALL);
@@ -68,22 +60,14 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
 
 	physx::PxFoundation* foundation_tmp;
 	physx::PxTolerancesScale scale_tmp;
-
-
 	
 	engine->m_physics_data->physics = PxCreateBasePhysics(PX_PHYSICS_VERSION, *(engine->m_physics_data->foundation), engine->m_physics_data->tolerance_scale, true, engine->m_physics_data->pvd);
-	
-	
 	if (engine->m_physics_data->physics == nullptr) {
 		printf("\n*** Error creating physics ***\n");
 		return nullptr;
 	}
+
 	// Gravity
-	//physx::PxSceneDesc scene_desc_tmp(physx::PxSceneDesc(engine->m_physics_data->physics->getTolerancesScale()));
-
-
-
-	//*(engine->m_physics_data->sceneDesc) = ;
 	(engine->m_physics_data->sceneDesc) = new physx::PxSceneDesc(engine->m_physics_data->physics->getTolerancesScale());
 	engine->m_physics_data->sceneDesc->gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 
@@ -104,14 +88,11 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
 		engine->m_physics_data->client->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
 	}
 
-	 
 	// Create simulation
 	engine->m_physics_data->material = engine->m_physics_data->physics->createMaterial(0.5f, 0.5f, 0.0f); // static friction, dynamic friction, restitution
 	physx::PxRigidStatic* groundPlane = PxCreatePlane(*(engine->m_physics_data->physics), physx::PxPlane(0,1,0,1), *(engine->m_physics_data->material));
 	engine->m_physics_data->scene->addActor(*groundPlane);
 	
-	//std::shared_ptr<PhysicsEngine> e = std::make_shared<PhysicsEngine>(std::move(engine));
-	//return std::move(engine);
 	return engine;
 }
 
@@ -130,12 +111,40 @@ PhysicsEngine::PhysicsEngine(PhysicsEngine&& other){
 
 void PhysicsEngine::GetError(){
 
-	//m_physics_data->error_callback.reportError();
+	//m_physics_data->error_callback.reportError
+}
+
+RigidBody PhysicsEngine::CreateRigidBody(){
+	RigidBody rb{};
+	PhysicsData data;
+	data.physics = m_physics_data->physics;
+	data.scene = m_physics_data->scene;
+
+	rb.m_data = std::make_shared<PhysicsData>(data);
+	return rb;
 }
 
 void PhysicsEngine::Simulate(double dt, bool fetch) {
 	m_physics_data->scene->simulate(dt);
 	m_physics_data->scene->fetchResults(fetch);
+}
+
+void PhysicsEngine::Apply(EntityComponentSystem& ecs) {
+
+	for (auto [tr, rb] : ecs.get_components<TransformComponent, RigidBody>()) {
+		float pos[3];
+		float rot[3];
+
+		rb->GetPositionRotation(pos, rot);
+		tr->SetPosition(pos);
+		tr->SetRotation(rot);
+	}
+}
+
+void PhysicsEngine::Release(EntityComponentSystem& ecs){
+	for (auto [rb] : ecs.get_components<RigidBody>()) {
+		rb->Release();
+	}
 }
 
 

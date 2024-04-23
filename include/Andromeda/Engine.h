@@ -10,6 +10,7 @@
 #include "Andromeda/Graphics/Lights/SpotLight.h"
 #include "Andromeda/Graphics/Lights/PointLight.h"
 #include "Andromeda/ECS/EntityComponentSystem.h"
+#include "Andromeda/Physics/RigidBody.h"
 
 namespace And
 {
@@ -36,5 +37,6 @@ namespace And
 		e.add_component_class<And::AmbientLight>();
 		e.add_component_class<And::DirectionalLight>();
 		e.add_component_class<And::PointLight>();
+		e.add_component_class<And::RigidBody>();
 	}
 }

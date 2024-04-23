@@ -1,5 +1,7 @@
 #pragma once
 #include "Andromeda/Misc/CoreMiscDefines.h"
+#include "Andromeda/Physics/RigidBody.h"
+#include "Andromeda/ECS/EntityComponentSystem.h"
 
 
 namespace And {
@@ -15,18 +17,25 @@ class PhysicsEngine final{
     ~PhysicsEngine();
     PhysicsEngine(PhysicsEngine&&);
     NON_COPYABLE_CLASS(PhysicsEngine)
-    
+
 
     void Simulate(double dt, bool fetch = true);
+    void Apply(EntityComponentSystem& ecs);
+    void Release(EntityComponentSystem& ecs);
+
+
     void SetGravity(float x, float y, float z);
     void SetObjectLenght(unsigned int l);
     void SetSpeedScale(unsigned int speed);
 
     void GetError();
 
+    
+    RigidBody CreateRigidBody();
+
+    std::shared_ptr<PhysicsEngineData> m_physics_data;
     private:
     
     PhysicsEngine();
-    std::shared_ptr<PhysicsEngineData> m_physics_data;
 };
 }
