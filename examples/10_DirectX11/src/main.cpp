@@ -111,7 +111,7 @@ int main(int argc, char** argv){
 
 
   And::SpotLight spot{};
-  spot.SetPosition(6.0f, 5.0f, -5.0f);
+  spot.SetPosition(10.0f, 5.0f, -5.0f);
   spot.SetDirection(-1.0f, 0.0f, 0.0f);
   spot.SetDiffuseColor(0.0f, 1.0f, 0.0f);
   spot.SetSpecularColor(specular_color);

@@ -177,8 +177,8 @@ namespace And
 
     D3D11_DEPTH_STENCIL_DESC DSDesc = {
       .DepthEnable = true,
-      .DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO,
-      .DepthFunc = D3D11_COMPARISON_LESS,
+      .DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL, //D3D11_DEPTH_WRITE_MASK_ZERO,
+      .DepthFunc = D3D11_COMPARISON_LESS_EQUAL,
       .StencilEnable = false,
       .StencilReadMask = 0,
       .StencilWriteMask = 0,
@@ -188,6 +188,22 @@ namespace And
 
     ComPtr<ID3D11DepthStencilState> DepthStencilState;
     result = device->CreateDepthStencilState(&DSDesc, DepthStencilState.GetAddressOf());
+
+    assert(SUCCEEDED(result));
+
+    D3D11_DEPTH_STENCIL_DESC DSDisabledDesc = {
+    .DepthEnable = false,
+    .DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO,
+    .DepthFunc = D3D11_COMPARISON_NEVER,
+    .StencilEnable = false,
+    .StencilReadMask = 0,
+    .StencilWriteMask = 0,
+    .FrontFace = {},
+    .BackFace = {}
+    };
+
+    ComPtr<ID3D11DepthStencilState> DisabledDepthStencilState;
+    result = device->CreateDepthStencilState(&DSDisabledDesc, DisabledDepthStencilState.GetAddressOf());
 
     assert(SUCCEEDED(result));
 
@@ -247,7 +263,8 @@ namespace And
     renderer->m_RasterizerState = RasterizerState;
     renderer->m_DepthStencilView = depthStencilView;
     renderer->m_RenderTargetView = RenderTargetView;
-    renderer->m_DepthStencil = DepthStencilState;
+    renderer->m_DepthStencil.Disabled = DisabledDepthStencilState;
+    renderer->m_DepthStencilState = DepthStencilState;
     renderer->m_LightsBlendState = LightBlendState;
     renderer->m_ZeroBlendState = ZeroBlendState;
 
@@ -303,18 +320,22 @@ namespace And
   {
     if (!m_Camera) return;
 
-    //SkyboxPass();
+    SkyboxPass();
 
     /**  Ambient light */
     {
       /**  Enable Blend state */
       m_DeviceContext->OMSetBlendState(m_ZeroBlendState.Get(), nullptr, 0xffffffff);
+      /**  Enable depth stencil state */
+      m_DeviceContext->OMSetDepthStencilState(m_DepthStencilState.Get(), 0);
       for (auto& [mesh_component, transform, matComp] : ecs.get_components<MeshComponent, TransformComponent, MaterialComponent>())
       {
         ObjectPass(mesh_component->GetMesh().get(), transform, matComp->GetMaterial().get(), "Light.Ambient");
       }
       /**  Disable Blend state */
       m_DeviceContext->OMSetBlendState(m_LightsBlendState.Get(), nullptr, 0xffffffff);
+      /**  Disable depth stencil state */
+      m_DeviceContext->OMSetDepthStencilState(m_DepthStencilState.Get(), 0);
     }
     
     /**  Directional light pass */
@@ -344,6 +365,8 @@ namespace And
     /**  Spot light pass */
     for (auto& [light] : ecs.get_components<SpotLight>())
     {
+      BillboardPass(glm::make_vec3(light->GetPosition()), glm::vec2(0.75f), m_LightTexture.get());
+
       if (!light->GetEnabled()) continue;
 
       for (auto& [mesh_component, transform, matComp] : ecs.get_components<MeshComponent, TransformComponent, MaterialComponent>())
@@ -374,9 +397,9 @@ namespace And
     /**  Point light pass */
     for (auto& [light] : ecs.get_components<PointLight>())
     {
-      if (!light->GetEnabled()) continue;
-
       BillboardPass(glm::make_vec3(light->GetPosition()), glm::vec2(0.75f), m_LightTexture.get());
+
+      if (!light->GetEnabled()) continue;
 
       for (auto& [mesh_component, transform, matComp] : ecs.get_components<MeshComponent, TransformComponent, MaterialComponent>())
       {
@@ -529,7 +552,7 @@ namespace And
     m_DeviceContext->PSSetSamplers(0, 1, PSSamplers);
 
     /**  Depth stencil state */
-    m_DeviceContext->OMSetDepthStencilState(m_DepthStencil.Get(), 0);
+    //m_DeviceContext->OMSetDepthStencilState(m_DepthStencilState.Get(), 0);
 
     m_DeviceContext->DrawIndexed((uint32)IB->GetNumIndices(), 0, 0);
   }
@@ -600,7 +623,7 @@ namespace And
     m_DeviceContext->PSSetSamplers(0, 1, PSSamplers);
 
     /**  Depth stencil state */
-    m_DeviceContext->OMSetDepthStencilState(m_DepthStencil.Get(), 0);
+    m_DeviceContext->OMSetDepthStencilState(m_DepthStencilState.Get(), 0);
     /**  Blend state */
     m_DeviceContext->OMGetBlendState(&LastBlendState, LastBlendFactor, &LastBlendMask);
     m_DeviceContext->OMSetBlendState(m_ZeroBlendState.Get(), nullptr, 0xffffffff);

@@ -67,7 +67,10 @@ namespace And
       std::shared_ptr<DirectX11VertexBuffer> VertexBuffer;
       std::shared_ptr<DirectX11IndexBuffer> IndexBuffer;
     } m_Billboard;
-    ComPtr<ID3D11DepthStencilState> m_DepthStencil;
+    struct {
+      ComPtr<ID3D11DepthStencilState> Disabled;
+    } m_DepthStencil;
+    ComPtr<ID3D11DepthStencilState> m_DepthStencilState;
     DirectX11ShaderLibrary m_ShaderLibrary;
     std::shared_ptr<DirectX11Texture2D> m_LightTexture;
     std::vector<ID3D11Buffer*> m_VSConstantBuffers;

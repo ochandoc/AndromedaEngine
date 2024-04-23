@@ -94,7 +94,7 @@ PS_OUTPUT main(PS_INPUT input) : SV_TARGET
   float Epsilon = (CutOff - OuterCutOff);
   float Intensity = clamp((Theta - OuterCutOff) / Epsilon, 0.0f, 1.0f);
   
-  float diff = max(dot(input.Normal, LightDir), 1.0f);
+  float diff = max(dot(input.Normal, LightDir), 0.0f);
   float3 diffuse = diff * DiffuseColor * AttenuationAmount * Intensity;
   
   float3 ReflectDir = reflect(-LightDir, input.Normal);
