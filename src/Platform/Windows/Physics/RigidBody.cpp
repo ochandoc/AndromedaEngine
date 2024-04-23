@@ -56,7 +56,7 @@ void RigidBody::AddBoxCollider(float* position, float* scale){
 	transform.p = physx::PxVec3(position[0], position[1], position[2]);
 	m_data->actor = m_data->physics->createRigidDynamic(transform);
 	
-	physx::PxBoxGeometry box(scale[0], scale[1], scale[2]);
+	physx::PxBoxGeometry box(scale[0] * 0.5f, scale[1] * 0.5f, scale[2] * 0.5f);
 	physx::PxMaterial* mat = m_data->physics->createMaterial(0.5f, 0.5f, 0.0f); // static friction, dynamic friction, restitution);
 	physx::PxShape* boxShape = m_data->physics->createShape(box, *mat, true);
 	//boxShape->setLocalPose(physx::PxTransform(0.0f, 0.0f, 0.0f));
@@ -73,6 +73,9 @@ void RigidBody::Release(){
 	m_data->actor->release();
 }
 
+void RigidBody::SetMass(float mass) {
+	m_data->actor->setMass(mass);
+}
 void RigidBody::GetPosition(float* position){
 
 	physx::PxTransform transform = m_data->actor->getGlobalPose();
@@ -92,9 +95,6 @@ void RigidBody::GetRotation(float* rotation)
 
 void RigidBody::GetPositionRotation(float* position, float* rotation){
 
-	if (m_data->actor) {
-		printf("Hay actor\n");
-	}
 	physx::PxTransform transform = m_data->actor->getGlobalPose();
 	rotation[0] = transform.q.x;
 	rotation[1] = transform.q.y;

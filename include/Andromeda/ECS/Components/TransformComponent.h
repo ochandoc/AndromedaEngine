@@ -18,6 +18,10 @@ namespace And
 
     TransformComponent();
     ~TransformComponent();
+    TransformComponent(const TransformComponent&);
+    TransformComponent(TransformComponent&&);
+    TransformComponent operator=(const TransformComponent&);
+
 
     TransformComponent* m_parent = nullptr;
 

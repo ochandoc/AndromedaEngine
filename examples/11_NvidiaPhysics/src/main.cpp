@@ -34,6 +34,31 @@ void WaitTask(int num){
   printf("Num: %d\n", num);
 }
 
+static void CreateJouCube(float* pos, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, std::shared_ptr<And::Texture> texture) {
+    And::MeshComponent MC;
+    MC.MeshOBJ = And::Geometry::load("cube.obj");
+    MC.MeshOBJ->SetTexture(texture);
+
+    And::TransformComponent tran;
+    tran.position[0] = pos[0];
+    tran.position[1] = pos[1];
+    tran.position[2] = pos[2];
+    tran.rotation[0] = 0.0f;
+    tran.rotation[1] = 0.0f;
+    tran.rotation[2] = 0.0f;
+    tran.scale[0] = 1.0f;
+    tran.scale[1] = 1.0f;
+    tran.scale[2] = 1.0f;
+
+    And::RigidBody rb = engine.CreateRigidBody();
+    rb.AddBoxCollider(tran.position, tran.scale);
+    rb.AffectsGravity(true);
+    rb.SetMass(5.0f);
+
+    ecs.new_entity(MC, tran, rb);
+
+}
+
 int main(int argc, char** argv){
 
   And::Engine e;
@@ -93,9 +118,10 @@ int main(int argc, char** argv){
   float pos_x = 0.0f;
   float pos_y = -5.0f;
 
-  And::MeshComponent MC, MC_teapot, MC_teapot2, MC_cube, MC_cube2;
+  And::MeshComponent MC, MC_teapot, MC_teapot2, MC_cube, MC_cube2, MC_cube_up;
   MC.MeshOBJ = And::Geometry::load("sponza.obj");
   MC_cube.MeshOBJ = And::Geometry::load("cube.obj");
+  MC_cube_up.MeshOBJ = And::Geometry::load("cube.obj");
   MC_cube2.MeshOBJ = And::Geometry::load("cube.obj");
   MC_teapot.MeshOBJ = And::Geometry::load("teapot.obj");
   MC_teapot2.MeshOBJ = And::Geometry::load("teapot.obj");
@@ -109,16 +135,19 @@ int main(int argc, char** argv){
   std::shared_ptr<And::Texture> texture_cara_de_jou = And::MakeTexture("jou_cumple.png");
   MC.MeshOBJ->SetTexture(texture_bricks);
   MC_cube.MeshOBJ->SetTexture(texture_jou);
+
   MC_cube2.MeshOBJ->SetTexture(texture_cara_de_jou);
+  MC_cube_up.MeshOBJ->SetTexture(texture_cara_de_jou);
 
 
   And::TransformComponent tran;
+  And::TransformComponent tran_cube_up;
   And::TransformComponent tran_cube;
   And::TransformComponent tran_cube2;
   And::TransformComponent tran_teapot;
   And::TransformComponent tran_teapot2;
   tran.position[0] = 0.0f;
-  tran.position[1] = 0.0f;
+  tran.position[1] = -1.0f;
   tran.position[2] = 0.0f;
   tran.rotation[0] = 0.0f;
   tran.rotation[1] = 0.0f;
@@ -136,6 +165,16 @@ int main(int argc, char** argv){
   tran_cube.scale[0] = 2.0f;
   tran_cube.scale[1] = 2.0f;
   tran_cube.scale[2] = 2.0f;
+  
+  tran_cube_up.position[0] = 1.0f;
+  tran_cube_up.position[1] = 20.0f;
+  tran_cube_up.position[2] = -15.0f;
+  tran_cube_up.rotation[0] = 0.0f;
+  tran_cube_up.rotation[1] = 0.0f;
+  tran_cube_up.rotation[2] = 0.0f;
+  tran_cube_up.scale[0] = 2.0f;
+  tran_cube_up.scale[1] = 2.0f;
+  tran_cube_up.scale[2] = 2.0f;
   
   tran_teapot.position[0] = 0.0f;
   tran_teapot.position[1] = 5.0f;
@@ -159,9 +198,16 @@ int main(int argc, char** argv){
   And::Entity* obj_id = entity_comp.new_entity(MC, tran);
 
   And::RigidBody rb = physics_engine->CreateRigidBody();
+  And::RigidBody rb_up = physics_engine->CreateRigidBody();
   rb.AddBoxCollider(tran_cube.position, tran_cube.scale);
   rb.AffectsGravity(true);
+  rb.SetMass(5.0f);
+  rb_up.AddBoxCollider(tran_cube_up.position, tran_cube_up.scale);
+  rb_up.AffectsGravity(true);
+  rb.SetMass(5.0f);
+
   And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube, rb);
+  And::Entity* obj_cube_up_id = entity_comp.new_entity(MC_cube_up, tran_cube_up, rb_up);
 
   tran_cube2.position[0] = 3.0f;
   tran_cube2.position[1] = 0.0f;
@@ -284,6 +330,35 @@ int main(int argc, char** argv){
 
   And::Transform* tr_tmp = obj_id->get_component<And::Transform>();
 
+  float position_tmp[3] = {-1.0f, 20.0f, -15.0f};
+  for (int i = 0; i < 30; i++) {
+
+      position_tmp[0] += (i * 0.2f);
+      position_tmp[1] += i;
+      And::MeshComponent MC_tmp;
+      MC_tmp.MeshOBJ = And::Geometry::load("cube.obj");
+      MC_tmp.MeshOBJ->SetTexture(texture_cara_de_jou);
+
+      And::TransformComponent tran_tmp;
+      tran_tmp.position[0] = position_tmp[0];
+      tran_tmp.position[1] = position_tmp[1];
+      tran_tmp.position[2] = position_tmp[2];
+      tran_tmp.rotation[0] = 0.0f;
+      tran_tmp.rotation[1] = 0.0f;
+      tran_tmp.rotation[2] = 0.0f;
+      tran_tmp.scale[0] = 2.0f;
+      tran_tmp.scale[1] = 2.0f;
+      tran_tmp.scale[2] = 2.0f;
+
+      And::RigidBody rb_tmp = physics_engine->CreateRigidBody();
+      rb_tmp.AddBoxCollider(tran_tmp.position, tran_tmp.scale);
+      rb_tmp.AffectsGravity(true);
+      rb_tmp.SetMass(5.0f);
+
+      entity_comp.new_entity(MC_tmp, tran_tmp, rb_tmp);
+
+  }
+  //CreateJouCube(position_tmp, entity_comp, *physics_engine, texture_cara_de_jou);
   
 
   float fps_count = 0.0f;
@@ -315,13 +390,15 @@ int main(int argc, char** argv){
     //spot2_entity->get_component<And::SpotLight>()->SetPosition(position);
     
 
-    
-    //physics_engine->Simulate(window->get_delta_time());
-    physics_engine->Simulate(1.0f/60.0f);
+    if (fps_count > 0.1f) [[likely]] {
+        physics_engine->Simulate(window->get_delta_time());
+    }
+    //physics_engine->Simulate(1.0f/60.0f);
     physics_engine->Apply(entity_comp);
     
 
     //g_renderer->draw_forward(entity_comp);
+
     g_renderer->draw_deferred(entity_comp);
     g_renderer->end_frame();
     window->swap_buffers();

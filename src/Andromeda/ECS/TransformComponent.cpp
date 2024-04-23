@@ -11,9 +11,44 @@ namespace And {
 
 	TransformComponent::TransformComponent() : m_matrix(){
 		m_matrix = std::make_shared<Mat4>();
+
 	}
 
 	TransformComponent::~TransformComponent(){}
+
+	TransformComponent::TransformComponent(const TransformComponent& other) {
+		for (int i = 0; i < 3; i++) {
+			this->position[i] = other.position[i];
+			this->rotation[i] = other.rotation[i];
+			this->scale[i] = other.scale[i];
+		}
+		this->m_matrix = std::make_shared<Mat4>();
+		this->m_should_recalculate = true;
+	}
+
+	TransformComponent::TransformComponent(TransformComponent&& other){
+		for (int i = 0; i < 3; i++) {
+			this->position[i] = other.position[i];
+			this->rotation[i] = other.rotation[i];
+			this->scale[i] = other.scale[i];
+		}
+		this->m_matrix = std::make_shared<Mat4>();
+		this->m_should_recalculate = true;
+	}
+	
+
+	TransformComponent TransformComponent::operator=(const TransformComponent& other)
+	{
+		//this->m_matrix = other.m_matrix;
+		for (int i = 0; i < 3; i++) {
+			this->position[i] = other.position[i];
+			this->rotation[i] = other.rotation[i];
+			this->scale[i] = other.scale[i];
+		}
+		this->m_matrix = std::make_shared<Mat4>();
+		this->m_should_recalculate = true;
+		return *this;
+	}
 
 	float* TransformComponent::GetModelMatrix() {
 
@@ -42,6 +77,7 @@ namespace And {
 
 
 	}
+	
 	void TransformComponent::SetParent(TransformComponent* parent) {
 		m_parent = parent;
 	}
@@ -71,6 +107,7 @@ namespace And {
 
 		m_should_recalculate = true;
 	}
+	
 	void TransformComponent::SetRotation(float x, float y, float z){
 
 		rotation[0] = x;
@@ -88,6 +125,7 @@ namespace And {
 
 		m_should_recalculate = true;
 	}
+	
 	void TransformComponent::SetScale(float x, float y, float z){
 
 		scale[0] = x;

@@ -19,15 +19,16 @@ public:
 	RigidBody(const RigidBody&);
 	RigidBody operator=(const RigidBody&);
 
-	void AffectsGravity(bool value);
 	void AddBoxCollider(float* position, float* scale);
 
-	void Release();
+	void AffectsGravity(bool value);
+	void SetMass(float mass);
 
 	void GetPosition(float* position);
 	void GetRotation(float* rotation);
 	void GetPositionRotation(float* position, float* rotation);
 
+	void Release();
 	friend class PhysicsEngine;
 private:
 	bool m_affects_gravity;

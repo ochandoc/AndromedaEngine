@@ -90,7 +90,7 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
 
 	// Create simulation
 	engine->m_physics_data->material = engine->m_physics_data->physics->createMaterial(0.5f, 0.5f, 0.0f); // static friction, dynamic friction, restitution
-	physx::PxRigidStatic* groundPlane = PxCreatePlane(*(engine->m_physics_data->physics), physx::PxPlane(0,1,0,1), *(engine->m_physics_data->material));
+	physx::PxRigidStatic* groundPlane = PxCreatePlane(*(engine->m_physics_data->physics), physx::PxPlane(0.0f, 1.0f, 0.0f, 1.0f), *(engine->m_physics_data->material));
 	engine->m_physics_data->scene->addActor(*groundPlane);
 	
 	return engine;
