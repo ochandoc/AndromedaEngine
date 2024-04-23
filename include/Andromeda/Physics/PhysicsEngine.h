@@ -13,7 +13,7 @@ class PhysicsEngine final{
 
     public:
 
-    static std::shared_ptr<PhysicsEngine> Init();
+    static std::shared_ptr<PhysicsEngine> Init(unsigned int substeps = 1);
     ~PhysicsEngine();
     PhysicsEngine(PhysicsEngine&&);
     NON_COPYABLE_CLASS(PhysicsEngine)
@@ -22,7 +22,6 @@ class PhysicsEngine final{
     void Simulate(double dt, bool fetch = true);
     void Apply(EntityComponentSystem& ecs);
     void Release(EntityComponentSystem& ecs);
-
 
     void SetGravity(float x, float y, float z);
     void SetObjectLenght(unsigned int l);

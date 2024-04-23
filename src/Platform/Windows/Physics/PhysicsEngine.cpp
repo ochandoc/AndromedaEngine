@@ -40,7 +40,7 @@ struct PhysicsEngineData {
 		physx::PxPvdSceneClient*			client;
 	};
 
-std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
+std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(unsigned int substeps){
 	
 	std::shared_ptr<PhysicsEngine> engine(new PhysicsEngine);
 	engine->m_physics_data = std::make_shared<PhysicsEngineData>();
@@ -51,9 +51,9 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
 		return nullptr;
 	}
 
-	engine->m_physics_data->pvd = PxCreatePvd(*(engine->m_physics_data->foundation));
-	engine->m_physics_data->transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10); // ip, port, timeout
-	engine->m_physics_data->pvd->connect(*(engine->m_physics_data->transport), physx::PxPvdInstrumentationFlag::eALL);
+	//engine->m_physics_data->pvd = PxCreatePvd(*(engine->m_physics_data->foundation));
+	//engine->m_physics_data->transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10); // ip, port, timeout
+	//engine->m_physics_data->pvd->connect(*(engine->m_physics_data->transport), physx::PxPvdInstrumentationFlag::eALL);
 
 	engine->m_physics_data->tolerance_scale.length = 100; // typical lenght of an object
 	engine->m_physics_data->tolerance_scale.speed = 981; // speed of and object in earth gravity
@@ -71,6 +71,9 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
 	(engine->m_physics_data->sceneDesc) = new physx::PxSceneDesc(engine->m_physics_data->physics->getTolerancesScale());
 	engine->m_physics_data->sceneDesc->gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 
+	// Sub steps (physics quality)
+	engine->m_physics_data->sceneDesc->nbContactDataBlocks = substeps;
+
 	// Threads
 	engine->m_physics_data->cpu_dispatcher = physx::PxDefaultCpuDispatcherCreate(2); // Num threads
 	engine->m_physics_data->sceneDesc->cpuDispatcher = engine->m_physics_data->cpu_dispatcher;
@@ -78,7 +81,7 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
 	engine->m_physics_data->sceneDesc->filterShader = physx::PxDefaultSimulationFilterShader;
 	engine->m_physics_data->scene = engine->m_physics_data->physics->createScene(*(engine->m_physics_data->sceneDesc));
 
-	engine->m_physics_data->client = engine->m_physics_data->scene->getScenePvdClient();
+	/*engine->m_physics_data->client = engine->m_physics_data->scene->getScenePvdClient();
 	if (!engine->m_physics_data->client) {
 		printf("\n*** Error creating physics client ***\n");
 		return nullptr;
@@ -86,7 +89,7 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(){
 		engine->m_physics_data->client->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_CONSTRAINTS, true);
 		engine->m_physics_data->client->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_CONTACTS, true);
 		engine->m_physics_data->client->setScenePvdFlag(physx::PxPvdSceneFlag::eTRANSMIT_SCENEQUERIES, true);
-	}
+	}*/
 
 	// Create simulation
 	engine->m_physics_data->material = engine->m_physics_data->physics->createMaterial(0.5f, 0.5f, 0.0f); // static friction, dynamic friction, restitution
@@ -132,12 +135,7 @@ void PhysicsEngine::Simulate(double dt, bool fetch) {
 void PhysicsEngine::Apply(EntityComponentSystem& ecs) {
 
 	for (auto [tr, rb] : ecs.get_components<TransformComponent, RigidBody>()) {
-		float pos[3];
-		float rot[3];
-
-		rb->GetPositionRotation(pos, rot);
-		tr->SetPosition(pos);
-		tr->SetRotation(rot);
+		rb->GetPositionRotation(tr->position, tr->rotation);
 	}
 }
 
@@ -149,7 +147,7 @@ void PhysicsEngine::Release(EntityComponentSystem& ecs){
 
 
 void PhysicsEngine::SetGravity(float x, float y, float z) {
-
+	m_physics_data->scene->setGravity(physx::PxVec3(x,y,z));
 }
 
 void PhysicsEngine::SetObjectLenght(unsigned int l) {

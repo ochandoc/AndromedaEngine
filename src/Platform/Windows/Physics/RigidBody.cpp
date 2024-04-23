@@ -76,6 +76,34 @@ void RigidBody::Release(){
 void RigidBody::SetMass(float mass) {
 	m_data->actor->setMass(mass);
 }
+
+void RigidBody::AddForce(const float x, const float y, const float z, ForceMode fmod){
+
+	physx::PxForceMode::Enum f;
+
+	switch (fmod) {
+		case ForceMode::ACCELERATION: f = physx::PxForceMode::eACCELERATION; break;
+		case ForceMode::FORCE: f = physx::PxForceMode::eFORCE; break;
+		case ForceMode::IMPULSE: f = physx::PxForceMode::eIMPULSE; break;
+		case ForceMode::VELOCITY_CHANGE: f = physx::PxForceMode::eVELOCITY_CHANGE; break;
+	}
+	m_data->actor->addForce(physx::PxVec3(x,y,z), f);
+}
+
+void RigidBody::AddForce(const float* direction, ForceMode fmod){
+	physx::PxForceMode::Enum f;
+
+	switch (fmod) {
+		case ForceMode::ACCELERATION: f = physx::PxForceMode::eACCELERATION; break;
+		case ForceMode::FORCE: f = physx::PxForceMode::eFORCE; break;
+		case ForceMode::IMPULSE: f = physx::PxForceMode::eIMPULSE; break;
+		case ForceMode::VELOCITY_CHANGE: f = physx::PxForceMode::eVELOCITY_CHANGE; break;
+	}
+
+	m_data->actor->addForce(physx::PxVec3(direction[0], direction[1], direction[2]), f);
+}
+
+
 void RigidBody::GetPosition(float* position){
 
 	physx::PxTransform transform = m_data->actor->getGlobalPose();
@@ -95,6 +123,7 @@ void RigidBody::GetRotation(float* rotation)
 
 void RigidBody::GetPositionRotation(float* position, float* rotation){
 
+	
 	physx::PxTransform transform = m_data->actor->getGlobalPose();
 	rotation[0] = transform.q.x;
 	rotation[1] = transform.q.y;

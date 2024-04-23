@@ -9,6 +9,13 @@ namespace And {
 
 	struct PhysicsData;
 
+	enum class ForceMode {
+		FORCE = 1,				//!< parameter has unit of mass * distance/ time^2, i.e. a force
+		IMPULSE = 2,			//!< parameter has unit of mass * distance /time
+		VELOCITY_CHANGE = 3,	//!< parameter has unit of distance / time, i.e. the effect is mass independent: a velocity change.
+		ACCELERATION = 4		//!< parameter has unit of distance/ time^2, i.e. an acceleration. It gets treated just like a force except the mass is not divided out before integration.
+	};
+
 class RigidBody : public RigidBodyBase {
 
 public:
@@ -23,6 +30,10 @@ public:
 
 	void AffectsGravity(bool value);
 	void SetMass(float mass);
+
+	void AddForce(const float x, const float y, const float z, ForceMode fmod = ForceMode::FORCE);
+	void AddForce(const float* direction, ForceMode fmod);
+
 
 	void GetPosition(float* position);
 	void GetRotation(float* rotation);

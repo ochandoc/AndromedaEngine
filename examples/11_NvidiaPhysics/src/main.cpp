@@ -34,29 +34,32 @@ void WaitTask(int num){
   printf("Num: %d\n", num);
 }
 
-static void CreateJouCube(float* pos, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, std::shared_ptr<And::Texture> texture) {
+static void CreateJouCube(const float* pos, const float* dir, float force, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, std::shared_ptr<And::Texture> texture) {
     And::MeshComponent MC;
     MC.MeshOBJ = And::Geometry::load("cube.obj");
     MC.MeshOBJ->SetTexture(texture);
 
     And::TransformComponent tran;
-    tran.position[0] = pos[0];
-    tran.position[1] = pos[1];
-    tran.position[2] = pos[2];
+    tran.position[0] = pos[0] + (dir[0] * 5.0f);
+    tran.position[1] = pos[1] + (dir[1] * 5.0f);
+    tran.position[2] = pos[2] + (dir[2] * 5.0f);
     tran.rotation[0] = 0.0f;
     tran.rotation[1] = 0.0f;
     tran.rotation[2] = 0.0f;
-    tran.scale[0] = 1.0f;
-    tran.scale[1] = 1.0f;
-    tran.scale[2] = 1.0f;
+    tran.scale[0] = 2.0f;
+    tran.scale[1] = 2.0f;
+    tran.scale[2] = 2.0f;
 
     And::RigidBody rb = engine.CreateRigidBody();
     rb.AddBoxCollider(tran.position, tran.scale);
     rb.AffectsGravity(true);
     rb.SetMass(5.0f);
 
-    ecs.new_entity(MC, tran, rb);
+    And::Entity* e = ecs.new_entity(MC, tran, rb);
 
+    float new_dir[3] = {dir[0] * force, dir[1] * force, dir[2] * force };
+    
+    e->get_component<And::RigidBody>()->AddForce(new_dir, And::ForceMode::IMPULSE);
 }
 
 int main(int argc, char** argv){
@@ -76,18 +79,19 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
-  //And::FlyCamera fly_cam{*window};
+  And::FlyCamera fly_cam{*window};
+  fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
+  fly_cam.SetSize(1920.0f, 1080.0f);
+
+  fly_cam.SetFar(1000.0f);
+  fly_cam.SetNear(0.1f);
+
+
   //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
-  //fly_cam.SetSize(1920.0f, 1080.0f);
+  fly_cam.SetFov(90.0f);
+  fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
 
-  //fly_cam.SetFar(1000.0f);
-  //fly_cam.SetNear(0.1f);
-
-  //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
-  //fly_cam.SetFov(90.0f);
-  //fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
-
-  //g_renderer->set_camera(&fly_cam);
+  g_renderer->set_camera(&fly_cam);
 
 
   //std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
@@ -112,7 +116,7 @@ int main(int argc, char** argv){
   And::AddBasicComponents(entity_comp);
 
 
-  std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init();
+  std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init(10);
 
   int num_obj = 10;
   float pos_x = 0.0f;
@@ -359,18 +363,29 @@ int main(int argc, char** argv){
 
   }
   //CreateJouCube(position_tmp, entity_comp, *physics_engine, texture_cara_de_jou);
-  
+  And::Input input{ *window };
+  And::ActionInput jump{ "Jump", And::KeyState::Press, { And::KeyCode::Space} };
 
   float fps_count = 0.0f;
+  const float force = 100.0f;
   while (window->is_open()){
 
     window->update();
     g_renderer->new_frame();
     editor.ShowWindows();
 
+    if(input.IsMouseButtonPressed(And::MouseCode::Left)){
+        CreateJouCube(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, texture_cara_de_jou);
+    }
+
+    if (input.check_action(jump)) {
+        physics_engine->SetGravity(0.0f, 10.0f, 0.0f);
+    }
+
     //tr_cube->SetRotation(0.0f, fps_count, 0.0f);
 
-    //fly_cam.ProcessInput();
+    fly_cam.ProcessInput();
+    fly_cam.ShowValues();
 
     //And::FlyCamera* cam;
         
@@ -395,10 +410,11 @@ int main(int argc, char** argv){
     }
     //physics_engine->Simulate(1.0f/60.0f);
     physics_engine->Apply(entity_comp);
+
+    
     
 
     //g_renderer->draw_forward(entity_comp);
-
     g_renderer->draw_deferred(entity_comp);
     g_renderer->end_frame();
     window->swap_buffers();
