@@ -116,7 +116,7 @@ int main(int argc, char** argv){
   And::AddBasicComponents(entity_comp);
 
 
-  std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init(10);
+  std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init();
 
   int num_obj = 10;
   float pos_x = 0.0f;
@@ -355,7 +355,8 @@ int main(int argc, char** argv){
       tran_tmp.scale[2] = 2.0f;
 
       And::RigidBody rb_tmp = physics_engine->CreateRigidBody();
-      rb_tmp.AddBoxCollider(tran_tmp.position, tran_tmp.scale);
+      //rb_tmp.AddBoxCollider(tran_tmp.position, tran_tmp.scale);
+      rb_tmp.AddSphereCollider(tran_tmp.position, tran_tmp.scale);
       rb_tmp.AffectsGravity(true);
       rb_tmp.SetMass(5.0f);
 

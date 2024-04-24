@@ -26,7 +26,8 @@ public:
 	RigidBody(const RigidBody&);
 	RigidBody operator=(const RigidBody&);
 
-	void AddBoxCollider(float* position, float* scale);
+	void AddBoxCollider(const float* position, const float* scale);
+	void AddSphereCollider(const float* position, const float* radius);
 
 	void AffectsGravity(bool value);
 	void SetMass(float mass);

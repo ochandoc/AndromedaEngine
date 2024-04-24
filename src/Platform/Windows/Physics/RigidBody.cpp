@@ -50,7 +50,7 @@ void RigidBody::AffectsGravity(bool value)
 {
 }
 
-void RigidBody::AddBoxCollider(float* position, float* scale){
+void RigidBody::AddBoxCollider(const float* position, const float* scale){
 
 	physx::PxTransform transform(physx::PxVec3(0.0f));
 	transform.p = physx::PxVec3(position[0], position[1], position[2]);
@@ -58,11 +58,30 @@ void RigidBody::AddBoxCollider(float* position, float* scale){
 	
 	physx::PxBoxGeometry box(scale[0] * 0.5f, scale[1] * 0.5f, scale[2] * 0.5f);
 	physx::PxMaterial* mat = m_data->physics->createMaterial(0.5f, 0.5f, 0.0f); // static friction, dynamic friction, restitution);
-	physx::PxShape* boxShape = m_data->physics->createShape(box, *mat, true);
+	physx::PxShape* shape = m_data->physics->createShape(box, *mat, true);
 	//boxShape->setLocalPose(physx::PxTransform(0.0f, 0.0f, 0.0f));
 	//boxShape->setLocalPose(transform);
 
-	m_data->actor->attachShape(*boxShape);
+	m_data->actor->attachShape(*shape);
+	m_data->actor->setGlobalPose(transform);
+	m_data->actor->getGlobalPose();
+	m_data->actor->setMass(1.0f);
+	m_data->scene->addActor(*(m_data->actor));
+}
+
+void RigidBody::AddSphereCollider(const float* position, const float* radius){
+
+	physx::PxTransform transform(physx::PxVec3(0.0f));
+	transform.p = physx::PxVec3(position[0], position[1], position[2]);
+	m_data->actor = m_data->physics->createRigidDynamic(transform);
+
+	float r = *radius;
+
+	physx::PxSphereGeometry sphere(r);
+	physx::PxMaterial* mat = m_data->physics->createMaterial(0.5f, 0.5f, 0.0f); // static friction, dynamic friction, restitution);
+	physx::PxShape* shape = m_data->physics->createShape(sphere, *mat, true);
+
+	m_data->actor->attachShape(*shape);
 	m_data->actor->setGlobalPose(transform);
 	m_data->actor->getGlobalPose();
 	m_data->actor->setMass(1.0f);

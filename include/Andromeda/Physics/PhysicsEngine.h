@@ -12,8 +12,13 @@ class PhysicsEngine final{
 
 
     public:
-
-    static std::shared_ptr<PhysicsEngine> Init(unsigned int substeps = 1);
+    /**
+     * @brief Creates Physics engine
+     * 
+     * @param substeps number of iterations per frame to calculate phisics
+     * @return std::shared_ptr<PhysicsEngine> 
+     */
+    static std::shared_ptr<PhysicsEngine> Init(unsigned int substeps = 0);
     ~PhysicsEngine();
     PhysicsEngine(PhysicsEngine&&);
     NON_COPYABLE_CLASS(PhysicsEngine)
