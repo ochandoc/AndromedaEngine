@@ -140,8 +140,8 @@ int main(int argc, char** argv){
   
   And::MaterialComponent material_comp_jou;
   std::shared_ptr<And::Material> material_jou = std::make_shared<And::Material>();
-  //material_jou->SetColorTexture(texture_cara_de_jou);
-  material_jou->SetColor(0.5f, 0.5f, 0.5f, 0.5f);
+  material_jou->SetColorTexture(texture_cara_de_jou);
+  material_jou->SetColor(0.1f, 1.0f, 0.1f, 0.5f);
   material_comp_jou.SetMaterial(material_jou);
   
   And::MaterialComponent material_comp_sponza;
@@ -321,7 +321,7 @@ int main(int argc, char** argv){
   And::PointLight point{};
   point.SetPosition(position2);
   point.SetEnabled(1.0f);
-  point.SetDiffuseColor(diffuse_color);
+  point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
   point.SetSpecularStrength(specular_strength);
   point.SetSpecularColor(specular_color);
   point.SetSpecularShininess(specular_shininess);
@@ -387,6 +387,9 @@ int main(int argc, char** argv){
   And::ActionInput jump{ "Jump", And::KeyState::Press, { And::KeyCode::Space} };
   And::ActionInput shot{ "Shot", And::KeyState::Press, { And::KeyCode::C} };
 
+
+  And::MaterialComponent* m_comp = obj_cube_id->get_component<And::MaterialComponent>();
+
   float fps_count = 0.0f;
   const float force = 100.0f;
   while (window->is_open()){
@@ -403,6 +406,8 @@ int main(int argc, char** argv){
     if (input.check_action(jump)) {
         physics_engine->SetGravity(0.0f, 10.0f, 0.0f);
     }
+
+    //m_comp->GetMaterial()->SetColor(sinf(fps_count * 0.7f), cosf(fps_count), cosf(fps_count * 0.5f), 1.0f);
 
     //tr_cube->SetRotation(0.0f, fps_count, 0.0f);
 

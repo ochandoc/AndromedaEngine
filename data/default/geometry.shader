@@ -17,9 +17,9 @@ uniform int m_use_normal_texture;
 uniform vec4 m_albedoColor;
 uniform int m_use_texture;
 
-out int use_normal_texture;
-out vec4 albedoColor_color;
-out int use_texture;
+//out int use_normal_texture;
+//out vec4 albedoColor_color;
+//out int use_texture;
 
 out vec3 s_normal;
 out vec3 s_fragPos;
@@ -38,9 +38,9 @@ void main()
 
   gl_Position = projection * view * worldPos;
 
-  use_texture = m_use_texture;
-  albedoColor_color = m_albedoColor;
-  use_normal_texture = m_use_normal_texture;
+  //use_texture = m_use_texture;
+  //albedoColor_color = m_albedoColor;
+  //use_normal_texture = m_use_normal_texture;
 }
 
 #type Fragment
@@ -54,9 +54,14 @@ in vec3 s_normal;
 in vec3 s_fragPos;
 in vec2 s_texCoords;
 
-in int use_normal_texture;
-in vec4 albedoColor_color;
-in int use_texture;
+uniform int m_use_normal_texture;
+uniform vec4 m_albedoColor;
+uniform int m_use_texture;
+
+
+//in int use_normal_texture;
+//in vec4 albedoColor_color;
+//in int use_texture;
 
 uniform sampler2D texMaterial;
 uniform sampler2D texNormal;
@@ -68,13 +73,14 @@ void main()
   Position = s_fragPos;
 
   //FragNormal = use_normal_texture == 1 ? texture(texNormal, s_texCoords).rgb : normalize(s_normal);
-  FragNormal = (normalize(s_normal) * -use_normal_texture) + (texture(texNormal, s_texCoords).rgb * use_normal_texture);
+  //FragNormal = (normalize(s_normal) * -use_normal_texture) + (texture(texNormal, s_texCoords).rgb * use_normal_texture);
 
-  //if(use_normal_texture == 1){
-    //FragNormal = texture(texNormal, s_texCoords).rgb;
-  //}
-  //else{
-  //}
+  //FragNormal = vec3(m_use_normal_texture);
+  if(m_use_normal_texture == 1){
+    FragNormal = texture(texNormal, s_texCoords).rgb;
+  }else{
+    FragNormal = normalize(s_normal);
+  }
 
 
 
@@ -85,12 +91,12 @@ void main()
 
 
 
-  //if(use_texture == 1){
+  if(m_use_texture == 1){
     FragColor.rgb = texture(texMaterial, s_texCoords).rgb;
     FragColor.a = 1.0; // specular
-  //}else{
-    //FragColor = albedoColor_color;
-  //}
+  }else{
+    FragColor = m_albedoColor;
+  }
   
   
   
