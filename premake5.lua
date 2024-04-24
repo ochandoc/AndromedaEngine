@@ -160,6 +160,7 @@ group "Examples"
   include "examples/08_OBJs"
   include "examples/09_OBJs_Lights"
   include "examples/10_DirectX11"
+  include "examples/11_NvidiaPhysics"
   include "examples/Audio"
 group ""
 

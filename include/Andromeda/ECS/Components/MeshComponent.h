@@ -8,6 +8,7 @@
 #include "Andromeda/Graphics/Geometry.h"
 
 #include "Andromeda/Graphics/Mesh.h"
+#include "Andromeda/Physics/RigidBody.h"
 
 namespace And
 {
@@ -22,6 +23,7 @@ namespace And
     const std::shared_ptr<Mesh> GetMesh() const { return m_Mesh; }
 
     std::shared_ptr<Geometry> MeshOBJ;
+
 
   private:
     std::shared_ptr<Mesh> m_Mesh;

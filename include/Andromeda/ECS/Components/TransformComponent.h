@@ -18,6 +18,10 @@ namespace And
 
     TransformComponent();
     ~TransformComponent();
+    TransformComponent(const TransformComponent&);
+    TransformComponent(TransformComponent&&);
+    TransformComponent operator=(const TransformComponent&);
+
 
     TransformComponent* m_parent = nullptr;
 
@@ -38,6 +42,7 @@ namespace And
     void Reset();
   private:
       bool m_should_recalculate = true;
+    
       //float* m_model_matrix = nullptr;
       std::shared_ptr<Mat4> m_matrix;
   };

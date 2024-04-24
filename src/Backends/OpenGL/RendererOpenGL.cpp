@@ -416,7 +416,7 @@ void RendererOpenGL::upload_light(Light* l){
 
             float dot = glm::dot(up, dir);
             dot = glm::abs(dot);
-            if (dot == 1.0f) {
+            if (dot == 1.0f) [[unlikely]]{
                 up = glm::vec3(0.0f, 0.0f, 1.0f);
             }
 
@@ -511,7 +511,7 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
 
     float dot = glm::dot(up, dir);
     dot = glm::abs(dot);
-    if (dot == 1.0f) {
+    if (dot == 1.0f)[[unlikely]] {
       up = glm::vec3(0.0f, 0.0f, 1.0f);
     }
 
@@ -821,7 +821,6 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     glDepthMask(GL_TRUE);
 }
 
-
 void RendererOpenGL::ResetTransforms(EntityComponentSystem& ecs) {
 
     for (auto [tr] : ecs.get_components<TransformComponent>()) {
@@ -855,7 +854,7 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
     for(auto [light] : entity.get_components<DirectionalLight>()){ 
       shadow_buffer->Activate();
       glDisable(GL_BLEND);
-      if(light->GetCastShadows()){
+      if(light->GetCastShadows()) [[likely]] {
         // Por cada luz que castea sombras guardamos textura de profundidad
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
           draw_shadows(light, obj, transform);
@@ -867,7 +866,7 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
       // Render Directional
       for (auto [light] : entity.get_components<DirectionalLight>()) {
           for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-              if (light->GetCastShadows()) {
+              if (light->GetCastShadows()) [[likely]] {
                   std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
                   OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_shadows_directional.get());
                   OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
@@ -902,7 +901,7 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
     for(auto [light] : entity.get_components<SpotLight>()){
       shadow_buffer->Activate();
       glDisable(GL_BLEND);
-      if(light->GetCastShadows()){
+      if(light->GetCastShadows()) [[likely]] {
         // Por cada luz que castea sombras guardamos textura de profundidad
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
           draw_shadows(light, obj, transform);
@@ -914,7 +913,7 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 
       // Render SpotLight 
       for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-            if (light->GetCastShadows()) {
+            if (light->GetCastShadows()) [[likely]] {
                 std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
                 OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_shadows_spot.get());
                 OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
@@ -947,7 +946,7 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
       
     for(auto [light] : entity.get_components<PointLight>()){
       glDisable(GL_BLEND);
-      if(light->GetCastShadows()){
+      if(light->GetCastShadows()) [[likely]] {
           int index = 0;
           for (auto& target : render_targets) {
               target->Activate();
@@ -963,7 +962,7 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
       
       /* Render PointLight */
       for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-            if (light->GetCastShadows()) {
+            if (light->GetCastShadows()) [[likely]] {
                 int index = 0;
                 OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_shadows_point.get());
                 for(auto& target : render_targets){
