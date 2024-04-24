@@ -87,4 +87,9 @@ namespace And
   {
     m_NormalTexture = tex;
   }
+  
+  void Material::SetSpecularTexture(std::shared_ptr<Texture> tex)
+  {
+    m_SpecularTexture = tex;
+  }
 }

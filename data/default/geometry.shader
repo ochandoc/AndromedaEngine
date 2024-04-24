@@ -16,6 +16,7 @@ layout (std140, binding = 0) uniform UniformBlock{
 uniform int m_use_normal_texture;
 uniform vec4 m_albedoColor;
 uniform int m_use_texture;
+uniform int m_use_specular_texture;
 
 //out int use_normal_texture;
 //out vec4 albedoColor_color;
@@ -57,6 +58,7 @@ in vec2 s_texCoords;
 uniform int m_use_normal_texture;
 uniform vec4 m_albedoColor;
 uniform int m_use_texture;
+uniform int m_use_specular_texture;
 
 
 //in int use_normal_texture;
@@ -65,6 +67,7 @@ uniform int m_use_texture;
 
 uniform sampler2D texMaterial;
 uniform sampler2D texNormal;
+uniform sampler2D texSpecular;
 //uniform sampler2D colorTexture;
 //uniform sampler2D specularTexture;
 
@@ -96,6 +99,10 @@ void main()
     FragColor.a = 1.0; // specular
   }else{
     FragColor = m_albedoColor;
+  }
+
+  if(m_use_specular_texture == 1){
+    FragColor.a = texture(texSpecular, s_texCoords).r; // specular
   }
   
   

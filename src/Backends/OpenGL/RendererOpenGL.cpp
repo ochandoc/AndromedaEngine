@@ -1040,6 +1040,15 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
             s_tmp->SetInt("m_use_normal_texture",0);
         }
 
+        OpenGLTexture2D* t_specular= static_cast<OpenGLTexture2D*>(mat->GetMaterial()->GetSpecularTexture().get());
+        if (t_specular) {
+            t_specular->Activate(2);
+            s_tmp->SetTexture("texSpecular", 2);
+            s_tmp->SetInt("m_use_specular_texture", 1);
+        }else {
+            s_tmp->SetInt("m_use_specular_texture", 0);
+        }
+
     }else{
         s_tmp->SetInt("m_use_texture", 1);
         static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);

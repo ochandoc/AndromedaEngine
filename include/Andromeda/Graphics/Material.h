@@ -22,6 +22,7 @@ namespace And
     void SetColor(float* rgba);
     void SetColorTexture(std::shared_ptr<Texture> tex);
     void SetNormalTexture(std::shared_ptr<Texture> tex);
+    void SetSpecularTexture(std::shared_ptr<Texture> tex);
 
     float* GetColor() { return m_Color; }
     const float* GetColor() const { return m_Color; }
@@ -29,10 +30,13 @@ namespace And
     const std::shared_ptr<Texture> GetColortexture() const { return m_ColorTexture; }
     std::shared_ptr<Texture> GetNormalTexture() { return m_NormalTexture; }
     const std::shared_ptr<Texture> GetNormaltexture() const { return m_NormalTexture; }
+    std::shared_ptr<Texture> GetSpecularTexture() { return m_SpecularTexture; }
+    const std::shared_ptr<Texture> GetSpeculartexture() const { return m_SpecularTexture; }
 
   private:
     float m_Color[4];
     std::shared_ptr<Texture> m_ColorTexture;
     std::shared_ptr<Texture> m_NormalTexture;
+    std::shared_ptr<Texture> m_SpecularTexture;
   };
 }

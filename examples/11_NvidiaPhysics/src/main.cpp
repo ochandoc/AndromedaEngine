@@ -137,10 +137,15 @@ int main(int argc, char** argv){
   std::shared_ptr<And::Texture> texture_bricks = And::MakeTexture("bricks.jpg");
   std::shared_ptr<And::Texture> texture_jou = And::MakeTexture("sphere_basecolor.png");
   std::shared_ptr<And::Texture> texture_cara_de_jou = And::MakeTexture("jou_cumple.png");
+  std::shared_ptr<And::Texture> wall_tex = And::MakeTexture("brick-wall-bl/brick-wall_albedo.png");
+  std::shared_ptr<And::Texture> wall_tex_normal = And::MakeTexture("brick-wall-bl/brick-wall_normal-ogl.png");
+  std::shared_ptr<And::Texture> wall_tex_specular = And::MakeTexture("brick-wall-bl/brick-wall_ao.png");
   
   And::MaterialComponent material_comp_jou;
   std::shared_ptr<And::Material> material_jou = std::make_shared<And::Material>();
-  material_jou->SetColorTexture(texture_cara_de_jou);
+  material_jou->SetColorTexture(wall_tex);
+  material_jou->SetNormalTexture(wall_tex_normal);
+  material_jou->SetSpecularTexture(wall_tex_specular);
   material_jou->SetColor(0.1f, 1.0f, 0.1f, 0.5f);
   material_comp_jou.SetMaterial(material_jou);
   
@@ -181,9 +186,9 @@ int main(int argc, char** argv){
   tran_cube.rotation[0] = 0.0f;
   tran_cube.rotation[1] = 0.0f;
   tran_cube.rotation[2] = 0.0f;
-  tran_cube.scale[0] = 2.0f;
-  tran_cube.scale[1] = 2.0f;
-  tran_cube.scale[2] = 2.0f;
+  tran_cube.scale[0] = 5.0f;
+  tran_cube.scale[1] = 5.0f;
+  tran_cube.scale[2] = 5.0f;
   
   tran_cube_up.position[0] = 1.0f;
   tran_cube_up.position[1] = 20.0f;
