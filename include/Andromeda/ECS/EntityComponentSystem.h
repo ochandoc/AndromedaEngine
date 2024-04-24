@@ -66,7 +66,7 @@ namespace And
 			virtual ~component_list_abs() = default;
 
 			virtual void add_empty(ID id) = 0;
-			virtual void remove(ID id) = 0;
+			virtual bool remove(ID id) = 0;
 			virtual size_t size() = 0;
 		};
 
@@ -105,7 +105,7 @@ namespace And
 				return &m_Components.back().value;
 			}
 
-			virtual void remove(ID id) override
+			virtual bool remove(ID id) override
 			{
 				sort();
 				component<T> tmp(id);
@@ -115,7 +115,9 @@ namespace And
 				if ((first != last) && !(tmp < *first))
 				{
 					m_Components.erase(first);
+					return true;
 				}
+				return false;
 			}
 
 			virtual size_t size() override
@@ -360,12 +362,21 @@ namespace And
 		template<typename... comps_t>
 		Entity* new_entity(comps_t... comps);
 
+		uint64 get_num_entities() const { return m_NumEntities; }
+
 		void remove_entity(Entity* e)
 		{
+			bool removed = false;
 			for (auto& [key, value] : m_Components)
 			{
-				value->remove(e->get_id());
+				if (value->remove(e->get_id()))
+				{
+					removed = true;
+				}
 			}
+
+			if (removed)
+				m_NumEntities--;
 		}
 
 		template<typename comp_t>
@@ -396,6 +407,7 @@ namespace And
 
 		std::unordered_map<size_t, std::unique_ptr<internal::component_list_abs>> m_Components;
 		std::vector<std::unique_ptr<Entity>> m_Entities;
+		uint64 m_NumEntities = 0;
 	};
 
 }
@@ -415,6 +427,8 @@ namespace And
 		(add_entity_component<comps_t>(ett, comps), ...);
 
 		m_Entities.push_back(std::move(new_e));
+
+		m_NumEntities++;
 
 		return ett;
 		//return m_Entities.back().get();
