@@ -70,9 +70,16 @@ namespace And
         uint32 desiredIndex = (uint32)log2f(type);
         glUniformBlockBinding(programId, blockIndex, desiredIndex);
       }
-    }
-    else
-    {
+    
+    }else{
+        GLsizei log_length = 0;
+        std::string output_log;
+        glGetShaderiv(programId, GL_INFO_LOG_LENGTH, &log_length);
+        output_log.reserve(log_length);
+
+        glGetShaderInfoLog(programId, 1024, &log_length, output_log.data());
+        printf("Error: %s\n", output_log.c_str());
+       
       shader.reset();
     }
 
