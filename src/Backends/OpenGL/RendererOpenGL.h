@@ -12,7 +12,7 @@
 #include "Andromeda/Graphics/Lights/SpotLight.h"
 #include "Andromeda/Graphics/Lights/DirectionalLight.h"
 #include "Andromeda/Graphics/Lights/PointLight.h"
-
+#include "Andromeda/Graphics/Material.h"
 
 
 #include "Andromeda/Graphics/Renderer.h"
@@ -94,6 +94,9 @@ namespace And{
         std::shared_ptr<UniformBuffer> m_buffer_point_light; // 64
         std::shared_ptr<UniformBuffer> m_buffer_spot_light; // 96
         std::shared_ptr<Direction> m_directions;
+
+        Material m_material_default;
+        Material m_material_error_default;
 
 
         unsigned int m_quad_vao;

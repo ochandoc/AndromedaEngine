@@ -66,4 +66,7 @@
 #include "Andromeda/Physics/RigidBodyBase.h"
 #include "Andromeda/Physics/RigidBody.h"
 
+#include "Andromeda/Graphics/Material.h"
+#include "Andromeda/ECS/Components/MaterialComponent.h"
+
 #include "andpch.hpp"

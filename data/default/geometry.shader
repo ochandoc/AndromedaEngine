@@ -13,9 +13,18 @@ layout (std140, binding = 0) uniform UniformBlock{
   vec3 camera_position;
 };
 
+uniform int m_use_normal_texture;
+uniform vec4 m_albedoColor;
+uniform int m_use_texture;
+
+out int use_normal_texture;
+out vec4 albedoColor_color;
+out int use_texture;
+
 out vec3 s_normal;
 out vec3 s_fragPos;
 out vec2 s_texCoords;
+
 
 void main()
 {
@@ -28,6 +37,10 @@ void main()
   s_normal = normalMatrix * normals;
 
   gl_Position = projection * view * worldPos;
+
+  use_texture = m_use_texture;
+  albedoColor_color = m_albedoColor;
+  use_normal_texture = m_use_normal_texture;
 }
 
 #type Fragment
@@ -41,18 +54,49 @@ in vec3 s_normal;
 in vec3 s_fragPos;
 in vec2 s_texCoords;
 
-uniform sampler2D texMaterial;
+in int use_normal_texture;
+in vec4 albedoColor_color;
+in int use_texture;
 
+uniform sampler2D texMaterial;
+uniform sampler2D texNormal;
 //uniform sampler2D colorTexture;
 //uniform sampler2D specularTexture;
 
 void main()
 {
   Position = s_fragPos;
-  FragNormal = normalize(s_normal);
+
+  //FragNormal = use_normal_texture == 1 ? texture(texNormal, s_texCoords).rgb : normalize(s_normal);
+  FragNormal = (normalize(s_normal) * -use_normal_texture) + (texture(texNormal, s_texCoords).rgb * use_normal_texture);
+
+  //if(use_normal_texture == 1){
+    //FragNormal = texture(texNormal, s_texCoords).rgb;
+  //}
+  //else{
+  //}
+
+
+
   //FragColor.rgb = vec3(s_normal);
-  FragColor.rgb = texture(texMaterial, s_texCoords).rgb;
-  FragColor.a = 1.0; // specular
+  //FragColor.rgb = (texture(texMaterial, s_texCoords).rgb * -use_color) + (albedoColor_color * use_color);
+
+
+
+
+
+  //if(use_texture == 1){
+    FragColor.rgb = texture(texMaterial, s_texCoords).rgb;
+    FragColor.a = 1.0; // specular
+  //}else{
+    //FragColor = albedoColor_color;
+  //}
+  
+  
+  
+  
+  
+  
   //FragColor.a = texture(specularTexture, s_texCoords).r;
   
 }

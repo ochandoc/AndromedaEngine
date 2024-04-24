@@ -37,7 +37,7 @@ void WaitTask(int num){
 static void CreateJouCube(const float* pos, const float* dir, float force, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, std::shared_ptr<And::Texture> texture) {
     And::MeshComponent MC;
     MC.MeshOBJ = And::Geometry::load("cube.obj");
-    MC.MeshOBJ->SetTexture(texture);
+    //MC.MeshOBJ->SetTexture(texture);
 
     And::TransformComponent tran;
     tran.position[0] = pos[0] + (dir[0] * 5.0f);
@@ -137,11 +137,26 @@ int main(int argc, char** argv){
   std::shared_ptr<And::Texture> texture_bricks = And::MakeTexture("bricks.jpg");
   std::shared_ptr<And::Texture> texture_jou = And::MakeTexture("sphere_basecolor.png");
   std::shared_ptr<And::Texture> texture_cara_de_jou = And::MakeTexture("jou_cumple.png");
-  MC.MeshOBJ->SetTexture(texture_bricks);
-  MC_cube.MeshOBJ->SetTexture(texture_jou);
+  
+  And::MaterialComponent material_comp_jou;
+  std::shared_ptr<And::Material> material_jou = std::make_shared<And::Material>();
+  //material_jou->SetColorTexture(texture_cara_de_jou);
+  material_jou->SetColor(0.5f, 0.5f, 0.5f, 0.5f);
+  material_comp_jou.SetMaterial(material_jou);
+  
+  And::MaterialComponent material_comp_sponza;
+  std::shared_ptr<And::Material> material_sponza = std::make_shared<And::Material>();
+  material_sponza->SetColorTexture(texture_bricks);
+  material_comp_sponza.SetMaterial(material_sponza);
 
-  MC_cube2.MeshOBJ->SetTexture(texture_cara_de_jou);
-  MC_cube_up.MeshOBJ->SetTexture(texture_cara_de_jou);
+  //MC.MeshOBJ->SetTexture(texture_bricks);
+  //MC_cube.MeshOBJ->SetTexture(texture_jou);
+
+
+
+
+  //MC_cube2.MeshOBJ->SetTexture(texture_cara_de_jou);
+  //MC_cube_up.MeshOBJ->SetTexture(texture_cara_de_jou);
 
 
   And::TransformComponent tran;
@@ -199,7 +214,9 @@ int main(int argc, char** argv){
   tran_teapot2.scale[0] = 2.0f;
   tran_teapot2.scale[1] = 2.0f;
   tran_teapot2.scale[2] = 2.0f;
-  And::Entity* obj_id = entity_comp.new_entity(MC, tran);
+
+  // Sponza
+  And::Entity* obj_id = entity_comp.new_entity(MC, tran, material_comp_sponza);
 
   And::RigidBody rb = physics_engine->CreateRigidBody();
   And::RigidBody rb_up = physics_engine->CreateRigidBody();
@@ -210,8 +227,9 @@ int main(int argc, char** argv){
   rb_up.AffectsGravity(true);
   rb.SetMass(5.0f);
 
-  And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube, rb);
-  And::Entity* obj_cube_up_id = entity_comp.new_entity(MC_cube_up, tran_cube_up, rb_up);
+  // Cube
+  And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube, rb, material_comp_jou);
+  //And::Entity* obj_cube_up_id = entity_comp.new_entity(MC_cube_up, tran_cube_up, rb_up, material_comp_jou);
 
   tran_cube2.position[0] = 3.0f;
   tran_cube2.position[1] = 0.0f;
@@ -222,11 +240,11 @@ int main(int argc, char** argv){
   tran_cube2.scale[0] = 1.0f;
   tran_cube2.scale[1] = 1.0f;
   tran_cube2.scale[2] = 1.0f;
-  And::Entity* obj_cube_id2 = entity_comp.new_entity(MC_cube2, tran_cube2);
+  //And::Entity* obj_cube_id2 = entity_comp.new_entity(MC_cube2, tran_cube2, material_comp_jou);
 
-  And::TransformComponent* tr_cube = obj_cube_id->get_component<And::TransformComponent>();
-  And::TransformComponent* tr_cube2 = obj_cube_id2->get_component<And::TransformComponent>();
-  tr_cube2->SetParent(tr_cube);
+  //And::TransformComponent* tr_cube = obj_cube_id->get_component<And::TransformComponent>();
+  //And::TransformComponent* tr_cube2 = obj_cube_id2->get_component<And::TransformComponent>();
+  //tr_cube2->SetParent(tr_cube);
 
  
   //And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
@@ -334,14 +352,15 @@ int main(int argc, char** argv){
 
   And::Transform* tr_tmp = obj_id->get_component<And::Transform>();
 
+  std::shared_ptr<And::Geometry> geo = And::Geometry::load("cube.obj");
   float position_tmp[3] = {-1.0f, 20.0f, -15.0f};
-  for (int i = 0; i < 30; i++) {
+  /*for (int i = 0; i < 30; i++) {
 
       position_tmp[0] += (i * 0.2f);
       position_tmp[1] += i;
       And::MeshComponent MC_tmp;
-      MC_tmp.MeshOBJ = And::Geometry::load("cube.obj");
-      MC_tmp.MeshOBJ->SetTexture(texture_cara_de_jou);
+      MC_tmp.MeshOBJ = geo;
+      //MC_tmp.MeshOBJ->SetTexture(texture_cara_de_jou);
 
       And::TransformComponent tran_tmp;
       tran_tmp.position[0] = position_tmp[0];
@@ -355,17 +374,18 @@ int main(int argc, char** argv){
       tran_tmp.scale[2] = 2.0f;
 
       And::RigidBody rb_tmp = physics_engine->CreateRigidBody();
-      //rb_tmp.AddBoxCollider(tran_tmp.position, tran_tmp.scale);
-      rb_tmp.AddSphereCollider(tran_tmp.position, tran_tmp.scale);
+      rb_tmp.AddBoxCollider(tran_tmp.position, tran_tmp.scale);
+      //rb_tmp.AddSphereCollider(tran_tmp.position, tran_tmp.scale);
       rb_tmp.AffectsGravity(true);
       rb_tmp.SetMass(5.0f);
 
       entity_comp.new_entity(MC_tmp, tran_tmp, rb_tmp);
 
-  }
+  }*/
   //CreateJouCube(position_tmp, entity_comp, *physics_engine, texture_cara_de_jou);
   And::Input input{ *window };
   And::ActionInput jump{ "Jump", And::KeyState::Press, { And::KeyCode::Space} };
+  And::ActionInput shot{ "Shot", And::KeyState::Press, { And::KeyCode::C} };
 
   float fps_count = 0.0f;
   const float force = 100.0f;
@@ -375,7 +395,8 @@ int main(int argc, char** argv){
     g_renderer->new_frame();
     editor.ShowWindows();
 
-    if(input.IsMouseButtonPressed(And::MouseCode::Left)){
+    //if(input.IsMouseButtonPressed(And::MouseCode::Left)){
+    if(input.check_action(shot)){
         CreateJouCube(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, texture_cara_de_jou);
     }
 

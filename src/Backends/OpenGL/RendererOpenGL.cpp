@@ -27,6 +27,9 @@
 #include "Andromeda/Graphics/Lights/AmbientLight.h"
 #include "Andromeda/Graphics/Lights/DirectionalLight.h"
 #include "Andromeda/Graphics/Lights/PointLight.h"
+#include "Andromeda/ECS/Components/MaterialComponent.h"
+#include "Andromeda/Graphics/Material.h"
+
 
 namespace And
 {
@@ -128,11 +131,15 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   m_directions->dir[3] = glm::vec3(0.0f, -1.0f, 0.0f);
   m_directions->dir[4] = glm::vec3(0.0f, 0.0f, 1.0f);
   m_directions->dir[5] = glm::vec3(0.0f, 0.0f, -1.0f);
+
+  std::shared_ptr<And::Texture> texture_tmp = And::MakeTexture("default_texture.jpg");
+  std::shared_ptr<And::Texture> texture_error_tmp = And::MakeTexture("error_texture.png");
+  m_material_default.SetColorTexture(texture_tmp);
 }
 
 RendererOpenGL::~RendererOpenGL(){
 	m_Window.imgui_end();
-}
+}   
 
 void RendererOpenGL::set_camera(CameraBase* cam){
     m_UserCamera = cam;
@@ -1007,9 +1014,37 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
   glDrawBuffers(3, attachments);
 
   m_shader_geometry->Use();
+  OpenGLShader* s_tmp = static_cast<OpenGLShader*>(m_shader_geometry.get());
   glDisable(GL_BLEND);
-  for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-    obj->MeshOBJ->UseTexture(0);
+  for (auto [transform, obj] : entity.get_components<TransformComponent, MeshComponent>()) {
+    //obj->MeshOBJ->UseTexture(0);
+    MaterialComponent* mat = obj->GetOwner()->get_component<MaterialComponent>();
+    if (mat) {
+        OpenGLTexture2D* t = static_cast<OpenGLTexture2D*>(mat->GetMaterial()->GetColorTexture().get());
+        if (t) {
+            t->Activate(0);
+            s_tmp->SetInt("m_use_texture", 1);
+        }else {
+            // Si no tiene textura, uso el color
+            //static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
+            s_tmp->SetVec4("m_albedoColor", glm::make_vec4(mat->GetMaterial()->GetColor()));
+            s_tmp->SetInt("m_use_texture", 0);
+        }
+
+        OpenGLTexture2D* t_normal = static_cast<OpenGLTexture2D*>(mat->GetMaterial()->GetNormalTexture().get());
+        if (t_normal) {
+            t_normal->Activate(1);
+            s_tmp->SetTexture("texNormal",1);
+            s_tmp->SetInt("m_use_normal_texture",1);
+        }else {
+            s_tmp->SetInt("m_use_normal_texture",0);
+        }
+
+    }else{
+        s_tmp->SetInt("m_use_texture", 1);
+        static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
+    }
+
     OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_geometry.get());
     tmp->Use();
     
@@ -1035,7 +1070,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
     glDisable(GL_BLEND);
     if (light->GetCastShadows()) {
         // Por cada luz que castea sombras guardamos textura de profundidad
-        for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+        for (auto [transform, obj] : entity.get_components<TransformComponent, MeshComponent>()) {
             draw_shadows(light, obj, transform);
         }
     }
