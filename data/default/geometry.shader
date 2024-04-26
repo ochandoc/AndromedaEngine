@@ -50,6 +50,7 @@ void main()
 layout(location = 0) out vec3 Position;
 layout(location = 1) out vec3 FragNormal;
 layout(location = 2) out vec4 FragColor;
+layout(location = 3) out vec3 Met_Roug_Ao; // Texture for Metallic, roughness and ambient oclusion
 
 in vec3 s_normal;
 in vec3 s_fragPos;
@@ -68,8 +69,10 @@ uniform int m_use_specular_texture;
 uniform sampler2D texMaterial;
 uniform sampler2D texNormal;
 uniform sampler2D texSpecular;
-//uniform sampler2D colorTexture;
-//uniform sampler2D specularTexture;
+
+uniform sampler2D texMetallic;
+uniform sampler2D texRoughness;
+uniform sampler2D texAmbientOclusion;
 
 void main()
 {
@@ -86,14 +89,6 @@ void main()
   }
 
 
-
-  //FragColor.rgb = vec3(s_normal);
-  //FragColor.rgb = (texture(texMaterial, s_texCoords).rgb * -use_color) + (albedoColor_color * use_color);
-
-
-
-
-
   if(m_use_texture == 1){
     FragColor.rgb = texture(texMaterial, s_texCoords).rgb;
     FragColor.a = 1.0; // specular
@@ -104,12 +99,11 @@ void main()
   if(m_use_specular_texture == 1){
     FragColor.a = texture(texSpecular, s_texCoords).r; // specular
   }
+
+  // All texture values stacked in a single texture
+  Met_Roug_Ao.r = texture(texMetallic, s_texCoords).r;
+  Met_Roug_Ao.g = texture(texRoughness, s_texCoords).r;
+  Met_Roug_Ao.b = texture(texAmbientOclusion, s_texCoords).r;
   
-  
-  
-  
-  
-  
-  //FragColor.a = texture(specularTexture, s_texCoords).r;
   
 }

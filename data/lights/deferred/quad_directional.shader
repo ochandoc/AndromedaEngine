@@ -32,10 +32,12 @@ out vec3 camera_pos;
 out vec2 uv;
 out mat4 lightSpace;
 
+//out vec3 obj_position;
+
 void main(){
   gl_Position = vec4(position, 1.0);
   uv = TexCoord;
-  vec4 obj_position = model * vec4(position, 1.0);
+  //obj_position = model * vec4(position, 1.0);
   lightSpace = ProjViewLight;
 }
 
@@ -49,6 +51,7 @@ uniform sampler2D texShadow;
 uniform sampler2D Frag_Position;
 uniform sampler2D Frag_Normal;
 uniform sampler2D Frag_Color;
+uniform sampler2D Met_Roug_Ao;
 
 in vec3 blend_color;
 in vec3 s_normal;
@@ -57,6 +60,7 @@ in vec3 camera_pos;
 in vec2 uv;
 in mat4 lightSpace;
 
+//in vec3 obj_position;
 
 struct DirectionalLight{
   vec3 direction;
@@ -145,21 +149,42 @@ vec3 CalculeDirLight(DirectionalLight light, vec3 normal, vec3 viewDir) {
   return (diffuse * light.enabled);
 }
 
-
 void main(){
 
   // Get textures
+  //vec3 frag_color = pow(texture(Frag_Color, uv).rgb, vec3(2.2));
   vec3 frag_color = texture(Frag_Color, uv).rgb;
   vec3 frag_normal = texture(Frag_Normal, uv).rgb;
   vec3 frag_position = texture(Frag_Position, uv).rgb;
 
-  vec3 view_direction = normalize(camera_pos - frag_position);
-  
+  vec3 stacked = texture(Met_Roug_Ao, uv).rgb;
+  float metallic = stacked.r;
+  float roughness = stacked.g;
+  float ambient_oclusion = stacked.b;
+
   vec4 light_space_tmp = lightSpace * texture(Frag_Position, uv); 
 
-  vec3 color = CalculeDirLight(directional_light, frag_normal, view_direction) * frag_color;
+  //vec3 N = getNormalFromMap(frag_normal,frag_position);
+  vec3 N = frag_normal;
+  vec3 view_direction = normalize(camera_pos - frag_position);
+
+
+
+  vec3 F0 = vec3(0.04); 
+  F0 = mix(F0, frag_color, metallic);
+
+  vec3 color = vec3(frag_color * ambient_oclusion);
+  
+  // HDR tonemapping
+  color = color / (color + vec3(1.0));
+  // gamma correct
+  color = pow(color, vec3(1.0/2.2)); 
+
+  color += CalculeDirLight(directional_light, frag_normal, view_direction) * frag_color;
   float shadow = ShadowCalculation(light_space_tmp, frag_normal);
   color = (1.0 - shadow) * color;
+  
+  
   
   FragColor = vec4(color, 1.0);
 }

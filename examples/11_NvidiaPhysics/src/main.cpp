@@ -137,15 +137,23 @@ int main(int argc, char** argv){
   std::shared_ptr<And::Texture> texture_bricks = And::MakeTexture("bricks.jpg");
   std::shared_ptr<And::Texture> texture_jou = And::MakeTexture("sphere_basecolor.png");
   std::shared_ptr<And::Texture> texture_cara_de_jou = And::MakeTexture("jou_cumple.png");
+
+  // PBR material
   std::shared_ptr<And::Texture> wall_tex = And::MakeTexture("brick-wall-bl/brick-wall_albedo.png");
   std::shared_ptr<And::Texture> wall_tex_normal = And::MakeTexture("brick-wall-bl/brick-wall_normal-ogl.png");
-  std::shared_ptr<And::Texture> wall_tex_specular = And::MakeTexture("brick-wall-bl/brick-wall_ao.png");
+  std::shared_ptr<And::Texture> wall_tex_met = And::MakeTexture("brick-wall-bl/brick-wall_metallic.png");
+  std::shared_ptr<And::Texture> wall_tex_rough = And::MakeTexture("brick-wall-bl/brick-wall_roughness.png");
+  std::shared_ptr<And::Texture> wall_tex_ao = And::MakeTexture("brick-wall-bl/brick-wall_ao.png");
   
   And::MaterialComponent material_comp_jou;
   std::shared_ptr<And::Material> material_jou = std::make_shared<And::Material>();
   material_jou->SetColorTexture(wall_tex);
+
   material_jou->SetNormalTexture(wall_tex_normal);
-  material_jou->SetSpecularTexture(wall_tex_specular);
+  material_jou->SetMetallicTexture(wall_tex_met);
+  material_jou->SetRoughnessTexture(wall_tex_rough);
+  material_jou->SetAmbientOclusionTexture(wall_tex_ao);
+  
   material_jou->SetColor(0.1f, 1.0f, 0.1f, 0.5f);
   material_comp_jou.SetMaterial(material_jou);
   

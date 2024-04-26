@@ -56,6 +56,7 @@ uniform sampler2D texShadow;
 uniform sampler2D Frag_Position;
 uniform sampler2D Frag_Normal;
 uniform sampler2D Frag_Color;
+uniform sampler2D Met_Roug_Ao;
 
 
 
@@ -212,9 +213,15 @@ vec3 CalculeSpotLightJou(SpotLight spot, vec3 normals, vec3 position){
 void main(){
 
   // Get textures
+  //vec3 frag_color = pow(texture(Frag_Color, uv).rgb, vec3(2.2));
   vec3 frag_color = texture(Frag_Color, uv).rgb;
   vec3 frag_normal = texture(Frag_Normal, uv).rgb;
   vec3 frag_position = texture(Frag_Position, uv).rgb;
+
+  vec3 stacked = texture(Met_Roug_Ao, uv).rgb;
+  float metallic = stacked.r;
+  float roughness = stacked.g;
+  float ambient_oclusion = stacked.b;
 
   vec3 view_direction = normalize(camera_pos - frag_position);
   

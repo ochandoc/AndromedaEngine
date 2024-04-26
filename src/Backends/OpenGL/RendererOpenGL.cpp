@@ -84,6 +84,7 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   info.Formats.push_back(ETextureFormat::RGB16F); // Posicion
   info.Formats.push_back(ETextureFormat::RGB16F); // Normales
   info.Formats.push_back(ETextureFormat::RGBA8);  // Color
+  info.Formats.push_back(ETextureFormat::RGBA16F);  // Metallic, Roughness & Ambien Oclusion
   m_gBuffer_ = MakeRenderTarget(info);
 
   info.Formats.clear();
@@ -738,6 +739,7 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     OpenGLTexture2D* normal_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[1].get());
     OpenGLTexture2D* color_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[2].get());
 
+
     OpenGLShader* tmp;
 
     DirectionalLight* directional = dynamic_cast<DirectionalLight*>(light);
@@ -758,11 +760,7 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     AmbientLight* ambient = dynamic_cast<AmbientLight*>(light);
     if (ambient) {
         tmp = static_cast<OpenGLShader*>(m_shader_quad_ambient.get());
-    }else {
-
     }
-
-    
 
 
     // posicion, normal, color
@@ -776,13 +774,16 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
 
     tmp->SetTexture("Frag_Color", 2);
     color_tex->Activate(2);
+    
+    tmp->SetTexture("Met_Roug_Ao", 3);
+    color_tex->Activate(3);
 
     if (!ambient && !point) {
         std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
         OpenGLTexture2D* tex_shadow = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
 
-        tmp->SetTexture("texShadow", 3);
-        tex_shadow->Activate(3);
+        tmp->SetTexture("texShadow", 4);
+        tex_shadow->Activate(4);
     }
 
     if (ambient) {
@@ -1020,18 +1021,20 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
     //obj->MeshOBJ->UseTexture(0);
     MaterialComponent* mat = obj->GetOwner()->get_component<MaterialComponent>();
     if (mat) {
-        OpenGLTexture2D* t = static_cast<OpenGLTexture2D*>(mat->GetMaterial()->GetColorTexture().get());
+
+        std::shared_ptr<Material> mat_instance = mat->GetMaterial();
+        OpenGLTexture2D* t = static_cast<OpenGLTexture2D*>(mat_instance->GetColorTexture().get());
         if (t) {
             t->Activate(0);
             s_tmp->SetInt("m_use_texture", 1);
         }else {
             // Si no tiene textura, uso el color
             //static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
-            s_tmp->SetVec4("m_albedoColor", glm::make_vec4(mat->GetMaterial()->GetColor()));
+            s_tmp->SetVec4("m_albedoColor", glm::make_vec4(mat_instance->GetColor()));
             s_tmp->SetInt("m_use_texture", 0);
         }
 
-        OpenGLTexture2D* t_normal = static_cast<OpenGLTexture2D*>(mat->GetMaterial()->GetNormalTexture().get());
+        OpenGLTexture2D* t_normal = static_cast<OpenGLTexture2D*>(mat_instance->GetNormalTexture().get());
         if (t_normal) {
             t_normal->Activate(1);
             s_tmp->SetTexture("texNormal",1);
@@ -1040,7 +1043,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
             s_tmp->SetInt("m_use_normal_texture",0);
         }
 
-        OpenGLTexture2D* t_specular= static_cast<OpenGLTexture2D*>(mat->GetMaterial()->GetSpecularTexture().get());
+        OpenGLTexture2D* t_specular= static_cast<OpenGLTexture2D*>(mat_instance->GetSpecularTexture().get());
         if (t_specular) {
             t_specular->Activate(2);
             s_tmp->SetTexture("texSpecular", 2);
@@ -1049,7 +1052,27 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
             s_tmp->SetInt("m_use_specular_texture", 0);
         }
 
+        OpenGLTexture2D* t_metallic = static_cast<OpenGLTexture2D*>(mat_instance->GetMetallicTexture().get());
+        if (t_metallic) {
+            t_metallic->Activate(3);
+            s_tmp->SetTexture("texMetallic", 3);
+        }
+
+        OpenGLTexture2D* t_roughness = static_cast<OpenGLTexture2D*>(mat_instance->GetRoughnessTexture().get());
+        if (t_roughness) {
+            t_roughness->Activate(4);
+            s_tmp->SetTexture("texRoughness", 4);
+        }
+        
+        OpenGLTexture2D* t_ao = static_cast<OpenGLTexture2D*>(mat_instance->GetAmbienOclusiontexture().get());
+        if (t_ao) {
+            t_ao->Activate(4);
+            s_tmp->SetTexture("texAmbientOclusion", 5);
+        }
+
     }else{
+
+        // Default texture if not material seted
         s_tmp->SetInt("m_use_texture", 1);
         static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
     }

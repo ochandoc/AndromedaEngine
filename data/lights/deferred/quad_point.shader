@@ -34,14 +34,14 @@ out vec3 s_normal;
 out vec3 s_fragPos;
 out vec3 camera_pos;
 out vec2 uv;
-out vec4 lightSpace[6];
+out mat4 lightSpace[6];
 
 void main(){
   gl_Position = vec4(position, 1.0);
   uv = TexCoord;
   vec4 obj_position = model * vec4(position, 1.0);
   for(int i = 0; i < 6; i++){
-    lightSpace[i] = ProjViewLight[i] * obj_position;
+    lightSpace[i] = ProjViewLight[i];// * obj_position;
   }
 }
 
@@ -55,6 +55,7 @@ uniform sampler2D texShadow[6];
 uniform sampler2D Frag_Position;
 uniform sampler2D Frag_Normal;
 uniform sampler2D Frag_Color;
+uniform sampler2D Met_Roug_Ao;
 
 in vec3 blend_color;
 in vec3 s_normal;
@@ -89,7 +90,7 @@ layout (std140, binding = 4) uniform UniformPoivvnt{
 };
 
 
-float ShadowCalculation(vec4 fragPosLightSpace, sampler2D tex){
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal_value, sampler2D tex){
 
   // perform perspective divide
   vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -106,9 +107,8 @@ float ShadowCalculation(vec4 fragPosLightSpace, sampler2D tex){
   // get depth of current fragment from light's perspective
   float currentDepth = projCoords.z;
   // calculate bias (based on depth map resolution and slope)
-  vec3 normal = normalize(s_normal);
   vec3 lightDir = normalize(point.position - s_fragPos);
-  float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+  float bias = max(0.05 * (1.0 - dot(normal_value, lightDir)), 0.005);
   // check whether current frag pos is in shadow
   // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
   // PCF
@@ -162,9 +162,15 @@ vec3 CalculePointLight(PointLight light, vec3 normalValue, vec3 view_dir, vec3 f
 void main(){
 
   // Get textures
+  //vec3 frag_color = pow(texture(Frag_Color, uv).rgb, vec3(2.2));
   vec3 frag_color = texture(Frag_Color, uv).rgb;
   vec3 frag_normal = texture(Frag_Normal, uv).rgb;
   vec3 frag_position = texture(Frag_Position, uv).rgb;
+
+  vec3 stacked = texture(Met_Roug_Ao, uv).rgb;
+  float metallic = stacked.r;
+  float roughness = stacked.g;
+  float ambient_oclusion = stacked.b;
 
   vec3 view_direction = normalize(camera_pos - frag_position);
   
@@ -174,10 +180,10 @@ void main(){
 
   float shadow = 0.0;
   for(int i = 0; i < 6; i++){
-    //vec4 light_space_tmp = lightSpace[i] * texture(Frag_Position, uv); 
-    //shadow += ShadowCalculation(light_space_tmp, frag_normal);
+    vec4 light_space_tmp = lightSpace[i] * texture(Frag_Position, uv); 
+    shadow += ShadowCalculation(light_space_tmp, frag_normal, texShadow[i]);
   }
-  //color = (1.0 - shadow) * color;
+  color = (1.0 - shadow) * color;
   
   FragColor = vec4(color, 1.0);
 }
