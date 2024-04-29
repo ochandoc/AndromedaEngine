@@ -91,7 +91,7 @@ int main(int argc, char** argv){
   fly_cam.SetFov(90.0f);
   fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
 
-  g_renderer->set_camera(&fly_cam);
+ //g_renderer->set_camera(&fly_cam);
 
 
   //std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
@@ -332,7 +332,7 @@ int main(int argc, char** argv){
   diffuse_color[2] = 1.0f;
   diffuse_color[1] = 0.0f;
   And::PointLight point{};
-  point.SetPosition(position2);
+  point.SetPosition(0.0f, 14.0f, 0.0f);
   point.SetEnabled(1.0f);
   point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
   point.SetSpecularStrength(specular_strength);
@@ -343,7 +343,7 @@ int main(int argc, char** argv){
   point.SetLinearAtt(linear_att);
   point.SetConstantAtt(constant_att);
   point.SetQuadraticAtt(quadratic_att);
-  //And::Entity* point_entity = entity_comp.new_entity(point);
+  And::Entity* point_entity = entity_comp.new_entity(point);
   
   //position2[0] += 40.0f;
   //diffuse_color[2] = 0.0f;
@@ -454,8 +454,8 @@ int main(int argc, char** argv){
     
     
 
-    g_renderer->draw_forward(entity_comp);
-    //g_renderer->draw_deferred(entity_comp);
+    //g_renderer->draw_forward(entity_comp);
+    g_renderer->draw_deferred(entity_comp);
     g_renderer->end_frame();
     window->swap_buffers();
   }

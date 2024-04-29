@@ -184,7 +184,5 @@ void main(){
   float shadow = ShadowCalculation(light_space_tmp, frag_normal);
   color = (1.0 - shadow) * color;
   
-  
-  
   FragColor = vec4(color, 1.0);
 }

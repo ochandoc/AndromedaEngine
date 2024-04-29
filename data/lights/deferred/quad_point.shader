@@ -175,8 +175,8 @@ void main(){
   vec3 view_direction = normalize(camera_pos - frag_position);
   
 
-  vec3 color = vec3(0.0, 0.0, 0.0);
-  color += CalculePointLight(point, frag_normal, view_direction, frag_position) * frag_color;
+  //vec3 color = vec3(0.0, 0.0, 0.0);
+  vec3 color = CalculePointLight(point, frag_normal, view_direction, frag_position) * frag_color;
 
   float shadow = 0.0;
   for(int i = 0; i < 6; i++){

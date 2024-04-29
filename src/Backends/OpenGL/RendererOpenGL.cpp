@@ -676,16 +676,16 @@ void RendererOpenGL::draw_shadows(SpotLight* l, MeshComponent* obj, TransformCom
 void RendererOpenGL::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran) {  
   CameraBase* cam = &m_DefaultCamera;
   if(m_UserCamera) cam = m_UserCamera;
-  //glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
+  glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
   glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
 
-  // float x = cam_pos.x + ( (-1.0f * light_dir.x) * 50.0f);
-  // float z = cam_pos.z + ( (-1.0f * light_dir.z) * 50.0f);
-  float x = 0.0f + ( (-1.0f * light_dir.x) * 50.0f);
-  float z = 0.0f + ( (-1.0f * light_dir.z) * 50.0f);
+  float x = cam_pos.x + ( (-1.0f * light_dir.x) * 50.0f);
+  float z = cam_pos.z + ( (-1.0f * light_dir.z) * 50.0f);
+  //float x = 0.0f + ( (-1.0f * light_dir.x) * 50.0f);
+  //float z = 0.0f + ( (-1.0f * light_dir.z) * 50.0f);
   
-  //glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
-  glm::vec3 pos = glm::vec3(x, 50.0f, z);
+  glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
+  //glm::vec3 pos = glm::vec3(x, 50.0f, z);
   glm::vec3 up(0.0f, 1.0f, 0.0f);
   glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
   up = glm::cross(light_dir, right);
@@ -698,9 +698,6 @@ void RendererOpenGL::draw_shadows(DirectionalLight* l, MeshComponent* obj, Trans
 void RendererOpenGL::draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* lightDir){  
   glm::vec3 pos = glm::make_vec3(l->GetPosition());
   glm::vec3 dir = glm::make_vec3(lightDir);
- 
-  // Para la directional, la posicion tiene que estar en la mitad del flusthrum en z, y en x e y tengo que sacar la posicion segun la direccion a la que viene la luz,
-  // y luego ir moviendola ligeramente hasta sacar los valores correctos
 
   glm::vec3 up(0.0f, 1.0f, 0.0f);
   float dot = glm::dot(up, dir);
@@ -790,17 +787,19 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
         tex_shadow->Activate(4);
     }
 
-    if (ambient) {
-        int index = 0;
+    if (point) {
+        int index = 4;
+        int index_array_shadows = 0;
         std::vector<std::shared_ptr<And::RenderTarget>> render_targets = get_shadow_buffer_pointLight();
         for (auto& target : render_targets) {
 
             std::vector<std::shared_ptr<And::Texture>> shadow_texture = target->GetTextures();
             OpenGLTexture2D* tex_shadows = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
             tmp->Use();
+            tmp->SetTextureInArray("texShadow", index_array_shadows, index);
             tex_shadows->Activate(index);
-            tmp->SetTextureInArray("texShadow", index, index);
             index++;
+            index_array_shadows++;
         }
     }
 
@@ -1099,6 +1098,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
         OpenGLTexture2D* t_color = static_cast<OpenGLTexture2D*>(mat_instance->GetColorTexture().get());
         if (t_color) {
             t_color->Activate(0);
+            s_tmp->SetTexture("texMaterial",0);
             s_tmp->SetInt("m_use_texture", 1);
         }else {
             // Si no tiene textura, uso el color
@@ -1139,7 +1139,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
         
         OpenGLTexture2D* t_ao = static_cast<OpenGLTexture2D*>(mat_instance->GetAmbienOclusiontexture().get());
         if (t_ao) {
-            t_ao->Activate(4);
+            t_ao->Activate(5);
             s_tmp->SetTexture("texAmbientOclusion", 5);
         }
 
@@ -1148,6 +1148,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
         // Default texture if not material seted
         s_tmp->SetInt("m_use_texture", 1);
         static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
+        s_tmp->SetTexture("texMaterial", 0);
     }
 
     OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_geometry.get());
@@ -1171,22 +1172,22 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
   // Shadows directional
   std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
   for (auto [light] : entity.get_components<DirectionalLight>()) {
-    shadow_buffer->Activate();
-    glDisable(GL_BLEND);
-    if (light->GetCastShadows()) {
-        // Por cada luz que castea sombras guardamos textura de profundidad
-        for (auto [transform, obj] : entity.get_components<TransformComponent, MeshComponent>()) {
-            draw_shadows(light, obj, transform);
-        }
-    }
-    shadow_buffer->Desactivate();
-    glEnable(GL_BLEND);
+      shadow_buffer->Activate();
+      glDisable(GL_BLEND);
+      if (light->GetCastShadows()) {
+          // Por cada luz que castea sombras guardamos textura de profundidad
+          for (auto [transform, obj] : entity.get_components<TransformComponent, MeshComponent>()) {
+              draw_shadows(light, obj, transform);
+          }
+      }
+      shadow_buffer->Desactivate();
+      glEnable(GL_BLEND);
 
 
-    // Render Directional
-    RenderLight(shadow_buffer, light);
-    glBlendFunc(GL_ONE, GL_ONE);
-    
+      // Render Directional
+      RenderLight(shadow_buffer, light);
+      glBlendFunc(GL_ONE, GL_ONE);
+
 
   }
 
@@ -1207,7 +1208,8 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
       RenderLight(shadow_buffer, light);
       glBlendFunc(GL_ONE, GL_ONE);
   }
-  
+
+  // Shadows point
   std::vector<std::shared_ptr<And::RenderTarget>> render_targets = get_shadow_buffer_pointLight();
   for (auto [light] : entity.get_components<PointLight>()) {
       glDisable(GL_BLEND);
@@ -1225,8 +1227,8 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
       }
       glEnable(GL_BLEND);
 
-      // Render spot
-      RenderLight(shadow_buffer, light);
+      // Render point
+      RenderLight(nullptr, light);
       glBlendFunc(GL_ONE, GL_ONE);
   }
 
