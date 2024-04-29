@@ -30,6 +30,11 @@ layout (std140, binding = 3) uniform UniformDirectional{
 };
 
 
+uniform int m_use_normal_texture;
+uniform vec4 m_albedoColor;
+uniform int m_use_texture;
+uniform int m_use_specular_texture;
+
 out vec3 blend_color;
 out vec3 s_normal;
 out vec3 s_fragPos;
@@ -57,6 +62,12 @@ layout(location = 0) out vec4 FragColor;
 
 uniform sampler2D texShadow;
 uniform sampler2D texMaterial;
+uniform sampler2D texNormal;
+uniform sampler2D texSpecular;
+
+uniform sampler2D texMetallic;
+uniform sampler2D texRoughness;
+uniform sampler2D texAmbientOclusion;
 
 in vec3 blend_color;
 in vec3 s_normal;
@@ -64,6 +75,11 @@ in vec3 s_fragPos;
 in vec3 camera_pos;
 in vec2 uv;
 in vec4 lightSpace;
+
+uniform int m_use_normal_texture;
+uniform vec4 m_albedoColor;
+uniform int m_use_texture;
+uniform int m_use_specular_texture;
 
 struct DirectionalLight{
   vec3 direction;
@@ -170,14 +186,27 @@ void main(){
   vec3 color = ambient_color;
   vec3 color_base = vec3(0.5, 0.5, 0.5);
 
-  color = CalculeDirLight(directional_light, s_normal, view_direction, color_base);
+  vec3 normal_value;
+  if(m_use_normal_texture == 1){
+    normal_value = s_normal;
+  }else{
+    normal_value = texture(texNormal,uv).rgb;
+  }
+
+  color = CalculeDirLight(directional_light, normal_value, view_direction, color_base);
 
   vec3 projCoords = lightSpace.xyz / lightSpace.w;
 
   float shadow = ShadowCalculation(lightSpace);
 
   color = (1.0 - shadow) * color;
-  vec4 tex_color = texture(texMaterial, uv); 
+  vec4 tex_color;
+  if(m_use_texture == 1){
+    tex_color = texture(texMaterial, uv); 
+  }else{
+    tex_color = m_albedoColor;
+  }
+
   FragColor = vec4(color, 1.0) * tex_color;
   //FragColor = vec4(shadow, shadow, shadow, 1.0);
 }

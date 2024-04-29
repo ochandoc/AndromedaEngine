@@ -183,6 +183,7 @@ void main(){
   vec3 color = CalculeDirLight(directional_light, frag_normal, view_direction) * frag_color;
   float shadow = ShadowCalculation(light_space_tmp, frag_normal);
   color = (1.0 - shadow) * color;
+
   
   FragColor = vec4(color, 1.0);
 }

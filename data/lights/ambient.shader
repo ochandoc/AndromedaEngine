@@ -29,11 +29,18 @@ layout (std140, binding = 2) uniform UniformAmbient{
 };
 
 
+uniform int m_use_normal_texture;
+uniform vec4 m_albedoColor;
+uniform int m_use_texture;
+uniform int m_use_specular_texture;
+
+
 out vec3 blend_color;
 out vec3 s_normal;
 out vec3 s_fragPos;
 out vec3 camera_pos;
 out vec2 uv;
+
 
 
 void main(){
@@ -52,6 +59,18 @@ void main(){
 layout(location = 0) out vec4 FragColor;
 
 uniform sampler2D texMaterial;
+uniform sampler2D texNormal;
+uniform sampler2D texSpecular;
+
+uniform sampler2D texMetallic;
+uniform sampler2D texRoughness;
+uniform sampler2D texAmbientOclusion;
+
+uniform int m_use_normal_texture;
+uniform vec4 m_albedoColor;
+uniform int m_use_texture;
+uniform int m_use_specular_texture;
+
 in vec2 TexCoord;
 
 in vec3 blend_color;
@@ -89,7 +108,13 @@ void main(){
   float ambient_strength = 1.0;
   vec3 color = ambient_strength * ambient_light.diffuse_color;
   
-  vec4 tex_color = texture(texMaterial, uv); 
+
+  vec4 tex_color;
+  if(m_use_texture == 1){
+   tex_color = texture(texMaterial, uv); 
+  }else{
+    tex_color = m_albedoColor;
+  }
   FragColor = vec4(color, 1.0) * tex_color;
   //FragColor = tex_color;
 }

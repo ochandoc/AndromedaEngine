@@ -53,7 +53,7 @@ namespace And{
         void draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran);
         void draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* dir);
 
-        void CheckMaterial(OpenGLShader* s, Material* mat);
+        void CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> mat);
         
         void ResetTransforms(EntityComponentSystem& ecs);
 

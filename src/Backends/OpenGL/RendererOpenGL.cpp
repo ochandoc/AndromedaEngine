@@ -840,17 +840,15 @@ void RendererOpenGL::ResetTransforms(EntityComponentSystem& ecs) {
 
 }
 
-void RendererOpenGL::CheckMaterial(OpenGLShader* s, Material* mat) {
+void RendererOpenGL::CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> mat) {
     //MaterialComponent m_tmp = mat-> 
-    if (mat) {
-
-
+    if (mat.get()){
         OpenGLTexture2D* t = static_cast<OpenGLTexture2D*>(mat->GetColorTexture().get());
         if (t) {
             t->Activate(0);
+            s->SetTexture("texMaterial", 0);
             s->SetInt("m_use_texture", 1);
-        }
-        else {
+        }else {
             // Si no tiene textura, uso el color
             //static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
             s->SetVec4("m_albedoColor", glm::make_vec4(mat->GetColor()));
@@ -891,7 +889,7 @@ void RendererOpenGL::CheckMaterial(OpenGLShader* s, Material* mat) {
 
         OpenGLTexture2D* t_ao = static_cast<OpenGLTexture2D*>(mat->GetAmbienOclusiontexture().get());
         if (t_ao) {
-            t_ao->Activate(4);
+            t_ao->Activate(5);
             s->SetTexture("texAmbientOclusion", 5);
         }
 
@@ -901,6 +899,7 @@ void RendererOpenGL::CheckMaterial(OpenGLShader* s, Material* mat) {
         // Default texture if not material seted
         s->SetInt("m_use_texture", 1);
         static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
+        s->SetTexture("texMaterial", 0);
     }
 
 }
@@ -915,9 +914,11 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 
       m_shader_ambient->Use();
       for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-        obj->MeshOBJ->UseTexture(1);
+        //obj->MeshOBJ->UseTexture(1);
         OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_ambient.get());
-        tmp->SetTexture("texMaterial",1);
+        MaterialComponent* mat = obj->GetOwner()->get_component<MaterialComponent>();
+        //tmp->SetTexture("texMaterial",1);
+        CheckMaterial(tmp,mat->GetMaterial());
         draw_obj(obj, light, transform);
       }
       glBlendFunc(GL_ONE, GL_ONE);
@@ -942,17 +943,20 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
       // Render Directional
       for (auto [light] : entity.get_components<DirectionalLight>()) {
           for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+              
+              MaterialComponent* mat = obj->GetOwner()->get_component<MaterialComponent>();
+              
               if (light->GetCastShadows()) [[likely]] {
                   std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
                   OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_shadows_directional.get());
                   OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
-
                   tmp->Use();
+
+
+                  CheckMaterial(tmp,mat->GetMaterial());
+                  
                   tex->Activate(6);
                   tmp->SetTexture("texShadow", 6);
-
-                  MaterialComponent* mat = obj->GetOwner()->get_component<MaterialComponent>();
-                  CheckMaterial(tmp,mat->GetMaterial().get());
                   
 
                   //obj->MeshOBJ->UseTexture(1);
@@ -962,9 +966,10 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
               }else {
                   m_shader_directional->Use();
                   
-                  obj->MeshOBJ->UseTexture(1);
+                  //obj->MeshOBJ->UseTexture(1);
                   OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_directional.get());
-                  tmp->SetTexture("texMaterial",1);
+                  CheckMaterial(tmp, mat->GetMaterial());
+                  //tmp->SetTexture("texMaterial",1);
                   
                   draw_obj(obj, light, transform);
               }

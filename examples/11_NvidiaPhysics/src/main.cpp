@@ -291,7 +291,7 @@ int main(int argc, char** argv){
   spot.SetOuterCuttOff(outer_cut_off);
   spot.SetCastShadows(true);
   spot.SetEnabled(true);
-  entity_comp.new_entity(spot);
+  //entity_comp.new_entity(spot);
 
   position[1] += 10.0f;
   diffuse_color[0] = 0.0f;
@@ -343,7 +343,7 @@ int main(int argc, char** argv){
   point.SetLinearAtt(linear_att);
   point.SetConstantAtt(constant_att);
   point.SetQuadraticAtt(quadratic_att);
-  And::Entity* point_entity = entity_comp.new_entity(point);
+  //And::Entity* point_entity = entity_comp.new_entity(point);
   
   //position2[0] += 40.0f;
   //diffuse_color[2] = 0.0f;
@@ -454,8 +454,8 @@ int main(int argc, char** argv){
     
     
 
-    //g_renderer->draw_forward(entity_comp);
-    g_renderer->draw_deferred(entity_comp);
+    g_renderer->draw_forward(entity_comp);
+    //g_renderer->draw_deferred(entity_comp);
     g_renderer->end_frame();
     window->swap_buffers();
   }
