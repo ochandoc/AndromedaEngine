@@ -572,8 +572,9 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   glm::mat4 modelMatrix = glm::make_mat4(trans->GetModelMatrix());
 
   glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
+  glm::vec3 simulated_pos = glm::vec3(0.0f, 0.0f, 0.0f);
   glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
-  glm::vec3 pos = glm::make_vec3(cam_pos + ( (-1.0f * light_dir) * 50.0f));
+  glm::vec3 pos = glm::make_vec3(simulated_pos + ( (-1.0f * light_dir) * 50.0f));
   
 
   glm::vec3 up(0.0f, 1.0f, 0.0f);
@@ -675,13 +676,16 @@ void RendererOpenGL::draw_shadows(SpotLight* l, MeshComponent* obj, TransformCom
 void RendererOpenGL::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran) {  
   CameraBase* cam = &m_DefaultCamera;
   if(m_UserCamera) cam = m_UserCamera;
-  glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
+  //glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
   glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
 
-  float x = cam_pos.x + ( (-1.0f * light_dir.x) * 50.0f);
-  float z = cam_pos.z + ( (-1.0f * light_dir.z) * 50.0f);
+  // float x = cam_pos.x + ( (-1.0f * light_dir.x) * 50.0f);
+  // float z = cam_pos.z + ( (-1.0f * light_dir.z) * 50.0f);
+  float x = 0.0f + ( (-1.0f * light_dir.x) * 50.0f);
+  float z = 0.0f + ( (-1.0f * light_dir.z) * 50.0f);
   
-  glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
+  //glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
+  glm::vec3 pos = glm::vec3(x, 50.0f, z);
   glm::vec3 up(0.0f, 1.0f, 0.0f);
   glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
   up = glm::cross(light_dir, right);
@@ -837,6 +841,71 @@ void RendererOpenGL::ResetTransforms(EntityComponentSystem& ecs) {
 
 }
 
+void RendererOpenGL::CheckMaterial(OpenGLShader* s, Material* mat) {
+    //MaterialComponent m_tmp = mat-> 
+    if (mat) {
+
+
+        OpenGLTexture2D* t = static_cast<OpenGLTexture2D*>(mat->GetColorTexture().get());
+        if (t) {
+            t->Activate(0);
+            s->SetInt("m_use_texture", 1);
+        }
+        else {
+            // Si no tiene textura, uso el color
+            //static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
+            s->SetVec4("m_albedoColor", glm::make_vec4(mat->GetColor()));
+            s->SetInt("m_use_texture", 0);
+        }
+
+        OpenGLTexture2D* t_normal = static_cast<OpenGLTexture2D*>(mat->GetNormalTexture().get());
+        if (t_normal) {
+            t_normal->Activate(1);
+            s->SetTexture("texNormal", 1);
+            s->SetInt("m_use_normal_texture", 1);
+        }
+        else {
+            s->SetInt("m_use_normal_texture", 0);
+        }
+
+        OpenGLTexture2D* t_specular = static_cast<OpenGLTexture2D*>(mat->GetSpecularTexture().get());
+        if (t_specular) {
+            t_specular->Activate(2);
+            s->SetTexture("texSpecular", 2);
+            s->SetInt("m_use_specular_texture", 1);
+        }
+        else {
+            s->SetInt("m_use_specular_texture", 0);
+        }
+
+        OpenGLTexture2D* t_metallic = static_cast<OpenGLTexture2D*>(mat->GetMetallicTexture().get());
+        if (t_metallic) {
+            t_metallic->Activate(3);
+            s->SetTexture("texMetallic", 3);
+        }
+
+        OpenGLTexture2D* t_roughness = static_cast<OpenGLTexture2D*>(mat->GetRoughnessTexture().get());
+        if (t_roughness) {
+            t_roughness->Activate(4);
+            s->SetTexture("texRoughness", 4);
+        }
+
+        OpenGLTexture2D* t_ao = static_cast<OpenGLTexture2D*>(mat->GetAmbienOclusiontexture().get());
+        if (t_ao) {
+            t_ao->Activate(4);
+            s->SetTexture("texAmbientOclusion", 5);
+        }
+
+    }
+    else {
+
+        // Default texture if not material seted
+        s->SetInt("m_use_texture", 1);
+        static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
+    }
+
+}
+
 void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 
     std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
@@ -880,11 +949,15 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
                   OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
 
                   tmp->Use();
-                  tex->Activate(0);
-                  tmp->SetTexture("texShadow", 0);
+                  tex->Activate(6);
+                  tmp->SetTexture("texShadow", 6);
 
-                  obj->MeshOBJ->UseTexture(1);
-                  tmp->SetTexture("texMaterial",1);                  
+                  MaterialComponent* mat = obj->GetOwner()->get_component<MaterialComponent>();
+                  CheckMaterial(tmp,mat->GetMaterial().get());
+                  
+
+                  //obj->MeshOBJ->UseTexture(1);
+                  //tmp->SetTexture("texMaterial",1);                  
 
                   draw_obj_shadows(obj, transform, light);
               }else {
@@ -1023,9 +1096,9 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
     if (mat) {
 
         std::shared_ptr<Material> mat_instance = mat->GetMaterial();
-        OpenGLTexture2D* t = static_cast<OpenGLTexture2D*>(mat_instance->GetColorTexture().get());
-        if (t) {
-            t->Activate(0);
+        OpenGLTexture2D* t_color = static_cast<OpenGLTexture2D*>(mat_instance->GetColorTexture().get());
+        if (t_color) {
+            t_color->Activate(0);
             s_tmp->SetInt("m_use_texture", 1);
         }else {
             // Si no tiene textura, uso el color

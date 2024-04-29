@@ -165,22 +165,22 @@ void main(){
   vec4 light_space_tmp = lightSpace * texture(Frag_Position, uv); 
 
   //vec3 N = getNormalFromMap(frag_normal,frag_position);
-  vec3 N = frag_normal;
+  //vec3 N = frag_normal;
   vec3 view_direction = normalize(camera_pos - frag_position);
 
 
 
-  vec3 F0 = vec3(0.04); 
-  F0 = mix(F0, frag_color, metallic);
+  //vec3 F0 = vec3(0.04); 
+  //F0 = mix(F0, frag_color, metallic);
 
-  vec3 color = vec3(frag_color * ambient_oclusion);
+  //vec3 color = vec3(frag_color * ambient_oclusion);
   
   // HDR tonemapping
-  color = color / (color + vec3(1.0));
+  //color = color / (color + vec3(1.0));
   // gamma correct
-  color = pow(color, vec3(1.0/2.2)); 
+  //color = pow(color, vec3(1.0/2.2)); 
 
-  color += CalculeDirLight(directional_light, frag_normal, view_direction) * frag_color;
+  vec3 color = CalculeDirLight(directional_light, frag_normal, view_direction) * frag_color;
   float shadow = ShadowCalculation(light_space_tmp, frag_normal);
   color = (1.0 - shadow) * color;
   

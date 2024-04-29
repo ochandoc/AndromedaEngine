@@ -13,7 +13,7 @@
 #include "Andromeda/Graphics/Lights/DirectionalLight.h"
 #include "Andromeda/Graphics/Lights/PointLight.h"
 #include "Andromeda/Graphics/Material.h"
-
+#include "Backends/OpenGL/OpenGLShader.h"
 
 #include "Andromeda/Graphics/Renderer.h"
 
@@ -52,6 +52,8 @@ namespace And{
         void draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran);
         void draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran);
         void draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* dir);
+
+        void CheckMaterial(OpenGLShader* s, Material* mat);
         
         void ResetTransforms(EntityComponentSystem& ecs);
 
