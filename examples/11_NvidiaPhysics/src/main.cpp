@@ -160,6 +160,7 @@ int main(int argc, char** argv){
   And::MaterialComponent material_comp_sponza;
   std::shared_ptr<And::Material> material_sponza = std::make_shared<And::Material>();
   material_sponza->SetColorTexture(texture_bricks);
+  //material_sponza->SetColor(0.0f, 0.5f, 0.0f, 1.0f);
   material_comp_sponza.SetMaterial(material_sponza);
 
   //MC.MeshOBJ->SetTexture(texture_bricks);
@@ -229,7 +230,7 @@ int main(int argc, char** argv){
   tran_teapot2.scale[2] = 2.0f;
 
   // Sponza
-  And::Entity* obj_id = entity_comp.new_entity(MC, tran, material_comp_sponza);
+  And::Entity* obj_id = entity_comp.new_entity(MC, tran);
 
   And::RigidBody rb = physics_engine->CreateRigidBody();
   And::RigidBody rb_up = physics_engine->CreateRigidBody();
@@ -290,9 +291,9 @@ int main(int argc, char** argv){
   spot.SetQuadraticAtt(quadratic_att);
   spot.SetCuttOff(cutt_off);
   spot.SetOuterCuttOff(outer_cut_off);
-  spot.SetCastShadows(false);
+  spot.SetCastShadows(true);
   spot.SetEnabled(true);
-  //entity_comp.new_entity(spot);
+  entity_comp.new_entity(spot);
 
   position[1] += 10.0f;
   diffuse_color[0] = 0.0f;
