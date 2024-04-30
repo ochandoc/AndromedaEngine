@@ -149,9 +149,9 @@ Light CalcLight(vec3 light_direction, vec3 light_color, vec3 normal_value){
   light.diffuse_color = diff * light_color;// * texture(u_texture, uv).rgb;
 
   vec3 reflectDir = reflect(-light_direction, normal_value);
-  float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+  float spec = pow(max(dot(viewDir, reflectDir), 0.0), spot.specular_shininess);
 
-  light.specular_color = 0.5 * spec * vec3(1.0, 1.0, 1.0); // * texture(u_texture, uv).rgb;
+  light.specular_color = spot.specular_strength * spec * spot.specular_color; // * texture(u_texture, uv).rgb;
 
   return light;
 }

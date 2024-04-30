@@ -149,7 +149,7 @@ int main(int argc, char** argv){
   std::shared_ptr<And::Material> material_jou = std::make_shared<And::Material>();
   material_jou->SetColorTexture(wall_tex);
 
-  material_jou->SetNormalTexture(wall_tex_normal);
+  //material_jou->SetNormalTexture(wall_tex_normal);
   material_jou->SetMetallicTexture(wall_tex_met);
   material_jou->SetRoughnessTexture(wall_tex_rough);
   material_jou->SetAmbientOclusionTexture(wall_tex_ao);
@@ -271,7 +271,7 @@ int main(int argc, char** argv){
   float direction[3] = {0.0f, 0.0f, -1.0f};
 
   float specular_strength = 0.003f;
-  float specular_shininess = 8.0f;
+  float specular_shininess = 2.0f;
   float constant_att = 1.0f;
   float linear_att = 0.014f;
   float quadratic_att = 0.0007f;

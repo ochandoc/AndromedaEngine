@@ -1019,10 +1019,11 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
                 draw_obj_shadows(obj, transform, light);
             }
             else {
-                m_shader_spot->Use();
+                //m_shader_spot->Use();
                 
                 //obj->MeshOBJ->UseTexture(1);
                 OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_spot.get());
+                tmp->Use();
                 CheckMaterial(tmp, mat->GetMaterial());
 
                 //tmp->SetTexture("texMaterial",1);

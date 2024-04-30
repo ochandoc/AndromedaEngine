@@ -26,10 +26,8 @@ struct SpotLight{
 
 layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
-  //mat4 view;
-  //mat4 projection;
-  mat4 ProjViewCam;
-  mat4 ProjViewLight;
+  mat4 view;
+  mat4 projection;
   vec3 camera_position;
 };
 
@@ -51,16 +49,14 @@ out vec4 lightSpace;
 
 
 void main(){
-  vec4 obj_position = model * vec4(position, 1.0);
-  gl_Position = ProjViewCam * obj_position;
-  blend_color = vec3(camera_position.x/20.0, camera_position.y/20.0, camera_position.z/20.0);
+  
+  gl_Position = projection * view * model * vec4(position, 1.0);
   s_fragPos = vec3(model * vec4(position, 1.0));
   s_normal = normals;
   camera_pos = camera_position;
   uv = TexCoord;
-  lightSpace = ProjViewLight * obj_position;
-  //lightSpace = vec4(1.0);
 }
+
 
 
 #type Fragment
@@ -68,7 +64,6 @@ void main(){
 
 layout(location = 0) out vec4 FragColor;
 
-uniform sampler2D texShadow;
 uniform sampler2D texMaterial;
 uniform sampler2D texNormal;
 uniform sampler2D texSpecular;
@@ -130,10 +125,8 @@ struct Light{
 
 layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
-  //mat4 view;
-  //mat4 projection;
-  mat4 ProjViewCam;
-  mat4 ProjViewLight;
+  mat4 view;
+  mat4 projection;
   vec3 camera_position;
 };
 
@@ -149,9 +142,9 @@ Light CalcLight(vec3 light_direction, vec3 light_color, vec3 normal_value){
   light.diffuse_color = diff * light_color;// * texture(u_texture, uv).rgb;
 
   vec3 reflectDir = reflect(-light_direction, normal_value);
-  float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
+  float spec = pow(max(dot(viewDir, reflectDir), 0.0), spot.specular_shininess);
 
-  light.specular_color = 0.5 * spec * vec3(1.0, 1.0, 1.0); // * texture(u_texture, uv).rgb;
+  light.specular_color = spot.specular_strength * spec * spot.specular_color; // * texture(u_texture, uv).rgb;
 
   return light;
 }
@@ -241,6 +234,6 @@ void main(){
     tex_color = m_albedoColor;
   }
 
-  //FragColor = vec4(color, 1.0) * tex_color;
-  FragColor = vec4(spot.diffuse_color, 1.0);
+  FragColor = vec4(color, 1.0) * tex_color;
+  //FragColor = vec4(spot.diffuse_color, 1.0);
 }
