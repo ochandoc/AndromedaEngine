@@ -241,7 +241,8 @@ int main(int argc, char** argv){
   rb.SetMass(5.0f);
 
   // Cube
-  And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube, rb, material_comp_jou);
+  //And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube, rb, material_comp_jou);
+  And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube, material_comp_jou);
   //And::Entity* obj_cube_up_id = entity_comp.new_entity(MC_cube_up, tran_cube_up, rb_up, material_comp_jou);
 
   tran_cube2.position[0] = 3.0f;
@@ -289,9 +290,9 @@ int main(int argc, char** argv){
   spot.SetQuadraticAtt(quadratic_att);
   spot.SetCuttOff(cutt_off);
   spot.SetOuterCuttOff(outer_cut_off);
-  spot.SetCastShadows(true);
+  spot.SetCastShadows(false);
   spot.SetEnabled(true);
-  //entity_comp.new_entity(spot);
+  entity_comp.new_entity(spot);
 
   position[1] += 10.0f;
   diffuse_color[0] = 0.0f;

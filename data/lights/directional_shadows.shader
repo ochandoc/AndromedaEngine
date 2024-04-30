@@ -188,18 +188,17 @@ void main(){
 
   vec3 normal_value;
   if(m_use_normal_texture == 1){
-    normal_value = s_normal;
-  }else{
     normal_value = texture(texNormal,uv).rgb;
+  }else{
+    normal_value = s_normal;
   }
-
-  color = CalculeDirLight(directional_light, normal_value, view_direction, color_base);
-
+  
   vec3 projCoords = lightSpace.xyz / lightSpace.w;
 
+  color = CalculeDirLight(directional_light, normal_value, view_direction, color_base);
   float shadow = ShadowCalculation(lightSpace);
-
   color = (1.0 - shadow) * color;
+
   vec4 tex_color;
   if(m_use_texture == 1){
     tex_color = texture(texMaterial, uv); 

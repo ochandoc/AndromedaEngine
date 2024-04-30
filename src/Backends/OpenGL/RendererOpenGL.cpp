@@ -572,9 +572,10 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   glm::mat4 modelMatrix = glm::make_mat4(trans->GetModelMatrix());
 
   glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
-  glm::vec3 simulated_pos = glm::vec3(0.0f, 0.0f, 0.0f);
+  //glm::vec3 simulated_pos = glm::vec3(0.0f, 0.0f, 0.0f);
   glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
-  glm::vec3 pos = glm::make_vec3(simulated_pos + ( (-1.0f * light_dir) * 50.0f));
+  //glm::vec3 pos = glm::make_vec3(simulated_pos + ( (-1.0f * light_dir) * 50.0f));
+  glm::vec3 pos = glm::make_vec3(cam_pos + ((-1.0f * light_dir) * 50.0f));
   
 
   glm::vec3 up(0.0f, 1.0f, 0.0f);
@@ -983,7 +984,7 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 
     // Shadows spot light
     // Spot Lights
-    for(auto [light] : entity.get_components<SpotLight>()){
+        for(auto [light] : entity.get_components<SpotLight>()){
       shadow_buffer->Activate();
       glDisable(GL_BLEND);
       if(light->GetCastShadows()) [[likely]] {
@@ -998,25 +999,33 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 
       // Render SpotLight 
       for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+
+            MaterialComponent* mat = obj->GetOwner()->get_component<MaterialComponent>();
+
             if (light->GetCastShadows()) [[likely]] {
                 std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
                 OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_shadows_spot.get());
                 OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
                 tmp->Use();
-                tex->Activate(0);
-                tmp->SetTexture("texShadow", 0);
+                //tex->Activate(0);
                 
-                obj->MeshOBJ->UseTexture(1);
-                tmp->SetTexture("texMaterial",1);
+                //obj->MeshOBJ->UseTexture(1);
+                //tmp->SetTexture("texMaterial",1);
                   
+                CheckMaterial(tmp, mat->GetMaterial());
+
+                tex->Activate(6);
+                tmp->SetTexture("texShadow", 6);
                 draw_obj_shadows(obj, transform, light);
             }
             else {
                 m_shader_spot->Use();
                 
-                obj->MeshOBJ->UseTexture(1);
+                //obj->MeshOBJ->UseTexture(1);
                 OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_spot.get());
-                tmp->SetTexture("texMaterial",1);
+                CheckMaterial(tmp, mat->GetMaterial());
+
+                //tmp->SetTexture("texMaterial",1);
                 
                 draw_obj(obj, light, transform);
             }
