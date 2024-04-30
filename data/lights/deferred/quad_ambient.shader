@@ -9,7 +9,7 @@ struct AmbientLight{
   vec3 direction;
   float enabled;
   vec3 diffuse_color;
-  float specular_strength;
+  float ambient_strength;
   vec3 specular_color;
   float specular_shininess; // 48 bytes
 };
@@ -63,7 +63,7 @@ struct AmbientLight{
   vec3 direction;
   float enabled;
   vec3 diffuse_color;
-  float specular_strength;
+  float ambient_strength;
   vec3 specular_color;
   float specular_shininess; // 48 bytes
 };
@@ -89,14 +89,12 @@ void main(){
   vec3 frag_color = texture(Frag_Color, uv).rgb;
   vec3 frag_normal = texture(Frag_Normal, uv).rgb;
   vec3 frag_position = texture(Frag_Position, uv).rgb;
-
   vec3 stacked = texture(Met_Roug_Ao, uv).rgb;
   float metallic = stacked.r;
   float roughness = stacked.g;
   float ambient_oclusion = stacked.b;
-
-  float ambient_strength = 1.0;
-  vec3 color = ambient_strength * ambient_light.diffuse_color;
+  
+  vec3 color = (ambient_light.ambient_strength * ambient_light.diffuse_color) * frag_color * ambient_oclusion;
   color *= frag_color; 
 
   FragColor = vec4(color, 1.0);

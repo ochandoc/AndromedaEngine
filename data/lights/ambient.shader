@@ -9,7 +9,7 @@ struct AmbientLight{
   vec3 direction;
   float enabled;
   vec3 diffuse_color;
-  float specular_strength;
+  float ambient_strength;
   vec3 specular_color;
   float specular_shininess; // 48 bytes
 };
@@ -83,7 +83,7 @@ struct AmbientLight{
   vec3 direction;
   float enabled;
   vec3 diffuse_color;
-  float specular_strength;
+  float ambient_strength;
   vec3 specular_color;
   float specular_shininess; // 48 bytes
 };

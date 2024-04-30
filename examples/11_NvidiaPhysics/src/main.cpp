@@ -149,7 +149,7 @@ int main(int argc, char** argv){
   std::shared_ptr<And::Material> material_jou = std::make_shared<And::Material>();
   material_jou->SetColorTexture(wall_tex);
 
-  //material_jou->SetNormalTexture(wall_tex_normal);
+  material_jou->SetNormalTexture(wall_tex_normal);
   material_jou->SetMetallicTexture(wall_tex_met);
   material_jou->SetRoughnessTexture(wall_tex_rough);
   material_jou->SetAmbientOclusionTexture(wall_tex_ao);
@@ -268,11 +268,11 @@ int main(int argc, char** argv){
   float enabled = 1.0f;
   float diffuse_color[3] = {1.0f, 0.0f, 0.0f};
   float specular_color[3] = {1.0f, 1.0f, 1.0f};
-  float position[3] = {0.0f, 14.0f, 0.0f};
+  float position[3] = {0.0f, 16.0f, 5.0f};
   float direction[3] = {0.0f, 0.0f, -1.0f};
 
   float specular_strength = 0.003f;
-  float specular_shininess = 2.0f;
+  float specular_shininess = 16.0f;
   float constant_att = 1.0f;
   float linear_att = 0.014f;
   float quadratic_att = 0.0007f;
@@ -282,9 +282,9 @@ int main(int argc, char** argv){
   And::SpotLight spot{};
   spot.SetPosition(position);
   spot.SetDirection(direction);
-  spot.SetDiffuseColor(diffuse_color);
+  spot.SetDiffuseColor(0.7f, 0.7f, 0.7f);
   spot.SetSpecularColor(specular_color);
-  spot.SetSpecularStrength(specular_strength);
+  spot.SetSpecularStrength(0.25f);
   spot.SetSpecularShininess(specular_shininess);
   spot.SetConstantAtt(constant_att);
   spot.SetLinearAtt(linear_att);
@@ -318,7 +318,8 @@ int main(int argc, char** argv){
   enabled = 1.0f;
 
   And::AmbientLight ambient{};
-  ambient.SetDiffuseColor(0.1f, 0.1f, 0.1f);
+  ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+  ambient.SetAmbientStrenght(0.3f);
   entity_comp.new_entity(ambient);
 
   And::DirectionalLight directional{};
@@ -328,7 +329,7 @@ int main(int argc, char** argv){
   directional.SetSpecularShininess(32.0f);
   directional.SetCastShadows(false);
   directional.SetEnabled(true);
-  entity_comp.new_entity(directional);
+  //entity_comp.new_entity(directional);
 
   float position2[3] = {0.0f, 8.0f, 0.0f};
   diffuse_color[2] = 1.0f;
@@ -345,7 +346,7 @@ int main(int argc, char** argv){
   point.SetLinearAtt(linear_att);
   point.SetConstantAtt(constant_att);
   point.SetQuadraticAtt(quadratic_att);
-  And::Entity* point_entity = entity_comp.new_entity(point);
+  //And::Entity* point_entity = entity_comp.new_entity(point);
   
   //position2[0] += 40.0f;
   //diffuse_color[2] = 0.0f;

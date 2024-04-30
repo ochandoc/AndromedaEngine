@@ -210,6 +210,8 @@ vec3 CalculeSpotLight(SpotLight light, vec3 normal, vec3 viewDir, vec3 fragPos) 
 }
 
 
+
+
 void main(){
   vec3 view_direction = normalize(camera_pos - s_fragPos);
   float ambient_strength = 0.01;
@@ -221,9 +223,12 @@ void main(){
   vec3 normal_value;
   if(m_use_normal_texture == 1){
     normal_value = texture(texNormal,uv).rgb;
+    //normal_value = getNormalFromMap();
   }else{
     normal_value = s_normal;
   }
+
+  
   
   vec3 color = CalculeSpotLightJou(spot, normal_value);
 

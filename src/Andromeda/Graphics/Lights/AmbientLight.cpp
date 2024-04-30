@@ -74,6 +74,10 @@ void AmbientLight::SetDiffuseColor(float x, float y, float z){
     
 }
 
+void AmbientLight::SetAmbientStrenght(float s){
+    m_raw.ambient_strenght = s;
+}
+
 void  AmbientLight::GetEnabled(float& enabled){
     enabled = m_raw.enabled;
 }
@@ -82,6 +86,10 @@ void  AmbientLight::GetDiffuseColor(float& r, float& g, float& b){
     r = m_raw.diffuse_color[0];
     g = m_raw.diffuse_color[1];
     b = m_raw.diffuse_color[2];
+}
+
+float AmbientLight::GetAmbientStrenght(){
+    return m_raw.ambient_strenght;
 }
 
 
