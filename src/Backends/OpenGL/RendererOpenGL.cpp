@@ -107,9 +107,14 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   m_shader_spot = MakeShader("lights/spot.shader");
   m_shader_shadows_spot = MakeShader("lights/spot_shadows.shader");
 
+  // Deferred shaders
   m_shader_geometry = MakeShader("default/geometry.shader");
-  m_shader_quad_directional = MakeShader("lights/deferred/quad_directional.shader");
+  m_shader_quad_directional_shadows = MakeShader("lights/deferred/quad_directional_shadows.shader");
   m_shader_quad_ambient = MakeShader("lights/deferred/quad_ambient.shader");
+  m_shader_quad_spot_shadows = MakeShader("lights/deferred/quad_spot_shadows.shader");
+  m_shader_quad_point_shadows = MakeShader("lights/deferred/quad_point_shadows.shader");
+
+  m_shader_quad_directional = MakeShader("lights/deferred/quad_directional.shader");;
   m_shader_quad_spot = MakeShader("lights/deferred/quad_spot.shader");
   m_shader_quad_point = MakeShader("lights/deferred/quad_point.shader");
 
@@ -735,6 +740,8 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     unsigned int dIndices[] = {
          0, 2, 1, 0, 3, 2
     };
+    
+    bool cast_shadows = light->GetCastShadows();
 
     std::vector<std::shared_ptr<Texture>> tex_gbuffer = m_gBuffer_->GetTextures();
     OpenGLTexture2D* position_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[0].get());
@@ -746,17 +753,30 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
 
     DirectionalLight* directional = dynamic_cast<DirectionalLight*>(light);
     if (directional) {
-        tmp = static_cast<OpenGLShader*>(m_shader_quad_directional.get());
+
+        if (cast_shadows) {
+            tmp = static_cast<OpenGLShader*>(m_shader_quad_directional_shadows.get());
+        }else {
+            tmp = static_cast<OpenGLShader*>(m_shader_quad_directional.get());
+        }
     }
     
     SpotLight* spot= dynamic_cast<SpotLight*>(light);
     if (spot) {
-        tmp = static_cast<OpenGLShader*>(m_shader_quad_spot.get());
+        if (cast_shadows) {
+            tmp = static_cast<OpenGLShader*>(m_shader_quad_spot_shadows.get());
+        }else {
+            tmp = static_cast<OpenGLShader*>(m_shader_quad_spot.get());
+        }
     }
     
     PointLight* point= dynamic_cast<PointLight*>(light);
     if (point) {
-        tmp = static_cast<OpenGLShader*>(m_shader_quad_point.get());
+        if (cast_shadows) {
+            tmp = static_cast<OpenGLShader*>(m_shader_quad_point_shadows.get());
+        }else {
+            tmp = static_cast<OpenGLShader*>(m_shader_quad_point.get());
+        }
     }
     
     AmbientLight* ambient = dynamic_cast<AmbientLight*>(light);
@@ -780,27 +800,32 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     tmp->SetTexture("Met_Roug_Ao", 3);
     color_tex->Activate(3);
 
-    if (!ambient && !point) {
-        std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
-        OpenGLTexture2D* tex_shadow = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+    if (cast_shadows) {
 
-        tmp->SetTexture("texShadow", 4);
-        tex_shadow->Activate(4);
-    }
+        if (!point) {
+            
+            // Shadows ambient or spot
+            std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+            OpenGLTexture2D* tex_shadow = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
 
-    if (point) {
-        int index = 4;
-        int index_array_shadows = 0;
-        std::vector<std::shared_ptr<And::RenderTarget>> render_targets = get_shadow_buffer_pointLight();
-        for (auto& target : render_targets) {
+            tmp->SetTexture("texShadow", 4);
+            tex_shadow->Activate(4);
+        }else {
 
-            std::vector<std::shared_ptr<And::Texture>> shadow_texture = target->GetTextures();
-            OpenGLTexture2D* tex_shadows = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
-            tmp->Use();
-            tmp->SetTextureInArray("texShadow", index_array_shadows, index);
-            tex_shadows->Activate(index);
-            index++;
-            index_array_shadows++;
+            // Shadows point
+            int index = 4;
+            int index_array_shadows = 0;
+            std::vector<std::shared_ptr<And::RenderTarget>> render_targets = get_shadow_buffer_pointLight();
+            for (auto& target : render_targets) {
+
+                std::vector<std::shared_ptr<And::Texture>> shadow_texture = target->GetTextures();
+                OpenGLTexture2D* tex_shadows = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+                tmp->Use();
+                tmp->SetTextureInArray("texShadow", index_array_shadows, index);
+                tex_shadows->Activate(index);
+                index++;
+                index_array_shadows++;
+            }
         }
     }
 
@@ -935,7 +960,7 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
     for(auto [light] : entity.get_components<DirectionalLight>()){ 
       shadow_buffer->Activate();
       glDisable(GL_BLEND);
-      if(light->GetCastShadows()) [[likely]] {
+      if(light->GetCastShadows()){
         // Por cada luz que castea sombras guardamos textura de profundidad
         for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()){
           draw_shadows(light, obj, transform);

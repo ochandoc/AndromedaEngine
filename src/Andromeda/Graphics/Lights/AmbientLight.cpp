@@ -15,6 +15,7 @@ struct MatrixData{
 AmbientLight::AmbientLight() : m_raw(){
     m_must_recalculate = true;
     m_matrix = std::make_shared<MatrixData>();
+    m_cast_shadows = false;
 }
 
 AmbientLight::~AmbientLight(){}

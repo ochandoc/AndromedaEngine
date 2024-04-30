@@ -84,8 +84,12 @@ namespace And{
         std::shared_ptr<Shader> m_shader_shadows_spot;
 
         std::shared_ptr<Shader> m_shader_geometry;
-        std::shared_ptr<Shader> m_shader_quad_directional;
+        std::shared_ptr<Shader> m_shader_quad_directional_shadows;
         std::shared_ptr<Shader> m_shader_quad_ambient;
+        std::shared_ptr<Shader> m_shader_quad_spot_shadows;
+        std::shared_ptr<Shader> m_shader_quad_point_shadows;
+        
+        std::shared_ptr<Shader> m_shader_quad_directional;
         std::shared_ptr<Shader> m_shader_quad_spot;
         std::shared_ptr<Shader> m_shader_quad_point;
 

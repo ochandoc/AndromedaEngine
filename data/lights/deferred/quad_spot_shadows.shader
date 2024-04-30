@@ -37,11 +37,13 @@ layout (std140, binding = 5) uniform UniformSpot{
 
 out vec3 camera_pos;
 out vec2 uv;
+out mat4 lightSpace;
 
 void main(){
   gl_Position = vec4(position, 1.0);
   uv = TexCoord;
   vec4 obj_position = model * vec4(position, 1.0);
+  lightSpace = ProjViewLight;
 }
 
 
@@ -50,14 +52,19 @@ void main(){
 
 layout(location = 0) out vec4 FragColor;
 
+uniform sampler2D texShadow;
 uniform sampler2D Frag_Position;
 uniform sampler2D Frag_Normal;
 uniform sampler2D Frag_Color;
 uniform sampler2D Met_Roug_Ao;
 
+
+
+
 in vec3 camera_pos;
 in vec2 uv;
 in mat4 lightSpace;
+
 
 struct Light{
   vec3 position;
@@ -109,6 +116,57 @@ layout (std140, binding = 5) uniform UniformSpot{
   SpotLight spot;
 };
 
+
+
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normals, vec3 position){
+ 
+  // perform perspective divide
+  vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+  // transform to [0,1] range
+  projCoords = projCoords * 0.5 + 0.5;
+
+  if (projCoords.x >= 1.0 || projCoords.x <= 0.0 ||
+    projCoords.y >= 1.0 || projCoords.y <= 0.0){
+    return 0.0;
+  }
+
+  // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+  float closestDepth = texture(texShadow, projCoords.xy).r; 
+  // get depth of current fragment from light's perspective
+  float currentDepth = projCoords.z;
+  // calculate bias (based on depth map resolution and slope)
+
+
+
+
+  vec3 normal = normalize(normals);
+
+  float x = camera_position.x + ( (-1.0 * spot.direction.x) * 50.0);
+  float z = camera_position.z + ( (-1.0 * spot.direction.z) * 50.0);
+  vec3 light_pos = vec3(x, camera_position.y, z);
+
+  vec3 lightDir = normalize(light_pos - position);
+  float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+  // check whether current frag pos is in shadow
+  // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+  // PCF
+  float shadow = 0.0;
+  vec2 texelSize = 1.0 / textureSize(texShadow, 0);
+  for(int x = -1; x <= 1; ++x){
+    for(int y = -1; y <= 1; ++y){
+      float pcfDepth = texture(texShadow, projCoords.xy + vec2(x, y) * texelSize).r; 
+      shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+    }    
+  }
+  shadow /= 9.0;
+  
+  // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+  if(projCoords.z > 1.0)
+    shadow = 0.0;
+  
+  
+  return shadow;
+}
 
 Light CalcLight(vec3 light_direction, vec3 light_color, vec3 normals, vec3 position){
   vec3 viewDir = normalize(camera_position - position);
@@ -166,7 +224,12 @@ void main(){
   float ambient_oclusion = stacked.b;
 
   vec3 view_direction = normalize(camera_pos - frag_position);
+  
+  vec4 light_space_tmp = lightSpace * texture(Frag_Position, uv); 
+
   vec3 color = CalculeSpotLightJou(spot, frag_normal, frag_position) * frag_color;
+  float shadow = ShadowCalculation(light_space_tmp, frag_normal, frag_position);
+  color = (1.0 - shadow) * color;
   
   FragColor = vec4(color, 1.0);
 }

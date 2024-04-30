@@ -47,6 +47,7 @@ void main(){
 
 layout(location = 0) out vec4 FragColor;
 
+uniform sampler2D texShadow;
 uniform sampler2D Frag_Position;
 uniform sampler2D Frag_Normal;
 uniform sampler2D Frag_Color;
@@ -82,6 +83,54 @@ layout (std140, binding = 0) uniform UniformBlock{
 layout (std140, binding = 3) uniform UniformDirectional{
   DirectionalLight directional_light;
 };
+
+
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normals){
+ 
+  // perform perspective divide
+  vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+  // transform to [0,1] range
+  projCoords = projCoords * 0.5 + 0.5;
+
+  if (projCoords.x >= 1.0 || projCoords.x <= 0.0 ||
+    projCoords.y >= 1.0 || projCoords.y <= 0.0){
+    return 0.0;
+  }
+
+  // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+  float closestDepth = texture(texShadow, projCoords.xy).r; 
+  // get depth of current fragment from light's perspective
+  float currentDepth = projCoords.z;
+  // calculate bias (based on depth map resolution and slope)
+  vec3 normal = normalize(normals);
+
+  float x = camera_position.x + ( (-1.0 * directional_light.direction.x) * 50.0);
+  float z = camera_position.z + ( (-1.0 * directional_light.direction.z) * 50.0);
+  vec3 light_pos = vec3(x, camera_position.y, z);
+
+  vec3 lightDir = normalize(light_pos - s_fragPos);
+  float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+  // check whether current frag pos is in shadow
+  // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
+  // PCF
+  float shadow = 0.0;
+  vec2 texelSize = 1.0 / textureSize(texShadow, 0);
+  for(int x = -1; x <= 1; ++x){
+    for(int y = -1; y <= 1; ++y){
+      float pcfDepth = texture(texShadow, projCoords.xy + vec2(x, y) * texelSize).r; 
+      shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+    }    
+  }
+  shadow /= 9.0;
+  
+  // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
+  if(projCoords.z > 1.0)
+    shadow = 0.0;
+  
+  
+  return shadow;
+}
+
 
 vec3 CalculeDirLight(DirectionalLight light, vec3 normal, vec3 viewDir) {
   
@@ -132,6 +181,9 @@ void main(){
   //color = pow(color, vec3(1.0/2.2)); 
 
   vec3 color = CalculeDirLight(directional_light, frag_normal, view_direction) * frag_color;
- 
+  float shadow = ShadowCalculation(light_space_tmp, frag_normal);
+  color = (1.0 - shadow) * color;
+
+  
   FragColor = vec4(color, 1.0);
 }

@@ -230,7 +230,7 @@ int main(int argc, char** argv){
   tran_teapot2.scale[2] = 2.0f;
 
   // Sponza
-  And::Entity* obj_id = entity_comp.new_entity(MC, tran);
+  And::Entity* obj_id = entity_comp.new_entity(MC, tran, material_comp_sponza);
 
   And::RigidBody rb = physics_engine->CreateRigidBody();
   And::RigidBody rb_up = physics_engine->CreateRigidBody();
@@ -291,7 +291,7 @@ int main(int argc, char** argv){
   spot.SetQuadraticAtt(quadratic_att);
   spot.SetCuttOff(cutt_off);
   spot.SetOuterCuttOff(outer_cut_off);
-  spot.SetCastShadows(true);
+  spot.SetCastShadows(false);
   spot.SetEnabled(true);
   entity_comp.new_entity(spot);
 
@@ -326,7 +326,7 @@ int main(int argc, char** argv){
   directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
   directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
   directional.SetSpecularShininess(32.0f);
-  directional.SetCastShadows(true);
+  directional.SetCastShadows(false);
   directional.SetEnabled(true);
   entity_comp.new_entity(directional);
 
@@ -340,7 +340,7 @@ int main(int argc, char** argv){
   point.SetSpecularStrength(specular_strength);
   point.SetSpecularColor(specular_color);
   point.SetSpecularShininess(specular_shininess);
-  point.SetCastShadows(true);
+  point.SetCastShadows(false);
   point.SetEnabled(true);
   point.SetLinearAtt(linear_att);
   point.SetConstantAtt(constant_att);
