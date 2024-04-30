@@ -39,7 +39,6 @@ out mat4 lightSpace[6];
 void main(){
   gl_Position = vec4(position, 1.0);
   uv = TexCoord;
-  vec4 obj_position = model * vec4(position, 1.0);
   for(int i = 0; i < 6; i++){
     lightSpace[i] = ProjViewLight[i];// * obj_position;
   }

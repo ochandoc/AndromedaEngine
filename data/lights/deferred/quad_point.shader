@@ -38,8 +38,6 @@ out vec2 uv;
 void main(){
   gl_Position = vec4(position, 1.0);
   uv = TexCoord;
-  vec4 obj_position = model * vec4(position, 1.0);
-  
 }
 
 
