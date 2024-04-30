@@ -984,7 +984,7 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 
     // Shadows spot light
     // Spot Lights
-        for(auto [light] : entity.get_components<SpotLight>()){
+    for(auto [light] : entity.get_components<SpotLight>()){
       shadow_buffer->Activate();
       glDisable(GL_BLEND);
       if(light->GetCastShadows()) [[likely]] {
@@ -993,7 +993,7 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
           draw_shadows(light, obj, transform);
         }
       }
-      // Cuando saque la sombra de una spot, tengo que renderizar para que cuando saque la segunda no se sobreescriba el buffer
+            
       shadow_buffer->Desactivate();
       glEnable(GL_BLEND);
 
@@ -1006,12 +1006,8 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
                 std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
                 OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_shadows_spot.get());
                 OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+
                 tmp->Use();
-                //tex->Activate(0);
-                
-                //obj->MeshOBJ->UseTexture(1);
-                //tmp->SetTexture("texMaterial",1);
-                  
                 CheckMaterial(tmp, mat->GetMaterial());
 
                 tex->Activate(6);
@@ -1019,14 +1015,10 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
                 draw_obj_shadows(obj, transform, light);
             }
             else {
-                //m_shader_spot->Use();
-                
-                //obj->MeshOBJ->UseTexture(1);
+
                 OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_spot.get());
                 tmp->Use();
                 CheckMaterial(tmp, mat->GetMaterial());
-
-                //tmp->SetTexture("texMaterial",1);
                 
                 draw_obj(obj, light, transform);
             }
@@ -1057,8 +1049,12 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
       
       /* Render PointLight */
       for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+
+          MaterialComponent* mat = obj->GetOwner()->get_component<MaterialComponent>();
+
             if (light->GetCastShadows()) [[likely]] {
-                int index = 0;
+                int index = 6; // Empieza en 6 porque si tiene todas las texturas de pbr, el siguiente slot disponible seria el 6
+                int index_shadow = 0;
                 OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_shadows_point.get());
                 for(auto& target : render_targets){
 
@@ -1066,20 +1062,25 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
                   OpenGLTexture2D* tex = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
                   tmp->Use();
                   tex->Activate(index);
-                  tmp->SetTextureInArray("texShadow", index, index);
+                  tmp->SetTextureInArray("texShadow", index_shadow, index);
                   index++;
+                  index_shadow++;
                 }
-                obj->MeshOBJ->UseTexture(index);
-                tmp->SetTexture("texMaterial",index);
                 
-                draw_obj_shadows(obj, transform, light, glm::value_ptr(m_directions->dir[index]));
+                CheckMaterial(tmp, mat->GetMaterial());
+                //obj->MeshOBJ->UseTexture(index);
+                //tmp->SetTexture("texMaterial",index);
+                
+                draw_obj_shadows(obj, transform, light, glm::value_ptr(m_directions->dir[index_shadow]));
             
             }else {
-                m_shader_point->Use();
+                //m_shader_point->Use();
                 
-                obj->MeshOBJ->UseTexture(1);
+                //obj->MeshOBJ->UseTexture(1);
                 OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_point.get());
-                tmp->SetTexture("texMaterial",1);
+                tmp->Use();
+                CheckMaterial(tmp, mat->GetMaterial());
+                //tmp->SetTexture("texMaterial",1);
                 
 
                 draw_obj(obj, light, transform);

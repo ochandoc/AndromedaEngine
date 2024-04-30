@@ -32,6 +32,10 @@ layout (std140, binding = 4) uniform UniformPoint{
   PointLight point;
 };
 
+uniform int m_use_normal_texture;
+uniform vec4 m_albedoColor;
+uniform int m_use_texture;
+uniform int m_use_specular_texture;
 
 out vec3 blend_color;
 out vec3 s_normal;
@@ -56,6 +60,13 @@ void main(){
 layout(location = 0) out vec4 FragColor;
 
 uniform sampler2D texMaterial;
+uniform sampler2D texNormal;
+uniform sampler2D texSpecular;
+
+uniform sampler2D texMetallic;
+uniform sampler2D texRoughness;
+uniform sampler2D texAmbientOclusion;
+
 in vec2 TexCoord;
 
 in vec3 blend_color;
@@ -63,6 +74,11 @@ in vec3 s_normal;
 in vec3 s_fragPos;
 in vec3 camera_pos;
 in vec2 uv;
+
+uniform int m_use_normal_texture;
+uniform vec4 m_albedoColor;
+uniform int m_use_texture;
+uniform int m_use_specular_texture;
 
 
 struct PointLight{
@@ -121,10 +137,22 @@ void main(){
   vec3 ambient_color = vec3(1.0);
   ambient_color = ambient_strength * ambient_color;
   vec3 color = ambient_color;
-  vec3 color_base = vec3(0.5, 0.5, 0.5);
-  
-  color += CalculePointLight(point, s_normal, view_direction, s_fragPos);
 
-  vec4 tex_color = texture(texMaterial, uv);
+  vec3 normal_value;
+  if(m_use_normal_texture == 1){
+    normal_value = texture(texNormal,uv).rgb;
+  }else{
+    normal_value = s_normal;
+  }
+  
+  color += CalculePointLight(point, normal_value, view_direction, s_fragPos);
+
+  vec4 tex_color;
+  if(m_use_texture == 1){
+    tex_color = texture(texMaterial, uv); 
+  }else{
+    tex_color = m_albedoColor;
+  }
+  
   FragColor = vec4(color, 1.0) * tex_color;
 }
