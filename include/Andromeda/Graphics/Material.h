@@ -48,6 +48,8 @@ namespace And
     std::shared_ptr<Texture> GetAmbientOclusionTexture() { return m_AmbienOclusionTexture; }
     const std::shared_ptr<Texture> GetAmbienOclusiontexture() const { return m_AmbienOclusionTexture; }
 
+    bool GetIsPBR();
+
   private:
     float m_Color[4];
     std::shared_ptr<Texture> m_ColorTexture;
@@ -56,5 +58,7 @@ namespace And
     std::shared_ptr<Texture> m_MetallicTexture;
     std::shared_ptr<Texture> m_RoughnessTexture;
     std::shared_ptr<Texture> m_AmbienOclusionTexture;
+
+    bool m_is_pbr = false;
   };
 }

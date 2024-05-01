@@ -17,6 +17,7 @@ uniform int m_use_normal_texture;
 uniform vec4 m_albedoColor;
 uniform int m_use_texture;
 uniform int m_use_specular_texture;
+uniform int is_pbr;
 
 //out int use_normal_texture;
 //out vec4 albedoColor_color;
@@ -112,8 +113,12 @@ void main()
 
 
   if(m_use_texture == 1){
-    FragColor.rgb = texture(texMaterial, s_texCoords).rgb;
-    //FragColor.rgb =  pow(texture(texMaterial, s_texCoords).rgb, vec3(2.2));
+
+    if(m_use_normal_texture == 1){
+      FragColor.rgb =  pow(texture(texMaterial, s_texCoords).rgb, vec3(2.2));
+    }else{
+      FragColor.rgb = texture(texMaterial, s_texCoords).rgb;
+    }
     FragColor.a = 1.0; // specular
   }else{
     FragColor = m_albedoColor;
@@ -127,6 +132,4 @@ void main()
   Met_Roug_Ao.r = texture(texMetallic, s_texCoords).r;
   Met_Roug_Ao.g = texture(texRoughness, s_texCoords).r;
   Met_Roug_Ao.b = texture(texAmbientOclusion, s_texCoords).r;
-  
-  
 }

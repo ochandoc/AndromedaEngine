@@ -57,9 +57,6 @@ uniform sampler2D Frag_Normal;
 uniform sampler2D Frag_Color;
 uniform sampler2D Met_Roug_Ao;
 
-
-
-
 in vec3 camera_pos;
 in vec2 uv;
 in mat4 lightSpace;

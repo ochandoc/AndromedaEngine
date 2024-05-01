@@ -820,7 +820,7 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
 
                 std::vector<std::shared_ptr<And::Texture>> shadow_texture = target->GetTextures();
                 OpenGLTexture2D* tex_shadows = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
-                tmp->Use();
+                //tmp->Use();
                 tmp->SetTextureInArray("texShadow", index_array_shadows, index);
                 tex_shadows->Activate(index);
                 index++;
@@ -918,6 +918,7 @@ void RendererOpenGL::CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> ma
             t_ao->Activate(5);
             s->SetTexture("texAmbientOclusion", 5);
         }
+
 
     }
     else {

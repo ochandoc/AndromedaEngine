@@ -107,5 +107,9 @@ namespace And
       m_AmbienOclusionTexture = tex;
   }
 
+  bool Material::GetIsPBR(){
+      return m_NormalTexture && m_RoughnessTexture && m_AmbienOclusionTexture && m_MetallicTexture;
+  }
+
 
 }

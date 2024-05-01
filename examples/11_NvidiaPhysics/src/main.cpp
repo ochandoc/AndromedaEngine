@@ -291,7 +291,7 @@ int main(int argc, char** argv){
   spot.SetQuadraticAtt(quadratic_att);
   spot.SetCuttOff(cutt_off);
   spot.SetOuterCuttOff(outer_cut_off);
-  spot.SetCastShadows(false);
+  spot.SetCastShadows(true);
   spot.SetEnabled(true);
   entity_comp.new_entity(spot);
 
@@ -319,7 +319,7 @@ int main(int argc, char** argv){
 
   And::AmbientLight ambient{};
   ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-  ambient.SetAmbientStrenght(0.3f);
+  ambient.SetAmbientStrenght(0.1f);
   entity_comp.new_entity(ambient);
 
   And::DirectionalLight directional{};
@@ -334,19 +334,23 @@ int main(int argc, char** argv){
   float position2[3] = {0.0f, 8.0f, 0.0f};
   diffuse_color[2] = 1.0f;
   diffuse_color[1] = 0.0f;
-  And::PointLight point{};
-  point.SetPosition(0.0f, 14.0f, 0.0f);
-  point.SetEnabled(1.0f);
-  point.SetDiffuseColor(0.2f, 0.6f, 0.2f);
-  point.SetSpecularStrength(specular_strength);
-  point.SetSpecularColor(specular_color);
-  point.SetSpecularShininess(specular_shininess);
-  point.SetCastShadows(false);
-  point.SetEnabled(true);
-  point.SetLinearAtt(linear_att);
-  point.SetConstantAtt(constant_att);
-  point.SetQuadraticAtt(quadratic_att);
-  //And::Entity* point_entity = entity_comp.new_entity(point);
+
+  for (int i = 0; i < 20; i++) {
+
+      And::PointLight point{};
+      point.SetPosition((float)i, 14.0f, 0.0f);
+      point.SetEnabled(1.0f);
+      point.SetDiffuseColor(0.2f, 0.6f, 0.2f);
+      point.SetSpecularStrength(specular_strength);
+      point.SetSpecularColor(specular_color);
+      point.SetSpecularShininess(specular_shininess);
+      point.SetCastShadows(false);
+      point.SetEnabled(true);
+      point.SetLinearAtt(linear_att);
+      point.SetConstantAtt(constant_att);
+      point.SetQuadraticAtt(quadratic_att);
+      And::Entity* point_entity = entity_comp.new_entity(point);
+  }
   
   //position2[0] += 40.0f;
   //diffuse_color[2] = 0.0f;

@@ -106,7 +106,7 @@ layout (std140, binding = 2) uniform UniformAmbient{
 void main(){
   vec3 view_direction = normalize(camera_pos - s_fragPos);
   float ambient_strength = 1.0;
-  vec3 color = ambient_strength * ambient_light.diffuse_color;
+  vec3 color = ambient_light.ambient_strength * ambient_light.diffuse_color;
   
 
   vec4 tex_color;

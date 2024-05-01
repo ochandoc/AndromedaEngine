@@ -225,6 +225,7 @@ void main(){
 
   // Get textures
   vec3 frag_color = texture(Frag_Color, uv).rgb;
+
   //vec3 frag_color = pow(texture(Frag_Color, uv).rgb, vec3(2.2));
   vec3 frag_normal = texture(Frag_Normal, uv).rgb;
   vec3 frag_position = texture(Frag_Position, uv).rgb;
@@ -234,11 +235,11 @@ void main(){
   float roughness = stacked.g;
   float ambient_oclusion = stacked.b;
   vec3 view_direction = normalize(camera_pos - frag_position);
+  vec3 direct_color = CalculeSpotLightJou(spot, frag_normal, frag_position) * frag_color;
 
   //vec3 F0 = vec3(0.04); 
   //F0 = mix(F0, frag_color, metallic);
 
-  vec3 direct_color = CalculeSpotLightJou(spot, frag_normal, frag_position) * frag_color;
 
   //vec3 indirect_color = CalCuleReflection(frag_position, view_direction, frag_normal, roughness, metallic, F0, frag_color);
   //vec3 ambient_color = vec3(0.03) * frag_color * ambient_oclusion;
