@@ -291,7 +291,7 @@ int main(int argc, char** argv){
   spot.SetQuadraticAtt(quadratic_att);
   spot.SetCuttOff(cutt_off);
   spot.SetOuterCuttOff(outer_cut_off);
-  spot.SetCastShadows(true);
+  spot.SetCastShadows(false);
   spot.SetEnabled(true);
   entity_comp.new_entity(spot);
 
@@ -299,21 +299,6 @@ int main(int argc, char** argv){
   diffuse_color[0] = 0.0f;
   diffuse_color[1] = 1.0f;
 
-  And::SpotLight spot2{};
-  spot2.SetPosition(position);
-  spot2.SetDirection(direction);
-  spot2.SetDiffuseColor(diffuse_color);
-  spot2.SetSpecularColor(specular_color);
-  spot2.SetSpecularStrength(specular_strength);
-  spot2.SetSpecularShininess(specular_shininess);
-  spot2.SetConstantAtt(constant_att);
-  spot2.SetLinearAtt(linear_att);
-  spot2.SetQuadraticAtt(quadratic_att);
-  spot2.SetCuttOff(cutt_off);
-  spot2.SetOuterCuttOff(outer_cut_off);
-  spot2.SetCastShadows(true);
-  spot2.SetEnabled(true);
-  //And::Entity* spot2_entity = entity_comp.new_entity(spot2);
     
   enabled = 1.0f;
 
@@ -329,13 +314,13 @@ int main(int argc, char** argv){
   directional.SetSpecularShininess(32.0f);
   directional.SetCastShadows(false);
   directional.SetEnabled(true);
-  //entity_comp.new_entity(directional);
+  entity_comp.new_entity(directional);
 
   float position2[3] = {0.0f, 8.0f, 0.0f};
   diffuse_color[2] = 1.0f;
   diffuse_color[1] = 0.0f;
 
-  for (int i = 0; i < 20; i++) {
+  for (int i = 0; i < 200; i++) {
 
       And::PointLight point{};
       point.SetPosition((float)i, 14.0f, 0.0f);
@@ -365,7 +350,7 @@ int main(int argc, char** argv){
   point2.SetSpecularShininess(specular_shininess);
   point2.SetCastShadows(true);
   point2.SetLinearAtt(linear_att);
-  point2.SetConstantAtt(constant_att);
+  point2.SetConstantAtt(constant_att); 
   point2.SetQuadraticAtt(quadratic_att);
   
   //And::Entity* point_entity2 = entity_comp.new_entity(point2);
@@ -414,6 +399,7 @@ int main(int argc, char** argv){
   const float force = 100.0f;
   while (window->is_open()){
 
+    
     window->update();
     g_renderer->new_frame();
     editor.ShowWindows();
@@ -460,9 +446,10 @@ int main(int argc, char** argv){
 
     
     
-
     //g_renderer->draw_forward(entity_comp);
     g_renderer->draw_deferred(entity_comp);
+
+    
     g_renderer->end_frame();
     window->swap_buffers();
   }

@@ -99,6 +99,7 @@ std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_
 
   //printf("Init obj %s \n", filename.c_str());
 
+  // Esto hacerlo solo en el de opengl
   unsigned int VAO;
   glGenVertexArrays(1, &VAO);
   obj.set_VAO(VAO);
