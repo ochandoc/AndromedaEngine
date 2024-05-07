@@ -79,19 +79,19 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
-  And::FlyCamera fly_cam{*window};
-  fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
-  fly_cam.SetSize(1920.0f, 1080.0f);
+  //And::FlyCamera fly_cam{*window};
+  //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
+  //fly_cam.SetSize(1920.0f, 1080.0f);
 
-  fly_cam.SetFar(1000.0f);
-  fly_cam.SetNear(0.1f);
+  //fly_cam.SetFar(1000.0f);
+  //fly_cam.SetNear(0.1f);
 
 
   //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
-  fly_cam.SetFov(90.0f);
-  fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
+  //fly_cam.SetFov(90.0f);
+  //fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
 
-  g_renderer->set_camera(&fly_cam);
+  //g_renderer->set_camera(&fly_cam);
 
 
   //std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
@@ -137,21 +137,30 @@ int main(int argc, char** argv){
   std::shared_ptr<And::Texture> texture_bricks = And::MakeTexture("bricks.jpg");
   std::shared_ptr<And::Texture> texture_jou = And::MakeTexture("sphere_basecolor.png");
   std::shared_ptr<And::Texture> texture_cara_de_jou = And::MakeTexture("jou_cumple.png");
+
+  // PBR material
   std::shared_ptr<And::Texture> wall_tex = And::MakeTexture("brick-wall-bl/brick-wall_albedo.png");
   std::shared_ptr<And::Texture> wall_tex_normal = And::MakeTexture("brick-wall-bl/brick-wall_normal-ogl.png");
-  std::shared_ptr<And::Texture> wall_tex_specular = And::MakeTexture("brick-wall-bl/brick-wall_ao.png");
+  std::shared_ptr<And::Texture> wall_tex_met = And::MakeTexture("brick-wall-bl/brick-wall_metallic.png");
+  std::shared_ptr<And::Texture> wall_tex_rough = And::MakeTexture("brick-wall-bl/brick-wall_roughness.png");
+  std::shared_ptr<And::Texture> wall_tex_ao = And::MakeTexture("brick-wall-bl/brick-wall_ao.png");
   
   And::MaterialComponent material_comp_jou;
   std::shared_ptr<And::Material> material_jou = std::make_shared<And::Material>();
   material_jou->SetColorTexture(wall_tex);
+
   material_jou->SetNormalTexture(wall_tex_normal);
-  material_jou->SetSpecularTexture(wall_tex_specular);
+  material_jou->SetMetallicTexture(wall_tex_met);
+  material_jou->SetRoughnessTexture(wall_tex_rough);
+  material_jou->SetAmbientOclusionTexture(wall_tex_ao);
+  
   material_jou->SetColor(0.1f, 1.0f, 0.1f, 0.5f);
   material_comp_jou.SetMaterial(material_jou);
   
   And::MaterialComponent material_comp_sponza;
   std::shared_ptr<And::Material> material_sponza = std::make_shared<And::Material>();
   material_sponza->SetColorTexture(texture_bricks);
+  //material_sponza->SetColor(0.0f, 0.5f, 0.0f, 1.0f);
   material_comp_sponza.SetMaterial(material_sponza);
 
   //MC.MeshOBJ->SetTexture(texture_bricks);
@@ -233,7 +242,8 @@ int main(int argc, char** argv){
   rb.SetMass(5.0f);
 
   // Cube
-  And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube, rb, material_comp_jou);
+  //And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube, rb, material_comp_jou);
+  And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube, material_comp_jou);
   //And::Entity* obj_cube_up_id = entity_comp.new_entity(MC_cube_up, tran_cube_up, rb_up, material_comp_jou);
 
   tran_cube2.position[0] = 3.0f;
@@ -258,11 +268,11 @@ int main(int argc, char** argv){
   float enabled = 1.0f;
   float diffuse_color[3] = {1.0f, 0.0f, 0.0f};
   float specular_color[3] = {1.0f, 1.0f, 1.0f};
-  float position[3] = {0.0f, 14.0f, 0.0f};
+  float position[3] = {0.0f, 16.0f, 5.0f};
   float direction[3] = {0.0f, 0.0f, -1.0f};
 
   float specular_strength = 0.003f;
-  float specular_shininess = 8.0f;
+  float specular_shininess = 16.0f;
   float constant_att = 1.0f;
   float linear_att = 0.014f;
   float quadratic_att = 0.0007f;
@@ -272,16 +282,16 @@ int main(int argc, char** argv){
   And::SpotLight spot{};
   spot.SetPosition(position);
   spot.SetDirection(direction);
-  spot.SetDiffuseColor(diffuse_color);
+  spot.SetDiffuseColor(0.7f, 0.7f, 0.7f);
   spot.SetSpecularColor(specular_color);
-  spot.SetSpecularStrength(specular_strength);
+  spot.SetSpecularStrength(0.25f);
   spot.SetSpecularShininess(specular_shininess);
   spot.SetConstantAtt(constant_att);
   spot.SetLinearAtt(linear_att);
   spot.SetQuadraticAtt(quadratic_att);
   spot.SetCuttOff(cutt_off);
   spot.SetOuterCuttOff(outer_cut_off);
-  spot.SetCastShadows(true);
+  spot.SetCastShadows(false);
   spot.SetEnabled(true);
   entity_comp.new_entity(spot);
 
@@ -289,26 +299,12 @@ int main(int argc, char** argv){
   diffuse_color[0] = 0.0f;
   diffuse_color[1] = 1.0f;
 
-  And::SpotLight spot2{};
-  spot2.SetPosition(position);
-  spot2.SetDirection(direction);
-  spot2.SetDiffuseColor(diffuse_color);
-  spot2.SetSpecularColor(specular_color);
-  spot2.SetSpecularStrength(specular_strength);
-  spot2.SetSpecularShininess(specular_shininess);
-  spot2.SetConstantAtt(constant_att);
-  spot2.SetLinearAtt(linear_att);
-  spot2.SetQuadraticAtt(quadratic_att);
-  spot2.SetCuttOff(cutt_off);
-  spot2.SetOuterCuttOff(outer_cut_off);
-  spot2.SetCastShadows(true);
-  spot2.SetEnabled(true);
-  //And::Entity* spot2_entity = entity_comp.new_entity(spot2);
     
   enabled = 1.0f;
 
   And::AmbientLight ambient{};
-  ambient.SetDiffuseColor(0.1f, 0.1f, 0.1f);
+  ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+  ambient.SetAmbientStrenght(0.1f);
   entity_comp.new_entity(ambient);
 
   And::DirectionalLight directional{};
@@ -316,26 +312,30 @@ int main(int argc, char** argv){
   directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
   directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
   directional.SetSpecularShininess(32.0f);
-  directional.SetCastShadows(true);
+  directional.SetCastShadows(false);
   directional.SetEnabled(true);
   entity_comp.new_entity(directional);
 
   float position2[3] = {0.0f, 8.0f, 0.0f};
   diffuse_color[2] = 1.0f;
   diffuse_color[1] = 0.0f;
-  And::PointLight point{};
-  point.SetPosition(position2);
-  point.SetEnabled(1.0f);
-  point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-  point.SetSpecularStrength(specular_strength);
-  point.SetSpecularColor(specular_color);
-  point.SetSpecularShininess(specular_shininess);
-  point.SetCastShadows(true);
-  point.SetEnabled(true);
-  point.SetLinearAtt(linear_att);
-  point.SetConstantAtt(constant_att);
-  point.SetQuadraticAtt(quadratic_att);
-  And::Entity* point_entity = entity_comp.new_entity(point);
+
+  for (int i = 0; i < 10; i++) {
+
+      And::PointLight point{};
+      point.SetPosition((float)i, 14.0f, 0.0f);
+      point.SetEnabled(1.0f);
+      point.SetDiffuseColor(0.2f, 0.6f, 0.2f);
+      point.SetSpecularStrength(specular_strength);
+      point.SetSpecularColor(specular_color);
+      point.SetSpecularShininess(specular_shininess);
+      point.SetCastShadows(false);
+      point.SetEnabled(true);
+      point.SetLinearAtt(linear_att);
+      point.SetConstantAtt(constant_att);
+      point.SetQuadraticAtt(quadratic_att);
+      And::Entity* point_entity = entity_comp.new_entity(point);
+  }
   
   //position2[0] += 40.0f;
   //diffuse_color[2] = 0.0f;
@@ -350,7 +350,7 @@ int main(int argc, char** argv){
   point2.SetSpecularShininess(specular_shininess);
   point2.SetCastShadows(true);
   point2.SetLinearAtt(linear_att);
-  point2.SetConstantAtt(constant_att);
+  point2.SetConstantAtt(constant_att); 
   point2.SetQuadraticAtt(quadratic_att);
   
   //And::Entity* point_entity2 = entity_comp.new_entity(point2);
@@ -399,14 +399,15 @@ int main(int argc, char** argv){
   const float force = 100.0f;
   while (window->is_open()){
 
+    
     window->update();
     g_renderer->new_frame();
     editor.ShowWindows();
 
     //if(input.IsMouseButtonPressed(And::MouseCode::Left)){
-    if(input.check_action(shot)){
-        CreateJouCube(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, texture_cara_de_jou);
-    }
+    //if(input.check_action(shot)){
+        //CreateJouCube(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, texture_cara_de_jou);
+    //}
 
     if (input.check_action(jump)) {
         physics_engine->SetGravity(0.0f, 10.0f, 0.0f);
@@ -416,8 +417,8 @@ int main(int argc, char** argv){
 
     //tr_cube->SetRotation(0.0f, fps_count, 0.0f);
 
-    fly_cam.ProcessInput();
-    fly_cam.ShowValues();
+    //fly_cam.ProcessInput();
+    //fly_cam.ShowValues();
 
     //And::FlyCamera* cam;
         
@@ -445,9 +446,10 @@ int main(int argc, char** argv){
 
     
     
-
     //g_renderer->draw_forward(entity_comp);
     g_renderer->draw_deferred(entity_comp);
+
+    
     g_renderer->end_frame();
     window->swap_buffers();
   }

@@ -13,7 +13,7 @@
 #include "Andromeda/Graphics/Lights/DirectionalLight.h"
 #include "Andromeda/Graphics/Lights/PointLight.h"
 #include "Andromeda/Graphics/Material.h"
-
+#include "Backends/OpenGL/OpenGLShader.h"
 
 #include "Andromeda/Graphics/Renderer.h"
 
@@ -52,6 +52,8 @@ namespace And{
         void draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran);
         void draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran);
         void draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* dir);
+
+        void CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> mat);
         
         void ResetTransforms(EntityComponentSystem& ecs);
 
@@ -82,8 +84,12 @@ namespace And{
         std::shared_ptr<Shader> m_shader_shadows_spot;
 
         std::shared_ptr<Shader> m_shader_geometry;
-        std::shared_ptr<Shader> m_shader_quad_directional;
+        std::shared_ptr<Shader> m_shader_quad_directional_shadows;
         std::shared_ptr<Shader> m_shader_quad_ambient;
+        std::shared_ptr<Shader> m_shader_quad_spot_shadows;
+        std::shared_ptr<Shader> m_shader_quad_point_shadows;
+        
+        std::shared_ptr<Shader> m_shader_quad_directional;
         std::shared_ptr<Shader> m_shader_quad_spot;
         std::shared_ptr<Shader> m_shader_quad_point;
 
@@ -101,6 +107,18 @@ namespace And{
 
         unsigned int m_quad_vao;
         unsigned int m_quad_vbo;
+
+
+        float dMesh[32] = {
+          -1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, // down-left
+          -1.0f, +1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, // up-left
+          +1.0f, +1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f, // up-right
+          +1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // down-right
+        };
+
+        unsigned int dIndices[6] = {
+             0, 2, 1, 2, 0, 3
+        };
 
 
 

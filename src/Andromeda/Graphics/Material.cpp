@@ -88,8 +88,28 @@ namespace And
     m_NormalTexture = tex;
   }
   
-  void Material::SetSpecularTexture(std::shared_ptr<Texture> tex)
-  {
+  void Material::SetSpecularTexture(std::shared_ptr<Texture> tex){
     m_SpecularTexture = tex;
   }
+
+  void Material::SetMetallicTexture(std::shared_ptr<Texture> tex){
+      
+      m_MetallicTexture = tex;
+  }
+
+  void Material::SetRoughnessTexture(std::shared_ptr<Texture> tex){
+
+      m_RoughnessTexture = tex;
+  }
+
+  void Material::SetAmbientOclusionTexture(std::shared_ptr<Texture> tex){
+
+      m_AmbienOclusionTexture = tex;
+  }
+
+  bool Material::GetIsPBR(){
+      return m_NormalTexture && m_RoughnessTexture && m_AmbienOclusionTexture && m_MetallicTexture;
+  }
+
+
 }

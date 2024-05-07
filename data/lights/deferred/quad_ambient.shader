@@ -9,7 +9,7 @@ struct AmbientLight{
   vec3 direction;
   float enabled;
   vec3 diffuse_color;
-  float specular_strength;
+  float ambient_strength;
   vec3 specular_color;
   float specular_shininess; // 48 bytes
 };
@@ -49,6 +49,7 @@ uniform sampler2D texShadow;
 uniform sampler2D Frag_Position;
 uniform sampler2D Frag_Normal;
 uniform sampler2D Frag_Color;
+uniform sampler2D Met_Roug_Ao;
 
 in vec3 blend_color;
 in vec3 s_normal;
@@ -62,7 +63,7 @@ struct AmbientLight{
   vec3 direction;
   float enabled;
   vec3 diffuse_color;
-  float specular_strength;
+  float ambient_strength;
   vec3 specular_color;
   float specular_shininess; // 48 bytes
 };
@@ -84,13 +85,18 @@ layout (std140, binding = 2) uniform UniformAmbient{
 void main(){
 
   // Get textures
+  //vec3 frag_color = pow(texture(Frag_Color, uv).rgb, vec3(2.2));
   vec3 frag_color = texture(Frag_Color, uv).rgb;
   vec3 frag_normal = texture(Frag_Normal, uv).rgb;
   vec3 frag_position = texture(Frag_Position, uv).rgb;
-
-  float ambient_strength = 1.0;
-  vec3 color = ambient_strength * ambient_light.diffuse_color;
-  color *= frag_color; 
+  //vec3 stacked = texture(Met_Roug_Ao, uv).rgb;
+  //float metallic = stacked.r;
+  //float roughness = stacked.g;
+  //float ambient_oclusion = stacked.b;
+  
+  //vec3 color = (ambient_light.ambient_strength * ambient_light.diffuse_color) * frag_color * ambient_oclusion;
+  vec3 color = (ambient_light.ambient_strength * ambient_light.diffuse_color) * frag_color;
+  //color *= frag_color; 
 
   FragColor = vec4(color, 1.0);
 }

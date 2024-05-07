@@ -8,7 +8,7 @@ struct AmbientLightRaw {
   float direction[3] = {0.0f, 0.0f, 0.0f};
   float enabled = 1.0f;
   float diffuse_color[3] = {0.5f, 0.5f, 0.5f};
-  float specular_strength = 1.0f;
+  float ambient_strenght = 1.0f;
   float specular_color[3] = {1.0f, 1.0f, 1.0f};
   float specular_shininess = 1.0f; // 48 bytes
 };
@@ -45,10 +45,13 @@ class AmbientLight : public Light{
         void   GetEnabled(float& enabled);
         float* GetDiffuseColor();
         void   GetDiffuseColor(float& r, float& g, float& b);
-        
+        float  GetAmbientStrenght();
+
         void   SetEnabled(bool e);
         void   SetDiffuseColor(float color[3]);
         void   SetDiffuseColor(float x, float y, float z);
+
+        void   SetAmbientStrenght(float s);
       
 };
 }
