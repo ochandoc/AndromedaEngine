@@ -109,6 +109,18 @@ namespace And{
         unsigned int m_quad_vbo;
 
 
+        float dMesh[32] = {
+          -1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, // down-left
+          -1.0f, +1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, // up-left
+          +1.0f, +1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f, // up-right
+          +1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // down-right
+        };
+
+        unsigned int dIndices[6] = {
+             0, 2, 1, 2, 0, 3
+        };
+
+
 
     protected:
 

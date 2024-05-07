@@ -126,6 +126,9 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
 
   glGenVertexArrays(1, &m_quad_vao);
   glGenBuffers(1, &m_quad_vbo);
+  glBindVertexArray(m_quad_vao);
+  glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
+  glBufferData(GL_ARRAY_BUFFER, (GLsizei)(sizeof(dMesh)), &dMesh[0], GL_STATIC_DRAW);
 
 
   // Create uniform buffers for lights
@@ -753,16 +756,24 @@ void RendererOpenGL::draw_shadows(PointLight* l, MeshComponent* obj, TransformCo
 
 void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffer, Light* light) {
 
-    float dMesh[] = {
-      -1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, // down-left
-      -1.0f, +1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f, // up-left
-      +1.0f, +1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f, // up-right
-      +1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f, // down-right
+
+
+    
+
+
+
+
+    /*float dMesh[] = {
+     -1.0f, 1.0f, 0.0f ,  0.0f, 0.0f, 1.0f , 0.0f, 1.0f ,   // Vértice 0
+    -1.0f, -1.0f,0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,   // Vértice 1
+    1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,   // Vértice 2
+    1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f    // Vértice 3
     };
 
     unsigned int dIndices[] = {
-         0, 2, 1, 0, 3, 2
-    };
+         0, 3, 1, 0, 2, 3
+    };*/
+
     
     bool cast_shadows = light->GetCastShadows();
 
@@ -855,8 +866,6 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
 
     glBindVertexArray(m_quad_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
-    glBufferData(GL_ARRAY_BUFFER, (GLsizei)(sizeof(dMesh)), &dMesh[0], GL_STATIC_DRAW);
-
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);

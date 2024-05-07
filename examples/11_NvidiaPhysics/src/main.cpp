@@ -79,19 +79,19 @@ int main(int argc, char** argv){
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
   std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
-  And::FlyCamera fly_cam{*window};
-  fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
-  fly_cam.SetSize(1920.0f, 1080.0f);
+  //And::FlyCamera fly_cam{*window};
+  //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
+  //fly_cam.SetSize(1920.0f, 1080.0f);
 
-  fly_cam.SetFar(1000.0f);
-  fly_cam.SetNear(0.1f);
+  //fly_cam.SetFar(1000.0f);
+  //fly_cam.SetNear(0.1f);
 
 
   //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
-  fly_cam.SetFov(90.0f);
-  fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
+  //fly_cam.SetFov(90.0f);
+  //fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
 
- //g_renderer->set_camera(&fly_cam);
+  //g_renderer->set_camera(&fly_cam);
 
 
   //std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
@@ -320,7 +320,7 @@ int main(int argc, char** argv){
   diffuse_color[2] = 1.0f;
   diffuse_color[1] = 0.0f;
 
-  for (int i = 0; i < 200; i++) {
+  for (int i = 0; i < 10; i++) {
 
       And::PointLight point{};
       point.SetPosition((float)i, 14.0f, 0.0f);
@@ -405,9 +405,9 @@ int main(int argc, char** argv){
     editor.ShowWindows();
 
     //if(input.IsMouseButtonPressed(And::MouseCode::Left)){
-    if(input.check_action(shot)){
-        CreateJouCube(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, texture_cara_de_jou);
-    }
+    //if(input.check_action(shot)){
+        //CreateJouCube(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, texture_cara_de_jou);
+    //}
 
     if (input.check_action(jump)) {
         physics_engine->SetGravity(0.0f, 10.0f, 0.0f);
@@ -417,8 +417,8 @@ int main(int argc, char** argv){
 
     //tr_cube->SetRotation(0.0f, fps_count, 0.0f);
 
-    fly_cam.ProcessInput();
-    fly_cam.ShowValues();
+    //fly_cam.ProcessInput();
+    //fly_cam.ShowValues();
 
     //And::FlyCamera* cam;
         
