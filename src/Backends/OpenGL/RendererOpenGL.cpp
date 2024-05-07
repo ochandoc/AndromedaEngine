@@ -303,7 +303,7 @@ void CheckError(){
 
 void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran)
 {
-  auto start = std::chrono::high_resolution_clock::now(); 
+  //auto start = std::chrono::high_resolution_clock::now(); 
   CameraBase* cam = &m_DefaultCamera;
   if(m_UserCamera) cam = m_UserCamera;
     
@@ -316,9 +316,9 @@ void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* 
   m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
   m_buffer_matrix->bind();
 
-  CheckTime(start, std::chrono::high_resolution_clock::now(), "UPLOAD Uniform block -> ");
+  //CheckTime(start, std::chrono::high_resolution_clock::now(), "UPLOAD Uniform block -> ");
   
-  start = std::chrono::high_resolution_clock::now(); 
+  //start = std::chrono::high_resolution_clock::now(); 
 
   SpotLight* spot = dynamic_cast<SpotLight*>(l);
   if(spot){
@@ -343,10 +343,10 @@ void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* 
     m_buffer_ambient_light->upload_data(ambient->GetData(), 48);
     m_buffer_ambient_light->bind();
   }
-  CheckTime(start, std::chrono::high_resolution_clock::now(), "UPLOAD Light block -> ");
+  //CheckTime(start, std::chrono::high_resolution_clock::now(), "UPLOAD Light block -> ");
 
 
-  start = std::chrono::high_resolution_clock::now(); 
+  //start = std::chrono::high_resolution_clock::now(); 
 
   unsigned int VBO = obj->MeshOBJ->get_vbo();
   unsigned int VAO = obj->MeshOBJ->get_vao();
@@ -355,9 +355,9 @@ void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* 
   glBindVertexArray(VAO);
 
   const std::vector<Vertex_info>& vertices = obj->MeshOBJ->getVertexInfo();
-  CheckTime(start, std::chrono::high_resolution_clock::now(), "Get Vertex info OBJ-> ");
+  //CheckTime(start, std::chrono::high_resolution_clock::now(), "Get Vertex info OBJ-> ");
 
-  start = std::chrono::high_resolution_clock::now(); 
+  //start = std::chrono::high_resolution_clock::now(); 
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
   glEnableVertexAttribArray(1);
@@ -365,19 +365,19 @@ void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* 
   glEnableVertexAttribArray(2);
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
 
-  CheckTime(start, std::chrono::high_resolution_clock::now(), "Enable Vertex atrib OBJ-> ");
+  //CheckTime(start, std::chrono::high_resolution_clock::now(), "Enable Vertex atrib OBJ-> ");
 
-  start = std::chrono::high_resolution_clock::now(); 
+  //start = std::chrono::high_resolution_clock::now(); 
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
   glEnable(GL_DEPTH_TEST);
-  CheckTime(start, std::chrono::high_resolution_clock::now(), "Enable cosas OBJ-> ");
+  //CheckTime(start, std::chrono::high_resolution_clock::now(), "Enable cosas OBJ-> ");
 
   const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
-  start = std::chrono::high_resolution_clock::now(); 
+  //start = std::chrono::high_resolution_clock::now(); 
   glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data()); // Esto es lo que tarda
 
-  CheckTime(start, std::chrono::high_resolution_clock::now(), "Draw Elements OBJ-> ");
+  //CheckTime(start, std::chrono::high_resolution_clock::now(), "Draw Elements OBJ-> ");
 
 }
 
@@ -1173,21 +1173,21 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
     OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_geometry.get());
     tmp->Use();
 
-    auto start_time_material = std::chrono::steady_clock::now();
+    //auto start_time_material = std::chrono::steady_clock::now();
     CheckMaterial(tmp, mat_tmp);
-    CheckTime(start_time_material, std::chrono::steady_clock::now(), "Check Material: ");
+    //CheckTime(start_time_material, std::chrono::steady_clock::now(), "Check Material: ");
     
-    auto start_time_draw = std::chrono::steady_clock::now();
+    //auto start_time_draw = std::chrono::steady_clock::now();
     draw_obj(obj, nullptr, transform);
-    CheckTime(start_time_draw, std::chrono::steady_clock::now(), "*** Draw OBJ TOTAL *** : ");
+    //CheckTime(start_time_draw, std::chrono::steady_clock::now(), "*** Draw OBJ TOTAL *** : ");
   }
   m_gBuffer_->Desactivate();
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  CheckTime(start_time, std::chrono::steady_clock::now(), "Geometry Pass: ");
+  //CheckTime(start_time, std::chrono::steady_clock::now(), "Geometry Pass: ");
 
 
-  start_time = std::chrono::steady_clock::now();
+  //start_time = std::chrono::steady_clock::now();
   // Lighting Pass
 
   // Ambient light
@@ -1260,7 +1260,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
       glBlendFunc(GL_ONE, GL_ONE);
   }
 
-  CheckTime(start_time, std::chrono::steady_clock::now(), "Lighting Pass: ");
+  //CheckTime(start_time, std::chrono::steady_clock::now(), "Lighting Pass: ");
 
 
 
