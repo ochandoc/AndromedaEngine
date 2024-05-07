@@ -756,24 +756,6 @@ void RendererOpenGL::draw_shadows(PointLight* l, MeshComponent* obj, TransformCo
 
 void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffer, Light* light) {
 
-
-
-    
-
-
-
-
-    /*float dMesh[] = {
-     -1.0f, 1.0f, 0.0f ,  0.0f, 0.0f, 1.0f , 0.0f, 1.0f ,   // Vértice 0
-    -1.0f, -1.0f,0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,   // Vértice 1
-    1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,   // Vértice 2
-    1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f    // Vértice 3
-    };
-
-    unsigned int dIndices[] = {
-         0, 3, 1, 0, 2, 3
-    };*/
-
     
     bool cast_shadows = light->GetCastShadows();
 
