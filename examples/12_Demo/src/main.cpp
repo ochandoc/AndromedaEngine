@@ -62,6 +62,33 @@ static void CreateJouCube(const float* pos, const float* dir, float force, And::
     e->get_component<And::RigidBody>()->AddForce(new_dir, And::ForceMode::IMPULSE);
 }
 
+
+static void SpawnBall(std::shared_ptr<And::PhysicsEngine> engine, And::EntityComponentSystem& entity_comp) {
+  float pos[3] = {0.0f, 2.0f, 0.0f};
+  float scale[3] = {1.0f, 1.0f, 1.0f};
+
+
+  And::MeshComponent MC;
+  MC.MeshOBJ = And::Geometry::load("cube.obj");
+  And::MaterialComponent mat_comp;
+  std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+  mat->SetColor(0.2f, 0.2f, 1.0f, 1.0f);
+  mat_comp.SetMaterial(mat);
+  And::TransformComponent tran;
+  tran.SetPosition(pos);
+  tran.SetRotation(0.0f, 0.0f, 0.0f);
+  tran.SetScale(scale);
+
+  And::RigidBody rb = engine->CreateRigidBody();
+  rb.AddSphereCollider(pos, scale);
+  rb.AffectsGravity(true);
+  rb.SetMass(5.0f);
+
+
+  And::Entity* e = entity_comp.new_entity(MC, mat_comp, tran, rb);
+  e->get_component<And::RigidBody>()->AddForce(0.0f, 1.0f, 0.0f, And::ForceMode::IMPULSE);
+}
+
 int main(int argc, char** argv){
 
     And::Engine e;
@@ -78,6 +105,7 @@ int main(int argc, char** argv){
     //window->set_vsync(true);
     std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
     std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
+
 
     //And::FlyCamera fly_cam{*window};
     //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
@@ -110,7 +138,6 @@ int main(int argc, char** argv){
 
     And::EntityComponentSystem entity_comp;
     And::AddBasicComponents(entity_comp);
-
 
     std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init();
 
@@ -234,6 +261,7 @@ int main(int argc, char** argv){
 
   }*/
 
+
   And::Input input{ *window };
   And::ActionInput jump{ "Jump", And::KeyState::Press, { And::KeyCode::Space} };
   And::ActionInput shot{ "Shot", And::KeyState::Press, { And::KeyCode::C} };
@@ -242,12 +270,14 @@ int main(int argc, char** argv){
   float fps_count = 0.0f;
   const float force = 100.0f;
   int frames = 0;
+  int secondsToSpawn = 3;
   while (window->is_open()){
        
     
     window->update();
     g_renderer->new_frame();
     editor.ShowWindows();
+    fps_count +=window->get_delta_time(); 
 
     //if(input.IsMouseButtonPressed(And::MouseCode::Left)){
     //if(input.check_action(shot)){
@@ -258,14 +288,16 @@ int main(int argc, char** argv){
     //point_tmp->SetPosition(pos[0], std::abs(cosf(fps_count) * 3.0f), pos[2]);
     //printf("Position-> Y: %f\n", std::abs(cosf(fps_count) * 3.0f));
 
-
-    fps_count +=window->get_delta_time(); 
-
-    if (fps_count > 0.1f) [[likely]] {
-        //physics_engine->Simulate(window->get_delta_time());
+    if (((int)fps_count) % secondsToSpawn == 0) {
+        SpawnBall(physics_engine, entity_comp);
     }
 
-    //physics_engine->Apply(entity_comp);
+
+    if (fps_count > 0.1f) [[likely]] {
+        physics_engine->Simulate(window->get_delta_time());
+    }
+
+    physics_engine->Apply(entity_comp);
     
     //g_renderer->draw_forward(entity_comp);
     g_renderer->draw_deferred(entity_comp);
@@ -276,7 +308,7 @@ int main(int argc, char** argv){
     window->swap_buffers();
   }
 
-  //physics_engine->Release(entity_comp);
+  physics_engine->Release(entity_comp);
 
   return 0;
 }
