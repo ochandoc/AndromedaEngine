@@ -104,23 +104,23 @@ vec3 CalculeDirLight(DirectionalLight light, vec3 normal, vec3 viewDir, vec3 col
 
   /*---Difuse---*/
   //float diff = max(dot(normal, dir), 0.0);
-  float diff = max(dot(normal, light.direction), 0.0);
-  vec3 diffuse = diff * light.diffuse_color * color_base.xyz;
+  float diff = max(dot(normal, -light.direction), 0.0); // este -1 es un poco raro
+  vec3 diffuse = diff * light.diffuse_color;// * color_base.xyz;
 
   /*---Specular---*/
 
   //vec3 reflectDir = normalize(reflect(-(dir), normalize(normal))  );
   vec3 reflectDir = normalize(reflect(-(light.direction), normalize(normal))  );
   float spec = pow(max(dot(normalize(viewDir), normalize(reflectDir)), 0.0), light.specular_shininess);
-  vec3 specular = light.specular_strength * spec * light.specular_color * color_base.xyz;
+  vec3 specular = light.specular_strength * spec * light.specular_color;// * color_base.xyz;
 
-  //return (diffuse + specular * light.active);
-  return (diffuse * light.enabled);
+  //return (diffuse * light.enabled);
+  return (diffuse + specular * light.enabled);
 }
 
 
 void main(){
-  vec3 view_direction = normalize(camera_pos - s_fragPos);
+ vec3 view_direction = normalize(camera_pos - s_fragPos);
   float ambient_strength = 0.01;
   vec3 ambient_color = vec3(1.0);
   ambient_color = ambient_strength * ambient_color;
@@ -129,9 +129,9 @@ void main(){
 
   vec3 normal_value;
   if(m_use_normal_texture == 1){
-    normal_value = s_normal;
-  }else{
     normal_value = texture(texNormal,uv).rgb;
+  }else{
+    normal_value = s_normal;
   }
 
   color = CalculeDirLight(directional_light, normal_value, view_direction, color_base);
@@ -142,6 +142,7 @@ void main(){
   }else{
     tex_color = m_albedoColor;
   }
+
   FragColor = vec4(color, 1.0) * tex_color;
 
 
