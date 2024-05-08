@@ -64,95 +64,116 @@ static void CreateJouCube(const float* pos, const float* dir, float force, And::
 
 int main(int argc, char** argv){
 
-  And::Engine e;
-  And::TaskSystem ts;
+    And::Engine e;
+    And::TaskSystem ts;
 
-  And::WorkerCreationInfo workerCreationInfo;
-  workerCreationInfo.Name = "Test";
-  workerCreationInfo.Function = And::GetGenericWorkerFunction();
-  workerCreationInfo.UserData = nullptr;
+    And::WorkerCreationInfo workerCreationInfo;
+    workerCreationInfo.Name = "Test";
+    workerCreationInfo.Function = And::GetGenericWorkerFunction();
+    workerCreationInfo.UserData = nullptr;
 
-  ts.AddWorker(workerCreationInfo);
+    ts.AddWorker(workerCreationInfo);
 
-  std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine", And::EGraphicsApiType::OpenGL);
-  //window->set_vsync(true);
-  std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
-  std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
+    std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine", And::EGraphicsApiType::OpenGL);
+    //window->set_vsync(true);
+    std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
+    std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
-  //And::FlyCamera fly_cam{*window};
-  //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
-  //fly_cam.SetSize(1920.0f, 1080.0f);
+    //And::FlyCamera fly_cam{*window};
+    //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
+    //fly_cam.SetSize(1920.0f, 1080.0f);
 
-  //fly_cam.SetFar(1000.0f);
-  //fly_cam.SetNear(0.1f);
-
-
-  //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
-  //fly_cam.SetFov(90.0f);
-  //fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
-
-  //g_renderer->set_camera(&fly_cam);
+    //fly_cam.SetFar(1000.0f);
+    //fly_cam.SetNear(0.1f);
 
 
-  And::ResourceManager r_manager{*window, ts};
-  r_manager.AddGenerator<And::ShaderGenerator>();
+    //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
+    //fly_cam.SetFov(90.0f);
+    //fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
+
+    //g_renderer->set_camera(&fly_cam);
+
+
+    And::ResourceManager r_manager{*window, ts};
+    r_manager.AddGenerator<And::ShaderGenerator>();
   
-  And::Editor editor{*window, &r_manager};
+    And::Editor editor{*window, &r_manager};
 
-  editor.AddWindow(ts.GetEditorWindow());
+    editor.AddWindow(ts.GetEditorWindow());
 
-  // Show pc info
-  g_context->create_info();
-
-
-  float clear_color[4] = {1.0f, 0.0f, 0.0f, 1.0f};
-  g_renderer->set_clear_color(clear_color);
-
-  And::EntityComponentSystem entity_comp;
-  And::AddBasicComponents(entity_comp);
+    // Show pc info
+    g_context->create_info();
 
 
-  std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init();
+    float clear_color[4] = {1.0f, 0.0f, 0.0f, 1.0f};
+    g_renderer->set_clear_color(clear_color);
 
-  int num_obj = 10;
-  float pos_x = 0.0f;
-  float pos_y = -5.0f;
+    And::EntityComponentSystem entity_comp;
+    And::AddBasicComponents(entity_comp);
 
-  And::MeshComponent MC_fountain;
-  MC_fountain.MeshOBJ = And::Geometry::load("demo/obj/fountain.obj");
-  And::MaterialComponent fountain_mat_comp;
-  std::shared_ptr<And::Material> fountain_mat = std::make_shared<And::Material>();
-  fountain_mat->SetColor(0.0f, 1.0f, 1.0f, 1.0f);
-  fountain_mat_comp.SetMaterial(fountain_mat);
-  And::TransformComponent fountain_tran;
-  fountain_tran.SetPosition(0.0f, 0.0f, 0.0f);
-  fountain_tran.SetRotation(0.0f, 0.0f, 0.0f);
-  fountain_tran.SetScale(1.0f, 1.0f, 1.0f);
-  entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran);
+
+    std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init();
+
+    int num_obj = 10;
+    float pos_x = 0.0f;
+    float pos_y = -5.0f;
+
+    And::MeshComponent MC_fountain;
+    MC_fountain.MeshOBJ = And::Geometry::load("demo/obj/fountain.obj");
+    And::MaterialComponent fountain_mat_comp;
+    std::shared_ptr<And::Material> fountain_mat = std::make_shared<And::Material>();
+    fountain_mat->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+    fountain_mat_comp.SetMaterial(fountain_mat);
+    And::TransformComponent fountain_tran;
+    fountain_tran.SetPosition(0.0f, 1.0f, 0.0f);
+    fountain_tran.SetRotation(0.0f, 0.0f, 0.0f);
+    fountain_tran.SetScale(1.0f, 1.0f, 1.0f);
+    entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran);
   
   
-  And::MeshComponent MC_suelo;
-  MC_suelo.MeshOBJ = And::Geometry::load("cube.obj");
+    And::MeshComponent MC_suelo;
+    MC_suelo.MeshOBJ = And::Geometry::load("cube.obj");
   
-  And::MaterialComponent suelo_mat_comp;
-  std::shared_ptr<And::Material> suelo_mat = std::make_shared<And::Material>();
-  std::shared_ptr<And::Texture> suelo_tex = And::MakeTexture("demo/textures/suelo/albedo.png");
-  std::shared_ptr<And::Texture> suelo_normals = And::MakeTexture("demo/textures/suelo/normals.png");
-  //suelo_mat->SetColorTexture(suelo_tex);
-  //suelo_mat->SetNormalTexture(suelo_normals);
-  suelo_mat_comp.SetMaterial(suelo_mat);
+    And::MaterialComponent suelo_mat_comp;
+    std::shared_ptr<And::Material> suelo_mat = std::make_shared<And::Material>();
+    std::shared_ptr<And::Texture> suelo_tex = And::MakeTexture("demo/textures/suelo/albedo.png");
+    std::shared_ptr<And::Texture> suelo_normals = And::MakeTexture("demo/textures/suelo/normals.png");
+    suelo_mat->SetColorTexture(suelo_tex);
+    //suelo_mat->SetNormalTexture(suelo_normals);
+    suelo_mat_comp.SetMaterial(suelo_mat);
 
-  And::TransformComponent suelo_tran;
-  suelo_tran.SetPosition(0.0f, -3.0f, 0.0f);
-  suelo_tran.SetRotation(0.0f, 0.0f, 0.0f);
-  suelo_tran.SetScale(100.0f, 1.0f, 100.0f);
-  entity_comp.new_entity(MC_suelo, suelo_mat_comp, suelo_tran);
+    And::TransformComponent suelo_tran;
+    suelo_tran.SetPosition(-20.0f, 0.0f, 0.0f);
+    suelo_tran.SetRotation(0.0f, 0.0f, 3.1415f / 2.0f);
+    suelo_tran.SetScale(10.0f, 1.0f, 10.0f);
+    entity_comp.new_entity(MC_suelo, suelo_mat_comp, suelo_tran);
+
+
+    suelo_tran.SetPosition(20.0f, 0.0f, 0.0f);
+    entity_comp.new_entity(MC_suelo, suelo_mat_comp, suelo_tran);
+  
+    suelo_tran.SetRotation(0.0f, 0.0f, 0.0f);
+   
+    const float suelo_scale = 20.0f;
+    const int suelo_num = 2;
+    suelo_tran.SetScale(suelo_scale, 1.0f, suelo_scale);
+   
+   
+    for (int j = -suelo_num; j < suelo_num; j++) {
+
+        for (int i = -suelo_num; i < suelo_num; i++) {
+            suelo_tran.SetPosition(i * suelo_scale, 0.0f, j * suelo_scale);
+            entity_comp.new_entity(MC_suelo, suelo_mat_comp, suelo_tran);
+        }
+    }
+  
+  
 
 
 
   And::AmbientLight ambient;
   ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-  ambient.SetAmbientStrenght(0.1f);
+  ambient.SetAmbientStrenght(0.3f);
   entity_comp.new_entity(ambient);
 
   
@@ -169,7 +190,7 @@ int main(int argc, char** argv){
 
 
   And::PointLight point;
-  point.SetPosition(0.0f, 2.0f, 0.0f);
+  point.SetPosition(0.0f, 3.0f, 0.0f);
   point.SetSpecularColor(1.0f, 1.0f, 1.0f);
   point.SetSpecularShininess(2.0f);
   point.SetSpecularStrength(0.003f);
@@ -179,8 +200,8 @@ int main(int argc, char** argv){
   point.SetEnabled(true);
   point.SetCastShadows(false);
   point.SetDiffuseColor(1.0f, 0.0f, 0.0f);
-  And::Entity* entity_tmp = entity_comp.new_entity(point);
-  And::PointLight* point_tmp = entity_tmp->get_component<And::PointLight>();
+  //And::Entity* entity_tmp = entity_comp.new_entity(point);
+  //And::PointLight* point_tmp = entity_tmp->get_component<And::PointLight>();
 
   std::shared_ptr<And::Geometry> geo = And::Geometry::load("cube.obj");
   float position_tmp[3] = {-1.0f, 20.0f, -15.0f};
@@ -233,9 +254,9 @@ int main(int argc, char** argv){
         //CreateJouCube(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, texture_cara_de_jou);
     //}
 
-    float* pos = point_tmp->GetPosition();
-    point_tmp->SetPosition(pos[0], std::abs(cosf(fps_count) * 3.0f), pos[2]);
-    printf("Position-> Y: %f\n", std::abs(cosf(fps_count) * 3.0f));
+    //float* pos = point_tmp->GetPosition();
+    //point_tmp->SetPosition(pos[0], std::abs(cosf(fps_count) * 3.0f), pos[2]);
+    //printf("Position-> Y: %f\n", std::abs(cosf(fps_count) * 3.0f));
 
 
     fps_count +=window->get_delta_time(); 
@@ -244,7 +265,7 @@ int main(int argc, char** argv){
         //physics_engine->Simulate(window->get_delta_time());
     }
 
-    physics_engine->Apply(entity_comp);
+    //physics_engine->Apply(entity_comp);
     
     //g_renderer->draw_forward(entity_comp);
     g_renderer->draw_deferred(entity_comp);
@@ -255,7 +276,7 @@ int main(int argc, char** argv){
     window->swap_buffers();
   }
 
-  physics_engine->Release(entity_comp);
+  //physics_engine->Release(entity_comp);
 
   return 0;
 }
