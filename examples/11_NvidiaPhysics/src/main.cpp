@@ -116,7 +116,7 @@ int main(int argc, char** argv){
   And::AddBasicComponents(entity_comp);
 
 
-  std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init();
+  std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init(64);
 
   int num_obj = 10;
   float pos_x = 0.0f;

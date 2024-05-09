@@ -25,6 +25,8 @@
 #include "Andromeda.h"
 
 
+#define POOL_SIZE 50
+
 
 int SlowTask()
 {
@@ -107,6 +109,55 @@ static void SpawnBall(std::shared_ptr<And::PhysicsEngine> engine, And::EntityCom
   printf("Lanuch at X:%f Y:%f Z:%f\n", x, 100.0f, z);
 }
 
+static void ThrowBall(And::Entity* pool[], int index) {
+
+    And::RigidBody* rb = pool[index]->get_component<And::RigidBody>();
+    rb->SetPosition(0.0f, 2.0, 0.0f);
+
+    int minimo = 1;
+    int maximo = 1000;
+    std::uniform_int_distribution<> distribucion(minimo, maximo);
+    int numero_aleatorio_x = distribucion(gen);
+    int numero_aleatorio_z = distribucion(gen);
+
+    float x = numero_aleatorio_x / 100;
+    float z = numero_aleatorio_z / 100;
+
+    rb->AddForce(x, 50.0f, z, And::ForceMode::IMPULSE);
+    printf("Lanuch at X:%f Y:%f Z:%f\n", x, 50.0f, z);
+
+}
+
+void CreateBallsPool(And::Entity* e[], std::shared_ptr<And::PhysicsEngine> engine, And::EntityComponentSystem& entity_comp) {
+    for (int i = 0; i < POOL_SIZE; i++) {
+        float pos[3] = { i * 2.0f , 0.0f, 0.0f };
+
+        float base[3] = { 0.5f, 0.5f, 0.5f };
+        float scale[3] = { 0.1f, 0.1f, 0.1f };
+
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("demo/obj/sphere.obj");
+        And::MaterialComponent mat_comp;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        mat->SetColor(0.2f, 0.2f, 1.0f, 1.0f);
+        mat_comp.SetMaterial(mat);
+        And::TransformComponent tran;
+        tran.SetPosition(pos);
+        tran.SetRotation(0.0f, 0.0f, 0.0f);
+        tran.SetScale(scale);
+
+        And::RigidBody rb = engine->CreateRigidBody();
+        rb.AddSphereCollider(pos, base);
+        rb.AffectsGravity(true);
+        rb.SetMass(5.0f);
+
+
+        e[i] = entity_comp.new_entity(MC, mat_comp, tran, rb);
+    }
+
+}
+
 int main(int argc, char** argv){
 
     And::Engine e;
@@ -157,7 +208,7 @@ int main(int argc, char** argv){
     And::EntityComponentSystem entity_comp;
     And::AddBasicComponents(entity_comp);
 
-    std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init();
+    std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init(8192);
 
     int num_obj = 10;
     float pos_x = 0.0f;
@@ -284,11 +335,16 @@ int main(int argc, char** argv){
   And::ActionInput jump{ "Jump", And::KeyState::Press, { And::KeyCode::Space} };
   And::ActionInput shot{ "Shot", And::KeyState::Press, { And::KeyCode::C} };
 
+  And::Entity* balls_pool[POOL_SIZE];
+  int index_pool = 0;
+
+  CreateBallsPool(balls_pool, physics_engine, entity_comp);
+
 
   float fps_count = 0.0f;
   const float force = 100.0f;
   int frames = 0;
-  float secondsToSpawn = 0.3f;
+  float secondsToSpawn = 3.0f;
   while (window->is_open()){
        
     
@@ -307,8 +363,11 @@ int main(int argc, char** argv){
     //printf("Position-> Y: %f\n", std::abs(cosf(fps_count) * 3.0f));
 
     if (fps_count >= secondsToSpawn) {
-        SpawnBall(physics_engine, entity_comp);
+        //SpawnBall(physics_engine, entity_comp);
+        ThrowBall(balls_pool, index_pool);
         fps_count -= secondsToSpawn;
+        index_pool++;
+        if (index_pool >= POOL_SIZE)index_pool = 0;
     }
 
 

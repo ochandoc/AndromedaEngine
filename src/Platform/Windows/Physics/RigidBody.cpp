@@ -57,8 +57,8 @@ void RigidBody::AddBoxCollider(const float* position, const float* scale){
 	m_data->actor = m_data->physics->createRigidDynamic(transform);
 	
 	physx::PxBoxGeometry box(scale[0] * 0.5f, scale[1] * 0.5f, scale[2] * 0.5f);
-	physx::PxMaterial* mat = m_data->physics->createMaterial(0.5f, 0.5f, 0.0f); // static friction, dynamic friction, restitution);
-	physx::PxShape* shape = m_data->physics->createShape(box, *mat, true);
+	physx::PxMaterial* mat = m_data->physics->createMaterial(1.0f, 1.0f, 1.0f); // static friction, dynamic friction, restitution);
+	physx::PxShape* shape = m_data->physics->createShape(box, *mat, false); // is exclusive = false
 	//boxShape->setLocalPose(physx::PxTransform(0.0f, 0.0f, 0.0f));
 	//boxShape->setLocalPose(transform);
 
@@ -120,6 +120,18 @@ void RigidBody::AddForce(const float* direction, ForceMode fmod){
 	}
 
 	m_data->actor->addForce(physx::PxVec3(direction[0], direction[1], direction[2]), f);
+}
+
+void RigidBody::SetPosition(float* pos){
+
+	physx::PxTransform tr{ pos[0], pos[1], pos[2]};
+	m_data->actor->setGlobalPose(tr);
+}
+
+void RigidBody::SetPosition(float x, float y, float z){
+
+	physx::PxTransform tr{ x, y, z };
+	m_data->actor->setGlobalPose(tr);
 }
 
 
