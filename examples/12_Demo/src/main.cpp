@@ -176,19 +176,19 @@ int main(int argc, char** argv){
     std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
 
-    //And::FlyCamera fly_cam{*window};
-    //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
-    //fly_cam.SetSize(1920.0f, 1080.0f);
+    And::FlyCamera fly_cam{*window};
+    fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
+    fly_cam.SetSize(1920.0f, 1080.0f);
 
-    //fly_cam.SetFar(1000.0f);
-    //fly_cam.SetNear(0.1f);
+    fly_cam.SetFar(1000.0f);
+    fly_cam.SetNear(0.1f);
 
 
-    //fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
-    //fly_cam.SetFov(90.0f);
-    //fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
+    fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
+    fly_cam.SetFov(90.0f);
+    fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
 
-    //g_renderer->set_camera(&fly_cam);
+    g_renderer->set_camera(&fly_cam);
 
 
     And::ResourceManager r_manager{*window, ts};
@@ -263,9 +263,6 @@ int main(int argc, char** argv){
         }
     }
   
-  
-
-
 
   And::AmbientLight ambient;
   ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
@@ -301,34 +298,7 @@ int main(int argc, char** argv){
 
   std::shared_ptr<And::Geometry> geo = And::Geometry::load("cube.obj");
   float position_tmp[3] = {-1.0f, 20.0f, -15.0f};
-  /*for (int i = 0; i < 30; i++) {
 
-      position_tmp[0] += (i * 0.2f);
-      position_tmp[1] += i;
-      And::MeshComponent MC_tmp;
-      MC_tmp.MeshOBJ = geo;
-      //MC_tmp.MeshOBJ->SetTexture(texture_cara_de_jou);
-
-      And::TransformComponent tran_tmp;
-      tran_tmp.position[0] = position_tmp[0];
-      tran_tmp.position[1] = position_tmp[1];
-      tran_tmp.position[2] = position_tmp[2];
-      tran_tmp.rotation[0] = 0.0f;
-      tran_tmp.rotation[1] = 0.0f;
-      tran_tmp.rotation[2] = 0.0f;
-      tran_tmp.scale[0] = 2.0f;
-      tran_tmp.scale[1] = 2.0f;
-      tran_tmp.scale[2] = 2.0f;
-
-      And::RigidBody rb_tmp = physics_engine->CreateRigidBody();
-      rb_tmp.AddBoxCollider(tran_tmp.position, tran_tmp.scale);
-      //rb_tmp.AddSphereCollider(tran_tmp.position, tran_tmp.scale);
-      rb_tmp.AffectsGravity(true);
-      rb_tmp.SetMass(5.0f);
-
-      entity_comp.new_entity(MC_tmp, tran_tmp, rb_tmp);
-
-  }*/
 
 
   And::Input input{ *window };
@@ -340,6 +310,27 @@ int main(int argc, char** argv){
 
   CreateBallsPool(balls_pool, physics_engine, entity_comp);
 
+
+
+  And::AudioManager audio_manager;
+  And::Audio audio_fondo;
+  And::Audio audio_fuente;
+  audio_fondo.load("demo/audio/fondo.wav");
+  audio_fuente.load("demo/audio/fuente.wav");
+
+  
+  audio_fondo.SetGain(0.3f);
+  audio_fondo.SetLooping(true);
+
+  audio_fuente.SetPosition(0.0f, 0.0f, 0.0f);
+  audio_fuente.SetDoppler(true);
+  audio_fuente.SetDopplerFactor(10.0f);
+  audio_fuente.SetLooping(true);
+  audio_fuente.SetPitch(1.0f);
+  audio_fuente.SetMaxDistance(20.0f);
+
+  audio_manager.play(audio_fondo);
+  audio_manager.play(audio_fuente);
 
   float fps_count = 0.0f;
   const float force = 100.0f;
@@ -362,6 +353,21 @@ int main(int argc, char** argv){
     //point_tmp->SetPosition(pos[0], std::abs(cosf(fps_count) * 3.0f), pos[2]);
     //printf("Position-> Y: %f\n", std::abs(cosf(fps_count) * 3.0f));
 
+    fly_cam.ProcessInput();
+
+
+
+
+    const float* src_pos = fly_cam.GetPosition();
+    const float* src_dir = fly_cam.GetDirection();
+
+    audio_fuente.UpdateListenerPosition(src_pos);
+    audio_fuente.UpdateListenerDirection(src_dir);
+
+    audio_fuente.ApplyEffects();
+   
+
+    audio_manager.Update();
     if (fps_count >= secondsToSpawn) {
         //SpawnBall(physics_engine, entity_comp);
         ThrowBall(balls_pool, index_pool);

@@ -2,6 +2,8 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alext.h>
+#include <glm/vec3.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace And{
 
@@ -19,7 +21,10 @@ namespace And{
 
   struct AudioEffect{
     ALfloat source_pos[3];
+    ALfloat source_dir[3];
     ALfloat source_vel[3];
+
+
     float pitch;
     float gain;
     unsigned int looping;
@@ -27,6 +32,8 @@ namespace And{
     bool doppler_enabled;
     float doppler_factor;
     ALfloat listener_vel[3];
+    ALfloat listener_pos[3];
+    ALfloat listener_orientation[6];
     
     // EFX extension
     float reverberation;
@@ -43,11 +50,17 @@ Audio::Audio() : m_audio_data(new AudioData), m_audio_effect(new AudioEffect){
     m_audio_effect->gain = 1.0f;
     m_audio_effect->looping = 0;
 
-    m_audio_effect->source_pos[0] = 50.0f; // A la derecha
+    m_audio_effect->source_pos[0] = 0.0f;
     m_audio_effect->source_pos[1] = 0.0f;
     m_audio_effect->source_pos[2] = 0.0f;
+    
+    m_audio_effect->source_dir[0] = 1.0f;
+    m_audio_effect->source_dir[1] = 1.0f;
+    m_audio_effect->source_dir[2] = 1.0f;
 
-    m_audio_effect->source_vel[0] = -20.0f; // Se mueve hacia la izquierda
+
+
+    m_audio_effect->source_vel[0] = 0.0f;
     m_audio_effect->source_vel[1] = 0.0f;
     m_audio_effect->source_vel[2] = 0.0f;
 
@@ -200,12 +213,13 @@ bool Audio::load(const char* path, const char* name){
 
 }
 
-// Called every frame for imgui
+// Called every frame for imgui 
 void Audio::ApplyEffects() {
     
     alSourcef(m_audio_data->source, AL_PITCH, m_audio_effect->pitch);
     alSourcef(m_audio_data->source, AL_GAIN, m_audio_effect->gain);
     alSourcefv(m_audio_data->source, AL_POSITION, m_audio_effect->source_pos);
+    //alSourcefv(m_audio_data->source, AL_DIRECTION, m_audio_effect->source_dir);
     alSourcei(m_audio_data->source, AL_LOOPING, m_audio_effect->looping);
     //alSourcefv(m_audio_data->source, AL_);
 
@@ -223,29 +237,72 @@ void Audio::ApplyEffects() {
         alDopplerFactor(m_audio_effect->doppler_factor);
         alDopplerVelocity(m_speedOfSound);
 
-        alSource3f(m_audio_data->source, AL_POSITION, m_audio_effect->source_pos[0], m_audio_effect->source_pos[1], m_audio_effect->source_pos[2]);
+        // Set listener orientation
+        alListenerfv(AL_ORIENTATION, m_audio_effect->listener_orientation);
+
+        alSource3f(m_audio_data->source, AL_POSITION, m_audio_effect->listener_pos[0], m_audio_effect->listener_pos[1], m_audio_effect->listener_pos[2]);
 
     }
-
-
-    
     
 }
 
-void Audio::UpdateSourcePosition(float x, float y, float z) {
-    m_audio_effect->source_pos[0] = x;
-    m_audio_effect->source_pos[1] = y;
-    m_audio_effect->source_pos[2] = z;
+void Audio::UpdateListenerPosition(const float x, const float y, const float z) {
+    m_audio_effect->listener_pos[0] = x;
+    m_audio_effect->listener_pos[1] = y;
+    m_audio_effect->listener_pos[2] = z;
 
     //alSource3f(m_audio_data->source, AL_POSITION, m_audio_effect->source_pos[0], m_audio_effect->source_pos[1], m_audio_effect->source_pos[2]);
 }
 
-void Audio::UpdateSourcePosition(float p[3]) {
-    m_audio_effect->source_pos[0] = p[0];
-    m_audio_effect->source_pos[1] = p[1];
-    m_audio_effect->source_pos[2] = p[2];
+void Audio::UpdateListenerPosition(const float p[3]) {
+    m_audio_effect->listener_pos[0] = p[0];
+    m_audio_effect->listener_pos[1] = p[1];
+    m_audio_effect->listener_pos[2] = p[2];
 
     //alSource3f(m_audio_data->source, AL_POSITION, m_audio_effect->source_pos[0], m_audio_effect->source_pos[1], m_audio_effect->source_pos[2]);
+}
+
+void Audio::UpdateListenerDirection(const float pos[3]){
+    glm::vec3 forward(pos[0], pos[1], pos[2]);
+    glm::vec3 up = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), forward);
+    if (glm::length(up) < 0.01f) {
+        up = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward);
+    }
+    up = glm::normalize(up);
+    glm::vec3 right = glm::cross(forward, up);
+
+    m_audio_effect->listener_orientation[0] = forward.x;
+    m_audio_effect->listener_orientation[1] = forward.y;
+    m_audio_effect->listener_orientation[2] = forward.z;
+    m_audio_effect->listener_orientation[3] = up.x;
+    m_audio_effect->listener_orientation[4] = up.y;
+    m_audio_effect->listener_orientation[5] = up.z;
+
+    m_audio_effect->source_dir[0] = pos[0];
+    m_audio_effect->source_dir[1] = pos[1];
+    m_audio_effect->source_dir[2] = pos[2];
+}
+
+void Audio::UpdateListenerDirection(const float x, const float y, const float z){
+
+    glm::vec3 forward(x, y, z);
+    glm::vec3 up = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), forward);
+    if (glm::length(up) < 0.01f) {
+        up = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward);
+    }
+    up = glm::normalize(up);
+    glm::vec3 right = glm::cross(forward, up);
+
+    m_audio_effect->listener_orientation[0] = forward.x;
+    m_audio_effect->listener_orientation[1] = forward.y;
+    m_audio_effect->listener_orientation[2] = forward.z;
+    m_audio_effect->listener_orientation[3] = up.x;
+    m_audio_effect->listener_orientation[4] = up.y;
+    m_audio_effect->listener_orientation[5] = up.z;
+
+    m_audio_effect->source_dir[0] = x;
+    m_audio_effect->source_dir[1] = y;
+    m_audio_effect->source_dir[2] = z;
 }
 
 void Audio::SetPitch(float pitch){
@@ -319,6 +376,11 @@ unsigned int Audio::get_source(){
 const char* Audio::get_name(){
 
   return m_audio_data->name;
+}
+
+void Audio::SetMaxDistance(const float distance){
+
+    alSourcef(m_audio_data->source, AL_MAX_DISTANCE, distance);
 }
 
 float Audio::GetPitch() {

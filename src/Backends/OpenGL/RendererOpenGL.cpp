@@ -130,6 +130,9 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
   glBufferData(GL_ARRAY_BUFFER, (GLsizei)(sizeof(dMesh)), &dMesh[0], GL_STATIC_DRAW);
 
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 
   // Create uniform buffers for lights
   m_buffer_matrix = std::make_shared<UniformBuffer>(0, 208);

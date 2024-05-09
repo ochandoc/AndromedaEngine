@@ -33,6 +33,10 @@ AudioManager::AudioManager() : m_audio_data(new AudioContext){
   m_audio_data->context = alcCreateContext(m_audio_data->device, nullptr);
   alcMakeContextCurrent(m_audio_data->context);
 
+
+  alDistanceModel(AL_LINEAR_DISTANCE);
+  
+
   if(!m_audio_data->device || !m_audio_data->context){
     printf("\nError\n");
   }

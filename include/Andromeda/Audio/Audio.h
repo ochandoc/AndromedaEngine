@@ -44,8 +44,6 @@ struct WAVE_Data {
 };
 
 
-
-
 class Audio{
 
 
@@ -80,7 +78,7 @@ class Audio{
 	* @brief Set pitch of the Audio
 	* @param float pitch value 0.0f to 1.0f
 	*/
-	// Must be 0.0f to 1.0f
+	// Must be 0.0f to 2.5f
 	void SetPitch(float pitch);
 
 	/**
@@ -145,13 +143,16 @@ class Audio{
 	 * @param float y position 
 	 * @param float z position 
 	 */
-	void UpdateSourcePosition(float x, float y, float z);
+	void UpdateListenerPosition(const float x, const float y, const float z);
 	/**
 	 * @brief Updates source position every frame
 	 * 
 	 * @param float* positions  
 	 */
-	void UpdateSourcePosition(float pos[3]);
+	void UpdateListenerPosition(const float pos[3]);
+
+	void UpdateListenerDirection(const float pos[3]);
+	void UpdateListenerDirection(const float x, const float y, const float z);
 
 	/**
 	 * @brief Get the Pitch value
@@ -235,15 +236,25 @@ class Audio{
 	 */
   const char* get_name();
 
-	friend class AudioManager;
-	friend class Song;
+  /**
+    * @brief Set maxium distance audio will be listened
+	*
+	* @param const float max distance
+  */
+   void SetMaxDistance(const float distance);
 
-protected:
+
 
 	/**
  	* @brief Apply effects setted before, must be called every frame
  	*/
 	void ApplyEffects();
+	
+	
+	friend class AudioManager;
+	friend class Song;
+
+protected:
 
 	/**
 	 * @brief AudioEffect* struct
