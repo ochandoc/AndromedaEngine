@@ -34,7 +34,7 @@ AudioManager::AudioManager() : m_audio_data(new AudioContext){
   alcMakeContextCurrent(m_audio_data->context);
 
 
-  alDistanceModel(AL_LINEAR_DISTANCE);
+  alDistanceModel(AL_LINEAR_DISTANCE_CLAMPED);
   
 
   if(!m_audio_data->device || !m_audio_data->context){

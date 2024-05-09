@@ -315,8 +315,10 @@ int main(int argc, char** argv){
   And::AudioManager audio_manager;
   And::Audio audio_fondo;
   And::Audio audio_fuente;
+  And::Audio audio_piano;
   audio_fondo.load("demo/audio/fondo.wav");
   audio_fuente.load("demo/audio/fuente.wav");
+  audio_piano.load("demo/audio/piano.wav");
 
   
   audio_fondo.SetGain(0.3f);
