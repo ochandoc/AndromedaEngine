@@ -20,6 +20,8 @@
 #include <condition_variable>
 #include <future>
 #include <chrono>
+#include <iostream>
+#include <random>
 #include "Andromeda.h"
 
 
@@ -62,14 +64,18 @@ static void CreateJouCube(const float* pos, const float* dir, float force, And::
     e->get_component<And::RigidBody>()->AddForce(new_dir, And::ForceMode::IMPULSE);
 }
 
+static std::random_device rd;
+static std::mt19937 gen(rd());
 
 static void SpawnBall(std::shared_ptr<And::PhysicsEngine> engine, And::EntityComponentSystem& entity_comp) {
   float pos[3] = {0.0f, 2.0f, 0.0f};
-  float scale[3] = {1.0f, 1.0f, 1.0f};
+
+  float base[3] = {1.0f, 1.0f, 1.0f};
+  float scale[3] = {0.1f, 0.1f, 0.1f};
 
 
   And::MeshComponent MC;
-  MC.MeshOBJ = And::Geometry::load("cube.obj");
+  MC.MeshOBJ = And::Geometry::load("demo/obj/sphere.obj");
   And::MaterialComponent mat_comp;
   std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
   mat->SetColor(0.2f, 0.2f, 1.0f, 1.0f);
@@ -80,13 +86,25 @@ static void SpawnBall(std::shared_ptr<And::PhysicsEngine> engine, And::EntityCom
   tran.SetScale(scale);
 
   And::RigidBody rb = engine->CreateRigidBody();
-  rb.AddSphereCollider(pos, scale);
+  rb.AddSphereCollider(pos, base);
   rb.AffectsGravity(true);
   rb.SetMass(5.0f);
 
 
   And::Entity* e = entity_comp.new_entity(MC, mat_comp, tran, rb);
-  e->get_component<And::RigidBody>()->AddForce(0.0f, 1.0f, 0.0f, And::ForceMode::IMPULSE);
+
+  int minimo = 1;
+  int maximo = 1000;
+  std::uniform_int_distribution<> distribucion(minimo, maximo);
+  int numero_aleatorio_x = distribucion(gen);
+  int numero_aleatorio_z = distribucion(gen);
+
+  float x = numero_aleatorio_x / 100;
+  float z = numero_aleatorio_z / 100;
+
+  e->get_component<And::RigidBody>()->AddForce(x, 100.0f, z, And::ForceMode::IMPULSE);
+
+  printf("Lanuch at X:%f Y:%f Z:%f\n", x, 100.0f, z);
 }
 
 int main(int argc, char** argv){
@@ -189,7 +207,7 @@ int main(int argc, char** argv){
     for (int j = -suelo_num; j < suelo_num; j++) {
 
         for (int i = -suelo_num; i < suelo_num; i++) {
-            suelo_tran.SetPosition(i * suelo_scale, 0.0f, j * suelo_scale);
+            suelo_tran.SetPosition(i * suelo_scale, -1.5f, j * suelo_scale);
             entity_comp.new_entity(MC_suelo, suelo_mat_comp, suelo_tran);
         }
     }
@@ -270,7 +288,7 @@ int main(int argc, char** argv){
   float fps_count = 0.0f;
   const float force = 100.0f;
   int frames = 0;
-  int secondsToSpawn = 3;
+  float secondsToSpawn = 0.3f;
   while (window->is_open()){
        
     
@@ -288,8 +306,9 @@ int main(int argc, char** argv){
     //point_tmp->SetPosition(pos[0], std::abs(cosf(fps_count) * 3.0f), pos[2]);
     //printf("Position-> Y: %f\n", std::abs(cosf(fps_count) * 3.0f));
 
-    if (((int)fps_count) % secondsToSpawn == 0) {
+    if (fps_count >= secondsToSpawn) {
         SpawnBall(physics_engine, entity_comp);
+        fps_count -= secondsToSpawn;
     }
 
 
