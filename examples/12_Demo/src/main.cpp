@@ -25,7 +25,7 @@
 #include "Andromeda.h"
 
 
-#define POOL_SIZE 50
+#define POOL_SIZE 5
 
 
 int SlowTask()
@@ -215,7 +215,7 @@ int main(int argc, char** argv){
     And::EntityComponentSystem entity_comp;
     And::AddBasicComponents(entity_comp);
 
-    std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init(8192);
+    std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init(false, 8192);
 
     int num_obj = 10;
     float pos_x = 0.0f;
@@ -349,6 +349,8 @@ int main(int argc, char** argv){
   const float force = 100.0f;
   int frames = 0;
   float secondsToSpawn = 0.3f;
+
+  float fixed_update = 0.0f;
   while (window->is_open()){
        
     
@@ -356,6 +358,7 @@ int main(int argc, char** argv){
     g_renderer->new_frame();
     editor.ShowWindows();
     fps_count +=window->get_delta_time(); 
+    fixed_update +=window->get_delta_time(); 
 
     //if(input.IsMouseButtonPressed(And::MouseCode::Left)){
     //if(input.check_action(shot)){
@@ -392,12 +395,15 @@ int main(int argc, char** argv){
 
     if (fps_count > 0.1f) [[likely]] {
         physics_engine->Simulate(window->get_delta_time());
+        //if(fixed_update >= 0.25f){
+            //physics_engine->Simulate(fixed_update);
+        //}
     }
 
     physics_engine->Apply(entity_comp);
     
-    //g_renderer->draw_forward(entity_comp);
-    g_renderer->draw_deferred(entity_comp);
+    g_renderer->draw_forward(entity_comp);
+    //g_renderer->draw_deferred(entity_comp);
 
     
     frames++;

@@ -40,7 +40,7 @@ struct PhysicsEngineData {
 		physx::PxPvdSceneClient*			client;
 	};
 
-std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(unsigned int substeps){
+std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(bool executeOnGPU, unsigned int substeps){
 	
 	std::shared_ptr<PhysicsEngine> engine(new PhysicsEngine);
 	engine->m_physics_data = std::make_shared<PhysicsEngineData>();
@@ -79,7 +79,25 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(unsigned int substeps){
 	engine->m_physics_data->sceneDesc->cpuDispatcher = engine->m_physics_data->cpu_dispatcher;
 
 	engine->m_physics_data->sceneDesc->filterShader = physx::PxDefaultSimulationFilterShader;
+
+	// Flags
+	engine->m_physics_data->sceneDesc->flags |= physx::PxSceneFlag::eENABLE_PCM;
+
+	if (executeOnGPU) {
+		engine->m_physics_data->sceneDesc->flags |= physx::PxSceneFlag::eENABLE_GPU_DYNAMICS;
+	}
+	//engine->m_physics_data->sceneDesc->flags |= physx::PxSceneFlag::eENABLE_ACTIVE_ACTORS;
+	//engine->m_physics_data->sceneDesc->flags |= physx::PxSceneFlag::eEXCLUDE_KINEMATICS_FROM_ACTIVE_ACTORS;
+
+	// Estabiliza rigid bodys pero puedes perder el momentum (confirmado que si)
+	//engine->m_physics_data->sceneDesc->flags |= physx::PxSceneFlag::eENABLE_STABILIZATION;
+
+
+	//engine->m_physics_data->sceneDesc->flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
+
+
 	engine->m_physics_data->scene = engine->m_physics_data->physics->createScene(*(engine->m_physics_data->sceneDesc));
+
 
 	/*engine->m_physics_data->client = engine->m_physics_data->scene->getScenePvdClient();
 	if (!engine->m_physics_data->client) {
@@ -95,6 +113,10 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(unsigned int substeps){
 	engine->m_physics_data->material = engine->m_physics_data->physics->createMaterial(0.5f, 0.5f, 0.0f); // static friction, dynamic friction, restitution
 	physx::PxRigidStatic* groundPlane = PxCreatePlane(*(engine->m_physics_data->physics), physx::PxPlane(0.0f, 1.0f, 0.0f, 1.0f), *(engine->m_physics_data->material));
 	engine->m_physics_data->scene->addActor(*groundPlane);
+
+
+
+	
 	
 	return engine;
 }
