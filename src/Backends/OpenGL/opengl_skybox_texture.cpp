@@ -19,7 +19,7 @@ std::shared_ptr<OpenGLSkyBoxTexture> And::OpenGLSkyBoxTexture::CreateShared(cons
 
 		int width, height, nrChannels;
 		int TextureChannels = 0;
-		stbi_set_flip_vertically_on_load_thread(1);
+		stbi_set_flip_vertically_on_load_thread(0);
 		data = stbi_load(paths[i].c_str(), &width, &height, &nrChannels, STBI_default);
 
 		if (data) {

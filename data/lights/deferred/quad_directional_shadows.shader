@@ -134,19 +134,22 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normals){
 
 vec3 CalculeDirLight(DirectionalLight light, vec3 normal, vec3 viewDir) {
   
+  //vec3 dir = vec3(0.5, 0.5, 0.0);  
+
   /*---Difuse---*/
-  float diff = max(dot(normal, -light.direction), 0.0);
-  vec3 diffuse = diff * light.diffuse_color;
+  //float diff = max(dot(normal, dir), 0.0);
+  float diff = max(dot(normal, -light.direction), 0.0); // este -1 es un poco raro
+  vec3 diffuse = diff * light.diffuse_color;// * color_base.xyz;
 
   /*---Specular---*/
 
+  //vec3 reflectDir = normalize(reflect(-(dir), normalize(normal))  );
   vec3 reflectDir = normalize(reflect(-(light.direction), normalize(normal))  );
-  //vec3 reflectDir = reflect(-light.direction, normal);
   float spec = pow(max(dot(normalize(viewDir), normalize(reflectDir)), 0.0), light.specular_shininess);
-  vec3 specular = light.specular_strength * spec * light.specular_color;
+  vec3 specular = light.specular_strength * spec * light.specular_color;// * color_base.xyz;
 
-  //return ((diffuse + specular) * light.enabled);
-  return (diffuse * light.enabled);
+  //return (diffuse * light.enabled);
+  return (diffuse + specular * light.enabled);
 }
 
 void main(){

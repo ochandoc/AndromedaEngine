@@ -145,17 +145,21 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
 
   glBindVertexArray(m_skybox_vao);
   glBindBuffer(GL_ARRAY_BUFFER, m_skybox_vbo);
-  glBufferData(GL_ARRAY_BUFFER, (GLsizei)(m_skybox_mesh.GetNumVertices()), &(m_skybox_mesh.GetVertices()), GL_STATIC_DRAW);
-
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
   
-  glBindVertexArray(0);
+  int tmp = sizeof(m_skybox_mesh.GetVertices());
+
+
+  glBufferData(GL_ARRAY_BUFFER, (GLsizei)(m_skybox_mesh.GetNumVertices() * sizeof(Vertex)), &(m_skybox_mesh.GetVertices()[0]), GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+  //glEnableVertexAttribArray(1);
+  //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
+  //glEnableVertexAttribArray(2);
+  //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(6 * sizeof(float)));
+  
   glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
 
 
   // Create uniform buffers for lights
@@ -797,7 +801,8 @@ void RendererOpenGL::draw_shadows(PointLight* l, MeshComponent* obj, TransformCo
 void RendererOpenGL::DrawSkyBox(){
     if (m_skybox_enabled) [[likely]] {
         
-        glDepthMask(GL_FALSE);
+        //glDepthMask(GL_FALSE);
+        glDepthFunc(GL_LEQUAL);
         m_shader_skybox->Use();
         
         OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_skybox.get());
@@ -808,37 +813,44 @@ void RendererOpenGL::DrawSkyBox(){
         CameraBase* cam = &m_DefaultCamera;
         if (m_UserCamera) cam = m_UserCamera;
 
-        glm::mat4 viewMatrix = glm::make_mat4(cam->GetViewMatrix());
+        glm::mat4 viewMatrix = glm::mat4(glm::mat3(glm::make_mat4(cam->GetViewMatrix())));
         glm::mat4 projectionMatrix = glm::make_mat4(cam->GetProjectionMatrix());
         glm::mat4 modelMatrix(0.0f);
-        glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
+        glm::vec3 cam_pos(0.0f);
 
         UniformBlockMatrices matrices_tmp = { modelMatrix, viewMatrix, projectionMatrix, cam_pos };
         m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
         m_buffer_matrix->bind();
 
-        glBindTexture(GL_TEXTURE_CUBE_MAP, m_skybox_tex->GetTexture());
+        //tmp->SetMat4("view",viewMatrix);
+        //tmp->SetMat4("projection", projectionMatrix);
+
         
         glBindBuffer(GL_ARRAY_BUFFER, m_skybox_vbo);
         glBindVertexArray(m_skybox_vao);
 
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+        //glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_skybox_tex->GetTexture());
+
+        //glEnableVertexAttribArray(1);
+        //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(), (void*)(3 * sizeof(float)));
+        //glEnableVertexAttribArray(2);
+        //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(), (void*)(6 * sizeof(float)));
 
 
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glEnable(GL_DEPTH_TEST);
+        //glEnable(GL_CULL_FACE);
+        //glCullFace(GL_BACK);
+        //glEnable(GL_DEPTH_TEST);
         
         
         const std::vector<unsigned int>& indices = m_skybox_mesh.GetIndices();
         glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
 
-        glDepthMask(GL_TRUE);
+        //glDepthMask(GL_TRUE);
+        glDepthFunc(GL_LESS);
     }
 }
 
@@ -1035,9 +1047,9 @@ void RendererOpenGL::CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> ma
 
 void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 
-    glBlendFunc(GL_ONE, GL_ZERO);
-    DrawSkyBox();
+    
 
+    glBlendFunc(GL_ONE, GL_ZERO);
 
     std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
 
@@ -1235,6 +1247,8 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
         glBlendFunc(GL_ONE, GL_ONE);
     }
 
+    DrawSkyBox();
+
     ResetTransforms(entity);
     
 }
@@ -1243,7 +1257,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
 
   auto start_time = std::chrono::steady_clock::now();
 
-  DrawSkyBox();
+  
     
   // Geometry Passs
   m_gBuffer_->Activate();
@@ -1355,7 +1369,7 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
 
   //CheckTime(start_time, std::chrono::steady_clock::now(), "Lighting Pass: ");
 
-
+  DrawSkyBox();
 
   ResetTransforms(entity);
   

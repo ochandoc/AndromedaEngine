@@ -14,11 +14,10 @@ layout (std140, binding = 0) uniform UniformBlock{
   vec3 camera_position;
 };
 
-void main()
-{
-
-    TexCoords = position;
-    gl_Position = (projection * view * vec4(position, 1.0)).xyww;
+void main(){
+  TexCoords = position;
+  vec4 pos_tmp = projection * view * vec4(position, 1.0);
+  gl_Position = pos_tmp.xyww;
 }
 
 
@@ -27,6 +26,8 @@ void main()
 #version 430 core
 out vec4 FragColor;
 
+in vec3 TexCoords;
+
 layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
   mat4 view;
@@ -34,11 +35,10 @@ layout (std140, binding = 0) uniform UniformBlock{
   vec3 camera_position;
 };
 
-in vec3 TexCoords;
 
 uniform samplerCube skybox;
 
 void main()
 {    
-    FragColor = texture(skybox, TexCoords);
+  FragColor = texture(skybox, TexCoords);
 }

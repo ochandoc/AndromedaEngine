@@ -175,7 +175,7 @@ int main(int argc, char** argv){
     std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
     std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
-    std::vector<std::string> paths = { {"skybox/right.jpg"}, {"skybox/left.jpg"}, {"skybox/top.jpg"}, {"skybox/bottom.jpg"}, {"skybox/front.jpg"}, {"skybox/back.jpg"} };
+    std::vector<std::string> paths = { {"skybox/right.jpg"}, {"skybox/left.jpg"}, {"skybox/top.jpg"}, {"skybox/bottom.jpg"}, {"skybox/back.jpg"}, {"skybox/front.jpg"} };
     std::shared_ptr<And::SkyboxTexture> sky_box = And::MakeSkyboxTexture(paths);
     g_renderer->set_skybox_texture(sky_box);
     g_renderer->enable_skybox(true);
@@ -225,7 +225,7 @@ int main(int argc, char** argv){
     MC_fountain.MeshOBJ = And::Geometry::load("demo/obj/fountain.obj");
     And::MaterialComponent fountain_mat_comp;
     std::shared_ptr<And::Material> fountain_mat = std::make_shared<And::Material>();
-    fountain_mat->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+    fountain_mat->SetColor(0.353f, 0.698f, 1.0f, 1.0f);
     fountain_mat_comp.SetMaterial(fountain_mat);
     And::TransformComponent fountain_tran;
     fountain_tran.SetPosition(0.0f, 1.0f, 0.0f);
@@ -273,8 +273,8 @@ int main(int argc, char** argv){
 
   And::AmbientLight ambient;
   ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-  ambient.SetAmbientStrenght(0.3f);
-  //entity_comp.new_entity(ambient);
+  ambient.SetAmbientStrenght(0.1f);
+  entity_comp.new_entity(ambient);
 
   
 
@@ -283,10 +283,10 @@ int main(int argc, char** argv){
   directional.SetDirection(1.0f, -0.5f, 0.0f);
   directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
   directional.SetSpecularShininess(32.0f);
-  directional.SetSpecularStrength(1.0f);
+  directional.SetSpecularStrength(0.003f);
   directional.SetEnabled(true);
   directional.SetCastShadows(false);
-  //entity_comp.new_entity(directional);
+  entity_comp.new_entity(directional);
 
 
   And::PointLight point;
@@ -348,7 +348,7 @@ int main(int argc, char** argv){
   float fps_count = 0.0f;
   const float force = 100.0f;
   int frames = 0;
-  float secondsToSpawn = 3.0f;
+  float secondsToSpawn = 0.3f;
   while (window->is_open()){
        
     
@@ -396,8 +396,8 @@ int main(int argc, char** argv){
 
     physics_engine->Apply(entity_comp);
     
-    g_renderer->draw_forward(entity_comp);
-    //g_renderer->draw_deferred(entity_comp);
+    //g_renderer->draw_forward(entity_comp);
+    g_renderer->draw_deferred(entity_comp);
 
     
     frames++;
