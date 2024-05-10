@@ -14,6 +14,8 @@ namespace And
     void SetFixed(bool value);
     bool GetFixed();
 
+    void SetSpeed(const float speed);
+
   private:
     Input m_Input;
     Window& m_Window;

@@ -74,6 +74,8 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   m_DefaultCamera.SetFar(1000.0f);
   m_DefaultCamera.SetNear(0.1f);
 
+  m_skybox_enabled = false;
+
 
   set_clear_color(default_color);
   window.imgui_start();
@@ -124,12 +126,34 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   m_shader_quad_spot = MakeShader("lights/deferred/quad_spot.shader");
   m_shader_quad_point = MakeShader("lights/deferred/quad_point.shader");
 
+
   glGenVertexArrays(1, &m_quad_vao);
   glGenBuffers(1, &m_quad_vbo);
   glBindVertexArray(m_quad_vao);
   glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
   glBufferData(GL_ARRAY_BUFFER, (GLsizei)(sizeof(dMesh)), &dMesh[0], GL_STATIC_DRAW);
 
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+  m_shader_skybox = MakeShader("shaders/opengl/skybox.shader");
+  m_skybox_mesh = RawMesh::CreateSkybox();
+
+  glGenVertexArrays(1, &m_skybox_vao);
+  glGenBuffers(1, &m_skybox_vbo);
+
+  glBindVertexArray(m_skybox_vao);
+  glBindBuffer(GL_ARRAY_BUFFER, m_skybox_vbo);
+  glBufferData(GL_ARRAY_BUFFER, (GLsizei)(m_skybox_mesh.GetNumVertices()), &(m_skybox_mesh.GetVertices()), GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
+  
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -161,6 +185,19 @@ RendererOpenGL::~RendererOpenGL(){
 
 void RendererOpenGL::set_camera(CameraBase* cam){
     m_UserCamera = cam;
+}
+
+void RendererOpenGL::enable_skybox(bool value){
+    m_skybox_enabled = value;
+}
+
+void RendererOpenGL::set_skybox_texture(std::shared_ptr<SkyboxTexture> texture){
+
+    //1m_skybox_tex = std::make_shared<OpenGLSkyBoxTexture>(
+    
+    OpenGLSkyBoxTexture* tmp = static_cast<OpenGLSkyBoxTexture*>(texture.get());
+    m_skybox_tex = std::make_shared<OpenGLSkyBoxTexture>(*tmp);
+    
 }
 
 void RendererOpenGL::new_frame()
@@ -757,6 +794,54 @@ void RendererOpenGL::draw_shadows(PointLight* l, MeshComponent* obj, TransformCo
   draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));
 }
 
+void RendererOpenGL::DrawSkyBox(){
+    if (m_skybox_enabled) [[likely]] {
+        
+        glDepthMask(GL_FALSE);
+        m_shader_skybox->Use();
+        
+        OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_skybox.get());
+        m_skybox_tex->Activate(0);
+        tmp->SetTexture("skybox", 0);
+
+
+        CameraBase* cam = &m_DefaultCamera;
+        if (m_UserCamera) cam = m_UserCamera;
+
+        glm::mat4 viewMatrix = glm::make_mat4(cam->GetViewMatrix());
+        glm::mat4 projectionMatrix = glm::make_mat4(cam->GetProjectionMatrix());
+        glm::mat4 modelMatrix(0.0f);
+        glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
+
+        UniformBlockMatrices matrices_tmp = { modelMatrix, viewMatrix, projectionMatrix, cam_pos };
+        m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
+        m_buffer_matrix->bind();
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP, m_skybox_tex->GetTexture());
+        
+        glBindBuffer(GL_ARRAY_BUFFER, m_skybox_vbo);
+        glBindVertexArray(m_skybox_vao);
+
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
+
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glEnable(GL_DEPTH_TEST);
+        
+        
+        const std::vector<unsigned int>& indices = m_skybox_mesh.GetIndices();
+        glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+
+        glDepthMask(GL_TRUE);
+    }
+}
+
 void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffer, Light* light) {
 
     
@@ -950,10 +1035,13 @@ void RendererOpenGL::CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> ma
 
 void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 
+    glBlendFunc(GL_ONE, GL_ZERO);
+    DrawSkyBox();
+
+
     std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
 
     // Ambient light
-    glBlendFunc(GL_ONE, GL_ZERO);
     for(auto [light] : entity.get_components<AmbientLight>()){
 
       m_shader_ambient->Use();
@@ -1154,6 +1242,8 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
 
   auto start_time = std::chrono::steady_clock::now();
+
+  DrawSkyBox();
     
   // Geometry Passs
   m_gBuffer_->Activate();

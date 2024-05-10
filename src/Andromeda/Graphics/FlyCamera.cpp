@@ -86,3 +86,7 @@ void And::FlyCamera::ProcessInput()
 
   SetPosition(position.x, position.y, position.z);
 }
+
+void And::FlyCamera::SetSpeed(const float speed) {
+    m_Speed = speed;
+}

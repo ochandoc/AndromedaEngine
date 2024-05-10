@@ -23,6 +23,8 @@ namespace And
     Sampler2D,
     Sampler3D,
 
+    SamplerCube,
+
     UniformBlock,
   };
 

@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <assert.h>
 
-static const char* UniformTypesStr[] = { "float", "int", "vec2", "vec3", "vec4", "mat2", "mat3", "mat4", "sampler1D", "sampler2D", "sampler3D" };
+static const char* UniformTypesStr[] = { "float", "int", "vec2", "vec3", "vec4", "mat2", "mat3", "mat4", "sampler1D", "sampler2D", "sampler3D", "samplerCube"};
 
 namespace And
 {
@@ -204,16 +204,22 @@ namespace And
 
   void OpenGLShader::SetTexture(const std::string& Name, int8 Slot)
   {
-    assert(m_Uniforms.contains(Name));
-    assert(m_Uniforms[Name].Type == EUniformType::Sampler1D || 
-           m_Uniforms[Name].Type == EUniformType::Sampler2D || 
-           m_Uniforms[Name].Type == EUniformType::Sampler3D);
+    //assert(m_Uniforms.contains(Name));
+    //assert(m_Uniforms[Name].Type == EUniformType::Sampler1D || 
+           //m_Uniforms[Name].Type == EUniformType::Sampler2D || 
+           //m_Uniforms[Name].Type == EUniformType::Sampler3D);
 
-    int32 location = m_Uniforms[Name].Location;
+    int32 location = glGetUniformLocation(m_Id, Name.c_str());
+    if (location != -1)
+    {
+        glUniform1i(location, Slot);
+    }
+
+    /*int32 location = m_Uniforms[Name].Location;
     if (location != -1)
     {
       glUniform1i(location, Slot);
-    }
+    }*/
   }
 
   void OpenGLShader::SetTextureInArray(const std::string& Name, uint32 index, uint8 Slot)
@@ -365,7 +371,7 @@ namespace And
   EUniformType OpenGLShaderPreProcessor::GetUniformTypeFromString(const std::string& uniform)
   {
     // TODO (och): check the name if the uniform blocks contains a name of a type
-    const uint32 NumUniformTypesStr = 11;
+    const uint32 NumUniformTypesStr = 12;
 
     for (int i = 0; i < NumUniformTypesStr; ++i)
     {

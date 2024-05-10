@@ -14,6 +14,7 @@
 #include "Andromeda/Graphics/Lights/PointLight.h"
 #include "Andromeda/Graphics/Material.h"
 #include "Backends/OpenGL/OpenGLShader.h"
+#include "Backends/OpenGL/opengl_skybox_texture.h"
 
 #include "Andromeda/Graphics/Renderer.h"
 
@@ -31,6 +32,9 @@ namespace And{
         void set_viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) override;
         void set_clear_color(float* color) override;
         void set_camera(CameraBase* cam) override;
+
+        void enable_skybox(bool value);
+        virtual void set_skybox_texture(std::shared_ptr<SkyboxTexture> texture);
 
         void draw_forward(EntityComponentSystem& entity) override;
         void draw_deferred(EntityComponentSystem& entity) override;
@@ -52,6 +56,8 @@ namespace And{
         void draw_shadows(SpotLight* l, MeshComponent* obj, TransformComponent* tran);
         void draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran);
         void draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* dir);
+
+        void DrawSkyBox();
 
         void CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> mat);
         
@@ -93,6 +99,8 @@ namespace And{
         std::shared_ptr<Shader> m_shader_quad_spot;
         std::shared_ptr<Shader> m_shader_quad_point;
 
+        std::shared_ptr<Shader> m_shader_skybox;
+
         std::shared_ptr<UniformBuffer> m_buffer_matrix; // 208
         std::shared_ptr<UniformBuffer> m_buffer_matrix_pointLight; // 208 + 16 * 5
         std::shared_ptr<UniformBuffer> m_buffer_ambient_light; // 48
@@ -103,11 +111,6 @@ namespace And{
 
         Material m_material_default;
         Material m_material_error_default;
-
-
-        unsigned int m_quad_vao;
-        unsigned int m_quad_vbo;
-
 
         float dMesh[32] = {
           -1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 0.0f, // down-left
@@ -120,6 +123,18 @@ namespace And{
              0, 2, 1, 2, 0, 3
         };
 
+ 
+        unsigned int m_quad_vao;
+        unsigned int m_quad_vbo;
+ 
+        
+        RawMesh m_skybox_mesh;
+
+        unsigned int m_skybox_vao;
+        unsigned int m_skybox_vbo;
+
+        bool m_skybox_enabled;
+        std::shared_ptr<OpenGLSkyBoxTexture> m_skybox_tex;
 
 
     protected:

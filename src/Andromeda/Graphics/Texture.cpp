@@ -4,6 +4,7 @@
 
 #include "Backends/OpenGL/OpenGLTexture2D.h"
 #include "Backends/DirectX11/DirectX11SkyboxTexture.h"
+#include "Backends/OpenGL/opengl_skybox_texture.h"
 #include "Backends/DirectX11/DirectX11Texture2D.h"
 
 namespace And
@@ -41,7 +42,7 @@ namespace And
     switch (GetGraphicApiType())
     {
     case EGraphicsApiType::OpenGL:
-      return std::shared_ptr<SkyboxTexture>();
+        return OpenGLSkyBoxTexture::CreateShared(paths);
       break;
     case EGraphicsApiType::DirectX11:
       return DirectX11SkyboxTexture::CreateShared(paths);
