@@ -201,7 +201,7 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0){
 void main(){
 
   // Get textures
-  //vec3 frag_color = pow(texture(Frag_Color, uv).rgb, vec3(2.2));
+  //vec3 albedo = pow(texture(Frag_Color, uv).rgb, vec3(2.2));
   vec3 albedo = texture(Frag_Color, uv).rgb;
   vec3 N = texture(Frag_Normal, uv).rgb;
   vec3 frag_position = texture(Frag_Position, uv).rgb;
@@ -254,14 +254,11 @@ void main(){
   Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
   
 
+  //vec3 ambient = vec3(0.03) * albedo * ao;
   vec3 ambient = vec3(0.03) * albedo * ao;
   vec3 color = Lo + ambient;
   //vec3 color = Lo + (albedo * ao);
 
-  // HDR tonemapping
-  color = color / (color + vec3(1.0));
-  // gamma correct
-  color = pow(color, vec3(1.0/2.2)); 
 
 
 
@@ -274,7 +271,13 @@ void main(){
     shadow += ShadowCalculation(light_space_tmp, N, texShadow[i]);
   }
   color = (1.0 - shadow) * color;
+  //color.rgb += albedo * 0.1;
   
+  // HDR tonemapping
+  color = color / (color + vec3(1.0));
+  // gamma correct
+  color = pow(color, vec3(1.0/2.2)); 
+
   FragColor = vec4(color, 1.0);
   //FragColor = vec4(color.r + metallic, color.g + roughness, color.b + ambient_oclusion, 1.0);
 }

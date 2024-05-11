@@ -253,9 +253,9 @@ int main(int argc, char** argv){
     fountain_mat_comp.SetMaterial(fountain_mat);
 
     And::TransformComponent fountain_tran;
-    fountain_tran.SetPosition(0.0f, 0.0f, 0.0f);
+    fountain_tran.SetPosition(0.0f, -1.0f, 0.0f);
     fountain_tran.SetRotation(0.0f, 0.0f, 0.0f);
-    fountain_tran.SetScale(1.0f, 1.0f, 1.0f);
+    fountain_tran.SetScale(3.0f, 3.0f, 3.0f);
     entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran);
   
   
@@ -264,16 +264,16 @@ int main(int argc, char** argv){
   
     And::MaterialComponent suelo_mat_comp;
     std::shared_ptr<And::Material> suelo_mat = std::make_shared<And::Material>();
-    std::shared_ptr<And::Texture> suelo_tex = And::MakeTexture("demo/textures/suelo/albedo.png");
-    std::shared_ptr<And::Texture> suelo_normals = And::MakeTexture("demo/textures/suelo/normals.png");
-    std::shared_ptr<And::Texture> suelo_ao = And::MakeTexture("demo/textures/suelo/ao.png");
-    std::shared_ptr<And::Texture> suelo_metallic = And::MakeTexture("demo/textures/suelo/metallic.png");
-    std::shared_ptr<And::Texture> suelo_rou = And::MakeTexture("demo/textures/suelo/roughness.png");
-    suelo_mat->SetColorTexture(suelo_tex);
-    suelo_mat->SetNormalTexture(suelo_normals);
-    suelo_mat->SetAmbientOclusionTexture(suelo_ao);
-    suelo_mat->SetMetallicTexture(suelo_metallic);
-    suelo_mat->SetRoughnessTexture(suelo_rou);
+    std::shared_ptr<And::Texture> suelo_tex_b = And::MakeTexture("demo/textures/suelo_2/albedo.png");
+    std::shared_ptr<And::Texture> suelo_normals_b = And::MakeTexture("demo/textures/suelo_2/normals.png");
+    std::shared_ptr<And::Texture> suelo_ao_b = And::MakeTexture("demo/textures/suelo_2/ao.png");
+    std::shared_ptr<And::Texture> suelo_metallic_b = And::MakeTexture("demo/textures/suelo_2/metallic.png");
+    std::shared_ptr<And::Texture> suelo_rou_b = And::MakeTexture("demo/textures/suelo_2/roughness.png");
+    suelo_mat->SetColorTexture(suelo_tex_b);
+    suelo_mat->SetNormalTexture(suelo_normals_b);
+    suelo_mat->SetAmbientOclusionTexture(suelo_ao_b);
+    suelo_mat->SetMetallicTexture(suelo_metallic_b);
+    suelo_mat->SetRoughnessTexture(suelo_rou_b);
     suelo_mat_comp.SetMaterial(suelo_mat);
 
     And::TransformComponent suelo_tran;
@@ -291,7 +291,7 @@ int main(int argc, char** argv){
     const float suelo_scale = 20.0f;
     const int suelo_num = 2;
     suelo_tran.SetScale(suelo_scale, 1.0f, suelo_scale);
-   
+
    
     for (int j = -suelo_num; j < suelo_num; j++) {
 
@@ -303,15 +303,15 @@ int main(int argc, char** argv){
 
 
     And::MeshComponent MC_bolinga;
-    MC_bolinga.MeshOBJ = And::Geometry::load("cube.obj");
+    MC_bolinga.MeshOBJ = And::Geometry::load("sphere.obj");
 
     And::MaterialComponent bolinga_mat_comp;
     std::shared_ptr<And::Material> bolinga_mat = std::make_shared<And::Material>();
-    std::shared_ptr<And::Texture> bolinga_tex = And::MakeTexture("demo/textures/fuente/albedo.png");
-    std::shared_ptr<And::Texture> bolinga_normals = And::MakeTexture("demo/textures/fuente/normals.png");
-    std::shared_ptr<And::Texture> bolinga_ao = And::MakeTexture("demo/textures/fuente/ao.png");
-    std::shared_ptr<And::Texture> bolinga_metallic = And::MakeTexture("demo/textures/fuente/metallic.png");
-    std::shared_ptr<And::Texture> bolinga_rou = And::MakeTexture("demo/textures/fuente/roughness.png");
+    std::shared_ptr<And::Texture> bolinga_tex = And::MakeTexture("demo/textures/bola/albedo.png");
+    std::shared_ptr<And::Texture> bolinga_normals = And::MakeTexture("demo/textures/bola/normals.png");
+    std::shared_ptr<And::Texture> bolinga_ao = And::MakeTexture("demo/textures/bola/ao.png");
+    std::shared_ptr<And::Texture> bolinga_metallic = And::MakeTexture("demo/textures/bola/metallic.png");
+    std::shared_ptr<And::Texture> bolinga_rou = And::MakeTexture("demo/textures/bola/roughness.png");
     bolinga_mat->SetColorTexture(bolinga_tex);
     bolinga_mat->SetNormalTexture(bolinga_normals);
     bolinga_mat->SetAmbientOclusionTexture(bolinga_ao);
@@ -322,8 +322,10 @@ int main(int argc, char** argv){
     And::TransformComponent bolinga_tran; 
     bolinga_tran.SetPosition(5.0f, 3.0f, 0.0f);
     bolinga_tran.SetRotation(0.0f, 0.0f, 0.0f);
-    bolinga_tran.SetScale(2.0f, 2.0f, 2.0f);
+    bolinga_tran.SetScale(1.0f, 1.0f, 1.0f);
     entity_comp.new_entity(MC_bolinga, bolinga_mat_comp, bolinga_tran);
+
+
 
 
   
@@ -345,9 +347,9 @@ int main(int argc, char** argv){
   directional.SetCastShadows(false);
   //entity_comp.new_entity(directional);
 
-
+  float intensity = 300.0f;
   And::PointLight point;
-  point.SetPosition(7.0f, 24.0f, 0.0f);
+  point.SetPosition(7.0f, 14.0f, 0.0f);
   point.SetSpecularColor(1.0f, 1.0f, 1.0f);
   point.SetSpecularShininess(32.0f);
   point.SetSpecularStrength(0.003f);
@@ -356,6 +358,7 @@ int main(int argc, char** argv){
   point.SetQuadraticAtt(0.0075f);
   point.SetEnabled(true);
   point.SetCastShadows(true);
+  point.SetIntensity(200.0f);
   point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
   And::Entity* entity_tmp = entity_comp.new_entity(point);
   //And::PointLight* point_tmp = entity_tmp->get_component<And::PointLight>();

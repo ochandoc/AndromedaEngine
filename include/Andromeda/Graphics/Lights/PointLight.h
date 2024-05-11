@@ -58,7 +58,9 @@ class PointLight : public Light{
         void   GetLinearAtt(float& linear);
         float  GetQuadraticAtt();
         void   GetQuadraticAtt(float& quadratic);
-        
+
+        // This is only for pbr
+        void  SetIntensity(const float intensity);
         void  SetEnabled(bool e);
         void  SetDiffuseColor(float color[3]);
         void  SetDiffuseColor(float r, float g, float b);
@@ -71,5 +73,8 @@ class PointLight : public Light{
         void  SetConstantAtt(float constant);
         void  SetLinearAtt(float linear);
         void  SetQuadraticAtt(float quadratic);
+
+private:
+    float m_intensity = 1.0f;
 };
 }

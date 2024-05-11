@@ -78,20 +78,24 @@ void PointLight::SetPosition(float p[3]){
     }
 }
 
+void PointLight::SetIntensity(const float intensity){
+    m_intensity = intensity;
+}
+
 void PointLight::SetEnabled(bool e){
     e ? m_raw.enabled = 1.0f : m_raw.enabled = 0.0f;
 }
 
 void PointLight::SetDiffuseColor(float color[3]){
     for (int i = 0; i < 3; i++) {
-        m_raw.diffuse_color[i] = color[i];
+        m_raw.diffuse_color[i] = color[i] * m_intensity;
     }
 }
 
 void PointLight::SetDiffuseColor(float r, float g, float b){
-    m_raw.diffuse_color[0] = r;
-    m_raw.diffuse_color[1] = g;
-    m_raw.diffuse_color[2] = b;
+    m_raw.diffuse_color[0] = r * m_intensity;
+    m_raw.diffuse_color[1] = g * m_intensity;
+    m_raw.diffuse_color[2] = b * m_intensity;
 }
 
 void  PointLight::SetSpecularStrength(float strength){

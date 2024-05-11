@@ -1080,14 +1080,14 @@ void RendererOpenGL::RenderPBRLight(std::shared_ptr<And::RenderTarget> shadow_bu
     glEnable(GL_BLEND);
 
     upload_light(light);
-    //glDepthMask(GL_FALSE);
+    glDepthMask(GL_FALSE);
     glDrawElements(GL_TRIANGLES, (GLsizei)(sizeof(dMesh)), GL_UNSIGNED_INT, &dIndices[0]);
-    //glBlendFunc(GL_ONE, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, opengl_render_target->GetId());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(0, 0, m_Window.get_width(), m_Window.get_height(), 0, 0, m_Window.get_width(), m_Window.get_height(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //glDepthMask(GL_TRUE);
+    glDepthMask(GL_TRUE);
 }
 
 void RendererOpenGL::ResetTransforms(EntityComponentSystem& ecs) {

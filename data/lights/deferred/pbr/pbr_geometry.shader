@@ -102,6 +102,7 @@ void main()
 
   FragNormal = getNormalFromMap();
   FragColor.rgb =  pow(texture(texMaterial, s_texCoords).rgb, vec3(2.2));  
+  //FragColor.rgb = texture(texMaterial, s_texCoords).rgb;  
   FragColor.a = 1.0; // specular
 
 
