@@ -252,6 +252,10 @@ namespace And
   void DirectX11Renderer::draw_deferred(EntityComponentSystem& ecs){
   }
 
+  void DirectX11Renderer::draw_pbr(EntityComponentSystem& ecs)
+  {
+  }
+
   void DirectX11Renderer::SkyboxPass()
   {
     if (!m_Skybox.Enabled) return;
@@ -457,6 +461,8 @@ namespace And
   {
     return s_DeviceContext;
   }
+
+
 
 
 }

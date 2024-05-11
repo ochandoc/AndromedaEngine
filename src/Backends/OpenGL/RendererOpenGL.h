@@ -38,6 +38,7 @@ namespace And{
 
         void draw_forward(EntityComponentSystem& entity) override;
         void draw_deferred(EntityComponentSystem& entity) override;
+        void draw_pbr(EntityComponentSystem& entity) override;
 
     private:
         void draw_triangle(Triangle* t);
@@ -48,6 +49,7 @@ namespace And{
         void draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s, TransformComponent* tran, float* view, float* projection);
 
         void RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffer, Light* light);
+        void RenderPBRLight(std::shared_ptr<And::RenderTarget> shadow_buffer, Light* light);
 
         void upload_light(Light* l);
 
@@ -60,6 +62,7 @@ namespace And{
         void DrawSkyBox();
 
         void CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> mat);
+        void CheckPBRMaterial(OpenGLShader* s, std::shared_ptr<Material> mat);
         
         void ResetTransforms(EntityComponentSystem& ecs);
 
@@ -99,6 +102,10 @@ namespace And{
         std::shared_ptr<Shader> m_shader_quad_spot;
         std::shared_ptr<Shader> m_shader_quad_point;
 
+        // PBR Shaders
+        std::shared_ptr<Shader> m_shader_pbr_geometry;
+        std::shared_ptr<Shader> m_shader_quad_point_pbr;
+
         std::shared_ptr<Shader> m_shader_skybox;
 
         std::shared_ptr<UniformBuffer> m_buffer_matrix; // 208
@@ -124,7 +131,6 @@ namespace And{
         };
 
  
-        unsigned int m_quad_vao;
         unsigned int m_quad_vbo;
  
         

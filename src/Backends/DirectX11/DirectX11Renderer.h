@@ -37,6 +37,7 @@ namespace And
 
     virtual void draw_forward(EntityComponentSystem& ecs) override;
     virtual void draw_deferred(EntityComponentSystem& ecs) override;
+    virtual void draw_pbr(EntityComponentSystem& ecs) override;
 
     virtual void enable_skybox(bool value) override;
     virtual void set_skybox_texture(std::shared_ptr<SkyboxTexture> texture) override;

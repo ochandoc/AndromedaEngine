@@ -92,7 +92,7 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   info.Formats.push_back(ETextureFormat::RGB16F); // Posicion
   info.Formats.push_back(ETextureFormat::RGB16F); // Normales
   info.Formats.push_back(ETextureFormat::RGBA8);  // Color
-  info.Formats.push_back(ETextureFormat::RGBA16F);  // Metallic, Roughness & Ambien Oclusion
+  info.Formats.push_back(ETextureFormat::RGB16F);  // Metallic, Roughness & Ambien Oclusion
   m_gBuffer_ = MakeRenderTarget(info);
 
   info.Formats.clear();
@@ -116,7 +116,7 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   m_shader_shadows_spot = MakeShader("lights/spot_shadows.shader");
 
   // Deferred shaders
-  m_shader_geometry = MakeShader("default/geometry.shader");
+  m_shader_geometry = MakeShader("lights/deferred/geometry.shader");
   m_shader_quad_directional_shadows = MakeShader("lights/deferred/quad_directional_shadows.shader");
   m_shader_quad_ambient = MakeShader("lights/deferred/quad_ambient.shader");
   m_shader_quad_spot_shadows = MakeShader("lights/deferred/quad_spot_shadows.shader");
@@ -126,10 +126,11 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   m_shader_quad_spot = MakeShader("lights/deferred/quad_spot.shader");
   m_shader_quad_point = MakeShader("lights/deferred/quad_point.shader");
 
+  m_shader_pbr_geometry = MakeShader("lights/deferred/pbr/pbr_geometry.shader");
+  m_shader_quad_point_pbr = MakeShader("lights/deferred/pbr/pbr_quad_point_shadows.shader");
 
-  glGenVertexArrays(1, &m_quad_vao);
+
   glGenBuffers(1, &m_quad_vbo);
-  glBindVertexArray(m_quad_vao);
   glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
   glBufferData(GL_ARRAY_BUFFER, (GLsizei)(sizeof(dMesh)), &dMesh[0], GL_STATIC_DRAW);
 
@@ -790,7 +791,7 @@ void RendererOpenGL::draw_shadows(PointLight* l, MeshComponent* obj, TransformCo
 
   float fov_radians = glm::radians(90.0f);
   float aspect_ratio = (float)width / (float)height;
-  float near = 10.0f;
+  float near = 10.0f; // Si lo bajo de 10, la textura de depth sale toda blanca
   float far = 310.0f;
   
   glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);
@@ -857,7 +858,11 @@ void RendererOpenGL::DrawSkyBox(){
 void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffer, Light* light) {
 
     
-    bool cast_shadows = light->GetCastShadows();
+    bool cast_shadows = false;
+
+    if (light) {
+        cast_shadows = light->GetCastShadows();
+    }
 
     std::vector<std::shared_ptr<Texture>> tex_gbuffer = m_gBuffer_->GetTextures();
     OpenGLTexture2D* position_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[0].get());
@@ -913,8 +918,6 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     tmp->SetTexture("Frag_Color", 2);
     color_tex->Activate(2);
     
-    tmp->SetTexture("Met_Roug_Ao", 3);
-    color_tex->Activate(3);
 
     if (cast_shadows) {
 
@@ -946,7 +949,123 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     }
 
 
-    glBindVertexArray(m_quad_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex ), (void*)(6 * sizeof(float)));
+
+    OpenGLRenderTarget* opengl_render_target = static_cast<OpenGLRenderTarget*>(m_gBuffer_.get());
+
+    glEnable(GL_BLEND);
+
+    upload_light(light);
+    //glDepthMask(GL_FALSE);
+    //glBlendFunc(GL_ONE, GL_ONE);
+    glDrawElements(GL_TRIANGLES, (GLsizei)(sizeof(dMesh)), GL_UNSIGNED_INT, &dIndices[0]);
+
+
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, opengl_render_target->GetId());
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+    glBlitFramebuffer(0, 0, m_Window.get_width(), m_Window.get_height(), 0, 0, m_Window.get_width(), m_Window.get_height(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //glDepthMask(GL_TRUE);
+}
+
+void RendererOpenGL::RenderPBRLight(std::shared_ptr<And::RenderTarget> shadow_buffer, Light* light){
+
+    bool cast_shadows = light->GetCastShadows();
+
+    std::vector<std::shared_ptr<Texture>> tex_gbuffer = m_gBuffer_->GetTextures();
+    OpenGLTexture2D* position_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[0].get());
+    OpenGLTexture2D* normal_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[1].get());
+    OpenGLTexture2D* color_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[2].get());
+    OpenGLTexture2D* met_rog_au= static_cast<OpenGLTexture2D*>(tex_gbuffer[3].get());
+
+
+    OpenGLShader* tmp;
+
+    DirectionalLight* directional = dynamic_cast<DirectionalLight*>(light);
+    if (directional) {
+
+        if (cast_shadows) {
+            tmp = static_cast<OpenGLShader*>(m_shader_quad_directional_shadows.get());
+        }
+        else {
+            tmp = static_cast<OpenGLShader*>(m_shader_quad_directional.get());
+        }
+    }
+
+    SpotLight* spot = dynamic_cast<SpotLight*>(light);
+    if (spot) {
+        if (cast_shadows) {
+            tmp = static_cast<OpenGLShader*>(m_shader_quad_spot_shadows.get());
+        }
+        else {
+            tmp = static_cast<OpenGLShader*>(m_shader_quad_spot.get());
+        }
+    }
+
+    PointLight* point = dynamic_cast<PointLight*>(light);
+    if (point) {
+        tmp = static_cast<OpenGLShader*>(m_shader_quad_point_pbr.get());
+        //if (cast_shadows) { }else { tmp = static_cast<OpenGLShader*>(m_shader_quad_point.get());}
+    }
+
+    AmbientLight* ambient = dynamic_cast<AmbientLight*>(light);
+    if (ambient) {
+        tmp = static_cast<OpenGLShader*>(m_shader_quad_ambient.get());
+    }
+
+
+    // posicion, normal, color
+    tmp->Use();
+
+    tmp->SetTexture("Frag_Position", 0);
+    position_tex->Activate(0);
+
+    tmp->SetTexture("Frag_Normal", 1);
+    normal_tex->Activate(1);
+
+    tmp->SetTexture("Frag_Color", 2);
+    color_tex->Activate(2);
+
+    tmp->SetTexture("Met_Roug_Ao", 3);
+    met_rog_au->Activate(3);
+
+    if (cast_shadows) {
+
+        if (!point) {
+
+            // Shadows ambient or spot
+            std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
+            OpenGLTexture2D* tex_shadow = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+
+            tmp->SetTexture("texShadow", 4);
+            tex_shadow->Activate(4);
+        } else {
+
+            // Shadows point
+            int index = 4;
+            int index_array_shadows = 0;
+            std::vector<std::shared_ptr<And::RenderTarget>> render_targets = get_shadow_buffer_pointLight();
+            for (auto& target : render_targets) {
+
+                std::vector<std::shared_ptr<And::Texture>> shadow_texture = target->GetTextures();
+                OpenGLTexture2D* tex_shadows = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
+                //tmp->Use();
+                tmp->SetTextureInArray("texShadow", index_array_shadows, index);
+                tex_shadows->Activate(index);
+                index++;
+                index_array_shadows++;
+            }
+        }
+    }
+
     glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
 
     glEnableVertexAttribArray(0);
@@ -961,15 +1080,14 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     glEnable(GL_BLEND);
 
     upload_light(light);
-    glBindVertexArray(m_quad_vao);
-    glDepthMask(GL_FALSE);
+    //glDepthMask(GL_FALSE);
     glDrawElements(GL_TRIANGLES, (GLsizei)(sizeof(dMesh)), GL_UNSIGNED_INT, &dIndices[0]);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glBlendFunc(GL_ONE, GL_ONE);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, opengl_render_target->GetId());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(0, 0, m_Window.get_width(), m_Window.get_height(), 0, 0, m_Window.get_width(), m_Window.get_height(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDepthMask(GL_TRUE);
+    //glDepthMask(GL_TRUE);
 }
 
 void RendererOpenGL::ResetTransforms(EntityComponentSystem& ecs) {
@@ -995,25 +1113,48 @@ void RendererOpenGL::CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> ma
             s->SetInt("m_use_texture", 0);
         }
 
+    }else {
+
+        // Default texture if not material seted
+        s->SetInt("m_use_texture", 1);
+        static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
+        s->SetTexture("texMaterial", 0);
+    }
+
+}
+
+void RendererOpenGL::CheckPBRMaterial(OpenGLShader* s, std::shared_ptr<Material> mat){
+
+    //MaterialComponent m_tmp = mat-> 
+    if (mat.get()) {
+        OpenGLTexture2D* t = static_cast<OpenGLTexture2D*>(mat->GetColorTexture().get());
+        if (t) {
+            t->Activate(0);
+            s->SetTexture("texMaterial", 0);
+            s->SetInt("m_use_texture", 1);
+        }else {
+            // Si no tiene textura, uso el color
+            //static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
+            s->SetVec4("m_albedoColor", glm::make_vec4(mat->GetColor()));
+            s->SetInt("m_use_texture", 0);
+        }
+
         OpenGLTexture2D* t_normal = static_cast<OpenGLTexture2D*>(mat->GetNormalTexture().get());
         if (t_normal) {
             t_normal->Activate(1);
             s->SetTexture("texNormal", 1);
-            s->SetInt("m_use_normal_texture", 1);
         }
-        else {
-            s->SetInt("m_use_normal_texture", 0);
-        }
+        
 
         OpenGLTexture2D* t_specular = static_cast<OpenGLTexture2D*>(mat->GetSpecularTexture().get());
         if (t_specular) {
             t_specular->Activate(2);
             s->SetTexture("texSpecular", 2);
-            s->SetInt("m_use_specular_texture", 1);
+            //s->SetInt("m_use_specular_texture", 1);
         }
-        else {
-            s->SetInt("m_use_specular_texture", 0);
-        }
+        //else {
+            //s->SetInt("m_use_specular_texture", 0);
+        //}
 
         OpenGLTexture2D* t_metallic = static_cast<OpenGLTexture2D*>(mat->GetMetallicTexture().get());
         if (t_metallic) {
@@ -1034,15 +1175,13 @@ void RendererOpenGL::CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> ma
         }
 
 
-    }
-    else {
+    }else {
 
         // Default texture if not material seted
         s->SetInt("m_use_texture", 1);
         static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
         s->SetTexture("texMaterial", 0);
     }
-
 }
 
 void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
@@ -1256,7 +1395,7 @@ void RendererOpenGL::draw_forward(EntityComponentSystem& entity){
 void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
 
   auto start_time = std::chrono::steady_clock::now();
-
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   
     
   // Geometry Passs
@@ -1373,6 +1512,127 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
 
   ResetTransforms(entity);
   
+}
+
+void RendererOpenGL::draw_pbr(EntityComponentSystem& entity){
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    
+    // Geometry Passs
+    m_gBuffer_->Activate();
+
+    // Le decimos el color attachment que vamos a usar en este framebuffer para el render
+    unsigned int attachments[4] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
+    glDrawBuffers(4, attachments);
+
+    m_shader_pbr_geometry->Use();
+    OpenGLShader* s_tmp = static_cast<OpenGLShader*>(m_shader_pbr_geometry.get());
+    glDisable(GL_BLEND);
+    for (auto [transform, obj] : entity.get_components<TransformComponent, MeshComponent>()) {
+        //obj->MeshOBJ->UseTexture(0);
+        MaterialComponent* mat = obj->GetOwner()->get_component<MaterialComponent>();
+        std::shared_ptr<Material> mat_tmp;
+        if (mat) {
+            mat_tmp = mat->GetMaterial();
+        }
+
+        OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_pbr_geometry.get());
+        tmp->Use();
+
+        //auto start_time_material = std::chrono::steady_clock::now();
+        CheckPBRMaterial(tmp, mat_tmp);
+        //CheckTime(start_time_material, std::chrono::steady_clock::now(), "Check Material: ");
+
+        //auto start_time_draw = std::chrono::steady_clock::now();
+        draw_obj(obj, nullptr, transform);
+        //CheckTime(start_time_draw, std::chrono::steady_clock::now(), "*** Draw OBJ TOTAL *** : ");
+    }
+    m_gBuffer_->Desactivate();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //CheckTime(start_time, std::chrono::steady_clock::now(), "Geometry Pass: ");
+
+
+    //start_time = std::chrono::steady_clock::now();
+    // Lighting Pass
+
+    // Ambient light
+    glBlendFunc(GL_ONE, GL_ZERO);
+    for (auto [light] : entity.get_components<AmbientLight>()) {
+        RenderLight(nullptr, light);
+        glBlendFunc(GL_ONE, GL_ONE);
+    }
+
+    // Shadows directional
+    std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
+    for (auto [light] : entity.get_components<DirectionalLight>()) {
+        shadow_buffer->Activate();
+        glDisable(GL_BLEND);
+        if (light->GetCastShadows()) {
+            // Por cada luz que castea sombras guardamos textura de profundidad
+            for (auto [transform, obj] : entity.get_components<TransformComponent, MeshComponent>()) {
+                draw_shadows(light, obj, transform);
+            }
+        }
+        shadow_buffer->Desactivate();
+        glEnable(GL_BLEND);
+
+
+        // Render Directional
+        RenderPBRLight(shadow_buffer, light);
+        glBlendFunc(GL_ONE, GL_ONE);
+
+
+    }
+
+    // Shadows spot
+    for (auto [light] : entity.get_components<SpotLight>()) {
+        shadow_buffer->Activate();
+        glDisable(GL_BLEND);
+        if (light->GetCastShadows()) {
+            // Por cada luz que castea sombras guardamos textura de profundidad
+            for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+                draw_shadows(light, obj, transform);
+            }
+        }
+        shadow_buffer->Desactivate();
+        glEnable(GL_BLEND);
+
+        // Render spot
+        RenderPBRLight(shadow_buffer, light);
+        glBlendFunc(GL_ONE, GL_ONE);
+    }
+
+    // Shadows point
+    std::vector<std::shared_ptr<And::RenderTarget>> render_targets = get_shadow_buffer_pointLight();
+    for (auto [light] : entity.get_components<PointLight>()) {
+        glDisable(GL_BLEND);
+        if (light->GetCastShadows()) {
+            int index = 0;
+            for (auto& target : render_targets) {
+                target->Activate();
+                // Por cada luz que castea sombras guardamos textura de profundidad, aqui hay que hacerlo en 6 shadow buffers, uno por cada cara de la point
+                for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+                    draw_shadows(light, obj, transform, glm::value_ptr(m_directions->dir[index]));
+                }
+                index++;
+                target->Desactivate();
+            }
+        }
+        glEnable(GL_BLEND);
+
+        // Render point
+        RenderPBRLight(nullptr, light);
+        glBlendFunc(GL_ONE, GL_ONE);
+    }
+
+    //CheckTime(start_time, std::chrono::steady_clock::now(), "Lighting Pass: ");
+
+    DrawSkyBox();
+
+    ResetTransforms(entity);
+
 }
 
 }

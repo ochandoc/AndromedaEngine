@@ -71,6 +71,7 @@ namespace And
 
     virtual void draw_forward(EntityComponentSystem& entity) = 0;
     virtual void draw_deferred(EntityComponentSystem& entity) = 0;
+    virtual void draw_pbr(EntityComponentSystem& entity) = 0;
 
     virtual void enable_skybox(bool value) {}
     virtual void set_skybox_texture(std::shared_ptr<SkyboxTexture> texture) {}

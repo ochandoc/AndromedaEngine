@@ -140,7 +140,20 @@ void CreateBallsPool(And::Entity* e[], std::shared_ptr<And::PhysicsEngine> engin
         MC.MeshOBJ = And::Geometry::load("demo/obj/sphere.obj");
         And::MaterialComponent mat_comp;
         std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/bola/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/bola/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/bola/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/bola/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/bola/roughness.png");
+        
         mat->SetColor(0.2f, 0.2f, 1.0f, 1.0f);
+        mat->SetColor(0.353f, 0.698f, 1.0f, 1.0f);
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+
         mat_comp.SetMaterial(mat);
         And::TransformComponent tran;
         tran.SetPosition(pos);
@@ -182,7 +195,7 @@ int main(int argc, char** argv){
 
 
     And::FlyCamera fly_cam{*window};
-    fly_cam.SetPosition(0.0f, 0.0f, 0.0f);
+    fly_cam.SetPosition(-5.0f, 0.0f, 0.0f);
     fly_cam.SetSize(1920.0f, 1080.0f);
 
     fly_cam.SetFar(1000.0f);
@@ -225,10 +238,22 @@ int main(int argc, char** argv){
     MC_fountain.MeshOBJ = And::Geometry::load("demo/obj/fountain.obj");
     And::MaterialComponent fountain_mat_comp;
     std::shared_ptr<And::Material> fountain_mat = std::make_shared<And::Material>();
+
+    std::shared_ptr<And::Texture> fuente_tex = And::MakeTexture("demo/textures/fuente/albedo.png");
+    std::shared_ptr<And::Texture> fuente_normals = And::MakeTexture("demo/textures/fuente/normals.png");
+    std::shared_ptr<And::Texture> fuente_ao = And::MakeTexture("demo/textures/fuente/ao.png");
+    std::shared_ptr<And::Texture> fuente_metallic = And::MakeTexture("demo/textures/fuente/metallic.png");
+    std::shared_ptr<And::Texture> fuente_rou = And::MakeTexture("demo/textures/fuente/roughness.png");
     fountain_mat->SetColor(0.353f, 0.698f, 1.0f, 1.0f);
+    fountain_mat->SetColorTexture(fuente_tex);
+    fountain_mat->SetNormalTexture(fuente_normals);
+    fountain_mat->SetAmbientOclusionTexture(fuente_ao);
+    fountain_mat->SetMetallicTexture(fuente_metallic);
+    fountain_mat->SetRoughnessTexture(fuente_rou);
     fountain_mat_comp.SetMaterial(fountain_mat);
+
     And::TransformComponent fountain_tran;
-    fountain_tran.SetPosition(0.0f, 1.0f, 0.0f);
+    fountain_tran.SetPosition(0.0f, 0.0f, 0.0f);
     fountain_tran.SetRotation(0.0f, 0.0f, 0.0f);
     fountain_tran.SetScale(1.0f, 1.0f, 1.0f);
     entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran);
@@ -241,12 +266,18 @@ int main(int argc, char** argv){
     std::shared_ptr<And::Material> suelo_mat = std::make_shared<And::Material>();
     std::shared_ptr<And::Texture> suelo_tex = And::MakeTexture("demo/textures/suelo/albedo.png");
     std::shared_ptr<And::Texture> suelo_normals = And::MakeTexture("demo/textures/suelo/normals.png");
+    std::shared_ptr<And::Texture> suelo_ao = And::MakeTexture("demo/textures/suelo/ao.png");
+    std::shared_ptr<And::Texture> suelo_metallic = And::MakeTexture("demo/textures/suelo/metallic.png");
+    std::shared_ptr<And::Texture> suelo_rou = And::MakeTexture("demo/textures/suelo/roughness.png");
     suelo_mat->SetColorTexture(suelo_tex);
-    //suelo_mat->SetNormalTexture(suelo_normals);
+    suelo_mat->SetNormalTexture(suelo_normals);
+    suelo_mat->SetAmbientOclusionTexture(suelo_ao);
+    suelo_mat->SetMetallicTexture(suelo_metallic);
+    suelo_mat->SetRoughnessTexture(suelo_rou);
     suelo_mat_comp.SetMaterial(suelo_mat);
 
     And::TransformComponent suelo_tran;
-    suelo_tran.SetPosition(-20.0f, 0.0f, 0.0f);
+    suelo_tran.SetPosition(-5.0f, 0.0f, 0.0f);
     suelo_tran.SetRotation(0.0f, 0.0f, 3.1415f / 2.0f);
     suelo_tran.SetScale(10.0f, 1.0f, 10.0f);
     entity_comp.new_entity(MC_suelo, suelo_mat_comp, suelo_tran);
@@ -269,12 +300,38 @@ int main(int argc, char** argv){
             entity_comp.new_entity(MC_suelo, suelo_mat_comp, suelo_tran);
         }
     }
+
+
+    And::MeshComponent MC_bolinga;
+    MC_bolinga.MeshOBJ = And::Geometry::load("cube.obj");
+
+    And::MaterialComponent bolinga_mat_comp;
+    std::shared_ptr<And::Material> bolinga_mat = std::make_shared<And::Material>();
+    std::shared_ptr<And::Texture> bolinga_tex = And::MakeTexture("demo/textures/fuente/albedo.png");
+    std::shared_ptr<And::Texture> bolinga_normals = And::MakeTexture("demo/textures/fuente/normals.png");
+    std::shared_ptr<And::Texture> bolinga_ao = And::MakeTexture("demo/textures/fuente/ao.png");
+    std::shared_ptr<And::Texture> bolinga_metallic = And::MakeTexture("demo/textures/fuente/metallic.png");
+    std::shared_ptr<And::Texture> bolinga_rou = And::MakeTexture("demo/textures/fuente/roughness.png");
+    bolinga_mat->SetColorTexture(bolinga_tex);
+    bolinga_mat->SetNormalTexture(bolinga_normals);
+    bolinga_mat->SetAmbientOclusionTexture(bolinga_ao);
+    bolinga_mat->SetMetallicTexture(bolinga_metallic);
+    bolinga_mat->SetRoughnessTexture(bolinga_rou);
+    bolinga_mat_comp.SetMaterial(bolinga_mat);
+
+    And::TransformComponent bolinga_tran; 
+    bolinga_tran.SetPosition(5.0f, 3.0f, 0.0f);
+    bolinga_tran.SetRotation(0.0f, 0.0f, 0.0f);
+    bolinga_tran.SetScale(2.0f, 2.0f, 2.0f);
+    entity_comp.new_entity(MC_bolinga, bolinga_mat_comp, bolinga_tran);
+
+
   
 
   And::AmbientLight ambient;
   ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-  ambient.SetAmbientStrenght(0.1f);
-  entity_comp.new_entity(ambient);
+  ambient.SetAmbientStrenght(0.5f);
+  //entity_comp.new_entity(ambient);
 
   
 
@@ -286,21 +343,21 @@ int main(int argc, char** argv){
   directional.SetSpecularStrength(0.003f);
   directional.SetEnabled(true);
   directional.SetCastShadows(false);
-  entity_comp.new_entity(directional);
+  //entity_comp.new_entity(directional);
 
 
   And::PointLight point;
-  point.SetPosition(0.0f, 3.0f, 0.0f);
+  point.SetPosition(7.0f, 24.0f, 0.0f);
   point.SetSpecularColor(1.0f, 1.0f, 1.0f);
-  point.SetSpecularShininess(2.0f);
+  point.SetSpecularShininess(32.0f);
   point.SetSpecularStrength(0.003f);
-  point.SetLinearAtt(0.014f);
-  point.SetQuadraticAtt(0.0007f);
-  point.SetLinearAtt(1.0f);
+  point.SetConstantAtt(1.0f);
+  point.SetLinearAtt(0.045f);
+  point.SetQuadraticAtt(0.0075f);
   point.SetEnabled(true);
-  point.SetCastShadows(false);
-  point.SetDiffuseColor(1.0f, 0.0f, 0.0f);
-  //And::Entity* entity_tmp = entity_comp.new_entity(point);
+  point.SetCastShadows(true);
+  point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+  And::Entity* entity_tmp = entity_comp.new_entity(point);
   //And::PointLight* point_tmp = entity_tmp->get_component<And::PointLight>();
 
   std::shared_ptr<And::Geometry> geo = And::Geometry::load("cube.obj");
@@ -348,7 +405,7 @@ int main(int argc, char** argv){
   float fps_count = 0.0f;
   const float force = 100.0f;
   int frames = 0;
-  float secondsToSpawn = 0.3f;
+  float secondsToSpawn = 3.0f;
 
   float fixed_update = 0.0f;
   while (window->is_open()){
@@ -370,6 +427,7 @@ int main(int argc, char** argv){
     //printf("Position-> Y: %f\n", std::abs(cosf(fps_count) * 3.0f));
 
     fly_cam.ProcessInput();
+    fly_cam.ShowValues();
 
 
 
@@ -402,9 +460,9 @@ int main(int argc, char** argv){
 
     physics_engine->Apply(entity_comp);
     
-    g_renderer->draw_forward(entity_comp);
+    //g_renderer->draw_forward(entity_comp);
     //g_renderer->draw_deferred(entity_comp);
-
+    g_renderer->draw_pbr(entity_comp);
     
     frames++;
     g_renderer->end_frame();

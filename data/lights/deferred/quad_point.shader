@@ -122,7 +122,7 @@ void main(){
   float roughness = stacked.g;
   float ambient_oclusion = stacked.b;
 
-  vec3 view_direction = normalize(camera_pos - frag_position);
+  vec3 view_direction = normalize(camera_position - frag_position);
   
 
   //vec3 color = vec3(0.0, 0.0, 0.0);
