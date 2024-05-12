@@ -128,7 +128,8 @@ static void ThrowBall(And::Entity* pool[], int index) {
 
 }
 
-void CreateBallsPool(And::Entity* e[], std::shared_ptr<And::PhysicsEngine> engine, And::EntityComponentSystem& entity_comp) {
+
+void CreateBallsPool(And::Entity* e[], std::shared_ptr<And::PhysicsEngine> engine, And::EntityComponentSystem& entity_comp, And::MaterialComponent& mat_comp) {
     for (int i = 0; i < POOL_SIZE; i++) {
         float pos[3] = { i * 2.0f , 0.0f, 0.0f };
 
@@ -138,23 +139,8 @@ void CreateBallsPool(And::Entity* e[], std::shared_ptr<And::PhysicsEngine> engin
 
         And::MeshComponent MC;
         MC.MeshOBJ = And::Geometry::load("demo/obj/sphere.obj");
-        And::MaterialComponent mat_comp;
-        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
-        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/bola/albedo.png");
-        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/bola/normals.png");
-        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/bola/ao.png");
-        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/bola/metallic.png");
-        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/bola/roughness.png");
-        
-        mat->SetColor(0.2f, 0.2f, 1.0f, 1.0f);
-        mat->SetColor(0.353f, 0.698f, 1.0f, 1.0f);
-        mat->SetColorTexture(tex);
-        mat->SetNormalTexture(normals);
-        mat->SetAmbientOclusionTexture(ao);
-        mat->SetMetallicTexture(metallic);
-        mat->SetRoughnessTexture(rou);
 
-        mat_comp.SetMaterial(mat);
+
         And::TransformComponent tran;
         tran.SetPosition(pos);
         tran.SetRotation(0.0f, 0.0f, 0.0f);
@@ -332,8 +318,8 @@ int main(int argc, char** argv){
 
   And::AmbientLight ambient;
   ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-  ambient.SetAmbientStrenght(0.5f);
-  //entity_comp.new_entity(ambient);
+  ambient.SetAmbientStrenght(0.1f);
+  And::Entity* ambient_entity = entity_comp.new_entity(ambient);
 
   
 
@@ -361,7 +347,7 @@ int main(int argc, char** argv){
   point.SetIntensity(200.0f);
   point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
   And::Entity* entity_tmp = entity_comp.new_entity(point);
-  //And::PointLight* point_tmp = entity_tmp->get_component<And::PointLight>();
+  And::PointLight* point_tmp = entity_tmp->get_component<And::PointLight>();
 
   std::shared_ptr<And::Geometry> geo = And::Geometry::load("cube.obj");
   float position_tmp[3] = {-1.0f, 20.0f, -15.0f};
@@ -371,11 +357,32 @@ int main(int argc, char** argv){
   And::Input input{ *window };
   And::ActionInput jump{ "Jump", And::KeyState::Press, { And::KeyCode::Space} };
   And::ActionInput shot{ "Shot", And::KeyState::Press, { And::KeyCode::C} };
+  And::ActionInput changePoint{ "ChangePoint", And::KeyState::Press, { And::KeyCode::P} };
 
   And::Entity* balls_pool[POOL_SIZE];
   int index_pool = 0;
 
-  CreateBallsPool(balls_pool, physics_engine, entity_comp);
+
+  And::MaterialComponent mat_comp;
+  std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+  std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/bola/albedo.png");
+  std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/bola/normals.png");
+  std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/bola/ao.png");
+  std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/bola/metallic.png");
+  std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/bola/roughness.png");
+
+
+  mat->SetColor(0.2f, 0.2f, 1.0f, 1.0f);
+  mat->SetColor(0.353f, 0.698f, 1.0f, 1.0f);
+  mat->SetColorTexture(tex);
+  mat->SetNormalTexture(normals);
+  mat->SetAmbientOclusionTexture(ao);
+  mat->SetMetallicTexture(metallic);
+  mat->SetRoughnessTexture(rou);
+
+  mat_comp.SetMaterial(mat);
+
+  //CreateBallsPool(balls_pool, physics_engine, entity_comp, mat_comp);
 
 
 
@@ -425,6 +432,15 @@ int main(int argc, char** argv){
         //CreateJouCube(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, texture_cara_de_jou);
     //}
 
+    if (input.check_action(jump)) {
+        And::AmbientLight* tmp = ambient_entity->get_component<And::AmbientLight>();
+        tmp->SetEnabled(!tmp->GetEnabled());
+    }
+
+    if (input.check_action(changePoint)) {
+        point_tmp->SetEnabled(!point_tmp->GetEnabled());
+    }
+
     //float* pos = point_tmp->GetPosition();
     //point_tmp->SetPosition(pos[0], std::abs(cosf(fps_count) * 3.0f), pos[2]);
     //printf("Position-> Y: %f\n", std::abs(cosf(fps_count) * 3.0f));
@@ -447,7 +463,7 @@ int main(int argc, char** argv){
     audio_manager.Update();
     if (fps_count >= secondsToSpawn) {
         //SpawnBall(physics_engine, entity_comp);
-        ThrowBall(balls_pool, index_pool);
+        //ThrowBall(balls_pool, index_pool);
         fps_count -= secondsToSpawn;
         index_pool++;
         if (index_pool >= POOL_SIZE)index_pool = 0;

@@ -48,10 +48,6 @@ SpotLight& SpotLight::operator=(const SpotLight& other){
     return *this;
 }
 
-float SpotLight::GetEnabled(){
-    return m_raw.enabled;;
-}
-
 float* SpotLight::GetDiffuseColor() {
     return &m_raw.diffuse_color[0];
 }
@@ -95,11 +91,6 @@ float SpotLight::GetLinearAtt(){
 
 float SpotLight::GetQuadraticAtt(){
     return m_raw.quadratic_att;
-}
-
-
-void SpotLight::SetEnabled(bool e){
-    e ? m_raw.enabled = 1.0f : m_raw.enabled = 0.0f;
 }
 
 void SpotLight::SetDiffuseColor(float color[3]){
@@ -164,10 +155,6 @@ void SpotLight::SetLinearAtt(float linear){
 void  SpotLight::SetQuadraticAtt(float quadratic){
     m_raw.quadratic_att = quadratic;
     //m_must_recalculate = true;
-}
-
-void  SpotLight::GetEnabled(float& enabled){
-    m_raw.enabled = enabled;
 }
 
 void SpotLight::GetDiffuseColor(float& r, float& g, float& b){

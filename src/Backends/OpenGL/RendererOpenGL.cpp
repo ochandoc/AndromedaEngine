@@ -128,14 +128,39 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
 
   m_shader_pbr_geometry = MakeShader("lights/deferred/pbr/pbr_geometry.shader");
   m_shader_quad_point_pbr = MakeShader("lights/deferred/pbr/pbr_quad_point_shadows.shader");
+  m_shader_quad_ambient_pbr = MakeShader("lights/deferred/pbr/pbr_quad_ambient.shader");
 
 
+  // QUAD
+  glGenVertexArrays(1, &m_quad_vao);
   glGenBuffers(1, &m_quad_vbo);
+  glGenBuffers(1, &m_quad_ebo);
+
+  glBindVertexArray(m_quad_vao);
   glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
-  glBufferData(GL_ARRAY_BUFFER, (GLsizei)(sizeof(dMesh)), &dMesh[0], GL_STATIC_DRAW);
+
+  auto tmp_tmp = 4 * sizeof(Vertex);
+  glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), &dMesh[0], GL_STATIC_DRAW);
+  
+  //glBufferData(GL_ARRAY_BUFFER, (GLsizei)(sizeof(dMesh)), &dMesh[0], GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_quad_ebo);
+
+  tmp_tmp = (GLsizei)(sizeof(dIndices));
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizei)(sizeof(dIndices)), &dIndices[0], GL_STATIC_DRAW);
+
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+  
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
+  
+  glEnableVertexAttribArray(2);
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(6 * sizeof(float)));
 
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
+  //
 
 
   m_shader_skybox = MakeShader("shaders/opengl/skybox.shader");
@@ -951,12 +976,12 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
 
     glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex ), (void*)(6 * sizeof(float)));
+    //glEnableVertexAttribArray(0);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    //glEnableVertexAttribArray(1);
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
+    //glEnableVertexAttribArray(2);
+    //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex ), (void*)(6 * sizeof(float)));
 
     OpenGLRenderTarget* opengl_render_target = static_cast<OpenGLRenderTarget*>(m_gBuffer_.get());
 
@@ -1018,7 +1043,7 @@ void RendererOpenGL::RenderPBRLight(std::shared_ptr<And::RenderTarget> shadow_bu
 
     AmbientLight* ambient = dynamic_cast<AmbientLight*>(light);
     if (ambient) {
-        tmp = static_cast<OpenGLShader*>(m_shader_quad_ambient.get());
+        tmp = static_cast<OpenGLShader*>(m_shader_quad_ambient_pbr.get());
     }
 
 
@@ -1066,28 +1091,31 @@ void RendererOpenGL::RenderPBRLight(std::shared_ptr<And::RenderTarget> shadow_bu
         }
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
+    //glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
 
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
+
+    //glEnableVertexAttribArray(0);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+    //glEnableVertexAttribArray(1);
+    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+    //glEnableVertexAttribArray(2);
+    //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
 
     OpenGLRenderTarget* opengl_render_target = static_cast<OpenGLRenderTarget*>(m_gBuffer_.get());
 
     glEnable(GL_BLEND);
 
     upload_light(light);
-    glDepthMask(GL_FALSE);
-    glDrawElements(GL_TRIANGLES, (GLsizei)(sizeof(dMesh)), GL_UNSIGNED_INT, &dIndices[0]);
-    glBlendFunc(GL_ONE, GL_ONE);
+    //glDepthMask(GL_FALSE);
+    //glDrawElements(GL_TRIANGLES, (GLsizei)(sizeof(dMesh)), GL_UNSIGNED_INT, &dIndices[0]);
+    glBindVertexArray(m_quad_vao);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    //glBlendFunc(GL_ONE, GL_ONE);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, opengl_render_target->GetId());
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     glBlitFramebuffer(0, 0, m_Window.get_width(), m_Window.get_height(), 0, 0, m_Window.get_width(), m_Window.get_height(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDepthMask(GL_TRUE);
+    //glDepthMask(GL_TRUE);
 }
 
 void RendererOpenGL::ResetTransforms(EntityComponentSystem& ecs) {
@@ -1439,71 +1467,79 @@ void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
   // Ambient light
   glBlendFunc(GL_ONE, GL_ZERO);
   for (auto [light] : entity.get_components<AmbientLight>()) {
-      RenderLight(nullptr, light);
-      glBlendFunc(GL_ONE, GL_ONE);
+      if (light->GetEnabled()) {
+        RenderLight(nullptr, light);
+        glBlendFunc(GL_ONE, GL_ONE);
+      }
   }
 
   // Shadows directional
   std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
   for (auto [light] : entity.get_components<DirectionalLight>()) {
-      shadow_buffer->Activate();
-      glDisable(GL_BLEND);
-      if (light->GetCastShadows()) {
-          // Por cada luz que castea sombras guardamos textura de profundidad
-          for (auto [transform, obj] : entity.get_components<TransformComponent, MeshComponent>()) {
-              draw_shadows(light, obj, transform);
+      if (light->GetEnabled()) {
+          shadow_buffer->Activate();
+          glDisable(GL_BLEND);
+          if (light->GetCastShadows()) {
+              // Por cada luz que castea sombras guardamos textura de profundidad
+              for (auto [transform, obj] : entity.get_components<TransformComponent, MeshComponent>()) {
+                  draw_shadows(light, obj, transform);
+              }
           }
+          shadow_buffer->Desactivate();
+          glEnable(GL_BLEND);
+
+
+          // Render Directional
+          RenderLight(shadow_buffer, light);
+          glBlendFunc(GL_ONE, GL_ONE);
       }
-      shadow_buffer->Desactivate();
-      glEnable(GL_BLEND);
-
-
-      // Render Directional
-      RenderLight(shadow_buffer, light);
-      glBlendFunc(GL_ONE, GL_ONE);
 
 
   }
 
   // Shadows spot
   for (auto [light] : entity.get_components<SpotLight>()) {
-      shadow_buffer->Activate();
-      glDisable(GL_BLEND);
-      if (light->GetCastShadows()) {
-          // Por cada luz que castea sombras guardamos textura de profundidad
-          for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-              draw_shadows(light, obj, transform);
+      if (light->GetEnabled()) {
+          shadow_buffer->Activate();
+          glDisable(GL_BLEND);
+          if (light->GetCastShadows()) {
+              // Por cada luz que castea sombras guardamos textura de profundidad
+              for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+                  draw_shadows(light, obj, transform);
+              }
           }
-      }
-      shadow_buffer->Desactivate();
-      glEnable(GL_BLEND);
+          shadow_buffer->Desactivate();
+          glEnable(GL_BLEND);
 
-      // Render spot
-      RenderLight(shadow_buffer, light);
-      glBlendFunc(GL_ONE, GL_ONE);
+          // Render spot
+          RenderLight(shadow_buffer, light);
+          glBlendFunc(GL_ONE, GL_ONE);
+      }
   }
 
   // Shadows point
   std::vector<std::shared_ptr<And::RenderTarget>> render_targets = get_shadow_buffer_pointLight();
   for (auto [light] : entity.get_components<PointLight>()) {
-      glDisable(GL_BLEND);
-      if (light->GetCastShadows()) {
-          int index = 0;
-          for (auto& target : render_targets) {
-              target->Activate();
-              // Por cada luz que castea sombras guardamos textura de profundidad, aqui hay que hacerlo en 6 shadow buffers, uno por cada cara de la point
-              for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-                  draw_shadows(light, obj, transform, glm::value_ptr(m_directions->dir[index]));
+      if (light->GetEnabled()) {
+          glDisable(GL_BLEND);
+          if (light->GetCastShadows()) {
+              int index = 0;
+              for (auto& target : render_targets) {
+                  target->Activate();
+                  // Por cada luz que castea sombras guardamos textura de profundidad, aqui hay que hacerlo en 6 shadow buffers, uno por cada cara de la point
+                  for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+                      draw_shadows(light, obj, transform, glm::value_ptr(m_directions->dir[index]));
+                  }
+                  index++;
+                  target->Desactivate();
               }
-              index++;
-              target->Desactivate();
           }
-      }
-      glEnable(GL_BLEND);
+          glEnable(GL_BLEND);
 
-      // Render point
-      RenderLight(nullptr, light);
-      glBlendFunc(GL_ONE, GL_ONE);
+          // Render point
+          RenderLight(nullptr, light);
+          glBlendFunc(GL_ONE, GL_ONE);
+      }
   }
 
   //CheckTime(start_time, std::chrono::steady_clock::now(), "Lighting Pass: ");
@@ -1560,71 +1596,80 @@ void RendererOpenGL::draw_pbr(EntityComponentSystem& entity){
     // Ambient light
     glBlendFunc(GL_ONE, GL_ZERO);
     for (auto [light] : entity.get_components<AmbientLight>()) {
-        RenderLight(nullptr, light);
-        glBlendFunc(GL_ONE, GL_ONE);
+        if (light->GetEnabled()) {
+            RenderPBRLight(nullptr, light);
+            glBlendFunc(GL_ONE, GL_ONE);
+        }
     }
 
     // Shadows directional
     std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
     for (auto [light] : entity.get_components<DirectionalLight>()) {
-        shadow_buffer->Activate();
-        glDisable(GL_BLEND);
-        if (light->GetCastShadows()) {
-            // Por cada luz que castea sombras guardamos textura de profundidad
-            for (auto [transform, obj] : entity.get_components<TransformComponent, MeshComponent>()) {
-                draw_shadows(light, obj, transform);
+        if (light->GetEnabled()) {
+
+            shadow_buffer->Activate();
+            glDisable(GL_BLEND);
+            if (light->GetCastShadows()) {
+                // Por cada luz que castea sombras guardamos textura de profundidad
+                for (auto [transform, obj] : entity.get_components<TransformComponent, MeshComponent>()) {
+                    draw_shadows(light, obj, transform);
+                }
             }
+            shadow_buffer->Desactivate();
+            glEnable(GL_BLEND);
+
+
+            // Render Directional
+            RenderPBRLight(shadow_buffer, light);
+            glBlendFunc(GL_ONE, GL_ONE);
+
+
         }
-        shadow_buffer->Desactivate();
-        glEnable(GL_BLEND);
-
-
-        // Render Directional
-        RenderPBRLight(shadow_buffer, light);
-        glBlendFunc(GL_ONE, GL_ONE);
-
-
     }
 
     // Shadows spot
     for (auto [light] : entity.get_components<SpotLight>()) {
-        shadow_buffer->Activate();
-        glDisable(GL_BLEND);
-        if (light->GetCastShadows()) {
-            // Por cada luz que castea sombras guardamos textura de profundidad
-            for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-                draw_shadows(light, obj, transform);
+        if (light->GetEnabled()) {
+            shadow_buffer->Activate();
+            glDisable(GL_BLEND);
+            if (light->GetCastShadows()) {
+                // Por cada luz que castea sombras guardamos textura de profundidad
+                for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+                    draw_shadows(light, obj, transform);
+                }
             }
-        }
-        shadow_buffer->Desactivate();
-        glEnable(GL_BLEND);
+            shadow_buffer->Desactivate();
+            glEnable(GL_BLEND);
 
-        // Render spot
-        RenderPBRLight(shadow_buffer, light);
-        glBlendFunc(GL_ONE, GL_ONE);
+            // Render spot
+            RenderPBRLight(shadow_buffer, light);
+            glBlendFunc(GL_ONE, GL_ONE);
+        }
     }
 
     // Shadows point
     std::vector<std::shared_ptr<And::RenderTarget>> render_targets = get_shadow_buffer_pointLight();
     for (auto [light] : entity.get_components<PointLight>()) {
-        glDisable(GL_BLEND);
-        if (light->GetCastShadows()) {
-            int index = 0;
-            for (auto& target : render_targets) {
-                target->Activate();
-                // Por cada luz que castea sombras guardamos textura de profundidad, aqui hay que hacerlo en 6 shadow buffers, uno por cada cara de la point
-                for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
-                    draw_shadows(light, obj, transform, glm::value_ptr(m_directions->dir[index]));
+        if (light->GetEnabled()) {
+            glDisable(GL_BLEND);
+            if (light->GetCastShadows()) {
+                int index = 0;
+                for (auto& target : render_targets) {
+                    target->Activate();
+                    // Por cada luz que castea sombras guardamos textura de profundidad, aqui hay que hacerlo en 6 shadow buffers, uno por cada cara de la point
+                    for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
+                        draw_shadows(light, obj, transform, glm::value_ptr(m_directions->dir[index]));
+                    }
+                    index++;
+                    target->Desactivate();
                 }
-                index++;
-                target->Desactivate();
             }
-        }
-        glEnable(GL_BLEND);
+            glEnable(GL_BLEND);
 
-        // Render point
-        RenderPBRLight(nullptr, light);
-        glBlendFunc(GL_ONE, GL_ONE);
+            // Render point
+            RenderPBRLight(nullptr, light);
+            glBlendFunc(GL_ONE, GL_ONE);
+        }
     }
 
     //CheckTime(start_time, std::chrono::steady_clock::now(), "Lighting Pass: ");

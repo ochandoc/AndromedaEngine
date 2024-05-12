@@ -195,6 +195,7 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness){
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0){
 
+  // Clampeo para evitar puntos negros
   return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
@@ -214,7 +215,7 @@ void main(){
   
 
   // PBR calculations
-
+  // 0.04 porque asumimos que la mayoria de superficies dielectricas se ven visualmente correctas con ese valor
   vec3 F0 = vec3(0.04); 
   F0 = mix(F0, albedo, metallic);
 

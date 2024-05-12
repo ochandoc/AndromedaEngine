@@ -36,10 +36,6 @@ PointLight& PointLight::operator=(const PointLight& other){
     return *this;
 }
 
-float PointLight::GetEnabled(){
-    return m_raw.enabled;;
-}
-
 float* PointLight::GetDiffuseColor() {
     return &m_raw.diffuse_color[0];
 }
@@ -80,10 +76,10 @@ void PointLight::SetPosition(float p[3]){
 
 void PointLight::SetIntensity(const float intensity){
     m_intensity = intensity;
-}
-
-void PointLight::SetEnabled(bool e){
-    e ? m_raw.enabled = 1.0f : m_raw.enabled = 0.0f;
+    m_raw.diffuse_color[0] = m_raw.diffuse_color[0] * m_intensity;
+    m_raw.diffuse_color[1] = m_raw.diffuse_color[0] * m_intensity;
+    m_raw.diffuse_color[2] = m_raw.diffuse_color[0] * m_intensity;
+    
 }
 
 void PointLight::SetDiffuseColor(float color[3]){
@@ -140,11 +136,6 @@ void PointLight::GetPosition(float& x, float& y, float& z){
     x = m_raw.position[0];
     y = m_raw.position[1];
     z = m_raw.position[2];
-}
-
-void PointLight::GetEnabled(float& e){
-
-    e = m_raw.enabled;
 }
 
 void PointLight::GetSpecularStrength(float& e){

@@ -41,13 +41,10 @@ class AmbientLight : public Light{
         virtual float* GetProjectMatrix(float aspect_ratio) override;
         virtual float* GetViewMatrix(float aspect_ratio) override;
 
-        float  GetEnabled();
-        void   GetEnabled(float& enabled);
         float* GetDiffuseColor();
         void   GetDiffuseColor(float& r, float& g, float& b);
         float  GetAmbientStrenght();
 
-        void   SetEnabled(bool e);
         void   SetDiffuseColor(float color[3]);
         void   SetDiffuseColor(float x, float y, float z);
 

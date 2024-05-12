@@ -40,8 +40,6 @@ class PointLight : public Light{
         virtual float* GetProjectMatrix(float aspect_ratio) override;
         virtual float* GetViewMatrix(float aspect_ratio) override;
 
-        float  GetEnabled();
-        void   GetEnabled(float& enabled);
         float* GetDiffuseColor();
         void   GetDiffuseColor(float &r, float& g, float& b);
         float  GetSpecularStrength();
@@ -61,7 +59,6 @@ class PointLight : public Light{
 
         // This is only for pbr
         void  SetIntensity(const float intensity);
-        void  SetEnabled(bool e);
         void  SetDiffuseColor(float color[3]);
         void  SetDiffuseColor(float r, float g, float b);
         void  SetSpecularStrength(float strength);
@@ -74,7 +71,7 @@ class PointLight : public Light{
         void  SetLinearAtt(float linear);
         void  SetQuadraticAtt(float quadratic);
 
-private:
-    float m_intensity = 1.0f;
+    private:
+        float m_intensity = 1.0f;
 };
 }

@@ -104,6 +104,7 @@ namespace And{
 
         // PBR Shaders
         std::shared_ptr<Shader> m_shader_pbr_geometry;
+        std::shared_ptr<Shader> m_shader_quad_ambient_pbr;
         std::shared_ptr<Shader> m_shader_quad_point_pbr;
 
         std::shared_ptr<Shader> m_shader_skybox;
@@ -132,6 +133,8 @@ namespace And{
 
  
         unsigned int m_quad_vbo;
+        unsigned int m_quad_vao;
+        unsigned int m_quad_ebo;
  
         
         RawMesh m_skybox_mesh;

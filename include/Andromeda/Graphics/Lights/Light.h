@@ -72,6 +72,9 @@ class Light : public ComponentBase{
          */
         bool GetCastShadows(){return m_cast_shadows;}
 
+        void SetEnabled(bool e) { m_enabled = e; }
+        bool GetEnabled() { return m_enabled; }
+
         friend class SpotLight;
         friend class DirectionalLight;
 
@@ -79,6 +82,7 @@ class Light : public ComponentBase{
 
         bool m_cast_shadows;
         bool m_must_recalculate;
+        bool m_enabled = true;
 
     private:
 

@@ -61,10 +61,6 @@ void DirectionalLight::SetCameraPosition(const float* pos){
     m_must_recalculate = true;
 }
 
-float DirectionalLight::GetEnabled(){
-    return m_raw.enabled;;
-}
-
 float* DirectionalLight::GetDiffuseColor() {
     return &m_raw.diffuse_color[0];
 }
@@ -83,10 +79,6 @@ float DirectionalLight::GetSpecularShininess(){
 
 float* DirectionalLight::GetDirection(){
     return &m_raw.direction[0];
-}
-
-void DirectionalLight::SetEnabled(bool e){
-    e ? m_raw.enabled = 1.0f : m_raw.enabled = 0.0f;
 }
 
 void DirectionalLight::SetDiffuseColor(float color[3]){
@@ -139,10 +131,6 @@ void DirectionalLight::SetDirection(float x, float y, float z){
     m_raw.direction[2] = z;
     m_must_recalculate = true;
     
-}
-
-void  DirectionalLight::GetEnabled(float& enabled){
-    enabled = m_raw.enabled;
 }
 
 void  DirectionalLight::GetDiffuseColor(float& r, float& g, float& b){

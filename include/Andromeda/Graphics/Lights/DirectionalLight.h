@@ -43,8 +43,6 @@ class DirectionalLight : public Light{
         void SetCameraPosition(float x, float y, float z);
         void SetCameraPosition(const float* pos);
 
-        float  GetEnabled();
-        void   GetEnabled(float& enabled);
         float* GetDiffuseColor();
         void   GetDiffuseColor(float& r, float& g, float& b);
         float  GetSpecularStrength();
@@ -55,8 +53,7 @@ class DirectionalLight : public Light{
         void   GetSpecularShininess(float& shininess);
         float* GetDirection();
         void   GetDirection(float& x, float& y, float& z);
-        
-        void   SetEnabled(bool e);
+
         void   SetDiffuseColor(float color[3]);
         void   SetDiffuseColor(float x, float y, float z);
         void   SetSpecularStrength(float strength);

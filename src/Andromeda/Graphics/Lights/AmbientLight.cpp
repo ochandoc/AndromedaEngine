@@ -48,16 +48,8 @@ AmbientLight& AmbientLight::operator=(const AmbientLight& other){
     return *this;
 }
 
-float AmbientLight::GetEnabled(){
-    return m_raw.enabled;;
-}
-
 float* AmbientLight::GetDiffuseColor() {
     return &m_raw.diffuse_color[0];
-}
-
-void AmbientLight::SetEnabled(bool e){
-    e ? m_raw.enabled = 1.0f : m_raw.enabled = 0.0f;
 }
 
 void AmbientLight::SetDiffuseColor(float color[3]){
@@ -76,10 +68,6 @@ void AmbientLight::SetDiffuseColor(float x, float y, float z){
 
 void AmbientLight::SetAmbientStrenght(float s){
     m_raw.ambient_strenght = s;
-}
-
-void  AmbientLight::GetEnabled(float& enabled){
-    enabled = m_raw.enabled;
 }
 
 void  AmbientLight::GetDiffuseColor(float& r, float& g, float& b){
