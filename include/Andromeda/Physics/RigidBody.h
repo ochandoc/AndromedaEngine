@@ -16,6 +16,11 @@ namespace And {
 		ACCELERATION = 4		//!< parameter has unit of distance/ time^2, i.e. an acceleration. It gets treated just like a force except the mass is not divided out before integration.
 	};
 
+	enum class ColliderType {
+		RigidDynamic = 1,
+		RigidStatic = 2
+	};
+
 class RigidBody : public RigidBodyBase {
 
 public:
@@ -26,8 +31,8 @@ public:
 	RigidBody(const RigidBody&);
 	RigidBody operator=(const RigidBody&);
 
-	void AddBoxCollider(const float* position, const float* scale);
-	void AddSphereCollider(const float* position, const float* radius);
+	void AddBoxCollider(const float* position, const float* scale, ColliderType type, float static_friction = 0.5f, float dinamic_friction = 0.5f, float restitution = 0.1f);
+	void AddSphereCollider(const float* position, const float* radius, ColliderType type, float static_friction = 0.5f, float dinamic_friction = 0.5f, float restitution = 0.1f);
 
 	void AffectsGravity(bool value);
 	void SetMass(float mass);
@@ -43,12 +48,17 @@ public:
 	void GetRotation(float* rotation);
 	void GetPositionRotation(float* position, float* rotation);
 
+	void Sleep();
+	void WakeUp();
+
 	void Release();
 	friend class PhysicsEngine;
 private:
 	bool m_affects_gravity;
 
 	std::shared_ptr<PhysicsData> m_data;
+
+	ColliderType m_collider_type;
 
 };
 

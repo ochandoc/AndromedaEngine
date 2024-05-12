@@ -97,6 +97,10 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(bool executeOnGPU, unsigned i
 
 
 	engine->m_physics_data->scene = engine->m_physics_data->physics->createScene(*(engine->m_physics_data->sceneDesc));
+	if (!engine->m_physics_data->scene) {
+		printf("\n*** Error creating scene ***\n");
+		return nullptr;
+	}
 
 
 	/*engine->m_physics_data->client = engine->m_physics_data->scene->getScenePvdClient();
@@ -110,7 +114,7 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(bool executeOnGPU, unsigned i
 	}*/
 
 	// Create simulation
-	engine->m_physics_data->material = engine->m_physics_data->physics->createMaterial(0.5f, 0.5f, 0.0f); // static friction, dynamic friction, restitution
+	engine->m_physics_data->material = engine->m_physics_data->physics->createMaterial(0.6f, 0.6f, 0.7f); // static friction, dynamic friction, restitution
 	physx::PxRigidStatic* groundPlane = PxCreatePlane(*(engine->m_physics_data->physics), physx::PxPlane(0.0f, 1.0f, 0.0f, 1.0f), *(engine->m_physics_data->material));
 	engine->m_physics_data->scene->addActor(*groundPlane);
 
@@ -151,6 +155,20 @@ RigidBody PhysicsEngine::CreateRigidBody(){
 
 void PhysicsEngine::Simulate(double dt, bool fetch) {
 	m_physics_data->scene->simulate(dt);
+
+	// Advanced split method (for complex scenes)
+	//const physx::PxContactPairHeader* pairHeader;
+	//physx::PxU32 nbContactPairs;
+	//m_physics_data->scene->fetchResultsStart(pairHeader, nbContactPairs, true);
+	//Set up continuation task to be run after callbacks have been processed in parallel
+	//callbackFinishTask.setContinuation(*gScene->getTaskManager(), NULL);
+	//callbackFinishTask.reset();
+	//process the callbacks
+	//gScene->processCallbacks(&callbackFinishTask);
+	//callbackFinishTask.removeReference();
+	//callbackFinishTask.wait();
+	//gScene->fetchResultsFinish();
+
 	m_physics_data->scene->fetchResults(fetch);
 }
 
@@ -169,6 +187,8 @@ void PhysicsEngine::Release(EntityComponentSystem& ecs){
 
 
 void PhysicsEngine::SetGravity(float x, float y, float z) {
+
+	// Iterar sobre todos los rigid body y llamar a wakeup()
 	m_physics_data->scene->setGravity(physx::PxVec3(x,y,z));
 }
 

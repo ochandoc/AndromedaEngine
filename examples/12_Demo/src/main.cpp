@@ -55,7 +55,7 @@ static void CreateJouCube(const float* pos, const float* dir, float force, And::
     tran.scale[2] = 2.0f;
 
     And::RigidBody rb = engine.CreateRigidBody();
-    rb.AddBoxCollider(tran.position, tran.scale);
+    rb.AddBoxCollider(tran.position, tran.scale, And::ColliderType::RigidDynamic);
     rb.AffectsGravity(true);
     rb.SetMass(5.0f);
 
@@ -88,7 +88,7 @@ static void SpawnBall(std::shared_ptr<And::PhysicsEngine> engine, And::EntityCom
   tran.SetScale(scale);
 
   And::RigidBody rb = engine->CreateRigidBody();
-  rb.AddSphereCollider(pos, base);
+  rb.AddSphereCollider(pos, base, And::ColliderType::RigidDynamic);
   rb.AffectsGravity(true);
   rb.SetMass(5.0f);
 
@@ -134,11 +134,11 @@ void CreateBallsPool(And::Entity* e[], std::shared_ptr<And::PhysicsEngine> engin
         float pos[3] = { i * 2.0f , 0.0f, 0.0f };
 
         float base[3] = { 0.5f, 0.5f, 0.5f };
-        float scale[3] = { 0.1f, 0.1f, 0.1f };
+        float scale[3] = { 0.5f, 0.5f, 0.5f };
 
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/sphere.obj");
+        MC.MeshOBJ = And::Geometry::load("sphere.obj");
 
 
         And::TransformComponent tran;
@@ -147,9 +147,9 @@ void CreateBallsPool(And::Entity* e[], std::shared_ptr<And::PhysicsEngine> engin
         tran.SetScale(scale);
 
         And::RigidBody rb = engine->CreateRigidBody();
-        rb.AddSphereCollider(pos, base);
+        rb.AddSphereCollider(pos, base, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
         rb.AffectsGravity(true);
-        rb.SetMass(5.0f);
+        rb.SetMass(4.0f);
 
 
         e[i] = entity_comp.new_entity(MC, mat_comp, tran, rb);
@@ -282,6 +282,8 @@ int main(int argc, char** argv){
     for (int j = -suelo_num; j < suelo_num; j++) {
 
         for (int i = -suelo_num; i < suelo_num; i++) {
+            //And::RigidBody rb = physics_engine->CreateRigidBody();
+            //rb.AddBoxCollider();
             suelo_tran.SetPosition(i * suelo_scale, -1.5f, j * suelo_scale);
             entity_comp.new_entity(MC_suelo, suelo_mat_comp, suelo_tran);
         }
@@ -319,7 +321,7 @@ int main(int argc, char** argv){
   And::AmbientLight ambient;
   ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
   ambient.SetAmbientStrenght(0.1f);
-  And::Entity* ambient_entity = entity_comp.new_entity(ambient);
+  //And::Entity* ambient_entity = entity_comp.new_entity(ambient);
 
   
 
@@ -382,7 +384,7 @@ int main(int argc, char** argv){
 
   mat_comp.SetMaterial(mat);
 
-  //CreateBallsPool(balls_pool, physics_engine, entity_comp, mat_comp);
+  CreateBallsPool(balls_pool, physics_engine, entity_comp, bolinga_mat_comp);
 
 
 
@@ -433,8 +435,8 @@ int main(int argc, char** argv){
     //}
 
     if (input.check_action(jump)) {
-        And::AmbientLight* tmp = ambient_entity->get_component<And::AmbientLight>();
-        tmp->SetEnabled(!tmp->GetEnabled());
+        //And::AmbientLight* tmp = ambient_entity->get_component<And::AmbientLight>();
+        //tmp->SetEnabled(!tmp->GetEnabled());
     }
 
     if (input.check_action(changePoint)) {
@@ -463,7 +465,7 @@ int main(int argc, char** argv){
     audio_manager.Update();
     if (fps_count >= secondsToSpawn) {
         //SpawnBall(physics_engine, entity_comp);
-        //ThrowBall(balls_pool, index_pool);
+        ThrowBall(balls_pool, index_pool);
         fps_count -= secondsToSpawn;
         index_pool++;
         if (index_pool >= POOL_SIZE)index_pool = 0;
@@ -472,6 +474,7 @@ int main(int argc, char** argv){
 
     if (fps_count > 0.1f) [[likely]] {
         physics_engine->Simulate(window->get_delta_time());
+        //physics_engine->Simulate(1.0f / 120.0f);
         //if(fixed_update >= 0.25f){
             //physics_engine->Simulate(fixed_update);
         //}

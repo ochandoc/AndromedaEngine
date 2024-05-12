@@ -10,7 +10,10 @@ namespace And{
 
 	struct PhysicsData {
 		physx::PxPhysics* physics;
-		physx::PxRigidDynamic* actor;
+		
+		physx::PxRigidActor* actor;
+		//physx::PxRigidDynamic* actor;
+		//physx::PxRigidStatic* actor_static;
 		physx::PxScene* scene;
 	};
 
@@ -46,18 +49,24 @@ RigidBody::RigidBody(RigidBody&& other) {
 	this->m_scene = other.m_scene;*/
 }
 
-void RigidBody::AffectsGravity(bool value)
-{
+void RigidBody::AffectsGravity(bool value){
+	m_data->actor->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, !value);
 }
 
-void RigidBody::AddBoxCollider(const float* position, const float* scale){
+void RigidBody::AddBoxCollider(const float* position, const float* scale, ColliderType type, float static_friction, float dinamic_friction, float restitution){
 
 	physx::PxTransform transform(physx::PxVec3(0.0f));
 	transform.p = physx::PxVec3(position[0], position[1], position[2]);
-	m_data->actor = m_data->physics->createRigidDynamic(transform);
+
+	switch (type) {
+		case ColliderType::RigidDynamic: m_data->actor = m_data->physics->createRigidDynamic(transform); m_collider_type = ColliderType::RigidDynamic; break;
+		case ColliderType::RigidStatic: m_data->actor = m_data->physics->createRigidStatic(transform); m_collider_type = ColliderType::RigidStatic; break;
+	}
+			
+	
 	
 	physx::PxBoxGeometry box(scale[0] * 0.5f, scale[1] * 0.5f, scale[2] * 0.5f);
-	physx::PxMaterial* mat = m_data->physics->createMaterial(1.0f, 1.0f, 1.0f); // static friction, dynamic friction, restitution);
+	physx::PxMaterial* mat = m_data->physics->createMaterial(static_friction, dinamic_friction, restitution); // static friction, dynamic friction, restitution;
 	physx::PxShape* shape = m_data->physics->createShape(box, *mat, false); // is exclusive = false
 	//boxShape->setLocalPose(physx::PxTransform(0.0f, 0.0f, 0.0f));
 	//boxShape->setLocalPose(transform);
@@ -65,26 +74,41 @@ void RigidBody::AddBoxCollider(const float* position, const float* scale){
 	m_data->actor->attachShape(*shape);
 	m_data->actor->setGlobalPose(transform);
 	m_data->actor->getGlobalPose();
-	m_data->actor->setMass(1.0f);
+	if (m_collider_type == ColliderType::RigidDynamic) {
+		physx::PxRigidDynamic* tmp = static_cast<physx::PxRigidDynamic*>(m_data->actor);
+		tmp->setMass(0.0f);
+	}
 	m_data->scene->addActor(*(m_data->actor));
 }
 
-void RigidBody::AddSphereCollider(const float* position, const float* radius){
+void RigidBody::AddSphereCollider(const float* position, const float* radius, ColliderType type, float static_friction, float dinamic_friction, float restitution){
 
 	physx::PxTransform transform(physx::PxVec3(0.0f));
 	transform.p = physx::PxVec3(position[0], position[1], position[2]);
-	m_data->actor = m_data->physics->createRigidDynamic(transform);
+	
+	switch (type) {
+		case ColliderType::RigidDynamic: m_data->actor = m_data->physics->createRigidDynamic(transform); m_collider_type = ColliderType::RigidDynamic; break;
+		case ColliderType::RigidStatic: m_data->actor = m_data->physics->createRigidStatic(transform); m_collider_type = ColliderType::RigidStatic; break;
+	}
 
 	float r = *radius;
 
 	physx::PxSphereGeometry sphere(r);
-	physx::PxMaterial* mat = m_data->physics->createMaterial(0.5f, 0.5f, 0.0f); // static friction, dynamic friction, restitution);
+
+	// Static fricction -> Force to start moving an object
+	// Dynamic friction -> Force against a object in movement
+	// Restitution -> Bounce level
+
+	physx::PxMaterial* mat = m_data->physics->createMaterial(static_friction, dinamic_friction, restitution); // static friction, dynamic friction, restitution);
 	physx::PxShape* shape = m_data->physics->createShape(sphere, *mat, true);
 
 	m_data->actor->attachShape(*shape);
 	m_data->actor->setGlobalPose(transform);
 	m_data->actor->getGlobalPose();
-	m_data->actor->setMass(1.0f);
+	if (m_collider_type == ColliderType::RigidDynamic) {
+		physx::PxRigidDynamic* tmp = static_cast<physx::PxRigidDynamic*>(m_data->actor);
+		tmp->setMass(0.0f);
+	}
 	m_data->scene->addActor(*(m_data->actor));
 }
 
@@ -93,7 +117,10 @@ void RigidBody::Release(){
 }
 
 void RigidBody::SetMass(float mass) {
-	m_data->actor->setMass(mass);
+	physx::PxRigidDynamic* tmp = static_cast<physx::PxRigidDynamic*>(m_data->actor);
+	if (tmp) {
+		tmp->setMass(mass);
+	}
 }
 
 void RigidBody::AddForce(const float x, const float y, const float z, ForceMode fmod){
@@ -106,7 +133,13 @@ void RigidBody::AddForce(const float x, const float y, const float z, ForceMode 
 		case ForceMode::IMPULSE: f = physx::PxForceMode::eIMPULSE; break;
 		case ForceMode::VELOCITY_CHANGE: f = physx::PxForceMode::eVELOCITY_CHANGE; break;
 	}
-	m_data->actor->addForce(physx::PxVec3(x,y,z), f);
+
+	
+	physx::PxRigidDynamic* tmp = static_cast<physx::PxRigidDynamic*>(m_data->actor);	
+	if (tmp){
+		tmp->addForce(physx::PxVec3(x,y,z), f);
+	}
+	
 }
 
 void RigidBody::AddForce(const float* direction, ForceMode fmod){
@@ -119,7 +152,10 @@ void RigidBody::AddForce(const float* direction, ForceMode fmod){
 		case ForceMode::VELOCITY_CHANGE: f = physx::PxForceMode::eVELOCITY_CHANGE; break;
 	}
 
-	m_data->actor->addForce(physx::PxVec3(direction[0], direction[1], direction[2]), f);
+	physx::PxRigidDynamic* tmp = static_cast<physx::PxRigidDynamic*>(m_data->actor);
+	if (tmp) {
+		tmp->addForce(physx::PxVec3(direction[0], direction[1], direction[2]), f);
+	}
 }
 
 void RigidBody::SetPosition(float* pos){
@@ -163,6 +199,21 @@ void RigidBody::GetPositionRotation(float* position, float* rotation){
 	position[0] = transform.p.x;
 	position[1] = transform.p.y;
 	position[2] = transform.p.z;
+}
+
+void RigidBody::Sleep(){
+
+	physx::PxRigidDynamic* tmp = static_cast<physx::PxRigidDynamic*>(m_data->actor);
+	if (tmp) {
+		tmp->putToSleep();
+	}
+}
+
+void RigidBody::WakeUp(){
+	physx::PxRigidDynamic* tmp = static_cast<physx::PxRigidDynamic*>(m_data->actor);
+	if (tmp) {
+		tmp->wakeUp();
+	}
 }
 
 }

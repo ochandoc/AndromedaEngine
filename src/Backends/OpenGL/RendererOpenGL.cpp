@@ -974,15 +974,6 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     }
 
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_quad_vbo);
-
-    //glEnableVertexAttribArray(0);
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-    //glEnableVertexAttribArray(1);
-    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
-    //glEnableVertexAttribArray(2);
-    //glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex ), (void*)(6 * sizeof(float)));
-
     OpenGLRenderTarget* opengl_render_target = static_cast<OpenGLRenderTarget*>(m_gBuffer_.get());
 
     glEnable(GL_BLEND);
@@ -990,7 +981,8 @@ void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffe
     upload_light(light);
     //glDepthMask(GL_FALSE);
     //glBlendFunc(GL_ONE, GL_ONE);
-    glDrawElements(GL_TRIANGLES, (GLsizei)(sizeof(dMesh)), GL_UNSIGNED_INT, &dIndices[0]);
+    glBindVertexArray(m_quad_vao);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 
     glBindFramebuffer(GL_READ_FRAMEBUFFER, opengl_render_target->GetId());
