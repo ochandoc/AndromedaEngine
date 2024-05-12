@@ -32,7 +32,7 @@ public:
 	RigidBody operator=(const RigidBody&);
 
 	void AddBoxCollider(const float* position, const float* scale, ColliderType type, float static_friction = 0.5f, float dinamic_friction = 0.5f, float restitution = 0.1f);
-	void AddSphereCollider(const float* position, const float* radius, ColliderType type, float static_friction = 0.5f, float dinamic_friction = 0.5f, float restitution = 0.1f);
+	void AddSphereCollider(const float* position, const float radius, ColliderType type, float static_friction = 0.5f, float dinamic_friction = 0.5f, float restitution = 0.1f);
 
 	void AffectsGravity(bool value);
 	void SetMass(float mass);

@@ -1115,6 +1115,10 @@ void RendererOpenGL::ResetTransforms(EntityComponentSystem& ecs) {
     for (auto [tr] : ecs.get_components<TransformComponent>()) {
         tr->Reset();
     }
+    
+    for (auto [rb] : ecs.get_components<RigidBody>()) {
+        rb->WakeUp();
+    }
 
 }
 

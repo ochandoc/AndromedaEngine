@@ -40,7 +40,7 @@ struct PhysicsEngineData {
 		physx::PxPvdSceneClient*			client;
 	};
 
-std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(bool executeOnGPU, unsigned int substeps){
+std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(bool executeOnGPU, unsigned int substeps, bool create_plane){
 	
 	std::shared_ptr<PhysicsEngine> engine(new PhysicsEngine);
 	engine->m_physics_data = std::make_shared<PhysicsEngineData>();
@@ -51,11 +51,11 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(bool executeOnGPU, unsigned i
 		return nullptr;
 	}
 
-	//engine->m_physics_data->pvd = PxCreatePvd(*(engine->m_physics_data->foundation));
-	//engine->m_physics_data->transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10); // ip, port, timeout
-	//engine->m_physics_data->pvd->connect(*(engine->m_physics_data->transport), physx::PxPvdInstrumentationFlag::eALL);
+	engine->m_physics_data->pvd = PxCreatePvd(*(engine->m_physics_data->foundation));
+	engine->m_physics_data->transport = physx::PxDefaultPvdSocketTransportCreate("127.0.0.1", 5425, 10); // ip, port, timeout
+	engine->m_physics_data->pvd->connect(*(engine->m_physics_data->transport), physx::PxPvdInstrumentationFlag::eALL);
 
-	engine->m_physics_data->tolerance_scale.length = 100; // typical lenght of an object
+	engine->m_physics_data->tolerance_scale.length = 1; // typical lenght of an object
 	engine->m_physics_data->tolerance_scale.speed = 981; // speed of and object in earth gravity
 
 	physx::PxFoundation* foundation_tmp;
@@ -114,9 +114,11 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(bool executeOnGPU, unsigned i
 	}*/
 
 	// Create simulation
-	engine->m_physics_data->material = engine->m_physics_data->physics->createMaterial(0.6f, 0.6f, 0.7f); // static friction, dynamic friction, restitution
-	physx::PxRigidStatic* groundPlane = PxCreatePlane(*(engine->m_physics_data->physics), physx::PxPlane(0.0f, 1.0f, 0.0f, 1.0f), *(engine->m_physics_data->material));
-	engine->m_physics_data->scene->addActor(*groundPlane);
+	if (create_plane) {
+		engine->m_physics_data->material = engine->m_physics_data->physics->createMaterial(0.6f, 0.6f, 0.7f); // static friction, dynamic friction, restitution
+		physx::PxRigidStatic* groundPlane = PxCreatePlane(*(engine->m_physics_data->physics), physx::PxPlane(0.0f, 1.0f, 0.0f, 1.0f), *(engine->m_physics_data->material));
+		engine->m_physics_data->scene->addActor(*groundPlane);
+	}
 
 
 

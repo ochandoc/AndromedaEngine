@@ -18,7 +18,7 @@ class PhysicsEngine final{
      * @param substeps number of iterations per frame to calculate phisics
      * @return std::shared_ptr<PhysicsEngine> 
      */
-    static std::shared_ptr<PhysicsEngine> Init(bool executeOnGPU = false, unsigned int substeps = 8192);
+    static std::shared_ptr<PhysicsEngine> Init(bool executeOnGPU = false, unsigned int substeps = 8192, bool create_plane = false);
     ~PhysicsEngine();
     PhysicsEngine(PhysicsEngine&&);
     NON_COPYABLE_CLASS(PhysicsEngine)

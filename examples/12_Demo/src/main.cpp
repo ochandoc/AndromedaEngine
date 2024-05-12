@@ -38,10 +38,7 @@ void WaitTask(int num){
   printf("Num: %d\n", num);
 }
 
-static void CreateJouCube(const float* pos, const float* dir, float force, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, std::shared_ptr<And::Texture> texture) {
-    And::MeshComponent MC;
-    MC.MeshOBJ = And::Geometry::load("cube.obj");
-    //MC.MeshOBJ->SetTexture(texture);
+static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, And::MeshComponent& mesh, And::MaterialComponent& material_comp) {
 
     And::TransformComponent tran;
     tran.position[0] = pos[0] + (dir[0] * 5.0f);
@@ -50,16 +47,18 @@ static void CreateJouCube(const float* pos, const float* dir, float force, And::
     tran.rotation[0] = 0.0f;
     tran.rotation[1] = 0.0f;
     tran.rotation[2] = 0.0f;
-    tran.scale[0] = 2.0f;
-    tran.scale[1] = 2.0f;
-    tran.scale[2] = 2.0f;
+    tran.scale[0] = 0.5f;
+    tran.scale[1] = 0.5f;
+    tran.scale[2] = 0.5f;
 
     And::RigidBody rb = engine.CreateRigidBody();
-    rb.AddBoxCollider(tran.position, tran.scale, And::ColliderType::RigidDynamic);
+    rb.AddSphereCollider(tran.position, 0.5f, And::ColliderType::RigidDynamic);
     rb.AffectsGravity(true);
-    rb.SetMass(5.0f);
+    rb.SetMass(50.0f);
 
-    And::Entity* e = ecs.new_entity(MC, tran, rb);
+    tran.HasRigidBody();
+
+    And::Entity* e = ecs.new_entity(mesh, material_comp, tran, rb);
 
     float new_dir[3] = {dir[0] * force, dir[1] * force, dir[2] * force };
     
@@ -88,9 +87,11 @@ static void SpawnBall(std::shared_ptr<And::PhysicsEngine> engine, And::EntityCom
   tran.SetScale(scale);
 
   And::RigidBody rb = engine->CreateRigidBody();
-  rb.AddSphereCollider(pos, base, And::ColliderType::RigidDynamic);
+  rb.AddSphereCollider(pos, 1.0f, And::ColliderType::RigidDynamic);
   rb.AffectsGravity(true);
   rb.SetMass(5.0f);
+
+  tran.HasRigidBody();
 
 
   And::Entity* e = entity_comp.new_entity(MC, mat_comp, tran, rb);
@@ -112,7 +113,7 @@ static void SpawnBall(std::shared_ptr<And::PhysicsEngine> engine, And::EntityCom
 static void ThrowBall(And::Entity* pool[], int index) {
 
     And::RigidBody* rb = pool[index]->get_component<And::RigidBody>();
-    rb->SetPosition(0.0f, 2.0, 0.0f);
+    rb->SetPosition(0.0f, 5.0, 0.0f);
 
     int minimo = 1;
     int maximo = 1000;
@@ -129,9 +130,77 @@ static void ThrowBall(And::Entity* pool[], int index) {
 }
 
 
+static void CreateSuelo(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine) {
+    And::MeshComponent MC_suelo;
+    MC_suelo.MeshOBJ = And::Geometry::load("cube.obj");
+
+    And::MaterialComponent suelo_mat_comp;
+    std::shared_ptr<And::Material> suelo_mat = std::make_shared<And::Material>();
+    std::shared_ptr<And::Texture> suelo_tex_b = And::MakeTexture("demo/textures/suelo_2/albedo.png");
+    std::shared_ptr<And::Texture> suelo_normals_b = And::MakeTexture("demo/textures/suelo_2/normals.png");
+    std::shared_ptr<And::Texture> suelo_ao_b = And::MakeTexture("demo/textures/suelo_2/ao.png");
+    std::shared_ptr<And::Texture> suelo_metallic_b = And::MakeTexture("demo/textures/suelo_2/metallic.png");
+    std::shared_ptr<And::Texture> suelo_rou_b = And::MakeTexture("demo/textures/suelo_2/roughness.png");
+    suelo_mat->SetColorTexture(suelo_tex_b);
+    suelo_mat->SetNormalTexture(suelo_normals_b);
+    suelo_mat->SetAmbientOclusionTexture(suelo_ao_b);
+    suelo_mat->SetMetallicTexture(suelo_metallic_b);
+    suelo_mat->SetRoughnessTexture(suelo_rou_b);
+    suelo_mat_comp.SetMaterial(suelo_mat);
+
+    float pos_tmp[3] = { -5.0f, 15.0f, 0.0f };
+    float scale_tmp[3] = { 1.0f, 10.0f, 10.0f };
+    And::TransformComponent suelo_tran;
+    suelo_tran.SetPosition(pos_tmp);
+    //suelo_tran.SetRotation(0.0f, 0.0f, 3.1415f / 2.0f);
+    suelo_tran.SetRotation(0.0f, 0.0f, 0.0f);
+    suelo_tran.SetScale(scale_tmp);
+
+    And::RigidBody rb = engine.CreateRigidBody();
+    rb.AddBoxCollider(pos_tmp, scale_tmp, And::ColliderType::RigidStatic, 0.5f, 0.5f, 0.8f);
+    rb.SetMass(50.0f);
+    rb.AffectsGravity(true);
+    suelo_tran.HasRigidBody();
+    ecs.new_entity(MC_suelo, suelo_mat_comp, suelo_tran, rb);
+    
+    /*And::RigidBody rb_2 = engine.CreateRigidBody();
+    rb_2.AddBoxCollider(pos_tmp, scale_tmp, And::ColliderType::RigidDynamic, 0.5f, 0.5f, 0.8f);
+    rb_2.SetMass(10.0f);
+    rb_2.AffectsGravity(true);
+
+
+    suelo_tran.SetPosition(20.0f, 4.0f, 0.0f);
+    ecs.new_entity(MC_suelo, suelo_mat_comp, suelo_tran);*/
+
+    suelo_tran.SetRotation(0.0f, 0.0f, 0.0f);
+
+    const float suelo_scale = 20.0f;
+    const int suelo_num = 5;
+    suelo_tran.SetScale(suelo_scale, 1.0f, suelo_scale);
+
+    float scale[3] = { suelo_scale , 1.0f, suelo_scale };
+
+    for (int j = -suelo_num; j < suelo_num; j++) {
+
+        for (int i = -suelo_num; i < suelo_num; i++) {
+
+            float pos[3] = { i * suelo_scale , -1.0f, j * suelo_scale };
+
+            And::RigidBody rb = engine.CreateRigidBody();
+            rb.AddBoxCollider(pos, scale, And::ColliderType::RigidStatic, 0.5f, 0.5f, 0.8f);
+            //rb.SetMass(10.0f);
+            //rb.AffectsGravity(true);
+            suelo_tran.SetPosition(pos[0], pos[1], pos[2]);
+            suelo_tran.HasRigidBody();
+            ecs.new_entity(MC_suelo, suelo_mat_comp, suelo_tran, rb);
+            //ecs.new_entity(MC_suelo, suelo_mat_comp, suelo_tran, rb);
+        }
+    }
+}
+
 void CreateBallsPool(And::Entity* e[], std::shared_ptr<And::PhysicsEngine> engine, And::EntityComponentSystem& entity_comp, And::MaterialComponent& mat_comp) {
     for (int i = 0; i < POOL_SIZE; i++) {
-        float pos[3] = { i * 2.0f , 0.0f, 0.0f };
+        float pos[3] = { i * 2.0f , 100.0f, 0.0f };
 
         float base[3] = { 0.5f, 0.5f, 0.5f };
         float scale[3] = { 0.5f, 0.5f, 0.5f };
@@ -145,9 +214,10 @@ void CreateBallsPool(And::Entity* e[], std::shared_ptr<And::PhysicsEngine> engin
         tran.SetPosition(pos);
         tran.SetRotation(0.0f, 0.0f, 0.0f);
         tran.SetScale(scale);
+        tran.HasRigidBody();
 
         And::RigidBody rb = engine->CreateRigidBody();
-        rb.AddSphereCollider(pos, base, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
+        rb.AddSphereCollider(pos, 0.5f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
         rb.AffectsGravity(true);
         rb.SetMass(4.0f);
 
@@ -242,52 +312,19 @@ int main(int argc, char** argv){
     fountain_tran.SetPosition(0.0f, -1.0f, 0.0f);
     fountain_tran.SetRotation(0.0f, 0.0f, 0.0f);
     fountain_tran.SetScale(3.0f, 3.0f, 3.0f);
-    entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran);
+    fountain_tran.HasRigidBody();
+
+    float pos_tmp_f[3] = {3.0f, -1.0f, 0.0f};
+    
+    And::RigidBody rb_tmp = physics_engine->CreateRigidBody();
+    rb_tmp.AddSphereCollider(pos_tmp_f, 3.0f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
+    rb_tmp.SetMass(50.0f);
+    rb_tmp.AffectsGravity(true);
+
+    entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran, rb_tmp);
   
   
-    And::MeshComponent MC_suelo;
-    MC_suelo.MeshOBJ = And::Geometry::load("cube.obj");
-  
-    And::MaterialComponent suelo_mat_comp;
-    std::shared_ptr<And::Material> suelo_mat = std::make_shared<And::Material>();
-    std::shared_ptr<And::Texture> suelo_tex_b = And::MakeTexture("demo/textures/suelo_2/albedo.png");
-    std::shared_ptr<And::Texture> suelo_normals_b = And::MakeTexture("demo/textures/suelo_2/normals.png");
-    std::shared_ptr<And::Texture> suelo_ao_b = And::MakeTexture("demo/textures/suelo_2/ao.png");
-    std::shared_ptr<And::Texture> suelo_metallic_b = And::MakeTexture("demo/textures/suelo_2/metallic.png");
-    std::shared_ptr<And::Texture> suelo_rou_b = And::MakeTexture("demo/textures/suelo_2/roughness.png");
-    suelo_mat->SetColorTexture(suelo_tex_b);
-    suelo_mat->SetNormalTexture(suelo_normals_b);
-    suelo_mat->SetAmbientOclusionTexture(suelo_ao_b);
-    suelo_mat->SetMetallicTexture(suelo_metallic_b);
-    suelo_mat->SetRoughnessTexture(suelo_rou_b);
-    suelo_mat_comp.SetMaterial(suelo_mat);
-
-    And::TransformComponent suelo_tran;
-    suelo_tran.SetPosition(-5.0f, 0.0f, 0.0f);
-    suelo_tran.SetRotation(0.0f, 0.0f, 3.1415f / 2.0f);
-    suelo_tran.SetScale(10.0f, 1.0f, 10.0f);
-    entity_comp.new_entity(MC_suelo, suelo_mat_comp, suelo_tran);
-
-
-    suelo_tran.SetPosition(20.0f, 0.0f, 0.0f);
-    entity_comp.new_entity(MC_suelo, suelo_mat_comp, suelo_tran);
-  
-    suelo_tran.SetRotation(0.0f, 0.0f, 0.0f);
-   
-    const float suelo_scale = 20.0f;
-    const int suelo_num = 2;
-    suelo_tran.SetScale(suelo_scale, 1.0f, suelo_scale);
-
-   
-    for (int j = -suelo_num; j < suelo_num; j++) {
-
-        for (int i = -suelo_num; i < suelo_num; i++) {
-            //And::RigidBody rb = physics_engine->CreateRigidBody();
-            //rb.AddBoxCollider();
-            suelo_tran.SetPosition(i * suelo_scale, -1.5f, j * suelo_scale);
-            entity_comp.new_entity(MC_suelo, suelo_mat_comp, suelo_tran);
-        }
-    }
+    
 
 
     And::MeshComponent MC_bolinga;
@@ -311,7 +348,11 @@ int main(int argc, char** argv){
     bolinga_tran.SetPosition(5.0f, 3.0f, 0.0f);
     bolinga_tran.SetRotation(0.0f, 0.0f, 0.0f);
     bolinga_tran.SetScale(1.0f, 1.0f, 1.0f);
-    entity_comp.new_entity(MC_bolinga, bolinga_mat_comp, bolinga_tran);
+    bolinga_tran.HasRigidBody(false);
+    And::Entity* bolinga_entity = entity_comp.new_entity(MC_bolinga, bolinga_mat_comp, bolinga_tran);
+
+
+    CreateSuelo(entity_comp, *physics_engine);
 
 
 
@@ -407,8 +448,8 @@ int main(int argc, char** argv){
   audio_fuente.SetPitch(1.0f);
   audio_fuente.SetMaxDistance(20.0f);
 
-  audio_manager.play(audio_fondo);
-  audio_manager.play(audio_fuente);
+  //audio_manager.play(audio_fondo);
+  //audio_manager.play(audio_fuente);
 
 
 
@@ -417,9 +458,12 @@ int main(int argc, char** argv){
   float fps_count = 0.0f;
   const float force = 100.0f;
   int frames = 0;
-  float secondsToSpawn = 3.0f;
+  float secondsToSpawn = 10.0f;
 
   float fixed_update = 0.0f;
+
+  And::TransformComponent* tr_tmp = bolinga_entity->get_component<And::TransformComponent>();
+
   while (window->is_open()){
        
     
@@ -430,9 +474,12 @@ int main(int argc, char** argv){
     fixed_update +=window->get_delta_time(); 
 
     //if(input.IsMouseButtonPressed(And::MouseCode::Left)){
-    //if(input.check_action(shot)){
-        //CreateJouCube(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, texture_cara_de_jou);
-    //}
+    if(input.check_action(shot)){
+
+        //static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem & ecs, And::PhysicsEngine & engine, And::MeshComponent & mesh, And::MaterialComponent & material_comp)
+
+        LaunchBall(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, MC_bolinga, bolinga_mat_comp);
+    }
 
     if (input.check_action(jump)) {
         //And::AmbientLight* tmp = ambient_entity->get_component<And::AmbientLight>();
@@ -458,7 +505,7 @@ int main(int argc, char** argv){
 
     audio_fuente.UpdateListenerPosition(src_pos);
     audio_fuente.UpdateListenerDirection(src_dir);
-
+     
     audio_fuente.ApplyEffects();
    
 
@@ -471,16 +518,18 @@ int main(int argc, char** argv){
         if (index_pool >= POOL_SIZE)index_pool = 0;
     }
 
+    tr_tmp->SetRotation(tr_tmp->rotation[0], fps_count, tr_tmp->rotation[2]);
 
-    if (fps_count > 0.1f) [[likely]] {
-        physics_engine->Simulate(window->get_delta_time());
+
+    //if (fps_count > 0.1f) [[likely]] {
+    physics_engine->Simulate(window->get_delta_time() > 1.0f ? 1.0f / 30.0f : window->get_delta_time());
         //physics_engine->Simulate(1.0f / 120.0f);
         //if(fixed_update >= 0.25f){
             //physics_engine->Simulate(fixed_update);
         //}
-    }
+        physics_engine->Apply(entity_comp);
+    //}
 
-    physics_engine->Apply(entity_comp);
     
     //g_renderer->draw_forward(entity_comp);
     //g_renderer->draw_deferred(entity_comp);

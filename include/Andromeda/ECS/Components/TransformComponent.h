@@ -13,7 +13,7 @@ namespace And
 
   public:
     float position[3] = { 0.0f };
-    float rotation[3] = { 0.0f };
+    float rotation[4] = { 0.0f };
     float scale[3] = { 1.0f };
 
     TransformComponent();
@@ -39,11 +39,14 @@ namespace And
     void SetScale(float* t);
     void SetScale(float x, float y, float z);
 
+    void HasRigidBody(bool value = true) { m_has_rb_ = value; }
+
     void Reset();
   private:
       bool m_should_recalculate = true;
     
       //float* m_model_matrix = nullptr;
       std::shared_ptr<Mat4> m_matrix;
+      bool m_has_rb_ = false;
   };
 }
