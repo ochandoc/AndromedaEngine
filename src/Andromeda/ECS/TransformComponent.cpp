@@ -66,16 +66,17 @@ namespace And {
 			glm::vec3 objScale = glm::vec3(scale[0], scale[1], scale[2]);
 			//glm::vec3 objRotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
 
-			m_matrix->model = glm::identity<glm::mat4>();
-			m_matrix->model = glm::translate(m_matrix->model, objPosition);
 
 			if (m_has_rb_) {
+				m_matrix->model = glm::identity<glm::mat4>();
+				m_matrix->model = glm::translate(m_matrix->model, objPosition);
 				glm::quat quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
 				glm::mat4 RotationMatrix = glm::mat4_cast(quaternion);
 
 				m_matrix->model *= RotationMatrix;
 			}else {
 
+				m_matrix->model = glm::translate(m_matrix->model, objPosition);
 				m_matrix->model = glm::rotate(m_matrix->model, rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
 				m_matrix->model = glm::rotate(m_matrix->model, rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
 				m_matrix->model = glm::rotate(m_matrix->model, rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
@@ -120,6 +121,10 @@ namespace And {
 
 	void TransformComponent::SetRotation(float* r){
 
+		if (r[0] > 999999.9f) {
+			printf("tus muertos pisaos\n");
+		}
+
 		rotation[0] = r[0];
 		rotation[1] = r[1];
 		rotation[2] = r[2];
@@ -128,6 +133,10 @@ namespace And {
 	}
 	
 	void TransformComponent::SetRotation(float x, float y, float z){
+
+		if (x > 999999.9f) {
+			printf("tus muertos pisaos\n");
+		}
 
 		rotation[0] = x;
 		rotation[1] = y;

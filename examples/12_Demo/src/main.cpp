@@ -47,14 +47,15 @@ static void LaunchBall(const float* pos, const float* dir, float force, And::Ent
     tran.rotation[0] = 0.0f;
     tran.rotation[1] = 0.0f;
     tran.rotation[2] = 0.0f;
+    tran.rotation[3] = 0.0f;
     tran.scale[0] = 0.5f;
     tran.scale[1] = 0.5f;
     tran.scale[2] = 0.5f;
 
     And::RigidBody rb = engine.CreateRigidBody();
-    rb.AddSphereCollider(tran.position, 0.5f, And::ColliderType::RigidDynamic);
+    rb.AddSphereCollider(tran.position, 0.5f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
     rb.AffectsGravity(true);
-    rb.SetMass(50.0f);
+    rb.SetMass(5.0f);
 
     tran.HasRigidBody();
 
@@ -62,7 +63,8 @@ static void LaunchBall(const float* pos, const float* dir, float force, And::Ent
 
     float new_dir[3] = {dir[0] * force, dir[1] * force, dir[2] * force };
     
-    e->get_component<And::RigidBody>()->AddForce(new_dir, And::ForceMode::IMPULSE);
+    And::RigidBody* tmp = e->get_component<And::RigidBody>();
+    tmp->AddForce(new_dir, And::ForceMode::IMPULSE);
 }
 
 static std::random_device rd;
@@ -462,6 +464,8 @@ int main(int argc, char** argv){
 
   float fixed_update = 0.0f;
 
+  float time = 0.0f;
+
   And::TransformComponent* tr_tmp = bolinga_entity->get_component<And::TransformComponent>();
 
   while (window->is_open()){
@@ -518,7 +522,12 @@ int main(int argc, char** argv){
         if (index_pool >= POOL_SIZE)index_pool = 0;
     }
 
-    tr_tmp->SetRotation(tr_tmp->rotation[0], fps_count, tr_tmp->rotation[2]);
+    if (tr_tmp->rotation[0] != 0.0f) {
+        //printf("Me caguen tus muertos\n");
+    }
+
+    bolinga_entity->get_component<And::TransformComponent>()->SetRotation(tr_tmp->rotation[0], time, tr_tmp->rotation[2]);
+    printf("Pos X[%f] Y[%f] Z[%f] ___ Rot X[%f] Y[%f] Z[%f]\n", bolinga_entity->get_component<And::TransformComponent>()->position[0], bolinga_entity->get_component<And::TransformComponent>()->position[1], bolinga_entity->get_component<And::TransformComponent>()->position[2], bolinga_entity->get_component<And::TransformComponent>()->rotation[0], bolinga_entity->get_component<And::TransformComponent>()->rotation[1], bolinga_entity->get_component<And::TransformComponent>()->rotation[2]);
 
 
     //if (fps_count > 0.1f) [[likely]] {
@@ -536,6 +545,7 @@ int main(int argc, char** argv){
     g_renderer->draw_pbr(entity_comp);
     
     frames++;
+    time += window->get_delta_time();
     g_renderer->end_frame();
     window->swap_buffers();
   }

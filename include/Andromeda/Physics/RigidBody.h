@@ -17,6 +17,7 @@ namespace And {
 	};
 
 	enum class ColliderType {
+		None = 0,
 		RigidDynamic = 1,
 		RigidStatic = 2
 	};
@@ -58,7 +59,7 @@ private:
 
 	std::shared_ptr<PhysicsData> m_data;
 
-	ColliderType m_collider_type;
+	ColliderType m_collider_type = ColliderType::None;
 
 };
 

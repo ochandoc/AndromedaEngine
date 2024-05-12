@@ -29,19 +29,13 @@ RigidBody::RigidBody(const RigidBody& other) {
 	this->m_data = other.m_data;
 	this->m_collider_type = other.m_collider_type;
 	this->m_affects_gravity = other.m_affects_gravity;
-	/*this->m_affects_gravity = other.m_affects_gravity;
-	this->m_actor = other.m_actor;
-	this->m_physics = other.m_physics;
-	this->m_scene = other.m_scene;*/
 }
 
 RigidBody RigidBody::operator=(const RigidBody& other){
 	this->m_data = other.m_data;
 	this->m_collider_type = other.m_collider_type;
 	this->m_affects_gravity = other.m_affects_gravity;
-	/*this->m_actor = other.m_actor;
-	this->m_physics = other.m_physics;
-	this->m_scene = other.m_scene;*/
+
 	return *this;
 }
 
@@ -50,9 +44,6 @@ RigidBody::RigidBody(RigidBody&& other) {
 	this->m_data = other.m_data;
 	this->m_collider_type = other.m_collider_type;
 	this->m_affects_gravity = other.m_affects_gravity;
-	/*this->m_actor = other.m_actor;
-	this->m_physics = other.m_physics;
-	this->m_scene = other.m_scene;*/
 }
 
 void RigidBody::AffectsGravity(bool value){

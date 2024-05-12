@@ -15,6 +15,7 @@ namespace And
     float position[3] = { 0.0f };
     float rotation[4] = { 0.0f };
     float scale[3] = { 1.0f };
+    float padding[2];
 
     TransformComponent();
     ~TransformComponent();
