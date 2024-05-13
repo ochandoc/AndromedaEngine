@@ -44,6 +44,11 @@ static void LaunchBall(const float* pos, const float* dir, float force, And::Ent
     tran.position[0] = pos[0] + (dir[0] * 5.0f);
     tran.position[1] = pos[1] + (dir[1] * 5.0f);
     tran.position[2] = pos[2] + (dir[2] * 5.0f);
+    
+    //tran.position[0] = 1.0f;
+    //tran.position[1] = 1.0f;
+    //tran.position[2] = 1.0f;
+    
     tran.rotation[0] = 0.0f;
     tran.rotation[1] = 0.0f;
     tran.rotation[2] = 0.0f;
@@ -57,9 +62,12 @@ static void LaunchBall(const float* pos, const float* dir, float force, And::Ent
     rb.AffectsGravity(true);
     rb.SetMass(5.0f);
 
-    tran.HasRigidBody();
+    tran.HasRigidBody(false);
 
+    //And::Entity* e = ecs.new_entity(mesh, material_comp, tran);
     And::Entity* e = ecs.new_entity(mesh, material_comp, tran, rb);
+
+   float* transform_tmp = e->get_component<And::TransformComponent>()->GetModelMatrix();
 
     float new_dir[3] = {dir[0] * force, dir[1] * force, dir[2] * force };
     
@@ -324,7 +332,7 @@ int main(int argc, char** argv){
     rb_tmp.SetMass(50.0f);
     rb_tmp.AffectsGravity(true);
 
-    //entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran);
+    entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran);
     entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran, rb_tmp);
   
   
@@ -356,7 +364,7 @@ int main(int argc, char** argv){
     And::Entity* bolinga_entity = entity_comp.new_entity(MC_bolinga, bolinga_mat_comp, bolinga_tran);
 
 
-    CreateSuelo(entity_comp, *physics_engine);
+  CreateSuelo(entity_comp, *physics_engine);
 
 
 
@@ -467,7 +475,7 @@ int main(int argc, char** argv){
 
   bool is_down = false;
 
-  And::TransformComponent* tr_tmp = bolinga_entity->get_component<And::TransformComponent>();
+  //And::TransformComponent* tr_tmp = bolinga_entity->get_component<And::TransformComponent>();
 
   while (window->is_open()){
        
@@ -482,7 +490,7 @@ int main(int argc, char** argv){
     if (input.check_action(shot)) {
 
         //static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem & ecs, And::PhysicsEngine & engine, And::MeshComponent & mesh, And::MaterialComponent & material_comp)
-        if (!is_down) {
+        if (!is_down || true) {
             LaunchBall(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, MC_bolinga, bolinga_mat_comp);
         }
         is_down = true;
@@ -528,22 +536,13 @@ int main(int argc, char** argv){
         if (index_pool >= POOL_SIZE)index_pool = 0;
     }
 
-    if (tr_tmp->rotation[0] != 0.0f) {
-        //printf("Me caguen tus muertos\n");
-    }
 
-    bolinga_entity->get_component<And::TransformComponent>()->SetRotation(tr_tmp->rotation[0], time, tr_tmp->rotation[2]);
-    printf("Pos X[%f] Y[%f] Z[%f] ___ Rot X[%f] Y[%f] Z[%f]\n", bolinga_entity->get_component<And::TransformComponent>()->position[0], bolinga_entity->get_component<And::TransformComponent>()->position[1], bolinga_entity->get_component<And::TransformComponent>()->position[2], bolinga_entity->get_component<And::TransformComponent>()->rotation[0], bolinga_entity->get_component<And::TransformComponent>()->rotation[1], bolinga_entity->get_component<And::TransformComponent>()->rotation[2]);
+    And::TransformComponent* tmp_nose = bolinga_entity->get_component<And::TransformComponent>();
+    tmp_nose->SetRotation(tmp_nose->rotation[0], time, tmp_nose->rotation[2]);
 
-
-    //if (fps_count > 0.1f) [[likely]] {
     physics_engine->Simulate(window->get_delta_time() > 1.0f ? 1.0f / 30.0f : window->get_delta_time());
-        //physics_engine->Simulate(1.0f / 120.0f);
-        //if(fixed_update >= 0.25f){
-            //physics_engine->Simulate(fixed_update);
-        //}
-        physics_engine->Apply(entity_comp);
-    //}
+    physics_engine->Apply(entity_comp);
+        
 
     
     //g_renderer->draw_forward(entity_comp);

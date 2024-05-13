@@ -26,6 +26,7 @@ namespace And {
 		this->m_has_rb_ = other.m_has_rb_;
 		this->m_matrix = std::make_shared<Mat4>();
 		this->m_should_recalculate = true;
+		this->m_parent = other.m_parent;
 	}
 
 	TransformComponent::TransformComponent(TransformComponent&& other){
@@ -39,6 +40,18 @@ namespace And {
 		this->m_has_rb_ = other.m_has_rb_;
 		this->m_matrix = std::make_shared<Mat4>();
 		this->m_should_recalculate = true;
+		this->m_parent = other.m_parent;
+
+		for (int i = 0; i < 3; i++) {
+			other.position[i] = 0.0f;
+			other.rotation[i] = 0.0f;
+			other.scale[i] = 0.0f;;
+		}
+		other.rotation[3] = 0.0f;
+		other.m_has_rb_ = false;
+		other.m_matrix = 0;
+		other.m_should_recalculate = false;
+		other.m_parent = nullptr;
 	}
 	
 
@@ -54,6 +67,7 @@ namespace And {
 		this->m_has_rb_ = other.m_has_rb_;
 		this->m_matrix = std::make_shared<Mat4>();
 		this->m_should_recalculate = true;
+		this->m_parent = other.m_parent;
 		return *this;
 	}
 
@@ -77,9 +91,9 @@ namespace And {
 			}else {
 
 				m_matrix->model = glm::translate(m_matrix->model, objPosition);
-				m_matrix->model = glm::rotate(m_matrix->model, rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
-				m_matrix->model = glm::rotate(m_matrix->model, rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
 				m_matrix->model = glm::rotate(m_matrix->model, rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
+				m_matrix->model = glm::rotate(m_matrix->model, rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
+				m_matrix->model = glm::rotate(m_matrix->model, rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
 			}
 
 			m_matrix->model = glm::scale(m_matrix->model, objScale);
