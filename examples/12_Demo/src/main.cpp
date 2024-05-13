@@ -464,6 +464,34 @@ int main(int argc, char** argv){
 
   }
 
+  {
+      And::MaterialComponent mat_com;
+      std::shared_ptr<And::Material> mat= std::make_shared<And::Material>();
+      std::shared_ptr<And::Texture> tex= And::MakeTexture("demo/textures/bambu/albedo.png");
+      std::shared_ptr<And::Texture> normals= And::MakeTexture("demo/textures/bambu/normals.png");
+      std::shared_ptr<And::Texture> ao= And::MakeTexture("demo/textures/bambu/ao.png");
+      std::shared_ptr<And::Texture> metallic= And::MakeTexture("demo/textures/bambu/metallic.png");
+      std::shared_ptr<And::Texture> rou= And::MakeTexture("demo/textures/bambu/roughness.png");
+      mat->SetColorTexture(tex);
+      mat->SetNormalTexture(normals);
+      mat->SetAmbientOclusionTexture(ao);
+      mat->SetMetallicTexture(metallic);
+      mat->SetRoughnessTexture(rou);
+      mat_com.SetMaterial(mat);
+
+      And::MeshComponent MC;
+      MC.MeshOBJ = And::Geometry::load("demo/obj/bowling_pin.obj");
+
+      And::TransformComponent tr;
+      tr.SetPosition(10.0f, 1.0f, 0.0f);
+      tr.SetRotation(0.0f, 0.0f, 0.0f);
+      tr.SetScale(5.0f, 5.0f, 5.0f);
+      tr.HasRigidBody(false);
+
+      entity_comp.new_entity(mat_com, MC, tr);
+
+  }
+
 
 
   And::AudioManager audio_manager;

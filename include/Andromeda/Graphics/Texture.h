@@ -21,6 +21,8 @@ namespace And
     RGB32F,
     RGBA32F,
 
+    GreyScale,
+
 
     /** Format for depth texture */
     Depth,

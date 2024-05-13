@@ -206,7 +206,7 @@ void main(){
   float roughness = stacked.g;
   float ao = stacked.b;
   vec3 V = normalize(camera_position - frag_position);
-  
+
 
   // PBR calculations
   // 0.04 porque asumimos que la mayoria de superficies dielectricas se ven visualmente correctas con ese valor

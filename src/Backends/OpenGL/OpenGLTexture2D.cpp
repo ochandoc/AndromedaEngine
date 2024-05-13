@@ -31,6 +31,9 @@ namespace And
 		case And::ETextureFormat::RGBA32F:
 			return GL_RGBA32F;
 			break;
+		case And::ETextureFormat::GreyScale:
+			return GL_R32F;
+			break;
 		case And::ETextureFormat::Depth:
 			return GL_DEPTH_COMPONENT;
 			break;
@@ -61,6 +64,9 @@ namespace And
 		case And::ETextureFormat::RGBA32F:
 			return GL_RGBA;
 			break;
+		case And::ETextureFormat::GreyScale:
+			return GL_RGBA;
+			break;
 		case And::ETextureFormat::Depth:
 			return GL_DEPTH_COMPONENT;
 			break;
@@ -89,6 +95,9 @@ namespace And
 			return GL_FLOAT;
 			break;
 		case And::ETextureFormat::RGBA32F:
+			return GL_FLOAT;
+			break;
+		case And::ETextureFormat::GreyScale:
 			return GL_FLOAT;
 			break;
 		case And::ETextureFormat::Depth:
@@ -134,12 +143,20 @@ namespace And
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 		*/
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		if (CreationInfo.Format == ETextureFormat::GreyScale) {
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		}else {
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		}
 		glTexImage2D(GL_TEXTURE_2D, 0, GetOpenGLInternalFormat(CreationInfo.Format), CreationInfo.Width, CreationInfo.Height, 0, GetOpenGLFormat(CreationInfo.Format), GetOpenGLFormatType(CreationInfo.Format), NULL);
-		//glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, CreationInfo.Width, CreationInfo.Height, 0, GetOpenGLFormat(CreationInfo.Format), GetOpenGLFormatType(CreationInfo.Format), NULL);
 
 		WAIT_GPU_LOAD();
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -156,6 +173,7 @@ namespace And
 		std::shared_ptr<OpenGLTexture2D> Texture;
 		if (pixels)
 		{
+			if (TextureChannels == 1) CreationInfo.Format = ETextureFormat::GreyScale;
 			if (TextureChannels == 3) CreationInfo.Format = ETextureFormat::RGB8;
 			if (TextureChannels == 4) CreationInfo.Format = ETextureFormat::RGBA8;
 
@@ -189,6 +207,7 @@ namespace And
 
 		if (m_CreationInfo.Format == ETextureFormat::RGB8) dataFormat = GL_RGB;
 		if (m_CreationInfo.Format == ETextureFormat::RGBA8) dataFormat = GL_RGBA;
+		if (m_CreationInfo.Format == ETextureFormat::GreyScale) dataFormat = GL_RED;
 
 		glTextureSubImage2D(m_Id, 0, 0, 0, m_CreationInfo.Width, m_CreationInfo.Height, dataFormat, GL_UNSIGNED_BYTE, Data);
 	}
