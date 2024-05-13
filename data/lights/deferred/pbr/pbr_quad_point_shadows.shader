@@ -199,6 +199,32 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0){
   return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
+vec3 CalculePointLight(PointLight light, vec3 normalValue, vec3 view_dir, vec3 fragPos, float attenuation){
+
+  vec3 lightDir = normalize(light.position - fragPos);
+ 
+  //Diffuse
+  float diff = max(dot(normalValue, lightDir), 0.0);
+
+  //Specular
+  vec3 reflectDir = reflect(-lightDir, normalValue);
+  float spec = pow(max(dot(view_dir, reflectDir), 0.0), light.specular_shininess);
+
+  float lightDistance = length(light.position- fragPos);
+  //float attenuation = 1.0 / (light.constant_att + light.linear_att * lightDistance + light.quadratic_att * (lightDistance * lightDistance));
+  
+
+  vec3 difuse = light.diffuse_color * diff;  
+  vec3 specular = (light.specular_strength * light.specular_shininess * spec) * light.specular_color;
+
+
+  difuse *= (attenuation * light.attenuation);
+  specular *= attenuation;
+  
+  return (difuse + specular);
+
+}
+
 void main(){
 
   // Get textures
@@ -222,11 +248,16 @@ void main(){
   vec3 Lo = vec3(0.0);
 
   // calculate per-light radiance
-  vec3 L = normalize(point.position - frag_position) * 0.5;
+  vec3 L = normalize((point.position - frag_position) * 8.0);
   vec3 H = normalize(V + L);
   float distance = length(point.position - frag_position);
   float attenuation = 1.0 / (distance * distance);
-  vec3 radiance = point.diffuse_color * attenuation;
+  // La atenuacion del pbr la tengo aqui
+
+
+  //vec3 radiance = point.diffuse_color * attenuation;
+
+  vec3 radiance = CalculePointLight(point, N, V, frag_position, attenuation);
 
   // Cook-Torrance BRDF
   float NDF = DistributionGGX(N, H, roughness);   

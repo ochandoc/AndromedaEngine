@@ -188,7 +188,7 @@ vec3 CalculeSpotLightJou(SpotLight spot, vec3 normals, vec3 position){
 
   float distance = length(spot.position - position);
 
-  float k0 = spot.linear_att;
+  float k0 = spot.constant_att;
   float k1 = spot.linear_att;
   float k2 = spot.quadratic_att;
 

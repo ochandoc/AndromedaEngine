@@ -158,7 +158,7 @@ static void CreateSuelo(And::EntityComponentSystem& ecs, And::PhysicsEngine& eng
     suelo_mat->SetRoughnessTexture(suelo_rou_b);
     suelo_mat_comp.SetMaterial(suelo_mat);
 
-    float pos_tmp[3] = { -5.0f, 15.0f, 0.0f };
+    float pos_tmp[3] = { -5.0f, 25.0f, 0.0f };
     float scale_tmp[3] = { 1.0f, 10.0f, 10.0f };
     And::TransformComponent suelo_tran;
     suelo_tran.SetPosition(pos_tmp);
@@ -167,7 +167,7 @@ static void CreateSuelo(And::EntityComponentSystem& ecs, And::PhysicsEngine& eng
     suelo_tran.SetScale(scale_tmp);
 
     And::RigidBody rb = engine.CreateRigidBody();
-    rb.AddBoxCollider(pos_tmp, scale_tmp, And::ColliderType::RigidStatic, 0.5f, 0.5f, 0.8f);
+    rb.AddBoxCollider(pos_tmp, scale_tmp, And::ColliderType::RigidDynamic, 0.5f, 0.5f, 0.8f);
     rb.SetMass(50.0f);
     rb.AffectsGravity(true);
     suelo_tran.HasRigidBody();
@@ -318,22 +318,22 @@ int main(int argc, char** argv){
     fountain_mat->SetRoughnessTexture(fuente_rou);
     fountain_mat_comp.SetMaterial(fountain_mat);
 
-    float pos_tmp_f[3] = {3.0f, 10.0f, 0.0f};
+    float pos_tmp_f[3] = {3.0f, 5.0f, 0.0f};
     And::TransformComponent fountain_tran;
     fountain_tran.SetPosition(pos_tmp_f);
     fountain_tran.SetRotation(0.0f, 0.0f, 0.0f);
     fountain_tran.SetScale(3.0f, 3.0f, 3.0f);
     fountain_tran.HasRigidBody();
 
-    float scale_tmp_f[3] = {2.0f, 2.0f, 2.0f};
+    float scale_tmp_f[3] = {3.0f, 3.0f, 3.0f};
     
     And::RigidBody rb_tmp = physics_engine->CreateRigidBody();
-    rb_tmp.AddBoxCollider(pos_tmp_f, scale_tmp_f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
+    rb_tmp.AddBoxCollider(pos_tmp_f, scale_tmp_f, And::ColliderType::RigidStatic, 0.4f, 0.4f, 0.8f);
     rb_tmp.SetMass(50.0f);
     rb_tmp.AffectsGravity(true);
 
-    entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran);
     entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran, rb_tmp);
+    //entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran);
   
   
     
