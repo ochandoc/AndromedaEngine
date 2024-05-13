@@ -310,19 +310,21 @@ int main(int argc, char** argv){
     fountain_mat->SetRoughnessTexture(fuente_rou);
     fountain_mat_comp.SetMaterial(fountain_mat);
 
+    float pos_tmp_f[3] = {3.0f, 10.0f, 0.0f};
     And::TransformComponent fountain_tran;
-    fountain_tran.SetPosition(0.0f, -1.0f, 0.0f);
+    fountain_tran.SetPosition(pos_tmp_f);
     fountain_tran.SetRotation(0.0f, 0.0f, 0.0f);
     fountain_tran.SetScale(3.0f, 3.0f, 3.0f);
     fountain_tran.HasRigidBody();
 
-    float pos_tmp_f[3] = {3.0f, -1.0f, 0.0f};
+    float scale_tmp_f[3] = {2.0f, 2.0f, 2.0f};
     
     And::RigidBody rb_tmp = physics_engine->CreateRigidBody();
-    rb_tmp.AddSphereCollider(pos_tmp_f, 3.0f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
+    rb_tmp.AddBoxCollider(pos_tmp_f, scale_tmp_f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
     rb_tmp.SetMass(50.0f);
     rb_tmp.AffectsGravity(true);
 
+    //entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran);
     entity_comp.new_entity(MC_fountain, fountain_mat_comp, fountain_tran, rb_tmp);
   
   
@@ -357,9 +359,6 @@ int main(int argc, char** argv){
     CreateSuelo(entity_comp, *physics_engine);
 
 
-
-
-  
 
   And::AmbientLight ambient;
   ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
@@ -460,11 +459,13 @@ int main(int argc, char** argv){
   float fps_count = 0.0f;
   const float force = 100.0f;
   int frames = 0;
-  float secondsToSpawn = 10.0f;
+  float secondsToSpawn = 4.0f;
 
   float fixed_update = 0.0f;
 
   float time = 0.0f;
+
+  bool is_down = false;
 
   And::TransformComponent* tr_tmp = bolinga_entity->get_component<And::TransformComponent>();
 
@@ -478,12 +479,17 @@ int main(int argc, char** argv){
     fixed_update +=window->get_delta_time(); 
 
     //if(input.IsMouseButtonPressed(And::MouseCode::Left)){
-    if(input.check_action(shot)){
+    if (input.check_action(shot)) {
 
         //static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem & ecs, And::PhysicsEngine & engine, And::MeshComponent & mesh, And::MaterialComponent & material_comp)
-
-        LaunchBall(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, MC_bolinga, bolinga_mat_comp);
+        if (!is_down) {
+            LaunchBall(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, MC_bolinga, bolinga_mat_comp);
+        }
+        is_down = true;
+    }else {
+        is_down = false;
     }
+
 
     if (input.check_action(jump)) {
         //And::AmbientLight* tmp = ambient_entity->get_component<And::AmbientLight>();

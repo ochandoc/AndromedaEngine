@@ -417,6 +417,7 @@ namespace And
 		m_Entities.push_back(std::move(new_e));
 
 		return ett;
+		//return m_Entities.back().get();
 	}
 
 

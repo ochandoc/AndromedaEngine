@@ -55,6 +55,7 @@ void RigidBody::AddBoxCollider(const float* position, const float* scale, Collid
 
 	physx::PxTransform transform(physx::PxVec3(0.0f));
 	transform.p = physx::PxVec3(position[0], position[1], position[2]);
+	transform.q = physx::PxQuat(1.0f);
 
 	switch (type) {
 		case ColliderType::RigidDynamic:m_data->actor = m_data->physics->createRigidDynamic(transform);m_collider_type = ColliderType::RigidDynamic; break;

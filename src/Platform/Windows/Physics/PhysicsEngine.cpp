@@ -177,7 +177,9 @@ void PhysicsEngine::Simulate(double dt, bool fetch) {
 void PhysicsEngine::Apply(EntityComponentSystem& ecs) {
 
 	for (auto [tr, rb] : ecs.get_components<TransformComponent, RigidBody>()) {
-		rb->GetPositionRotation(tr->position, tr->rotation);
+		if (rb->m_collider_type == ColliderType::RigidDynamic) {
+			rb->GetPositionRotation(tr->position, tr->rotation);
+		}
 	}
 }
 

@@ -196,32 +196,31 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 void main(){
 
   // Get textures
-  //vec3 frag_color = pow(texture(Frag_Color, uv).rgb, vec3(2.2));
+  //vec3 albedo = pow(texture(Frag_Color, uv).rgb, vec3(2.2));
   vec3 albedo = texture(Frag_Color, uv).rgb;
-  vec3 frag_normal = texture(Frag_Normal, uv).rgb;
+  vec3 N = texture(Frag_Normal, uv).rgb;
   vec3 frag_position = texture(Frag_Position, uv).rgb;
 
   vec3 stacked = texture(Met_Roug_Ao, uv).rgb;
   float metallic = stacked.r;
   float roughness = stacked.g;
-  float ambient_oclusion = stacked.b;
+  float ao = stacked.b;
+  vec3 V = normalize(camera_position - frag_position);
+  
 
-  /*vec4 light_space_tmp = lightSpace * texture(Frag_Position, uv); 
-  vec3 view_direction = normalize(camera_pos - frag_position);
-
-
+  // PBR calculations
+  // 0.04 porque asumimos que la mayoria de superficies dielectricas se ven visualmente correctas con ese valor
   vec3 F0 = vec3(0.04); 
   F0 = mix(F0, albedo, metallic);
 
-  // reflectance equation
   vec3 Lo = vec3(0.0);
 
   // calculate per-light radiance
-  vec3 L = normalize(lightPositions[i] - WorldPos);
+  vec3 L = normalize(directional_light.direction);
   vec3 H = normalize(V + L);
-  float distance = length(lightPositions[i] - WorldPos);
-  float attenuation = 1.0 / (distance * distance);
-  vec3 radiance = lightColors[i] * attenuation;
+  float distance = length(0.0);
+  float attenuation = 1.0;
+  vec3 radiance = directional_light.diffuse_color * attenuation;
 
   // Cook-Torrance BRDF
   float NDF = DistributionGGX(N, H, roughness);   
@@ -248,18 +247,32 @@ void main(){
 
   // add to outgoing radiance Lo
   Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
- 
-
-
-
-*/
-
-
-
-  vec3 color = CalculeDirLight(directional_light, frag_normal, view_direction) * frag_color;
-  float shadow = ShadowCalculation(light_space_tmp, frag_normal);
-  color = (1.0 - shadow) * color;
-
   
+
+  //vec3 ambient = vec3(0.03) * albedo * ao;
+  vec3 ambient = vec3(0.03) * albedo * ao;
+  vec3 color = Lo + ambient;
+  //vec3 color = Lo + (albedo * ao);
+
+
+
+
+
+  //color = CalculePointLight(point, N, V, frag_position) * albedo;
+
+  //float shadow = 0.0;
+  for(int i = 0; i < 6; i++){
+    //vec4 light_space_tmp = lightSpace[i] * texture(Frag_Position, uv); 
+    //shadow += ShadowCalculation(light_space_tmp, N, texShadow[i]);
+  }
+  //color = (1.0 - shadow) * color;
+  //color.rgb += albedo * 0.1;
+  
+  // HDR tonemapping
+  color = color / (color + vec3(1.0));
+  // gamma correct
+  color = pow(color, vec3(1.0/2.2)); 
+
   FragColor = vec4(color, 1.0);
+  //FragColor = vec4(color.r + metallic, color.g + roughness, color.b + ambient_oclusion, 1.0);
 }

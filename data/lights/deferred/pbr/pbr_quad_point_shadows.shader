@@ -222,7 +222,7 @@ void main(){
   vec3 Lo = vec3(0.0);
 
   // calculate per-light radiance
-  vec3 L = normalize(point.position - frag_position);
+  vec3 L = normalize(point.position - frag_position) * 0.5;
   vec3 H = normalize(V + L);
   float distance = length(point.position - frag_position);
   float attenuation = 1.0 / (distance * distance);
