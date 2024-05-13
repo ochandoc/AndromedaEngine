@@ -118,10 +118,6 @@ namespace And {
 
 	void TransformComponent::SetPosition(float* p) {
 
-		if (p[0] > 999999.9f) {
-			printf("tus muertos pisaos\n");
-		}
-
 		position[0] = p[0];
 		position[1] = p[1];
 		position[2] = p[2];
@@ -130,11 +126,7 @@ namespace And {
 	}
 
 	void TransformComponent::SetPosition(float x, float y, float z){
-
-		if (z > 999999.9f) {
-			printf("tus muertos pisaos\n");
-		}
-
+		
 		position[0] = x;
 		position[1] = y;
 		position[2] = z;
@@ -143,10 +135,6 @@ namespace And {
 	}
 
 	void TransformComponent::SetRotation(float* r){
-
-		if (r[0] > 999999.9f) {
-			printf("tus muertos pisaos\n");
-		}
 
 		rotation[0] = r[0];
 		rotation[1] = r[1];

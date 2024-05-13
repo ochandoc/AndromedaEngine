@@ -158,7 +158,7 @@ static void CreateSuelo(And::EntityComponentSystem& ecs, And::PhysicsEngine& eng
     suelo_mat->SetRoughnessTexture(suelo_rou_b);
     suelo_mat_comp.SetMaterial(suelo_mat);
 
-    float pos_tmp[3] = { -5.0f, 25.0f, 0.0f };
+    float pos_tmp[3] = { -5.0f, 5.0f, 0.0f };
     float scale_tmp[3] = { 1.0f, 10.0f, 10.0f };
     And::TransformComponent suelo_tran;
     suelo_tran.SetPosition(pos_tmp);
@@ -167,7 +167,7 @@ static void CreateSuelo(And::EntityComponentSystem& ecs, And::PhysicsEngine& eng
     suelo_tran.SetScale(scale_tmp);
 
     And::RigidBody rb = engine.CreateRigidBody();
-    rb.AddBoxCollider(pos_tmp, scale_tmp, And::ColliderType::RigidDynamic, 0.5f, 0.5f, 0.8f);
+    rb.AddBoxCollider(pos_tmp, scale_tmp, And::ColliderType::RigidStatic, 0.5f, 0.5f, 0.8f);
     rb.SetMass(50.0f);
     rb.AffectsGravity(true);
     suelo_tran.HasRigidBody();
@@ -436,6 +436,34 @@ int main(int argc, char** argv){
 
   CreateBallsPool(balls_pool, physics_engine, entity_comp, bolinga_mat_comp);
 
+  {
+      And::MaterialComponent mat_com_bola_bolos;
+      std::shared_ptr<And::Material> mat_bola_bolos = std::make_shared<And::Material>();
+      std::shared_ptr<And::Texture> tex_bola_bolos = And::MakeTexture("demo/textures/titanio/albedo.png");
+      std::shared_ptr<And::Texture> normals_bola_bolos = And::MakeTexture("demo/textures/titanio/normals.png");
+      std::shared_ptr<And::Texture> ao_bola_bolos = And::MakeTexture("demo/textures/titanio/ao.png");
+      std::shared_ptr<And::Texture> metallic_bola_bolos = And::MakeTexture("demo/textures/titanio/metallic.png");
+      std::shared_ptr<And::Texture> rou_bola_bolos = And::MakeTexture("demo/textures/titanio/roughness.png");
+      mat_bola_bolos->SetColorTexture(tex_bola_bolos);
+      mat_bola_bolos->SetNormalTexture(normals_bola_bolos);
+      mat_bola_bolos->SetAmbientOclusionTexture(ao_bola_bolos);
+      mat_bola_bolos->SetMetallicTexture(metallic_bola_bolos);
+      mat_bola_bolos->SetRoughnessTexture(rou_bola_bolos);
+      mat_com_bola_bolos.SetMaterial(mat_bola_bolos);
+      
+      And::MeshComponent MC_bola_bolos;
+      MC_bola_bolos.MeshOBJ = And::Geometry::load("sphere.obj");
+
+      And::TransformComponent bola_bolos_tr;
+      bola_bolos_tr.SetPosition(8.0f, 3.0f, 0.0f);
+      bola_bolos_tr.SetRotation(0.0f, 0.0f, 0.0f);
+      bola_bolos_tr.SetScale(1.0f, 1.0f, 1.0f);
+      bola_bolos_tr.HasRigidBody(false);
+
+      entity_comp.new_entity(mat_com_bola_bolos, MC_bola_bolos, bola_bolos_tr);
+
+  }
+
 
 
   And::AudioManager audio_manager;
@@ -490,7 +518,7 @@ int main(int argc, char** argv){
     if (input.check_action(shot)) {
 
         //static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem & ecs, And::PhysicsEngine & engine, And::MeshComponent & mesh, And::MaterialComponent & material_comp)
-        if (!is_down || true) {
+        if (!is_down) {
             LaunchBall(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, MC_bolinga, bolinga_mat_comp);
         }
         is_down = true;
