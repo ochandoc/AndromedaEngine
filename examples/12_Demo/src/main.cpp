@@ -28,16 +28,6 @@
 #define POOL_SIZE 5
 
 
-int SlowTask()
-{
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-  return 10;
-}
-
-void WaitTask(int num){
-  printf("Num: %d\n", num);
-}
-
 static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, And::MeshComponent& mesh, And::MaterialComponent& material_comp) {
 
     And::TransformComponent tran;
@@ -60,14 +50,14 @@ static void LaunchBall(const float* pos, const float* dir, float force, And::Ent
     And::RigidBody rb = engine.CreateRigidBody();
     rb.AddSphereCollider(tran.position, 0.5f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
     rb.AffectsGravity(true);
-    rb.SetMass(5.0f);
+    rb.SetMass(20.0f);
 
-    tran.HasRigidBody(false);
+    tran.HasRigidBody();
 
     //And::Entity* e = ecs.new_entity(mesh, material_comp, tran);
     And::Entity* e = ecs.new_entity(mesh, material_comp, tran, rb);
 
-   float* transform_tmp = e->get_component<And::TransformComponent>()->GetModelMatrix();
+    float* transform_tmp = e->get_component<And::TransformComponent>()->GetModelMatrix();
 
     float new_dir[3] = {dir[0] * force, dir[1] * force, dir[2] * force };
     
@@ -194,7 +184,7 @@ static void CreateSuelo(And::EntityComponentSystem& ecs, And::PhysicsEngine& eng
 
         for (int i = -suelo_num; i < suelo_num; i++) {
 
-            float pos[3] = { i * suelo_scale , -1.0f, j * suelo_scale };
+            float pos[3] = { i * suelo_scale , 0.0f, j * suelo_scale };
 
             And::RigidBody rb = engine.CreateRigidBody();
             rb.AddBoxCollider(pos, scale, And::ColliderType::RigidStatic, 0.5f, 0.5f, 0.8f);
@@ -234,6 +224,74 @@ void CreateBallsPool(And::Entity* e[], std::shared_ptr<And::PhysicsEngine> engin
 
         e[i] = entity_comp.new_entity(MC, mat_comp, tran, rb);
     }
+
+}
+
+
+void CreateBolos(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, And::MeshComponent& mesh, And::MaterialComponent& material_comp) {
+    
+    And::TransformComponent tr;
+    
+    tr.SetRotation(0.0f, 0.0f, 0.0f);
+    tr.SetScale(11.0f, 11.0f, 11.0f);
+    tr.HasRigidBody();
+
+    float initial_position_x = 0.0f;
+    float initial_position_z = 70.0f;
+    float initial_position_y = 0.0f;
+    float separation = 2.0f;
+
+
+    float scale[3] = {1.0f, 4.0f, 1.0f};
+    float position[3] = { 1.0f, 2.0f, 1.0f };
+
+    And::RigidBody rb = engine.CreateRigidBody();
+
+
+    for (int i = -3; i <= 3; i++) {
+        tr.SetPosition(initial_position_x + (i * 1.5f), initial_position_y, initial_position_z);
+        position[0] = initial_position_x + (i * 1.5f);
+        position[2] = initial_position_z;
+        rb.AddBoxCollider(position, scale, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.5f);
+        rb.SetMass(5.0f);
+        rb.AffectsGravity(true);
+        tr.HasRigidBody();
+        ecs.new_entity(mesh, material_comp, tr, rb);
+    }
+    
+    for (int i = -2; i <= 2; i++) {
+        tr.SetPosition(initial_position_x + (i * 1.5f), initial_position_y, initial_position_z + (-separation));
+        position[0] = initial_position_x + (i * 1.5f);
+        position[2] = initial_position_z + (-separation);
+        rb.AddBoxCollider(position, scale, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.5f);
+        rb.SetMass(5.0f);
+        rb.AffectsGravity(true);
+        tr.HasRigidBody();
+        ecs.new_entity(mesh, material_comp, tr, rb);
+    }
+    
+    for (int i = -1; i <= 1; i++) {
+        tr.SetPosition(initial_position_x + (i * 1.5f), initial_position_y, initial_position_z + ( -separation * 2.0f));
+        position[0] = initial_position_x + (i * 1.5f);
+        position[2] = initial_position_z + (-separation * 2.0f);
+        rb.AddBoxCollider(position, scale, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.5f);
+        rb.SetMass(5.0f);
+        rb.AffectsGravity(true);
+        tr.HasRigidBody();
+        ecs.new_entity(mesh, material_comp, tr, rb);
+    }
+
+    tr.SetPosition(initial_position_x, initial_position_y, initial_position_z + (-separation * 3.0f));
+    position[0] = initial_position_x;
+    position[2] = initial_position_z + (-separation * 3.0f);
+    rb.AddBoxCollider(position, scale, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.5f);
+    rb.SetMass(5.0f);
+    rb.AffectsGravity(true);
+    tr.HasRigidBody();
+    ecs.new_entity(mesh, material_comp, tr, rb);
+
+    
+    
 
 }
 
@@ -387,7 +445,7 @@ int main(int argc, char** argv){
 
   float intensity = 300.0f;
   And::PointLight point;
-  point.SetPosition(7.0f, 14.0f, 0.0f);
+  point.SetPosition(0.0f, 14.0f, 0.0f);
   point.SetSpecularColor(1.0f, 1.0f, 1.0f);
   point.SetSpecularShininess(32.0f);
   point.SetSpecularStrength(0.003f);
@@ -490,7 +548,38 @@ int main(int argc, char** argv){
 
       entity_comp.new_entity(mat_com, MC, tr);
 
+      CreateBolos(entity_comp, *physics_engine, MC, mat_com);
+
   }
+
+  {
+      And::MaterialComponent mat_com;
+      std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+      std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/concreto/albedo.png");
+      std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/concreto/normals.png");
+      std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/concreto/ao.png");
+      std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/concreto/metallic.png");
+      std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/concreto/roughness.png");
+      mat->SetColorTexture(tex);
+      mat->SetNormalTexture(normals);
+      mat->SetAmbientOclusionTexture(ao);
+      mat->SetMetallicTexture(metallic);
+      mat->SetRoughnessTexture(rou);
+      mat_com.SetMaterial(mat);
+
+      And::MeshComponent MC;
+      MC.MeshOBJ = And::Geometry::load("demo/obj/arco.obj");
+
+      And::TransformComponent tr;
+      tr.SetPosition(0.0f, 0.0f, 20.0f);
+      tr.SetRotation(0.0f, 0.0f, 0.0f);
+      tr.SetScale(5.0f, 10.0f, 5.0f);
+      tr.HasRigidBody(false);
+
+      entity_comp.new_entity(mat_com, MC, tr);
+
+  }
+
 
 
 
@@ -521,7 +610,7 @@ int main(int argc, char** argv){
 
 
   float fps_count = 0.0f;
-  const float force = 100.0f;
+  const float force = 600.0f;
   int frames = 0;
   float secondsToSpawn = 4.0f;
 
