@@ -2,6 +2,7 @@
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/euler_angles.hpp >
 
 namespace And {
 
@@ -85,18 +86,27 @@ namespace And {
 
 			if (m_has_rb_) {
 				
-				glm::quat quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
-				glm::vec3 euler = glm::eulerAngles(quaternion);
-				rotation[0] = euler[2];
-				rotation[1] = euler[1];
-				rotation[2] = euler[0];
+				glm::quat rotationQuat(rotation[3], rotation[0], rotation[1], rotation[2]);
+				glm::mat4 rotationMatrix = glm::mat4_cast(rotationQuat);
+				m_matrix->model = m_matrix->model * rotationMatrix;
 
-				m_matrix->model = glm::rotate(m_matrix->model, rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
-				m_matrix->model = glm::rotate(m_matrix->model, rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-				m_matrix->model = glm::rotate(m_matrix->model, rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
-				//glm::mat4 RotationMatrix = glm::mat4_cast(quaternion);
 
-				//m_matrix->model *= RotationMatrix;
+				//glm::quat quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
+				//glm::vec3 euler = glm::eulerAngles(quaternion);
+				//rotation[0] = euler[0];
+				//rotation[1] = euler[1];
+				//rotation[2] = euler[2];
+
+				
+				// Lo de arnau
+				//glm::mat4 transform = glm::eulerAngleYXZ(rotation[1], rotation[0], rotation[2]);
+				//m_matrix->model = m_matrix->model * transform;
+				//
+
+				//m_matrix->model = glm::rotate(m_matrix->model, rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
+				//m_matrix->model = glm::rotate(m_matrix->model, rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
+				//m_matrix->model = glm::rotate(m_matrix->model, rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
+				
 			}else {
 
 				//m_matrix->model = glm::translate(m_matrix->model, objPosition);

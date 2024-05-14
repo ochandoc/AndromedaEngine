@@ -233,26 +233,26 @@ void CreateBolos(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, An
     And::TransformComponent tr;
     
     tr.SetRotation(0.0f, 0.0f, 0.0f);
-    tr.SetScale(11.0f, 11.0f, 11.0f);
+    tr.SetScale(15.0f, 15.0f, 15.0f);
     tr.HasRigidBody();
 
     float initial_position_x = 0.0f;
     float initial_position_z = 70.0f;
     float initial_position_y = 0.0f;
-    float separation = 2.0f;
+    float separation = 20.0f;
 
 
-    float scale[3] = {1.0f, 4.0f, 1.0f};
-    float position[3] = { 1.0f, 2.0f, 1.0f };
+    float scale[3] = {1.75f, 8.0f, 1.75f};
+    float position[3] = { 1.0f, 1.0f, 1.0f };
 
-    And::RigidBody rb = engine.CreateRigidBody();
 
 
     for (int i = -3; i <= 3; i++) {
+        And::RigidBody rb = engine.CreateRigidBody();
         tr.SetPosition(initial_position_x + (i * 1.5f), initial_position_y, initial_position_z);
         position[0] = initial_position_x + (i * 1.5f);
         position[2] = initial_position_z;
-        rb.AddBoxCollider(position, scale, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.5f);
+        rb.AddBoxCollider(position, scale, And::ColliderType::RigidStatic, 0.4f, 0.4f, 0.5f);
         rb.SetMass(5.0f);
         rb.AffectsGravity(true);
         tr.HasRigidBody();
@@ -260,10 +260,11 @@ void CreateBolos(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, An
     }
     
     for (int i = -2; i <= 2; i++) {
+        And::RigidBody rb = engine.CreateRigidBody();
         tr.SetPosition(initial_position_x + (i * 1.5f), initial_position_y, initial_position_z + (-separation));
         position[0] = initial_position_x + (i * 1.5f);
         position[2] = initial_position_z + (-separation);
-        rb.AddBoxCollider(position, scale, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.5f);
+        rb.AddBoxCollider(position, scale, And::ColliderType::RigidStatic, 0.4f, 0.4f, 0.5f);
         rb.SetMass(5.0f);
         rb.AffectsGravity(true);
         tr.HasRigidBody();
@@ -271,10 +272,11 @@ void CreateBolos(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, An
     }
     
     for (int i = -1; i <= 1; i++) {
+        And::RigidBody rb = engine.CreateRigidBody();
         tr.SetPosition(initial_position_x + (i * 1.5f), initial_position_y, initial_position_z + ( -separation * 2.0f));
         position[0] = initial_position_x + (i * 1.5f);
         position[2] = initial_position_z + (-separation * 2.0f);
-        rb.AddBoxCollider(position, scale, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.5f);
+        rb.AddBoxCollider(position, scale, And::ColliderType::RigidStatic, 0.4f, 0.4f, 0.5f);
         rb.SetMass(5.0f);
         rb.AffectsGravity(true);
         tr.HasRigidBody();
@@ -284,7 +286,8 @@ void CreateBolos(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, An
     tr.SetPosition(initial_position_x, initial_position_y, initial_position_z + (-separation * 3.0f));
     position[0] = initial_position_x;
     position[2] = initial_position_z + (-separation * 3.0f);
-    rb.AddBoxCollider(position, scale, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.5f);
+    And::RigidBody rb = engine.CreateRigidBody();
+    rb.AddBoxCollider(position, scale, And::ColliderType::RigidStatic, 0.4f, 0.4f, 0.5f);
     rb.SetMass(5.0f);
     rb.AffectsGravity(true);
     tr.HasRigidBody();

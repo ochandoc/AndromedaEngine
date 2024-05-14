@@ -3,6 +3,7 @@
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/euler_angles.hpp >
 
 
 namespace And{
@@ -211,8 +212,21 @@ void RigidBody::GetPositionRotation(float* position, float* rotation){
 	//float angle;
 	//physx::PxVec3 axis;
 	//transform.q.toRadiansAndUnitAxis(angle, axis);
+
 	//physx::PxVec3 eulerRotation = axis * angle;
+
+	//glm::quat q(transform.q.w, transform.q.x, transform.q.y, transform.q.z);
+	//glm::vec3 euler = glm::eulerAngles(q);// *3.14159f / 180.f; // eulerAngleYXZ takes radians but eulerAngles returns degrees
 	
+	//rotation[0] = euler[0];
+	//rotation[1] = euler[1];
+	//rotation[2] = euler[2];
+
+	//rotation[0] = axis[0];
+	//rotation[1] = axis[1];
+	//rotation[2] = axis[2];
+	//rotation[3] = angle;
+
 	rotation[0] = transform.q.x;
 	rotation[1] = transform.q.y;
 	rotation[2] = transform.q.z;
