@@ -41,13 +41,18 @@ namespace And
     void SetScale(float x, float y, float z);
 
     void HasRigidBody(bool value = true) { m_has_rb_ = value; }
+    void SetPositionOffet(float* offset);
+    void SetPositionOffet(float x, float y, float z);
+
 
     void Reset();
+
   private:
       bool m_should_recalculate = true;
     
       //float* m_model_matrix = nullptr;
       std::shared_ptr<Mat4> m_matrix;
       bool m_has_rb_ = false;
+      float position_offset[3] = {0.0f};
   };
 }

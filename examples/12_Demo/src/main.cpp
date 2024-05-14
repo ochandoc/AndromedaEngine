@@ -28,7 +28,9 @@
 #define POOL_SIZE 5
 
 
-static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, And::MeshComponent& mesh, And::MaterialComponent& material_comp) {
+static And::Entity* big_balls[POOL_SIZE];
+
+static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, And::MeshComponent& mesh, And::MaterialComponent& material_comp, bool big = false) {
 
     And::TransformComponent tran;
     tran.position[0] = pos[0] + (dir[0] * 5.0f);
@@ -43,14 +45,29 @@ static void LaunchBall(const float* pos, const float* dir, float force, And::Ent
     tran.rotation[1] = 0.0f;
     tran.rotation[2] = 0.0f;
     tran.rotation[3] = 0.0f;
+
     tran.scale[0] = 0.5f;
     tran.scale[1] = 0.5f;
     tran.scale[2] = 0.5f;
 
+
     And::RigidBody rb = engine.CreateRigidBody();
-    rb.AddSphereCollider(tran.position, 0.5f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
+    
+    if (big) {
+        tran.scale[0] = 1.0f;
+        tran.scale[1] = 1.0f;
+        tran.scale[2] = 1.0f;
+
+        rb.AddSphereCollider(tran.position, 1.0f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
+        rb.SetMass(40.0f);
+        force *= 2.0f;
+    }else {
+
+        rb.AddSphereCollider(tran.position, 0.5f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
+        rb.SetMass(20.0f);
+    }
+   
     rb.AffectsGravity(true);
-    rb.SetMass(20.0f);
 
     tran.HasRigidBody();
 
@@ -237,22 +254,25 @@ void CreateBolos(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, An
     tr.HasRigidBody();
 
     float initial_position_x = 0.0f;
-    float initial_position_z = 70.0f;
-    float initial_position_y = 0.0f;
-    float separation = 20.0f;
+    float initial_position_z = 80.0f;
+    float initial_position_y = 6.0f;
+    float separation = 4.0f;
+    float separation_x = 3.0f;
 
 
-    float scale[3] = {1.75f, 8.0f, 1.75f};
+    float scale[3] = {1.75f, 5.5f, 1.75f};
     float position[3] = { 1.0f, 1.0f, 1.0f };
 
+    tr.SetPositionOffet(0.0f, -3.0f, 0.0f);
 
 
     for (int i = -3; i <= 3; i++) {
         And::RigidBody rb = engine.CreateRigidBody();
-        tr.SetPosition(initial_position_x + (i * 1.5f), initial_position_y, initial_position_z);
-        position[0] = initial_position_x + (i * 1.5f);
+        tr.SetPosition(initial_position_x + (i * separation_x), initial_position_y, initial_position_z);
+        position[0] = initial_position_x + (i * separation_x);
+        position[1] = initial_position_y;
         position[2] = initial_position_z;
-        rb.AddBoxCollider(position, scale, And::ColliderType::RigidStatic, 0.4f, 0.4f, 0.5f);
+        rb.AddBoxCollider(position, scale, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.5f);
         rb.SetMass(5.0f);
         rb.AffectsGravity(true);
         tr.HasRigidBody();
@@ -261,10 +281,11 @@ void CreateBolos(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, An
     
     for (int i = -2; i <= 2; i++) {
         And::RigidBody rb = engine.CreateRigidBody();
-        tr.SetPosition(initial_position_x + (i * 1.5f), initial_position_y, initial_position_z + (-separation));
-        position[0] = initial_position_x + (i * 1.5f);
+        tr.SetPosition(initial_position_x + (i * separation_x), initial_position_y, initial_position_z + (-separation));
+        position[0] = initial_position_x + (i * separation_x);
+        position[1] = initial_position_y;
         position[2] = initial_position_z + (-separation);
-        rb.AddBoxCollider(position, scale, And::ColliderType::RigidStatic, 0.4f, 0.4f, 0.5f);
+        rb.AddBoxCollider(position, scale, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.5f);
         rb.SetMass(5.0f);
         rb.AffectsGravity(true);
         tr.HasRigidBody();
@@ -273,10 +294,11 @@ void CreateBolos(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, An
     
     for (int i = -1; i <= 1; i++) {
         And::RigidBody rb = engine.CreateRigidBody();
-        tr.SetPosition(initial_position_x + (i * 1.5f), initial_position_y, initial_position_z + ( -separation * 2.0f));
-        position[0] = initial_position_x + (i * 1.5f);
+        tr.SetPosition(initial_position_x + (i * separation_x), initial_position_y, initial_position_z + ( -separation * 2.0f));
+        position[0] = initial_position_x + (i * separation_x);
+        position[1] = initial_position_y;
         position[2] = initial_position_z + (-separation * 2.0f);
-        rb.AddBoxCollider(position, scale, And::ColliderType::RigidStatic, 0.4f, 0.4f, 0.5f);
+        rb.AddBoxCollider(position, scale, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.5f);
         rb.SetMass(5.0f);
         rb.AffectsGravity(true);
         tr.HasRigidBody();
@@ -285,9 +307,10 @@ void CreateBolos(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, An
 
     tr.SetPosition(initial_position_x, initial_position_y, initial_position_z + (-separation * 3.0f));
     position[0] = initial_position_x;
+    position[1] = initial_position_y;
     position[2] = initial_position_z + (-separation * 3.0f);
     And::RigidBody rb = engine.CreateRigidBody();
-    rb.AddBoxCollider(position, scale, And::ColliderType::RigidStatic, 0.4f, 0.4f, 0.5f);
+    rb.AddBoxCollider(position, scale, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.5f);
     rb.SetMass(5.0f);
     rb.AffectsGravity(true);
     tr.HasRigidBody();
@@ -322,7 +345,7 @@ int main(int argc, char** argv){
 
 
     And::FlyCamera fly_cam{*window};
-    fly_cam.SetPosition(-5.0f, 0.0f, 0.0f);
+    fly_cam.SetPosition(-5.0f, 10.0f, 10.0f);
     fly_cam.SetSize(1920.0f, 1080.0f);
 
     fly_cam.SetFar(1000.0f);
@@ -470,6 +493,7 @@ int main(int argc, char** argv){
   And::Input input{ *window };
   And::ActionInput jump{ "Jump", And::KeyState::Press, { And::KeyCode::Space} };
   And::ActionInput shot{ "Shot", And::KeyState::Press, { And::KeyCode::C} };
+  And::ActionInput big_shot{ "BigShot", And::KeyState::Press, { And::KeyCode::V} };
   And::ActionInput changePoint{ "ChangePoint", And::KeyState::Press, { And::KeyCode::P} };
 
   And::Entity* balls_pool[POOL_SIZE];
@@ -622,6 +646,7 @@ int main(int argc, char** argv){
   float time = 0.0f;
 
   bool is_down = false;
+  bool is_big_down = false;
 
   //And::TransformComponent* tr_tmp = bolinga_entity->get_component<And::TransformComponent>();
 
@@ -644,6 +669,17 @@ int main(int argc, char** argv){
         is_down = true;
     }else {
         is_down = false;
+    }
+    
+    if (input.check_action(big_shot)) {
+
+        //static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem & ecs, And::PhysicsEngine & engine, And::MeshComponent & mesh, And::MaterialComponent & material_comp)
+        if (!is_big_down) {
+            LaunchBall(fly_cam.GetPosition(), fly_cam.GetDirection(), force, entity_comp, *physics_engine, MC_bolinga, bolinga_mat_comp, true);
+        }
+        is_big_down = true;
+    }else {
+        is_big_down = false;
     }
 
 

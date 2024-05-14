@@ -22,6 +22,7 @@ namespace And {
 			this->position[i] = other.position[i];
 			this->rotation[i] = other.rotation[i];
 			this->scale[i] = other.scale[i];
+			this->position_offset[i] = other.position_offset[i];
 		}
 		this->rotation[3] = other.rotation[3];
 		this->m_has_rb_ = other.m_has_rb_;
@@ -35,6 +36,7 @@ namespace And {
 			this->position[i] = other.position[i];
 			this->rotation[i] = other.rotation[i];
 			this->scale[i] = other.scale[i];
+			this->position_offset[i] = other.position_offset[i];
 		}
 		
 		this->rotation[3] = other.rotation[3];
@@ -47,6 +49,7 @@ namespace And {
 			other.position[i] = 0.0f;
 			other.rotation[i] = 0.0f;
 			other.scale[i] = 0.0f;;
+			other.position_offset[i] = 0.0f;
 		}
 		other.rotation[3] = 0.0f;
 		other.m_has_rb_ = false;
@@ -63,6 +66,7 @@ namespace And {
 			this->position[i] = other.position[i];
 			this->rotation[i] = other.rotation[i];
 			this->scale[i] = other.scale[i];
+			this->position_offset[i] = other.position_offset[i];
 		}
 		this->rotation[3] = other.rotation[3];
 		this->m_has_rb_ = other.m_has_rb_;
@@ -77,7 +81,7 @@ namespace And {
 		if (m_should_recalculate) {
 			m_matrix->model = glm::mat4(1.0f);
 
-			glm::vec3 objPosition = glm::vec3(position[0], position[1], position[2]);
+			glm::vec3 objPosition = glm::vec3(position[0] + position_offset[0], position[1] + position_offset[1], position[2] + position_offset[2]);
 			glm::vec3 objScale = glm::vec3(scale[0], scale[1], scale[2]);
 			//glm::vec3 objRotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
 
@@ -164,10 +168,6 @@ namespace And {
 	
 	void TransformComponent::SetRotation(float x, float y, float z){
 
-		if (x > 999999.9f) {
-			printf("tus muertos pisaos\n");
-		}
-
 		rotation[0] = x;
 		rotation[1] = y;
 		rotation[2] = z;
@@ -191,6 +191,20 @@ namespace And {
 		scale[2] = z;
 
 		m_should_recalculate = true;
+	}
+
+	void TransformComponent::SetPositionOffet(float* offset){
+		for (int i = 0; i < 3; i++) {
+			position_offset[i] = offset[i];
+		}
+	}
+
+	void TransformComponent::SetPositionOffet(float x, float y, float z){
+		
+		position_offset[0] = x;
+		position_offset[1] = y;
+		position_offset[2] = z;
+		
 	}
 
 	void TransformComponent::Reset(){
