@@ -54,13 +54,13 @@ static void LaunchBall(const float* pos, const float* dir, float force, And::Ent
     And::RigidBody rb = engine.CreateRigidBody();
     
     if (big) {
-        tran.scale[0] = 1.0f;
-        tran.scale[1] = 1.0f;
-        tran.scale[2] = 1.0f;
+        tran.scale[0] = 2.0f;
+        tran.scale[1] = 2.0f;
+        tran.scale[2] = 2.0f;
 
-        rb.AddSphereCollider(tran.position, 1.0f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
-        rb.SetMass(40.0f);
-        force *= 2.0f;
+        rb.AddSphereCollider(tran.position, 2.0f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
+        rb.SetMass(60.0f);
+        force *= 4.0f;
     }else {
 
         rb.AddSphereCollider(tran.position, 0.5f, And::ColliderType::RigidDynamic, 0.4f, 0.4f, 0.8f);
@@ -260,7 +260,7 @@ void CreateBolos(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, An
     float separation_x = 3.0f;
 
 
-    float scale[3] = {1.75f, 5.5f, 1.75f};
+    float scale[3] = {1.2f, 5.5f, 1.2f};
     float position[3] = { 1.0f, 1.0f, 1.0f };
 
     tr.SetPositionOffet(0.0f, -3.0f, 0.0f);
@@ -450,40 +450,58 @@ int main(int argc, char** argv){
 
   CreateSuelo(entity_comp, *physics_engine);
 
+  {
 
 
-  And::AmbientLight ambient;
-  ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-  ambient.SetAmbientStrenght(0.1f);
-  //And::Entity* ambient_entity = entity_comp.new_entity(ambient);
+      And::AmbientLight ambient;
+      ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+      ambient.SetAmbientStrenght(0.1f);
+      //And::Entity* ambient_entity = entity_comp.new_entity(ambient);
 
   
 
-  And::DirectionalLight directional;
-  directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-  directional.SetDirection(1.0f, -0.5f, 0.0f);
-  directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
-  directional.SetSpecularShininess(32.0f);
-  directional.SetSpecularStrength(0.003f);
-  directional.SetEnabled(true);
-  directional.SetCastShadows(false);
-  //entity_comp.new_entity(directional);
+      And::DirectionalLight directional;
+      directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+      directional.SetDirection(0.5f, -0.5f, 0.5f);
+      directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
+      directional.SetSpecularShininess(32.0f);
+      directional.SetSpecularStrength(0.003f);
+      directional.SetEnabled(true);
+      directional.SetCastShadows(false);
+      entity_comp.new_entity(directional);
 
-  float intensity = 300.0f;
-  And::PointLight point;
-  point.SetPosition(0.0f, 14.0f, 0.0f);
-  point.SetSpecularColor(1.0f, 1.0f, 1.0f);
-  point.SetSpecularShininess(32.0f);
-  point.SetSpecularStrength(0.003f);
-  point.SetConstantAtt(1.0f);
-  point.SetLinearAtt(0.045f);
-  point.SetQuadraticAtt(0.0075f);
-  point.SetEnabled(true);
-  point.SetCastShadows(true);
-  point.SetIntensity(200.0f);
-  point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-  And::Entity* entity_tmp = entity_comp.new_entity(point);
-  And::PointLight* point_tmp = entity_tmp->get_component<And::PointLight>();
+      float intensity = 300.0f;
+      And::PointLight point;
+      point.SetPosition(0.0f, 14.0f, 0.0f);
+      point.SetSpecularColor(1.0f, 1.0f, 1.0f);
+      point.SetSpecularShininess(32.0f);
+      point.SetSpecularStrength(0.003f);
+      point.SetConstantAtt(1.0f);
+      point.SetLinearAtt(0.045f);
+      point.SetQuadraticAtt(0.0075f);
+      point.SetEnabled(true);
+      point.SetCastShadows(true);
+      point.SetIntensity(intensity);
+      point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+      //And::Entity* entity_tmp = entity_comp.new_entity(point);
+
+      And::SpotLight spot{};
+      spot.SetPosition(0.0f, 16.0f, 84.0f);
+      spot.SetDirection(0.0f, -1.0f, 0.0f);
+      spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+      spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+      spot.SetSpecularStrength(0.003f);
+      spot.SetSpecularShininess(32.0f);
+      spot.SetConstantAtt(1.0f);
+      spot.SetLinearAtt(0.045f);
+      spot.SetQuadraticAtt(0.0075f);
+      spot.SetCuttOff(2.5f);
+      spot.SetOuterCuttOff(50.0f);
+      spot.SetCastShadows(true);
+      spot.SetEnabled(true);
+      spot.SetIntensity(intensity);
+      entity_comp.new_entity(spot);
+  }
 
   std::shared_ptr<And::Geometry> geo = And::Geometry::load("cube.obj");
   float position_tmp[3] = {-1.0f, 20.0f, -15.0f};
@@ -600,7 +618,7 @@ int main(int argc, char** argv){
       And::TransformComponent tr;
       tr.SetPosition(0.0f, 0.0f, 20.0f);
       tr.SetRotation(0.0f, 0.0f, 0.0f);
-      tr.SetScale(5.0f, 10.0f, 5.0f);
+      tr.SetScale(5.0f, 5.0f, 5.0f);
       tr.HasRigidBody(false);
 
       entity_comp.new_entity(mat_com, MC, tr);
@@ -689,7 +707,7 @@ int main(int argc, char** argv){
     }
 
     if (input.check_action(changePoint)) {
-        point_tmp->SetEnabled(!point_tmp->GetEnabled());
+        //point_tmp->SetEnabled(!point_tmp->GetEnabled());
     }
 
     //float* pos = point_tmp->GetPosition();

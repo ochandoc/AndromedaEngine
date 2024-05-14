@@ -72,6 +72,8 @@ class SpotLight : public Light{
         float  GetQuadraticAtt();
         void   GetQuadraticAtt(float& quadratic);
         
+        // This is only for pbr
+        void  SetIntensity(const float intensity);
         void  SetDiffuseColor(float color[3]);
         void  SetDiffuseColor(float r, float g, float b);
         void  SetSpecularStrength(float strength);
@@ -88,5 +90,8 @@ class SpotLight : public Light{
         void  SetConstantAtt(float constant);
         void  SetLinearAtt(float linear);
         void  SetQuadraticAtt(float quadratic);
+
+    private:
+        float m_intensity = 1.0f;
 };
 }

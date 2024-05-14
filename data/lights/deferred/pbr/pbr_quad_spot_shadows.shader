@@ -5,43 +5,47 @@ layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normals;
 layout(location = 2) in vec2 TexCoord;
 
-struct PointLight{
+struct SpotLight{
   vec3 position;
-  float specular_strength;
+  float padding3;
+  vec3 direction;
+  float padding;
   vec3 diffuse_color;
-  float specular_shininess;
+  float padding2;
   vec3 specular_color;
+  float enabled;
+  float cutt_off;
+  float outer_cut_off;
+  float specular_strength;
+  float specular_shininess;
   float constant_att;
   float linear_att;
-  float quadratic_att;
-  float enabled;
-  float attenuation; // 64 bytes
+  float quadratic_att; // 80 bytes
 };
 
-layout (std140, binding = 1) uniform UniformBlockPoivvntLight{
+layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
-  mat4 ProjViewLight[6];
   mat4 ProjViewCam;
+  mat4 ProjViewLight;
   vec3 camera_position;
 };
 
-layout (std140, binding = 4) uniform UniformPoivvnt{
-  PointLight point;
+layout (std140, binding = 5) uniform UniformSpot{
+  SpotLight spot;
 };
+
 
 out vec3 blend_color;
 out vec3 s_normal;
 out vec3 s_fragPos;
 out vec3 camera_pos;
 out vec2 uv;
-out mat4 lightSpace[6];
+out mat4 lightSpace;
 
 void main(){
   gl_Position = vec4(position, 1.0);
   uv = TexCoord;
-  for(int i = 0; i < 6; i++){
-    lightSpace[i] = ProjViewLight[i];// * obj_position;
-  }
+  lightSpace = ProjViewLight;
 }
 
 
@@ -54,43 +58,68 @@ uniform sampler2D Frag_Position;
 uniform sampler2D Frag_Normal;
 uniform sampler2D Frag_Color;
 uniform sampler2D Met_Roug_Ao;
-uniform sampler2D texShadow[6];
+uniform sampler2D texShadow;
 
 in vec3 blend_color;
 in vec3 s_normal;
 in vec3 s_fragPos;
 in vec3 camera_pos;
 in vec2 uv;
-in mat4 lightSpace[6];
+in mat4 lightSpace;
 
-
-struct PointLight{
+struct Light{
   vec3 position;
-  float specular_strength;
+  float padding3;
+  vec3 direction;
+  float padding;
   vec3 diffuse_color;
-  float specular_shininess;
+  float padding2;
   vec3 specular_color;
+  float enabled;
+  float cutt_off;
+  float outer_cut_off;
+  float specular_strength;
+  float specular_shininess;
   float constant_att;
   float linear_att;
-  float quadratic_att;
-  float enabled;
-  float attenuation; // 64 bytes
+  float quadratic_att; // 80 bytes
 };
 
-layout (std140, binding = 1) uniform UniformBlockPoivvntLight{
+
+struct SpotLight{
+  vec3 position;
+  float padding3;
+  vec3 direction;
+  float padding;
+  vec3 diffuse_color;
+  float padding2;
+  vec3 specular_color;
+  float enabled;
+  float cutt_off;
+  float outer_cut_off;
+  float specular_strength;
+  float specular_shininess;
+  float constant_att;
+  float linear_att;
+  float quadratic_att; 
+  // 80 bytes
+};
+
+layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
-  mat4 ProjViewLight[6];
   mat4 ProjViewCam;
+  mat4 ProjViewLight;
   vec3 camera_position;
 };
 
-layout (std140, binding = 4) uniform UniformPoivvnt{
-  PointLight point;
+layout (std140, binding = 5) uniform UniformSpot{
+  SpotLight spot;
 };
+
 
 const float PI = 3.14159265359;
 
-float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal_value, sampler2D tex){
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal_value, sampler2D tex, vec3 frag_pos){
 
   // perform perspective divide
   vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -107,7 +136,7 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal_value, sampler2D tex
   // get depth of current fragment from light's perspective
   float currentDepth = projCoords.z;
   // calculate bias (based on depth map resolution and slope)
-  vec3 lightDir = normalize(point.position - s_fragPos);
+  vec3 lightDir = normalize(spot.position - frag_pos);
   float bias = max(0.05 * (1.0 - dot(normal_value, lightDir)), 0.005);
   // check whether current frag pos is in shadow
   // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
@@ -131,31 +160,48 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal_value, sampler2D tex
   return shadow;
 }
 
-
-vec3 CalculePointLight(PointLight light, vec3 normalValue, vec3 view_dir, vec3 fragPos){
-
-  vec3 lightDir = normalize(light.position - fragPos);
- 
-  //Diffuse
-  float diff = max(dot(normalValue, lightDir), 0.0);
-
-  //Specular
-  vec3 reflectDir = reflect(-lightDir, normalValue);
-  float spec = pow(max(dot(view_dir, reflectDir), 0.0), light.specular_shininess);
-
-  float lightDistance = length(light.position- fragPos);
-  float attenuation = 1.0 / (light.constant_att + light.linear_att * lightDistance + light.quadratic_att * (lightDistance * lightDistance));
+Light CalcLight(vec3 light_direction, vec3 light_color, vec3 normals, vec3 position, vec3 view_dir){
   
+  Light light;
 
-  vec3 difuse = light.diffuse_color * diff;  
-  vec3 specular = (light.specular_strength * light.specular_shininess * spec) * light.specular_color;
+  float diff = max(dot(normals, light_direction),0.0);
+  light.diffuse_color = diff * light_color;// * texture(u_texture, uv).rgb;
 
+  vec3 reflectDir = reflect(-light_direction, normals);
+  float spec = pow(max(dot(view_dir, reflectDir), 0.0), spot.specular_shininess);
 
-  difuse *= (attenuation * light.attenuation);
-  specular *= attenuation;
+  light.specular_color = spot.specular_strength * spec * spot.specular_color; // * texture(u_texture, uv).rgb;
+
+  return light;
+}
+
+vec3 CalculeSpotLightJou(SpotLight spot, vec3 normals, vec3 view_dir, vec3 position, float attenuation){
+
+  vec3 lightDir  = normalize(spot.position - position);
+  float cut_off = cos(spot.cutt_off * 3.1415/180.0);
+  float outer_cut_off = cos(spot.outer_cut_off * 3.1415/180.0);
+  Light light = CalcLight(lightDir, spot.diffuse_color, normals, position, view_dir);
+
+  float distance = length(spot.position - position);
+
+  //float k0 = spot.constant_att;
+  //float k1 = spot.linear_att;
+  //float k2 = spot.quadratic_att;
+
+  //float attenuationAmount = 1.0 / (k0 + (k1*distance) + k2* (distance*distance));
   
-  return (difuse + specular);
+  light.diffuse_color *= attenuation ;
+  light.specular_color *= attenuation;
 
+
+  float theta = dot(lightDir,normalize(-spot.direction));//0.5
+
+  float epsilon = (cut_off - outer_cut_off); // 0.9978 - 0.953 /
+  float intensity = clamp((theta - outer_cut_off) / epsilon, 0.0, 1.0); //  0.5 - 0.953 / 0.9978 - 0.953
+  light.diffuse_color  *= intensity;
+  light.specular_color *= intensity;
+
+  return light.diffuse_color + light.specular_color;
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness){
@@ -199,32 +245,6 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0){
   return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
-vec3 CalculePointLight(PointLight light, vec3 normalValue, vec3 view_dir, vec3 fragPos, float attenuation){
-
-  vec3 lightDir = normalize(light.position - fragPos);
- 
-  //Diffuse
-  float diff = max(dot(normalValue, lightDir), 0.0);
-
-  //Specular
-  vec3 reflectDir = reflect(-lightDir, normalValue);
-  float spec = pow(max(dot(view_dir, reflectDir), 0.0), light.specular_shininess);
-
-  float lightDistance = length(light.position- fragPos);
-  //float attenuation = 1.0 / (light.constant_att + light.linear_att * lightDistance + light.quadratic_att * (lightDistance * lightDistance));
-  
-
-  vec3 difuse = light.diffuse_color * diff;  
-  vec3 specular = (light.specular_strength * light.specular_shininess * spec) * light.specular_color;
-
-
-  difuse *= (attenuation * light.attenuation);
-  specular *= attenuation;
-  
-  return (difuse + specular);
-
-}
-
 void main(){
 
   // Get textures
@@ -248,16 +268,16 @@ void main(){
   vec3 Lo = vec3(0.0);
 
   // calculate per-light radiance
-  vec3 L = normalize((point.position - frag_position) * 8.0);
+  vec3 L = normalize((spot.position - frag_position) * 8.0);
   vec3 H = normalize(V + L);
-  float distance = length(point.position - frag_position);
+  float distance = length(spot.position - frag_position);
   float attenuation = 1.0 / (distance * distance);
   // La atenuacion del pbr la tengo aqui
 
 
   //vec3 radiance = point.diffuse_color * attenuation;
 
-  vec3 radiance = CalculePointLight(point, N, V, frag_position, attenuation);
+  vec3 radiance = CalculeSpotLightJou(spot, N, V, frag_position, attenuation);
 
   // Cook-Torrance BRDF
   float NDF = DistributionGGX(N, H, roughness);   
@@ -287,21 +307,14 @@ void main(){
   
 
   //vec3 ambient = vec3(0.03) * albedo * ao;
-  //vec3 ambient = vec3(0.03) * albedo * ao;
+  vec3 ambient = vec3(0.03) * albedo * ao;
   vec3 color = Lo;
   //vec3 color = Lo + (albedo * ao);
 
 
 
-
-
-  //color = CalculePointLight(point, N, V, frag_position) * albedo;
-
-  float shadow = 0.0;
-  for(int i = 0; i < 6; i++){
-    vec4 light_space_tmp = lightSpace[i] * texture(Frag_Position, uv); 
-    shadow += ShadowCalculation(light_space_tmp, N, texShadow[i]);
-  }
+  vec4 light_space_tmp = lightSpace * texture(Frag_Position, uv); 
+  float shadow = ShadowCalculation(light_space_tmp, N, texShadow, frag_position);
   color = (1.0 - shadow) * color;
   //color.rgb += albedo * 0.1;
   

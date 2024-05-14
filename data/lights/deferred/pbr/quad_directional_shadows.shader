@@ -220,7 +220,7 @@ void main(){
   vec3 H = normalize(V + L);
   float distance = length(0.0);
   float attenuation = 1.0;
-  vec3 radiance = directional_light.diffuse_color * attenuation;
+  vec3 radiance = directional_light.diffuse_color;// * attenuation;
 
   // Cook-Torrance BRDF
   float NDF = DistributionGGX(N, H, roughness);   
@@ -250,8 +250,8 @@ void main(){
   
 
   //vec3 ambient = vec3(0.03) * albedo * ao;
-  vec3 ambient = vec3(0.03) * albedo * ao;
-  vec3 color = Lo + ambient;
+  //vec3 ambient = vec3(0.03) * albedo * ao;
+  vec3 color = Lo;
   //vec3 color = Lo + (albedo * ao);
 
 

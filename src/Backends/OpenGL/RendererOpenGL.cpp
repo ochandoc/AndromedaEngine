@@ -129,6 +129,7 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   m_shader_pbr_geometry = MakeShader("lights/deferred/pbr/pbr_geometry.shader");
   m_shader_quad_point_pbr = MakeShader("lights/deferred/pbr/pbr_quad_point_shadows.shader");
   m_shader_quad_ambient_pbr = MakeShader("lights/deferred/pbr/pbr_quad_ambient.shader");
+  m_shader_quad_spot_pbr = MakeShader("lights/deferred/pbr/pbr_quad_spot_shadows.shader");
 
 
   // QUAD
@@ -1019,12 +1020,7 @@ void RendererOpenGL::RenderPBRLight(std::shared_ptr<And::RenderTarget> shadow_bu
 
     SpotLight* spot = dynamic_cast<SpotLight*>(light);
     if (spot) {
-        if (cast_shadows) {
-            tmp = static_cast<OpenGLShader*>(m_shader_quad_spot_shadows.get());
-        }
-        else {
-            tmp = static_cast<OpenGLShader*>(m_shader_quad_spot.get());
-        }
+        tmp = static_cast<OpenGLShader*>(m_shader_quad_spot_pbr.get());
     }
 
     PointLight* point = dynamic_cast<PointLight*>(light);
