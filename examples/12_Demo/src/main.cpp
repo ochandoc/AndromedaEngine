@@ -29,6 +29,8 @@
 
 
 static And::Entity* big_balls[POOL_SIZE];
+static std::random_device rd;
+static std::mt19937 gen(rd());
 
 static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, And::MeshComponent& mesh, And::MaterialComponent& material_comp, bool big = false) {
 
@@ -81,9 +83,6 @@ static void LaunchBall(const float* pos, const float* dir, float force, And::Ent
     And::RigidBody* tmp = e->get_component<And::RigidBody>();
     tmp->AddForce(new_dir, And::ForceMode::IMPULSE);
 }
-
-static std::random_device rd;
-static std::mt19937 gen(rd());
 
 static void SpawnBall(std::shared_ptr<And::PhysicsEngine> engine, And::EntityComponentSystem& entity_comp) {
   float pos[3] = {0.0f, 2.0f, 0.0f};
@@ -145,7 +144,6 @@ static void ThrowBall(And::Entity* pool[], int index) {
     printf("Lanuch at X:%f Y:%f Z:%f\n", x, 50.0f, z);
 
 }
-
 
 static void CreateSuelo(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine) {
     And::MeshComponent MC_suelo;
@@ -243,7 +241,6 @@ void CreateBallsPool(And::Entity* e[], std::shared_ptr<And::PhysicsEngine> engin
     }
 
 }
-
 
 void CreateBolos(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, And::MeshComponent& mesh, And::MaterialComponent& material_comp) {
     
@@ -455,7 +452,7 @@ int main(int argc, char** argv){
 
       And::AmbientLight ambient;
       ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-      ambient.SetAmbientStrenght(0.1f);
+      ambient.SetAmbientStrenght(0.025f);
       //And::Entity* ambient_entity = entity_comp.new_entity(ambient);
 
   
@@ -483,7 +480,7 @@ int main(int argc, char** argv){
       point.SetCastShadows(true);
       point.SetIntensity(intensity);
       point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-      //And::Entity* entity_tmp = entity_comp.new_entity(point);
+      And::Entity* entity_tmp = entity_comp.new_entity(point);
 
       And::SpotLight spot{};
       spot.SetPosition(0.0f, 16.0f, 84.0f);
@@ -645,10 +642,10 @@ int main(int argc, char** argv){
   audio_fuente.SetDopplerFactor(10.0f);
   audio_fuente.SetLooping(true);
   audio_fuente.SetPitch(1.0f);
-  audio_fuente.SetMaxDistance(20.0f);
+  audio_fuente.SetMaxDistance(10.0f);
 
-  //audio_manager.play(audio_fondo);
-  //audio_manager.play(audio_fuente);
+  audio_manager.play(audio_fondo);
+  audio_manager.play(audio_fuente);
 
 
 
