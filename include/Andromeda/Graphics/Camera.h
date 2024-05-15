@@ -50,6 +50,8 @@ namespace And
 
     virtual const float* GetPosition() const override  { return m_Position; }
     virtual const float* GetDirection() const override { return m_Direction; }
+    const float* GetUp() { return m_up; }
+    const float* GetRight() { return m_right; }
     float GetFov() const { return m_Fov; }
     float GetAspectRation() const { return m_AspectRatio; }
     virtual float GetNear() const override { return m_Near; }
@@ -57,6 +59,8 @@ namespace And
     const float* GetViewMatrix();
     const float* GetProjectionMatrix();
     const float* GetProjectionViewMatrix();
+
+    
 
     virtual void ShowValues();  
 
@@ -66,6 +70,8 @@ namespace And
 
     float m_Position[3];
     float m_Direction[3];
+    float m_up[3];
+    float m_right[3];
     float m_Fov;
     float m_AspectRatio;
     float m_Near;

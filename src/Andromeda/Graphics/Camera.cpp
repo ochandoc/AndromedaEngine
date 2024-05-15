@@ -170,6 +170,15 @@ void And::Camera::RecalculeViewMatrix(bool bForce)
     glm::vec3 up(0.0f, 1.0f, 0.0f);
     glm::vec3 cameraRight = glm::normalize(glm::cross(up, direction));
     glm::vec3 cameraUp = glm::cross(direction, cameraRight);
+
+    m_up[0] = cameraUp[0];
+    m_up[1] = cameraUp[1];
+    m_up[2] = cameraUp[2];
+    
+    m_right[0] = cameraRight[0];
+    m_right[1] = cameraRight[1];
+    m_right[2] = cameraRight[2];
+
     m_Data->ViewMatrix = glm::lookAt(position, position + glm::normalize(direction), cameraUp);
 
     m_Data->ProjectionViewMatrix = m_Data->ProjectionMatrix * m_Data->ViewMatrix;
