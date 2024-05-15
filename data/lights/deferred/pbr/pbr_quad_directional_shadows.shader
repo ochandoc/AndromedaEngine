@@ -216,7 +216,9 @@ void main(){
   vec3 Lo = vec3(0.0);
 
   // calculate per-light radiance
-  vec3 L = normalize(directional_light.direction);
+  vec3 L = -directional_light.direction;
+  //vec3 L = normalize(directional_light.direction * 8.0);
+  //vec3 L = normalize((point.position - frag_position) * 8.0);
   vec3 H = normalize(V + L);
   float distance = length(0.0);
   float attenuation = 1.0;

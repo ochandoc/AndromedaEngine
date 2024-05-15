@@ -106,7 +106,8 @@ namespace And{
         std::shared_ptr<Shader> m_shader_pbr_geometry;
         std::shared_ptr<Shader> m_shader_quad_ambient_pbr;
         std::shared_ptr<Shader> m_shader_quad_point_pbr;
-        std::shared_ptr<Shader> m_shader_quad_spot_pbr; //pbr_quad_spot_shadows.shader
+        std::shared_ptr<Shader> m_shader_quad_spot_pbr;
+        std::shared_ptr<Shader> m_shader_quad_directional_pbr;
 
         std::shared_ptr<Shader> m_shader_skybox;
 
