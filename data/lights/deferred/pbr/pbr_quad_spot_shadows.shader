@@ -119,8 +119,9 @@ layout (std140, binding = 5) uniform UniformSpot{
 
 const float PI = 3.14159265359;
 
-float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal_value, sampler2D tex, vec3 frag_pos){
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal_value, sampler2D tex, vec3 position){
 
+  
   // perform perspective divide
   vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
   // transform to [0,1] range
@@ -136,27 +137,36 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal_value, sampler2D tex
   // get depth of current fragment from light's perspective
   float currentDepth = projCoords.z;
   // calculate bias (based on depth map resolution and slope)
-  vec3 lightDir = normalize(spot.position - frag_pos);
-  float bias = max(0.05 * (1.0 - dot(normal_value, lightDir)), 0.005);
+
+
+
+
+  vec3 normal = normalize(normal_value);
+
+  float x = camera_position.x + ( (-1.0 * spot.direction.x) * 50.0);
+  float z = camera_position.z + ( (-1.0 * spot.direction.z) * 50.0);
+  vec3 light_pos = vec3(x, camera_position.y, z);
+
+  vec3 lightDir = normalize(light_pos - position);
+  float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
   // check whether current frag pos is in shadow
   // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
   // PCF
   float shadow = 0.0;
   vec2 texelSize = 1.0 / textureSize(tex, 0);
-  for(int x = -1; x <= 1; ++x)
-  {
-      for(int y = -1; y <= 1; ++y)
-      {
-          float pcfDepth = texture(tex, projCoords.xy + vec2(x, y) * texelSize).r; 
-          shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
-      }    
+  for(int x = -1; x <= 1; ++x){
+    for(int y = -1; y <= 1; ++y){
+      float pcfDepth = texture(tex, projCoords.xy + vec2(x, y) * texelSize).r; 
+      shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+    }    
   }
   shadow /= 9.0;
   
   // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
   if(projCoords.z > 1.0)
-      shadow = 0.0;
-      
+    shadow = 0.0;
+  
+  
   return shadow;
 }
 

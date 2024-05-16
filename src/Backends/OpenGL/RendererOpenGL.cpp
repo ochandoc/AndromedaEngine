@@ -132,7 +132,7 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   m_shader_quad_point_pbr = MakeShader("lights/deferred/pbr/pbr_quad_point_shadows.shader");
   m_shader_quad_ambient_pbr = MakeShader("lights/deferred/pbr/pbr_quad_ambient.shader");
   m_shader_quad_spot_pbr = MakeShader("lights/deferred/pbr/pbr_quad_spot_shadows.shader");
-  m_shader_quad_directional_pbr = MakeShader("lights/deferred/pbr/pbr_quad_directional_shadows.shader");
+  m_shader_quad_directional_pbr = MakeShader("lights/deferred/pbr/pbr_quad_directional_shadows.shader"); 
 
 
   // QUAD
@@ -419,47 +419,18 @@ void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* 
     m_buffer_ambient_light->upload_data(ambient->GetData(), 48);
     m_buffer_ambient_light->bind();
   }
-  //CheckTime(start, std::chrono::high_resolution_clock::now(), "UPLOAD Light block -> ");
 
-
-  //start = std::chrono::high_resolution_clock::now(); 
-
-  //OpenGLIndexBuffer* index_buffer = static_cast<OpenGLIndexBuffer*>(obj->GetMesh()->GetIndexBuffer());
   OpenGLVertexBuffer* vertex_buffer = static_cast<OpenGLVertexBuffer*>(obj->GetMesh()->GetVertexBuffer());
 
-  //index_buffer->BindEBO();
-  //vertex_buffer->BindVBO();
   vertex_buffer->BindVAO();
-  
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-  glEnable(GL_DEPTH_TEST);
 
+  //glEnable(GL_CULL_FACE);
+  //glCullFace(GL_BACK);
+  //glEnable(GL_DEPTH_TEST);
+
+  //start = std::chrono::high_resolution_clock::now(); 
   glDrawElements(GL_TRIANGLES, vertex_buffer->GetNumIndices(), GL_UNSIGNED_INT, 0);
-
-  //const std::vector<Vertex>& vertices = obj->MeshOBJ->getVertexInfo();
-  //CheckTime(start, std::chrono::high_resolution_clock::now(), "Get Vertex info OBJ-> ");
-
-  //start = std::chrono::high_resolution_clock::now(); 
-  /*glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(6 * sizeof(float)));*/
-
-  //CheckTime(start, std::chrono::high_resolution_clock::now(), "Enable Vertex atrib OBJ-> ");
-
-  //start = std::chrono::high_resolution_clock::now(); 
-  //CheckTime(start, std::chrono::high_resolution_clock::now(), "Enable cosas OBJ-> ");
-
-  //const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
-  //start = std::chrono::high_resolution_clock::now(); 
-
-  //glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data()); // Esto es lo que tarda
-
   //CheckTime(start, std::chrono::high_resolution_clock::now(), "Draw Elements OBJ-> ");
-
 }
 
 void RendererOpenGL::upload_light(Light* l){
@@ -593,9 +564,9 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   //vertex_buffer->BindVBO();
   vertex_buffer->BindVAO();
 
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-  glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_CULL_FACE);
+  //glCullFace(GL_BACK);
+  //glEnable(GL_DEPTH_TEST);
 
   glDrawElements(GL_TRIANGLES, vertex_buffer->GetNumIndices(), GL_UNSIGNED_INT, 0);
 }
@@ -656,9 +627,9 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   //vertex_buffer->BindVBO();
   vertex_buffer->BindVAO();
 
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-  glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_CULL_FACE);
+  //glCullFace(GL_BACK);
+  //glEnable(GL_DEPTH_TEST);
 
   glDrawElements(GL_TRIANGLES, vertex_buffer->GetNumIndices(), GL_UNSIGNED_INT, 0);
 }
@@ -703,9 +674,9 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   //vertex_buffer->BindVBO();
   vertex_buffer->BindVAO();
 
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-  glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_CULL_FACE);
+  //glCullFace(GL_BACK);
+  //glEnable(GL_DEPTH_TEST);
 
   glDrawElements(GL_TRIANGLES, vertex_buffer->GetNumIndices(), GL_UNSIGNED_INT, 0);
 }
@@ -1544,6 +1515,10 @@ void RendererOpenGL::draw_pbr(EntityComponentSystem& entity){
     m_shader_pbr_geometry->Use();
     OpenGLShader* s_tmp = static_cast<OpenGLShader*>(m_shader_pbr_geometry.get());
     glDisable(GL_BLEND);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glEnable(GL_DEPTH_TEST);
     for (auto [transform, obj] : entity.get_components<TransformComponent, MeshComponent>()) {
         //obj->MeshOBJ->UseTexture(0);
         MaterialComponent* mat = obj->GetOwner()->get_component<MaterialComponent>();
@@ -1590,6 +1565,9 @@ void RendererOpenGL::draw_pbr(EntityComponentSystem& entity){
             glDisable(GL_BLEND);
             if (light->GetCastShadows()) {
                 // Por cada luz que castea sombras guardamos textura de profundidad
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_BACK);
+                glEnable(GL_DEPTH_TEST);
                 for (auto [transform, obj] : entity.get_components<TransformComponent, MeshComponent>()) {
                     draw_shadows(light, obj, transform);
                 }
@@ -1613,6 +1591,9 @@ void RendererOpenGL::draw_pbr(EntityComponentSystem& entity){
             glDisable(GL_BLEND);
             if (light->GetCastShadows()) {
                 // Por cada luz que castea sombras guardamos textura de profundidad
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_BACK);
+                glEnable(GL_DEPTH_TEST);
                 for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
                     draw_shadows(light, obj, transform);
                 }
@@ -1636,6 +1617,9 @@ void RendererOpenGL::draw_pbr(EntityComponentSystem& entity){
                 for (auto& target : render_targets) {
                     target->Activate();
                     // Por cada luz que castea sombras guardamos textura de profundidad, aqui hay que hacerlo en 6 shadow buffers, uno por cada cara de la point
+                    glEnable(GL_CULL_FACE);
+                    glCullFace(GL_BACK);
+                    glEnable(GL_DEPTH_TEST);
                     for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
                         draw_shadows(light, obj, transform, glm::value_ptr(m_directions->dir[index]));
                     }

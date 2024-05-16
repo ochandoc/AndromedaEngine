@@ -552,22 +552,43 @@ int main(int argc, char** argv){
       point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
       //And::Entity* entity_tmp = entity_comp.new_entity(point);
 
-      And::SpotLight spot{};
-      spot.SetPosition(0.0f, 16.0f, 84.0f);
-      spot.SetDirection(0.0f, -1.0f, 0.0f);
-      spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-      spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
-      spot.SetSpecularStrength(0.003f);
-      spot.SetSpecularShininess(32.0f);
-      spot.SetConstantAtt(1.0f);
-      spot.SetLinearAtt(0.045f);
-      spot.SetQuadraticAtt(0.0075f);
-      spot.SetCuttOff(2.5f);
-      spot.SetOuterCuttOff(50.0f);
-      spot.SetCastShadows(true);
-      spot.SetEnabled(true);
-      spot.SetIntensity(intensity);
-      //entity_comp.new_entity(spot);
+      {
+          And::SpotLight spot{};
+          spot.SetPosition(0.0f, 16.0f, 84.0f);
+          spot.SetDirection(0.0f, -1.0f, 0.0f);
+          spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+          spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+          spot.SetSpecularStrength(0.003f);
+          spot.SetSpecularShininess(32.0f);
+          spot.SetConstantAtt(1.0f);
+          spot.SetLinearAtt(0.045f);
+          spot.SetQuadraticAtt(0.0075f);
+          spot.SetCuttOff(2.5f);
+          spot.SetOuterCuttOff(50.0f);
+          spot.SetCastShadows(true);
+          spot.SetEnabled(true);
+          spot.SetIntensity(intensity);
+          entity_comp.new_entity(spot);
+      }
+      
+      {
+          And::SpotLight spot{};
+          spot.SetPosition(20.0f, 3.0f, 0.0f);
+          spot.SetDirection(-1.0f, 0.0f, 0.0f);
+          spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+          spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+          spot.SetSpecularStrength(0.003f);
+          spot.SetSpecularShininess(32.0f);
+          spot.SetConstantAtt(1.0f);
+          spot.SetLinearAtt(0.045f);
+          spot.SetQuadraticAtt(0.0075f);
+          spot.SetCuttOff(2.5f);
+          spot.SetOuterCuttOff(17.5f);
+          spot.SetCastShadows(true);
+          spot.SetEnabled(true);
+          spot.SetIntensity(intensity);
+          entity_comp.new_entity(spot);
+      }
   }
 
   //std::shared_ptr<And::Geometry> geo = And::Geometry::load("cube.obj");
