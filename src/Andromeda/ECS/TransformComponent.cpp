@@ -83,36 +83,15 @@ namespace And {
 
 			glm::vec3 objPosition = glm::vec3(position[0] + position_offset[0], position[1] + position_offset[1], position[2] + position_offset[2]);
 			glm::vec3 objScale = glm::vec3(scale[0], scale[1], scale[2]);
-			//glm::vec3 objRotation = glm::vec3(rotation[0], rotation[1], rotation[2]);
 
 			m_matrix->model = glm::mat4(1.0f);
 			m_matrix->model = glm::translate(m_matrix->model, objPosition);
 
 			if (m_has_rb_) {
-				
 				glm::quat rotationQuat(rotation[3], rotation[0], rotation[1], rotation[2]);
 				glm::mat4 rotationMatrix = glm::mat4_cast(rotationQuat);
 				m_matrix->model = m_matrix->model * rotationMatrix;
-
-
-				//glm::quat quaternion(rotation[0], rotation[1], rotation[2], rotation[3]);
-				//glm::vec3 euler = glm::eulerAngles(quaternion);
-				//rotation[0] = euler[0];
-				//rotation[1] = euler[1];
-				//rotation[2] = euler[2];
-
-				
-				// Lo de arnau
-				//glm::mat4 transform = glm::eulerAngleYXZ(rotation[1], rotation[0], rotation[2]);
-				//m_matrix->model = m_matrix->model * transform;
-				//
-
-				//m_matrix->model = glm::rotate(m_matrix->model, rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
-				//m_matrix->model = glm::rotate(m_matrix->model, rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
-				//m_matrix->model = glm::rotate(m_matrix->model, rotation[0], glm::vec3(1.0f, 0.0f, 0.0f));
-				
 			}else {
-
 				//m_matrix->model = glm::translate(m_matrix->model, objPosition);
 				m_matrix->model = glm::rotate(m_matrix->model, rotation[2], glm::vec3(0.0f, 0.0f, 1.0f));
 				m_matrix->model = glm::rotate(m_matrix->model, rotation[1], glm::vec3(0.0f, 1.0f, 0.0f));
