@@ -162,6 +162,7 @@ group "Examples"
   include "examples/10_DirectX11"
   include "examples/11_NvidiaPhysics"
   include "examples/12_Demo"
+  include "examples/13_DemoPBR"
   include "examples/Audio"
 group ""
 
