@@ -9,6 +9,7 @@ namespace And
   {
   public:
     RawMesh();
+    RawMesh(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices);
     RawMesh(const RawMesh& other);
     RawMesh(RawMesh&& other);
 

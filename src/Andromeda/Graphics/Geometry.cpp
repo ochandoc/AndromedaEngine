@@ -22,7 +22,7 @@ std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_
   std::string err;
 
   std::vector<unsigned int> indices;
-  std::vector<Vertex_info> vertex_info;
+  std::vector<Vertex> vertex_info;
   Material_info mat;
 
   // Si le pasamos la ruta y luego el nombre, cogera los .mtl del directorio
@@ -37,27 +37,27 @@ std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_
 
     int inner = 0;
     int outer = 0;
-    Vertex_info v_info;
+    Vertex v_info;
     for (const auto& shape : shapes) {
         for (const auto& index : shape.mesh.indices) {
 
   
             // Load vertex
-            v_info.position[0] = attrib.vertices[3 * index.vertex_index + 0];
-            v_info.position[1] = attrib.vertices[3 * index.vertex_index + 1];
-            v_info.position[2] = attrib.vertices[3 * index.vertex_index + 2];
+            v_info.x = attrib.vertices[3 * index.vertex_index + 0];
+            v_info.y = attrib.vertices[3 * index.vertex_index + 1];
+            v_info.z = attrib.vertices[3 * index.vertex_index + 2];
             
             // Load normals
             if (attrib.normals.size() > 0) {
-                v_info.normal[0] = attrib.normals[3 * index.normal_index + 0];
-                v_info.normal[1] = attrib.normals[3 * index.normal_index + 1];
-                v_info.normal[2] = attrib.normals[3 * index.normal_index + 2];
+                v_info.nx = attrib.normals[3 * index.normal_index + 0];
+                v_info.ny = attrib.normals[3 * index.normal_index + 1];
+                v_info.nz = attrib.normals[3 * index.normal_index + 2];
             }
 
             // Load UV
             if(attrib.texcoords.size() > 0){
-              v_info.uv[0] = attrib.texcoords[2 * index.texcoord_index + 0];
-              v_info.uv[1] = attrib.texcoords[2 * index.texcoord_index + 1];
+              v_info.u = attrib.texcoords[2 * index.texcoord_index + 0];
+              v_info.v = attrib.texcoords[2 * index.texcoord_index + 1];
             }
 
             vertex_info.push_back(v_info);
@@ -100,7 +100,7 @@ std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_
   //printf("Init obj %s \n", filename.c_str());
 
   // Esto hacerlo solo en el de opengl
-  unsigned int VAO;
+  /*unsigned int VAO;
   glGenVertexArrays(1, &VAO);
   obj.set_VAO(VAO);
   
@@ -114,7 +114,7 @@ std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_
   glBufferData(GL_ARRAY_BUFFER, vertex_info.size() * sizeof(Vertex_info), &vertex_info[0], GL_STATIC_DRAW);
   
   // Desbindeamos el vao
-  glBindVertexArray(0);  
+  glBindVertexArray(0);  */
 
   obj.filename_ = std::string(filename);
   obj.m_texture = MakeTexture("default_texture.jpg");
@@ -126,11 +126,13 @@ std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_
   return std::make_shared<Geometry>(std::move(obj));
 }
 
-Geometry::Geometry(std::vector<unsigned int> indices, std::vector<Vertex_info> vertex_info, Material_info mat) :
+Geometry::Geometry(std::vector<unsigned int> indices, std::vector<Vertex> vertex_info, Material_info mat) :
  m_mat_info(mat), m_vertex_info(vertex_info),m_indices(indices){
 }
 
-const std::vector<Vertex_info>& Geometry::getVertexInfo(){
+Geometry::Geometry(){}
+
+const std::vector<Vertex>& Geometry::getVertexInfo(){
   return m_vertex_info;
 }
 

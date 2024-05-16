@@ -28,6 +28,8 @@
 #include "Andromeda/Graphics/Lights/DirectionalLight.h"
 #include "Andromeda/Graphics/Lights/PointLight.h"
 #include "Andromeda/ECS/Components/MaterialComponent.h"
+#include "Backends/OpenGL/OpenGLIndexBuffer.h"
+#include "Backends/OpenGL/OpenGLVertexBuffer.h"
 #include "Andromeda/Graphics/Material.h"
 
 
@@ -163,6 +165,8 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   //
+
+
 
 
   m_shader_skybox = MakeShader("shaders/opengl/skybox.shader");
@@ -420,34 +424,39 @@ void RendererOpenGL::draw_obj(MeshComponent* obj, Light* l, TransformComponent* 
 
   //start = std::chrono::high_resolution_clock::now(); 
 
-  unsigned int VBO = obj->MeshOBJ->get_vbo();
-  unsigned int VAO = obj->MeshOBJ->get_vao();
+  //OpenGLIndexBuffer* index_buffer = static_cast<OpenGLIndexBuffer*>(obj->GetMesh()->GetIndexBuffer());
+  OpenGLVertexBuffer* vertex_buffer = static_cast<OpenGLVertexBuffer*>(obj->GetMesh()->GetVertexBuffer());
 
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindVertexArray(VAO);
+  //index_buffer->BindEBO();
+  //vertex_buffer->BindVBO();
+  vertex_buffer->BindVAO();
+  
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glEnable(GL_DEPTH_TEST);
 
-  const std::vector<Vertex_info>& vertices = obj->MeshOBJ->getVertexInfo();
+  glDrawElements(GL_TRIANGLES, vertex_buffer->GetNumIndices(), GL_UNSIGNED_INT, 0);
+
+  //const std::vector<Vertex>& vertices = obj->MeshOBJ->getVertexInfo();
   //CheckTime(start, std::chrono::high_resolution_clock::now(), "Get Vertex info OBJ-> ");
 
   //start = std::chrono::high_resolution_clock::now(); 
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
+  /*glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(6 * sizeof(float)));*/
 
   //CheckTime(start, std::chrono::high_resolution_clock::now(), "Enable Vertex atrib OBJ-> ");
 
   //start = std::chrono::high_resolution_clock::now(); 
-  glEnable(GL_CULL_FACE);
-  glCullFace(GL_BACK);
-  glEnable(GL_DEPTH_TEST);
   //CheckTime(start, std::chrono::high_resolution_clock::now(), "Enable cosas OBJ-> ");
 
-  const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
+  //const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
   //start = std::chrono::high_resolution_clock::now(); 
-  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data()); // Esto es lo que tarda
+
+  //glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data()); // Esto es lo que tarda
 
   //CheckTime(start, std::chrono::high_resolution_clock::now(), "Draw Elements OBJ-> ");
 
@@ -577,23 +586,18 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   m_buffer_spot_light->upload_data(l->GetData(), 96);
   m_buffer_spot_light->bind();
 
-  unsigned int VBO = obj->MeshOBJ->get_vbo();
-  unsigned int VAO = obj->MeshOBJ->get_vao();
+  //OpenGLIndexBuffer* index_buffer = static_cast<OpenGLIndexBuffer*>(obj->GetMesh()->GetIndexBuffer());
+  OpenGLVertexBuffer* vertex_buffer = static_cast<OpenGLVertexBuffer*>(obj->GetMesh()->GetVertexBuffer());
 
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindVertexArray(VAO);
+  //index_buffer->BindEBO();
+  //vertex_buffer->BindVBO();
+  vertex_buffer->BindVAO();
 
-  const std::vector<Vertex_info>& vertices = obj->MeshOBJ->getVertexInfo();
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glEnable(GL_DEPTH_TEST);
 
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
-
-  const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
-  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+  glDrawElements(GL_TRIANGLES, vertex_buffer->GetNumIndices(), GL_UNSIGNED_INT, 0);
 }
 
 void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, PointLight* l, float* dirLight){
@@ -645,23 +649,18 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   m_buffer_point_light->upload_data(l->GetData(), 64);
   m_buffer_point_light->bind();
 
-  unsigned int VBO = obj->MeshOBJ->get_vbo();
-  unsigned int VAO = obj->MeshOBJ->get_vao();
+  //OpenGLIndexBuffer* index_buffer = static_cast<OpenGLIndexBuffer*>(obj->GetMesh()->GetIndexBuffer());
+  OpenGLVertexBuffer* vertex_buffer = static_cast<OpenGLVertexBuffer*>(obj->GetMesh()->GetVertexBuffer());
 
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindVertexArray(VAO);
+  //index_buffer->BindEBO();
+  //vertex_buffer->BindVBO();
+  vertex_buffer->BindVAO();
 
-  const std::vector<Vertex_info>& vertices = obj->MeshOBJ->getVertexInfo();
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glEnable(GL_DEPTH_TEST);
 
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
-
-  const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
-  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+  glDrawElements(GL_TRIANGLES, vertex_buffer->GetNumIndices(), GL_UNSIGNED_INT, 0);
 }
 
 void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* trans, DirectionalLight* l){
@@ -697,23 +696,18 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   m_buffer_directional_light->upload_data(l->GetData(), 48);
   m_buffer_directional_light->bind();
 
-  unsigned int VBO = obj->MeshOBJ->get_vbo();
-  unsigned int VAO = obj->MeshOBJ->get_vao();
+  //OpenGLIndexBuffer* index_buffer = static_cast<OpenGLIndexBuffer*>(obj->GetMesh()->GetIndexBuffer());
+  OpenGLVertexBuffer* vertex_buffer = static_cast<OpenGLVertexBuffer*>(obj->GetMesh()->GetVertexBuffer());
 
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindVertexArray(VAO);
+  //index_buffer->BindEBO();
+  //vertex_buffer->BindVBO();
+  vertex_buffer->BindVAO();
 
-  const std::vector<Vertex_info>& vertices = obj->MeshOBJ->getVertexInfo();
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glEnable(GL_DEPTH_TEST);
 
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-  glEnableVertexAttribArray(2);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(6 * sizeof(float)));
-
-  const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
-  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+  glDrawElements(GL_TRIANGLES, vertex_buffer->GetNumIndices(), GL_UNSIGNED_INT, 0);
 }
 
 void RendererOpenGL::draw_scene(Scene& scene, Shader* s){
@@ -741,22 +735,18 @@ void RendererOpenGL::draw_deep_obj(MeshComponent* obj, std::shared_ptr<Shader> s
   m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
   m_buffer_matrix->bind();
 
-  unsigned int VBO = obj->MeshOBJ->get_vbo();
-  unsigned int VAO = obj->MeshOBJ->get_vao();
-  //WAIT_GPU_LOAD();
+  OpenGLIndexBuffer* index_buffer = static_cast<OpenGLIndexBuffer*>(obj->GetMesh()->GetIndexBuffer());
+  OpenGLVertexBuffer* vertex_buffer = static_cast<OpenGLVertexBuffer*>(obj->GetMesh()->GetVertexBuffer());
 
-  glBindBuffer(GL_ARRAY_BUFFER, VBO);
-  glBindVertexArray(VAO);
+  //index_buffer->BindEBO();
+  //vertex_buffer->BindVBO();
+  vertex_buffer->BindVAO();
 
-  const std::vector<Vertex_info>& vertices = obj->MeshOBJ->getVertexInfo();
+  glEnable(GL_CULL_FACE);
+  glCullFace(GL_BACK);
+  glEnable(GL_DEPTH_TEST);
 
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_info), (void*)(3 * sizeof(float)));
-
-  const std::vector<unsigned int>& indices = obj->MeshOBJ->getIndices();
-  glDrawElements(GL_TRIANGLES, (GLsizei)indices.size(), GL_UNSIGNED_INT, indices.data());
+  glDrawElements(GL_TRIANGLES, vertex_buffer->GetNumIndices(), GL_UNSIGNED_INT, 0);
 
 }
 

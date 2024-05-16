@@ -3,6 +3,11 @@
 namespace And
 {
   RawMesh::RawMesh() {}
+ 
+  RawMesh::RawMesh(const std::vector<Vertex>& vertices, const std::vector<uint32>& indices) {
+      m_Vertices = vertices;
+      m_Indices = indices;
+  }
 
   RawMesh::RawMesh(const RawMesh& other) 
   {

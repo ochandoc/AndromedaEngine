@@ -85,7 +85,7 @@ static void LaunchBall(const float* pos, const float* dir, float force, And::Ent
 }
 
 static void SpawnBall(std::shared_ptr<And::PhysicsEngine> engine, And::EntityComponentSystem& entity_comp) {
-  float pos[3] = {0.0f, 2.0f, 0.0f};
+  /*float pos[3] = {0.0f, 2.0f, 0.0f};
 
   float base[3] = {1.0f, 1.0f, 1.0f};
   float scale[3] = {0.1f, 0.1f, 0.1f};
@@ -123,7 +123,7 @@ static void SpawnBall(std::shared_ptr<And::PhysicsEngine> engine, And::EntityCom
 
   e->get_component<And::RigidBody>()->AddForce(x, 100.0f, z, And::ForceMode::IMPULSE);
 
-  printf("Lanuch at X:%f Y:%f Z:%f\n", x, 100.0f, z);
+  printf("Lanuch at X:%f Y:%f Z:%f\n", x, 100.0f, z);*/
 }
 
 static void ThrowBall(And::Entity* pool[], int index) {
@@ -205,9 +205,11 @@ void CreateBallsPool(And::Entity* e[], std::shared_ptr<And::PhysicsEngine> engin
         float base[3] = { 0.5f, 0.5f, 0.5f };
         float scale[3] = { 0.5f, 0.5f, 0.5f };
 
-
         And::MeshComponent MC;
         MC.MeshOBJ = And::Geometry::load("sphere.obj");
+        And::RawMesh raw_mesh_tmp(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh_tmp = std::make_shared<And::Mesh>(raw_mesh_tmp);
+        MC.SetMesh(mesh_tmp);
 
 
         And::TransformComponent tran;
@@ -407,6 +409,15 @@ int main(int argc, char** argv){
 
     std::shared_ptr<And::PhysicsEngine> physics_engine = And::PhysicsEngine::Init(false, 8192);
 
+
+
+    //And::MeshComponent mesh_com_tmp;
+    //mesh_com_tmp.MeshOBJ = And::Geometry::load("demo/obj/fountain.obj");
+    //And::RawMesh raw_mesh_tmp(mesh_com_tmp.MeshOBJ->get_vertices(), mesh_com_tmp.MeshOBJ->get_indices());
+    //std::shared_ptr<And::Mesh> mesh_tmp = std::make_shared<And::Mesh>(raw_mesh_tmp);
+
+
+
     int num_obj = 10;
     float pos_x = 0.0f;
     float pos_y = -5.0f;
@@ -415,6 +426,10 @@ int main(int argc, char** argv){
 
         And::MeshComponent MC_fountain;
         MC_fountain.MeshOBJ = And::Geometry::load("demo/obj/fountain.obj");
+        And::RawMesh raw_mesh_tmp(MC_fountain.MeshOBJ->get_vertices(), MC_fountain.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh_tmp = std::make_shared<And::Mesh>(raw_mesh_tmp);
+        MC_fountain.SetMesh(mesh_tmp);
+
         And::MaterialComponent fountain_mat_comp;
         std::shared_ptr<And::Material> fountain_mat = std::make_shared<And::Material>();
 
@@ -452,9 +467,11 @@ int main(int argc, char** argv){
   
     
 
-
     And::MeshComponent MC_bolinga;
     MC_bolinga.MeshOBJ = And::Geometry::load("sphere.obj");
+    And::RawMesh raw_mesh_tmp(MC_bolinga.MeshOBJ->get_vertices(), MC_bolinga.MeshOBJ->get_indices());
+    std::shared_ptr<And::Mesh> mesh_tmp = std::make_shared<And::Mesh>(raw_mesh_tmp);
+    MC_bolinga.SetMesh(mesh_tmp);
 
     And::MaterialComponent bolinga_mat_comp;
     std::shared_ptr<And::Material> bolinga_mat = std::make_shared<And::Material>();
@@ -480,6 +497,9 @@ int main(int argc, char** argv){
 
     And::MeshComponent MC_suelo;
     MC_suelo.MeshOBJ = And::Geometry::load("cube.obj");
+    And::RawMesh raw_mesh_suelo_tmp(MC_suelo.MeshOBJ->get_vertices(), MC_suelo.MeshOBJ->get_indices());
+    std::shared_ptr<And::Mesh> mesh_suelo_tmp = std::make_shared<And::Mesh>(raw_mesh_suelo_tmp);
+    MC_suelo.SetMesh(mesh_suelo_tmp);
 
     And::MaterialComponent suelo_mat_comp;
     std::shared_ptr<And::Material> suelo_mat = std::make_shared<And::Material>();
@@ -550,7 +570,7 @@ int main(int argc, char** argv){
       //entity_comp.new_entity(spot);
   }
 
-  std::shared_ptr<And::Geometry> geo = And::Geometry::load("cube.obj");
+  //std::shared_ptr<And::Geometry> geo = And::Geometry::load("cube.obj");
   float position_tmp[3] = {-1.0f, 20.0f, -15.0f};
 
 
@@ -606,6 +626,9 @@ int main(int argc, char** argv){
 
       And::MeshComponent MC;
       MC.MeshOBJ = And::Geometry::load("demo/obj/vela_simple_01.obj");
+      And::RawMesh raw_mesh_vela_tmp(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+      std::shared_ptr<And::Mesh> mesh_vela_tmp = std::make_shared<And::Mesh>(raw_mesh_vela_tmp);
+      MC.SetMesh(mesh_vela_tmp);
 
       And::TransformComponent tr;
       tr.SetPosition(0.0f, 0.0f, 20.0f);
@@ -613,7 +636,7 @@ int main(int argc, char** argv){
       tr.SetScale(10.0f, 10.0f, 10.0f);
       tr.HasRigidBody(false);
 
-     vela = entity_comp.new_entity(mat_com, MC, tr);
+      vela = entity_comp.new_entity(mat_com, MC, tr);
 
   }
 
@@ -632,9 +655,12 @@ int main(int argc, char** argv){
       mat_bola_bolos->SetMetallicTexture(metallic_bola_bolos);
       mat_bola_bolos->SetRoughnessTexture(rou_bola_bolos);
       mat_com_bola_bolos.SetMaterial(mat_bola_bolos);
-      
+
       And::MeshComponent MC_bola_bolos;
       MC_bola_bolos.MeshOBJ = And::Geometry::load("sphere.obj");
+      And::RawMesh raw_mesh_bolo_tmp(MC_bola_bolos.MeshOBJ->get_vertices(), MC_bola_bolos.MeshOBJ->get_indices());
+      std::shared_ptr<And::Mesh> mesh_bolo_tmp = std::make_shared<And::Mesh>(raw_mesh_bolo_tmp);
+      MC_bola_bolos.SetMesh(mesh_bolo_tmp);
 
       And::TransformComponent bola_bolos_tr;
       bola_bolos_tr.SetPosition(8.0f, 3.0f, 0.0f);
@@ -663,6 +689,9 @@ int main(int argc, char** argv){
 
       And::MeshComponent MC;
       MC.MeshOBJ = And::Geometry::load("demo/obj/bowling_pin.obj");
+      And::RawMesh raw_mesh(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+      std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh);
+      MC.SetMesh(mesh);
 
       And::TransformComponent tr;
       tr.SetPosition(10.0f, 1.0f, 0.0f);
@@ -832,6 +861,7 @@ int main(int argc, char** argv){
     tmp_nose->SetRotation(tmp_nose->rotation[0], time, tmp_nose->rotation[2]);
 
     physics_engine->Simulate(window->get_delta_time() > 1.0f ? 1.0f / 30.0f : window->get_delta_time());
+
     physics_engine->Apply(entity_comp);
         
 

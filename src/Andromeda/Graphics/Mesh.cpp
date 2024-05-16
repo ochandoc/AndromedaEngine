@@ -4,7 +4,9 @@ namespace And
 {
   Mesh::Mesh(const RawMesh& RawMesh)
   {
-    m_IndexBuffer = IndexBuffer::CreateShared(RawMesh.GetIndices());
-    m_VertexBuffer = VertexBuffer::CreateShare(RawMesh.GetVertices());
+    m_VertexBuffer = VertexBuffer::CreateShare(RawMesh.GetVertices(), RawMesh.GetIndices());
+
+
+    //m_IndexBuffer = IndexBuffer::CreateShared(RawMesh.GetIndices());
   }
 }

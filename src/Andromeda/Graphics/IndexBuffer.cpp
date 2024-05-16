@@ -2,6 +2,7 @@
 #include "Andromeda/HAL/Window.h"
 
 #include "Backends/DirectX11/DirectX11IndexBuffer.h"
+#include "Backends/OpenGL/OpenGLIndexBuffer.h"
 
 namespace And
 {
@@ -10,7 +11,7 @@ namespace And
     switch (GetGraphicApiType())
     {
     case EGraphicsApiType::OpenGL:
-      return nullptr;
+        return OpenGLIndexBuffer::CreateShared(Indices);
       break;
     case EGraphicsApiType::DirectX11:
       return DirectX11IndexBuffer::CreateShared(Indices);
