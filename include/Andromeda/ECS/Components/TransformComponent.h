@@ -22,6 +22,7 @@ namespace And
     TransformComponent(const TransformComponent&);
     TransformComponent(TransformComponent&&);
     TransformComponent operator=(const TransformComponent&);
+    TransformComponent operator=(TransformComponent&&);
 
 
     TransformComponent* m_parent = nullptr;

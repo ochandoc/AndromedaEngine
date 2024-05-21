@@ -780,7 +780,7 @@ void RendererOpenGL::draw_shadows(PointLight* l, MeshComponent* obj, TransformCo
   float fov_radians = glm::radians(90.0f);
   float aspect_ratio = (float)width / (float)height;
   float near = 10.0f; // Si lo bajo de 10, la textura de depth sale toda blanca
-  float far = 250.0f;
+  float far = 310.0f;
   
   glm::mat4 persp = glm::perspective(fov_radians, aspect_ratio, near, far);
 

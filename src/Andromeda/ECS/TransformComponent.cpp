@@ -76,6 +76,45 @@ namespace And {
 		return *this;
 	}
 
+	TransformComponent TransformComponent::operator=(TransformComponent&& other){
+		float tmp;
+		for (int i = 0; i < 3; i++) {
+			tmp = this->position[i];
+			this->position[i] = other.position[i];
+			other.position[i] = tmp;
+
+			tmp = this->rotation[i];
+			this->rotation[i] = other.rotation[i];
+			other.rotation[i] = tmp;
+
+			tmp = this->scale[i];
+			this->scale[i] = other.scale[i];
+			other.scale[i] = tmp;
+
+			tmp = this->position_offset[i];
+			this->position_offset[i] = other.position_offset[i];
+			other.position_offset[i] = tmp;
+		}
+
+		tmp = this->rotation[3];
+		this->rotation[3] = other.rotation[3];
+		other.rotation[3] = tmp;
+
+		bool b_tmp = this->m_has_rb_;
+		this->m_has_rb_ = other.m_has_rb_;
+		other.m_has_rb_ = b_tmp;
+
+		this->m_matrix = std::make_shared<Mat4>();
+		this->m_should_recalculate = true;
+
+		TransformComponent* tr_tmp = this->m_parent;
+		this->m_parent = other.m_parent;
+		other.m_parent = tr_tmp;
+
+		return *this;
+		
+	}
+
 	float* TransformComponent::GetModelMatrix() {
 
 		if (m_should_recalculate) {

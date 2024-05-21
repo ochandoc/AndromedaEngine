@@ -26,9 +26,11 @@
 
 const float PI = 3.14159265f;
 
-void CreateHabitaculo(And::EntityComponentSystem& ecs) {
+const float Global_Scale = 20.0f;
 
-    const float scale_suelo = 50.0f;
+void CreateHabitaculo(And::EntityComponentSystem& ecs, And::Entity* parent) {
+
+    const float scale_suelo = 75.0f;
     
     And::MaterialComponent mat_com;
     std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
@@ -53,8 +55,9 @@ void CreateHabitaculo(And::EntityComponentSystem& ecs) {
     And::TransformComponent tr;
     tr.SetPosition(0.0f, 0.0f, 0.0f);
     tr.SetRotation(0.0f, 0.0f, 0.0f);
-    tr.SetScale(scale_suelo, 1.0f, scale_suelo);
+    tr.SetScale(scale_suelo, 1.0f, scale_suelo * 1.5f);
     tr.HasRigidBody(false);
+    //tr.SetParent(parent->get_component<And::TransformComponent>());
     ecs.new_entity(mat_com, MC, tr);
 
 
@@ -73,16 +76,19 @@ void CreateHabitaculo(And::EntityComponentSystem& ecs) {
     mat_com_pared.SetMaterial(mat_pared);
 
     
-    tr.SetScale(1.0f, 30.0f, scale_suelo);
+    tr.SetScale(1.0f, 30.0f, scale_suelo * 1.5f);
     tr.SetPosition(scale_suelo * -0.5f, 15.0f, 0.0f);
+    //tr.SetParent(parent->get_component<And::TransformComponent>());
     ecs.new_entity(mat_com_pared, MC, tr);
     
-    tr.SetScale(1.0f, 30.0f, scale_suelo);
+    tr.SetScale(1.0f, 30.0f, scale_suelo * 1.5f);
     tr.SetPosition(scale_suelo * 0.5f, 15.0f, 0.0f);
+    //tr.SetParent(parent->get_component<And::TransformComponent>());
     ecs.new_entity(mat_com_pared, MC, tr);
     
     tr.SetScale(scale_suelo, 30.0f, 1.0f);
-    tr.SetPosition(0.0f, 15.0f, scale_suelo * 0.5f);
+    tr.SetPosition(0.0f, 15.0f, scale_suelo * 0.75f);
+    //tr.SetParent(parent->get_component<And::TransformComponent>());
     ecs.new_entity(mat_com_pared, MC, tr);
 
 
@@ -98,7 +104,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
     
     const float intensity = 300.0f;
     And::PointLight point;
-    point.SetPosition(21.00f, 26.0f, 21.0f);
+    point.SetPosition(34.0f, 26.0f, 53.0f);
     point.SetSpecularColor(1.0f, 1.0f, 1.0f);
     point.SetSpecularShininess(32.0f);
     point.SetSpecularStrength(0.003f);
@@ -110,9 +116,41 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
     point.SetIntensity(intensity);
     point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
     ecs.new_entity(point);
+
+    And::DirectionalLight directional;
+    directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+    directional.SetDirection(0.5f, -0.5f, 0.5f);
+    directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
+    directional.SetSpecularShininess(32.0f);
+    directional.SetSpecularStrength(0.003f);
+    directional.SetEnabled(true);
+    directional.SetCastShadows(false);
+    directional.SetIntensity(1.0f);
+    //ecs.new_entity(directional);
+
+
+
+    {
+        And::SpotLight spot{};
+        spot.SetPosition(0.0f, 16.0f, 84.0f);
+        spot.SetDirection(0.0f, -1.0f, 0.0f);
+        spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        spot.SetSpecularStrength(0.003f);
+        spot.SetSpecularShininess(32.0f);
+        spot.SetConstantAtt(1.0f);
+        spot.SetLinearAtt(0.045f);
+        spot.SetQuadraticAtt(0.0075f);
+        spot.SetCuttOff(2.5f);
+        spot.SetOuterCuttOff(50.0f);
+        spot.SetCastShadows(true);
+        spot.SetEnabled(true);
+        //spot.SetIntensity(intensity);
+        //ecs.new_entity(spot);
+    }
 }
 
-void CreateFurnitures(And::EntityComponentSystem& ecs){
+void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
     
     // Mesa 
     {
@@ -137,10 +175,11 @@ void CreateFurnitures(And::EntityComponentSystem& ecs){
         MC.SetMesh(mesh);
 
         And::TransformComponent tr;
-        tr.SetPosition(20.0f, 1.0f, 0.0f);
+        tr.SetPosition(33.0f, 1.0f, 0.0f);
         tr.SetRotation(0.0f,PI / 2.0f, 0.0f);
-        tr.SetScale(10.0f, 10.0f, 10.0f);
+        tr.SetScale(15.0f, 5.0f, 10.0f);
         tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
         ecs.new_entity(mat_com, MC, tr);
     }
 
@@ -148,11 +187,11 @@ void CreateFurnitures(And::EntityComponentSystem& ecs){
     {
         And::MaterialComponent mat_com;
         std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
-        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/bambu/albedo.png");
-        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/bambu/normals.png");
-        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/bambu/ao.png");
-        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/bambu/metallic.png");
-        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/bambu/roughness.png");
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/suelo_5/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/suelo_5/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/suelo_5/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/suelo_5/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/suelo_5/roughness.png");
         mat->SetColorTexture(tex);
         mat->SetNormalTexture(normals);
         mat->SetAmbientOclusionTexture(ao);
@@ -167,15 +206,14 @@ void CreateFurnitures(And::EntityComponentSystem& ecs){
         MC.SetMesh(mesh);
 
         And::TransformComponent tr;
-        tr.SetPosition(-21.0f, 1.0f, 21.0f);
+        tr.SetPosition(-30.0f, 1.0f, 50.5f);
         tr.SetRotation(PI / -8.0f, PI, 0.0f);
-        tr.SetScale(10.0f, 10.0f, 10.0f);
+        tr.SetScale(12.5f, 12.5f, 12.5f);
         tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
         ecs.new_entity(mat_com, MC, tr);
+        //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
     }
-
-
-
 
 
 
@@ -199,7 +237,7 @@ int main(int argc, char** argv){
     std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
     std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
-    std::vector<std::string> paths = { {"skybox/right.jpg"}, {"skybox/left.jpg"}, {"skybox/top.jpg"}, {"skybox/bottom.jpg"}, {"skybox/back.jpg"}, {"skybox/front.jpg"} };
+    std::vector<std::string> paths = { {"demo/skybox/lago/right.jpg"}, {"demo/skybox/lago/left.jpg"}, {"demo/skybox/lago/top.jpg"}, {"demo/skybox/lago/bottom.jpg"}, {"demo/skybox/lago/front.jpg"}, {"demo/skybox/lago/back.jpg"} };
     std::shared_ptr<And::SkyboxTexture> sky_box = And::MakeSkyboxTexture(paths);
     g_renderer->set_skybox_texture(sky_box);
     g_renderer->enable_skybox(true);
@@ -238,42 +276,18 @@ int main(int argc, char** argv){
       
 
 
-      And::DirectionalLight directional;
-      directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-      directional.SetDirection(0.5f, -0.5f, 0.5f);
-      directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
-      directional.SetSpecularShininess(32.0f);
-      directional.SetSpecularStrength(0.003f);
-      directional.SetEnabled(true);
-      directional.SetCastShadows(false);
-      directional.SetIntensity(1.0f);
-      //entity_comp.new_entity(directional);
-
       
 
-      {
-          And::SpotLight spot{};
-          spot.SetPosition(0.0f, 16.0f, 84.0f);
-          spot.SetDirection(0.0f, -1.0f, 0.0f);
-          spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-          spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
-          spot.SetSpecularStrength(0.003f);
-          spot.SetSpecularShininess(32.0f);
-          spot.SetConstantAtt(1.0f);
-          spot.SetLinearAtt(0.045f);
-          spot.SetQuadraticAtt(0.0075f);
-          spot.SetCuttOff(2.5f);
-          spot.SetOuterCuttOff(50.0f);
-          spot.SetCastShadows(true);
-          spot.SetEnabled(true);
-          //spot.SetIntensity(intensity);
-          //entity_comp.new_entity(spot);
-      }
+      And::TransformComponent scene;
+      scene.SetPosition(0.0f, 0.0f, 0.0f);
+      scene.SetScale(1.0f, 1.0f, 1.0f);
+      scene.SetRotation(0.0f, 0.0f, 0.0f);
+      And::Entity* scene_entity = entity_comp.new_entity(scene);
       
 
-      CreateHabitaculo(entity_comp);
+      CreateHabitaculo(entity_comp, scene_entity);
       CreateLighting(entity_comp);
-      CreateFurnitures(entity_comp);
+      CreateFurnitures(entity_comp, scene_entity);
     
   }
 
