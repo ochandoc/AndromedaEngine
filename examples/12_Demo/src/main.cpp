@@ -22,11 +22,15 @@
 #include <chrono>
 #include <iostream>
 #include <random>
+#include <cmath>
+#include <cstdlib>
 #include "Andromeda.h"
 
 const float PI = 3.14159265f;
 
 const float Global_Scale = 20.0f;
+
+static And::Entity* point_tv;
 
 void CreateHabitaculo(And::EntityComponentSystem& ecs, And::Entity* parent) {
 
@@ -210,20 +214,22 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         point.SetCastShadows(true);
         point.SetIntensity(intensity);
         point.SetDiffuseColor(1.0f, 0.01f, 0.01f);
-        ecs.new_entity(point);
+        point_tv = ecs.new_entity(point);
     }
 
-
-    And::DirectionalLight directional;
-    directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-    directional.SetDirection(0.5f, -0.5f, 0.5f);
-    directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
-    directional.SetSpecularShininess(32.0f);
-    directional.SetSpecularStrength(0.003f);
-    directional.SetEnabled(true);
-    directional.SetCastShadows(true);
-    directional.SetIntensity(1.0f);
-    // ecs.new_entity(directional);
+    // Directional
+    {
+        And::DirectionalLight directional;
+        directional.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        directional.SetDirection(0.5f, -0.5f, 0.5f);
+        directional.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        directional.SetSpecularShininess(32.0f);
+        directional.SetSpecularStrength(0.003f);
+        directional.SetEnabled(true);
+        directional.SetCastShadows(true);
+        directional.SetIntensity(1.0f);
+        // ecs.new_entity(directional);
+    }
    
     {
         And::SpotLight spot{};
@@ -620,7 +626,69 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
     }
 
+    // Living room keyboard
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/worn_metal/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/worn_metal/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/worn_metal/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/worn_metal/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/worn_metal/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
 
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("demo/obj/keyboard.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        tr.SetPosition(9.0f, 5.0f, -16.0f);
+        tr.SetRotation(0.0f, PI * 1.70f, 0.0f);
+        tr.SetScale(16.0f, 16.0f, 16.0f);
+        tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
+        ecs.new_entity(mat_com, MC, tr);
+        //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
+    }
+    
+    // Living room mouse
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/aluminio/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/aluminio/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/woraluminion_metal/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/aluminio/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/aluminio/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("demo/obj/mouse.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        tr.SetPosition(9.0f, 5.0f, -10.0f);
+        tr.SetRotation(0.0f, PI * -0.5f, 0.0f);
+        tr.SetScale(16.0f, 16.0f, 16.0f);
+        tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
+        ecs.new_entity(mat_com, MC, tr);
+        //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
+    }
 
 }
 
@@ -677,12 +745,6 @@ int main(int argc, char** argv){
 
   {
 
-
-      
-
-
-      
-
       And::TransformComponent scene;
       scene.SetPosition(0.0f, 0.0f, 0.0f);
       scene.SetScale(1.0f, 1.0f, 1.0f);
@@ -696,7 +758,15 @@ int main(int argc, char** argv){
     
   }
 
+
+  And::Input input{ *window };
+  And::ActionInput light_tv{ "LightTV", And::KeyState::Press, { And::KeyCode::T} };
+  bool is_light_tv = false;
+
+  bool change_light = false;
+
   float time = 0.0f;
+  float fps_count = 0.0f;
   while (window->is_open()){
        
     window->update();
@@ -708,8 +778,44 @@ int main(int argc, char** argv){
     
     // Code Here
 
-    
 
+    if (input.check_action(light_tv)) {
+
+        //static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem & ecs, And::PhysicsEngine & engine, And::MeshComponent & mesh, And::MaterialComponent & material_comp)
+        if (!is_light_tv) {
+            change_light = !change_light;
+        }
+        is_light_tv = true;
+    }
+    else {
+        is_light_tv = false;
+    }
+
+
+
+    /*if (change_light) {
+        And::PointLight* p = point_tv->get_component<And::PointLight>();
+        const float speed = 0.2f;
+        float r = std::abs(sinf(time * 0.8f));
+        float g = std::abs(cosf(time * speed));
+        float b = 0.1f;
+        //float b = std::abs(cosf(time * 0.7f * speed));
+        p->SetIntensity(0.0f);
+        p->SetIntensity(1.0f);
+        p->SetDiffuseColor(r, g, b);
+
+        printf("R %f G %f B %f\n", r, g, b);
+        p->SetIntensity(400.0f);
+    } else {
+        And::PointLight* p = point_tv->get_component<And::PointLight>();
+        p->SetIntensity(0.0f);
+        p->SetIntensity(1.0f);
+        p->SetDiffuseColor(1.0f, 0.01f, 0.01f);
+        p->SetIntensity(200.0f);
+
+    }*/
+  
+ 
 
 
 
@@ -722,6 +828,7 @@ int main(int argc, char** argv){
     g_renderer->draw_pbr(entity_comp);
     
     time += window->get_delta_time();
+    fps_count += 0.5f * window->get_delta_time();
     g_renderer->end_frame();
     window->swap_buffers();
   }
