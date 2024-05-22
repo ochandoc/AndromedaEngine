@@ -793,27 +793,26 @@ int main(int argc, char** argv){
 
 
 
-    /*if (change_light) {
+    if (change_light) {
         And::PointLight* p = point_tv->get_component<And::PointLight>();
         const float speed = 0.2f;
-        float r = std::abs(sinf(time * 0.8f));
+        float r = std::abs(sinf(time * speed));
         float g = std::abs(cosf(time * speed));
         float b = 0.1f;
         //float b = std::abs(cosf(time * 0.7f * speed));
-        p->SetIntensity(0.0f);
-        p->SetIntensity(1.0f);
+        
         p->SetDiffuseColor(r, g, b);
 
         printf("R %f G %f B %f\n", r, g, b);
-        p->SetIntensity(400.0f);
+        p->SetIntensity(300.0f);
     } else {
         And::PointLight* p = point_tv->get_component<And::PointLight>();
-        p->SetIntensity(0.0f);
-        p->SetIntensity(1.0f);
+        //p->SetIntensity(0.0f);
+        //p->SetIntensity(1.0f);
         p->SetDiffuseColor(1.0f, 0.01f, 0.01f);
-        p->SetIntensity(200.0f);
+        p->SetIntensity(300.0f);
 
-    }*/
+    }
   
  
 

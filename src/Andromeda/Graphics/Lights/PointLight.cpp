@@ -76,19 +76,24 @@ void PointLight::SetPosition(float p[3]){
 
 void PointLight::SetIntensity(const float intensity){
     m_intensity = intensity;
-    m_raw.diffuse_color[0] = m_raw.diffuse_color[0] * m_intensity;
-    m_raw.diffuse_color[1] = m_raw.diffuse_color[0] * m_intensity;
-    m_raw.diffuse_color[2] = m_raw.diffuse_color[0] * m_intensity;
+    m_raw.diffuse_color[0] = m_base_color[0] * m_intensity;
+    m_raw.diffuse_color[1] = m_base_color[1] * m_intensity;
+    m_raw.diffuse_color[2] = m_base_color[2] * m_intensity;
     
 }
 
 void PointLight::SetDiffuseColor(float color[3]){
     for (int i = 0; i < 3; i++) {
+        m_base_color[i] = color[i];
         m_raw.diffuse_color[i] = color[i] * m_intensity;
     }
 }
 
 void PointLight::SetDiffuseColor(float r, float g, float b){
+    m_base_color[0] = r;
+    m_base_color[1] = g;
+    m_base_color[2] = b;
+
     m_raw.diffuse_color[0] = r * m_intensity;
     m_raw.diffuse_color[1] = g * m_intensity;
     m_raw.diffuse_color[2] = b * m_intensity;

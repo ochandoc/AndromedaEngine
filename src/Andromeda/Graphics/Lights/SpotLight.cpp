@@ -93,18 +93,29 @@ float SpotLight::GetQuadraticAtt(){
     return m_raw.quadratic_att;
 }
 
-void SpotLight::SetIntensity(const float intensity){
-    
+void SpotLight::SetIntensity(const float intensity) {
     m_intensity = intensity;
-    m_raw.diffuse_color[0] = m_raw.diffuse_color[0] * m_intensity;
-    m_raw.diffuse_color[1] = m_raw.diffuse_color[1] * m_intensity;
-    m_raw.diffuse_color[2] = m_raw.diffuse_color[2] * m_intensity;
+    m_raw.diffuse_color[0] = m_base_color[0] * m_intensity;
+    m_raw.diffuse_color[1] = m_base_color[1] * m_intensity;
+    m_raw.diffuse_color[2] = m_base_color[2] * m_intensity;
+
 }
 
-void SpotLight::SetDiffuseColor(float color[3]){
+void SpotLight::SetDiffuseColor(float color[3]) {
     for (int i = 0; i < 3; i++) {
+        m_base_color[i] = color[i];
         m_raw.diffuse_color[i] = color[i] * m_intensity;
     }
+}
+
+void SpotLight::SetDiffuseColor(float r, float g, float b) {
+    m_base_color[0] = r;
+    m_base_color[1] = g;
+    m_base_color[2] = b;
+
+    m_raw.diffuse_color[0] = r * m_intensity;
+    m_raw.diffuse_color[1] = g * m_intensity;
+    m_raw.diffuse_color[2] = b * m_intensity;
 }
 
 
@@ -215,13 +226,6 @@ void  SpotLight::GetLinearAtt(float& linear){
 
 void  SpotLight::GetQuadraticAtt(float& quadratic){
     quadratic = m_raw.quadratic_att;
-}
-
-void  SpotLight::SetDiffuseColor(float r, float g, float b){
-    m_raw.diffuse_color[0] = r * m_intensity;
-    m_raw.diffuse_color[1] = g * m_intensity;
-    m_raw.diffuse_color[2] = b * m_intensity;
-    //m_must_recalculate = true;
 }
 
 void  SpotLight::SetSpecularColor(float r, float g, float b){

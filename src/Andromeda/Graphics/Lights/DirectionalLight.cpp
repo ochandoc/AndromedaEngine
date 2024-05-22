@@ -81,27 +81,29 @@ float* DirectionalLight::GetDirection(){
     return &m_raw.direction[0];
 }
 
-void DirectionalLight::SetIntensity(float value){
-    m_intensity = value;
-   
-    m_raw.diffuse_color[0] *= value;
-    m_raw.diffuse_color[1] *= value;
-    m_raw.diffuse_color[2] *= value;
-    
+void DirectionalLight::SetIntensity(const float intensity) {
+    m_intensity = intensity;
+    m_raw.diffuse_color[0] = m_base_color[0] * m_intensity;
+    m_raw.diffuse_color[1] = m_base_color[1] * m_intensity;
+    m_raw.diffuse_color[2] = m_base_color[2] * m_intensity;
+
 }
 
-void DirectionalLight::SetDiffuseColor(float color[3]){
+void DirectionalLight::SetDiffuseColor(float color[3]) {
     for (int i = 0; i < 3; i++) {
+        m_base_color[i] = color[i];
         m_raw.diffuse_color[i] = color[i] * m_intensity;
     }
 }
 
-void DirectionalLight::SetDiffuseColor(float x, float y, float z){
+void DirectionalLight::SetDiffuseColor(float r, float g, float b) {
+    m_base_color[0] = r;
+    m_base_color[1] = g;
+    m_base_color[2] = b;
 
-    m_raw.diffuse_color[0] = x * m_intensity;
-    m_raw.diffuse_color[1] = y * m_intensity;
-    m_raw.diffuse_color[2] = z * m_intensity;
-    
+    m_raw.diffuse_color[0] = r * m_intensity;
+    m_raw.diffuse_color[1] = g * m_intensity;
+    m_raw.diffuse_color[2] = b * m_intensity;
 }
 
 void  DirectionalLight::SetSpecularStrength(float strength){

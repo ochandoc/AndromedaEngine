@@ -84,6 +84,8 @@ class Light : public ComponentBase{
         bool m_must_recalculate;
         bool m_enabled = true;
 
+        float m_base_color[3] = { 1.0f };
+
     private:
 
 };
