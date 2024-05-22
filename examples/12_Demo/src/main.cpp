@@ -100,19 +100,94 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
     And::AmbientLight ambient;
     ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
     ambient.SetAmbientStrenght(0.001f);
-    ecs.new_entity(ambient);
+    //ecs.new_entity(ambient);
+
+    const float esquina_x = 30.0f;
+    const float esquina_z = 49.0f;
     
     // Point esquina
     {
-        const float intensity = 300.0f;
+        const float intensity = 100.0f;
         And::PointLight point;
-        point.SetPosition(34.0f, 26.0f, 53.0f);
+        point.SetPosition(esquina_x, 26.0f, esquina_z);
         point.SetSpecularColor(1.0f, 1.0f, 1.0f);
         point.SetSpecularShininess(32.0f);
         point.SetSpecularStrength(0.003f);
         point.SetConstantAtt(1.0f);
-        point.SetLinearAtt(0.045f);
-        point.SetQuadraticAtt(0.0075f);
+        point.SetLinearAtt(0.09f);
+        point.SetQuadraticAtt(0.032f);
+        point.SetEnabled(true);
+        point.SetCastShadows(true);
+        point.SetIntensity(intensity);
+        point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        ecs.new_entity(point);
+    }
+    
+    // Point esquina2
+    {
+        const float intensity = 100.0f;
+        And::PointLight point;
+        point.SetPosition(-esquina_x, 26.0f, -esquina_z);
+        point.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        point.SetSpecularShininess(32.0f);
+        point.SetSpecularStrength(0.003f);
+        point.SetConstantAtt(1.0f);
+        point.SetLinearAtt(0.09f);
+        point.SetQuadraticAtt(0.032f);
+        point.SetEnabled(true);
+        point.SetCastShadows(true);
+        point.SetIntensity(intensity);
+        point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        ecs.new_entity(point);
+    }
+    
+    // Point esquina3
+    {
+        const float intensity = 100.0f;
+        And::PointLight point;
+        point.SetPosition(esquina_x, 26.0f, -esquina_z);
+        point.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        point.SetSpecularShininess(32.0f);
+        point.SetSpecularStrength(0.003f);
+        point.SetConstantAtt(1.0f);
+        point.SetLinearAtt(0.09f);
+        point.SetQuadraticAtt(0.032f);
+        point.SetEnabled(true);
+        point.SetCastShadows(true);
+        point.SetIntensity(intensity);
+        point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        ecs.new_entity(point);
+    }
+    
+    // Point esquina4
+    {
+        const float intensity = 100.0f;
+        And::PointLight point;
+        point.SetPosition(-esquina_x, 26.0f, esquina_z);
+        point.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        point.SetSpecularShininess(32.0f);
+        point.SetSpecularStrength(0.003f);
+        point.SetConstantAtt(1.0f);
+        point.SetLinearAtt(0.09f);
+        point.SetQuadraticAtt(0.032f);
+        point.SetEnabled(true);
+        point.SetCastShadows(true);
+        point.SetIntensity(intensity);
+        point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        //ecs.new_entity(point);
+    }
+    
+    // Point medio
+    {
+        const float intensity = 100.0f;
+        And::PointLight point;
+        point.SetPosition(0.0f, 26.0f, 0.0f);
+        point.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        point.SetSpecularShininess(32.0f);
+        point.SetSpecularStrength(0.003f);
+        point.SetConstantAtt(1.0f);
+        point.SetLinearAtt(0.09f);
+        point.SetQuadraticAtt(0.032f);
         point.SetEnabled(true);
         point.SetCastShadows(true);
         point.SetIntensity(intensity);
@@ -148,7 +223,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
     directional.SetEnabled(true);
     directional.SetCastShadows(true);
     directional.SetIntensity(1.0f);
-    ecs.new_entity(directional);
+    // ecs.new_entity(directional);
    
     {
         And::SpotLight spot{};
@@ -175,7 +250,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         And::SpotLight spot{};
         //spot.SetPosition(33.0f, 20.0f, 0.0f);
         spot.SetPosition(-9.5f, 12.5f, 52.0f);
-        spot.SetDirection(-1.0f, -1.0f, 0.0f);
+        spot.SetDirection(-1.0f, -0.5f, 0.0f);
         spot.SetDiffuseColor(0.976f, 0.518f, 0.3f);
         spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
         spot.SetSpecularStrength(0.003f);
@@ -184,7 +259,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         spot.SetLinearAtt(0.7f);
         spot.SetQuadraticAtt(1.8f);
         spot.SetCuttOff(2.5f);
-        spot.SetOuterCuttOff(35.0f);
+        spot.SetOuterCuttOff(30.0f);
         spot.SetCastShadows(true);
         spot.SetEnabled(true);
         spot.SetIntensity(300.0f);
@@ -352,6 +427,38 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         ecs.new_entity(mat_com, MC, tr);
         //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
     }
+    
+    // Display table
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/bambu/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/bambu/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/bambu/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/bambu/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/bambu/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("demo/obj/furniture/display_table.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        tr.SetPosition(10.0f, 0.0f, -15.0f);
+        tr.SetRotation(0.0f,PI * -0.5f, 0.0f);
+        tr.SetScale(12.0f, 6.0f, 10.0f);
+        tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
+        ecs.new_entity(mat_com, MC, tr);
+        //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
+    }
 
     // office desk
     {
@@ -449,6 +556,69 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
     }
 
+    // office calendar
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/paper/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/paper/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/paper/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/paper/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/paper/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("demo/obj/office/calendar.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        tr.SetPosition(-25.0f, 9.1f, 52.0f);
+        tr.SetRotation(0.0f, PI * 0.75f, 0.0f);
+        tr.SetScale(12.0f, 12.0f, 12.0f);
+        tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
+        ecs.new_entity(mat_com, MC, tr);
+        //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
+    }
+
+    // office tubos
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/metal_dented/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/metal_dented/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/metal_dented/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/metal_dented/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/metal_dented/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("demo/obj/office/tubos.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        tr.SetPosition(-21.0f, 9.1f, 51.0f);
+        tr.SetRotation(0.0f, PI * 0.75f, 0.0f);
+        tr.SetScale(14.0f, 14.0f, 14.0f);
+        tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
+        ecs.new_entity(mat_com, MC, tr);
+        //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
+    }
 
 
 
