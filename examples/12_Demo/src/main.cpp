@@ -32,6 +32,8 @@ const float Global_Scale = 20.0f;
 
 static And::Entity* point_tv;
 
+static And::Entity* points_habitaculo[4];
+
 void CreateHabitaculo(And::EntityComponentSystem& ecs, And::Entity* parent) {
 
     const float scale_suelo = 75.0f;
@@ -124,7 +126,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         point.SetCastShadows(true);
         point.SetIntensity(intensity);
         point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-        ecs.new_entity(point);
+        points_habitaculo[0] = ecs.new_entity(point);
     }
     
     // Point esquina2
@@ -142,7 +144,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         point.SetCastShadows(true);
         point.SetIntensity(intensity);
         point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-        ecs.new_entity(point);
+        points_habitaculo[1] = ecs.new_entity(point);
     }
     
     // Point esquina3
@@ -160,7 +162,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         point.SetCastShadows(true);
         point.SetIntensity(intensity);
         point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-        ecs.new_entity(point);
+        points_habitaculo[2] = ecs.new_entity(point);
     }
     
     // Point esquina4
@@ -196,7 +198,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         point.SetCastShadows(true);
         point.SetIntensity(intensity);
         point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-        ecs.new_entity(point);
+        points_habitaculo[3] = ecs.new_entity(point);
     }
 
     // Point detras tele
@@ -796,7 +798,8 @@ int main(int argc, char** argv){
     if (change_light) {
         And::PointLight* p = point_tv->get_component<And::PointLight>();
         const float speed = 0.2f;
-        float r = std::abs(sinf(time * speed));
+        //float r = std::abs(sinf(time * speed));
+        float r = 1.0f;
         float g = std::abs(cosf(time * speed));
         float b = 0.1f;
         //float b = std::abs(cosf(time * 0.7f * speed));
@@ -805,12 +808,19 @@ int main(int argc, char** argv){
 
         printf("R %f G %f B %f\n", r, g, b);
         p->SetIntensity(300.0f);
+
+        for (int i = 0; i < 4; i++) {
+            points_habitaculo[i]->get_component<And::PointLight>()->SetEnabled(false);
+        }
     } else {
         And::PointLight* p = point_tv->get_component<And::PointLight>();
         //p->SetIntensity(0.0f);
         //p->SetIntensity(1.0f);
         p->SetDiffuseColor(1.0f, 0.01f, 0.01f);
-        p->SetIntensity(300.0f);
+        p->SetIntensity(400.0f);
+        for (int i = 0; i < 4; i++) {
+            points_habitaculo[i]->get_component<And::PointLight>()->SetEnabled(true);
+        }
 
     }
   
