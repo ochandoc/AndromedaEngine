@@ -20,9 +20,9 @@ namespace And{
 
 
   struct AudioEffect{
-    ALfloat source_pos[3];
-    ALfloat source_dir[3];
-    ALfloat source_vel[3];
+      ALfloat source_pos[3] = { 0.0f };
+    ALfloat source_dir[3] = { 0.0f };
+    ALfloat source_vel[3] = { 0.0f };
 
 
     float pitch;
@@ -31,9 +31,10 @@ namespace And{
 
     bool doppler_enabled;
     float doppler_factor;
-    ALfloat listener_vel[3];
-    ALfloat listener_pos[3];
-    ALfloat listener_orientation[6];
+    ALfloat listener_vel[3] = { 0.0f };
+    ALfloat listener_pos[3] = { 0.0f };
+    ALfloat listener_orientation[6] = { 0.0f, 0.0f, 1.0f,
+                                        0.0f, 1.0f,0.0f};
     
     // EFX extension
     float reverberation;
@@ -238,9 +239,12 @@ void Audio::ApplyEffects() {
         alDopplerVelocity(m_speedOfSound);
 
         // Set listener orientation
-        alListenerfv(AL_ORIENTATION, m_audio_effect->listener_orientation);
+        //if (m_has_listener_orientation) {
+            alListenerfv(AL_ORIENTATION, m_audio_effect->listener_orientation);
+        //}
 
-        alSource3f(m_audio_data->source, AL_POSITION, m_audio_effect->listener_pos[0], m_audio_effect->listener_pos[1], m_audio_effect->listener_pos[2]);
+        alListenerfv(AL_POSITION, m_audio_effect->listener_pos);
+        //alSource3f(m_audio_data->source, AL_POSITION, m_audio_effect->listener_pos[0], m_audio_effect->listener_pos[1], m_audio_effect->listener_pos[2]);
 
     }
     
@@ -251,6 +255,7 @@ void Audio::UpdateListenerPosition(const float x, const float y, const float z) 
     m_audio_effect->listener_pos[1] = y;
     m_audio_effect->listener_pos[2] = z;
 
+
     //alSource3f(m_audio_data->source, AL_POSITION, m_audio_effect->source_pos[0], m_audio_effect->source_pos[1], m_audio_effect->source_pos[2]);
 }
 
@@ -258,6 +263,8 @@ void Audio::UpdateListenerPosition(const float p[3]) {
     m_audio_effect->listener_pos[0] = p[0];
     m_audio_effect->listener_pos[1] = p[1];
     m_audio_effect->listener_pos[2] = p[2];
+
+    
 
     //alSource3f(m_audio_data->source, AL_POSITION, m_audio_effect->source_pos[0], m_audio_effect->source_pos[1], m_audio_effect->source_pos[2]);
 }
@@ -281,6 +288,8 @@ void Audio::UpdateListenerDirection(const float pos[3]){
     m_audio_effect->source_dir[0] = pos[0];
     m_audio_effect->source_dir[1] = pos[1];
     m_audio_effect->source_dir[2] = pos[2];
+
+    m_has_listener_orientation = true;
 }
 
 void Audio::UpdateListenerDirection(const float x, const float y, const float z){
@@ -303,6 +312,8 @@ void Audio::UpdateListenerDirection(const float x, const float y, const float z)
     m_audio_effect->source_dir[0] = x;
     m_audio_effect->source_dir[1] = y;
     m_audio_effect->source_dir[2] = z;
+
+    m_has_listener_orientation = true;
 }
 
 void Audio::SetPitch(float pitch){

@@ -760,6 +760,29 @@ int main(int argc, char** argv){
     
   }
 
+  And::AudioManager audio_manager;
+  And::Audio audio_tele;
+  And::Audio audio_lapiz;
+
+  audio_tele.load("demo/audio/jazz_estereo.wav");
+  audio_tele.SetPosition(33.0f, 5.0f, -15.0f);
+  audio_tele.SetGain(1.0f);
+  audio_tele.SetDoppler(true);
+  audio_tele.SetDopplerFactor(10.0f);
+  audio_tele.SetLooping(true);
+  audio_tele.SetPitch(1.0f);
+  audio_tele.SetMaxDistance(30.0f);
+  
+  audio_lapiz.load("demo/audio/lapiz.wav");
+  audio_lapiz.SetPosition(-16.0f, 10.0f, 50.0f);
+  audio_lapiz.SetGain(1.0f);
+  audio_lapiz.SetDoppler(true);
+  audio_lapiz.SetDopplerFactor(5.0f);
+  audio_lapiz.SetLooping(true);
+  audio_lapiz.SetPitch(1.0f);
+  audio_lapiz.SetMaxDistance(20.0f);
+
+  audio_manager.play(audio_lapiz);
 
   And::Input input{ *window };
   And::ActionInput light_tv{ "LightTV", And::KeyState::Press, { And::KeyCode::T} };
@@ -796,6 +819,8 @@ int main(int argc, char** argv){
 
 
     if (change_light) {
+
+        audio_manager.play(audio_tele);
         And::PointLight* p = point_tv->get_component<And::PointLight>();
         const float speed = 0.2f;
         //float r = std::abs(sinf(time * speed));
@@ -813,6 +838,7 @@ int main(int argc, char** argv){
             points_habitaculo[i]->get_component<And::PointLight>()->SetEnabled(false);
         }
     } else {
+        audio_manager.stop(audio_tele);
         And::PointLight* p = point_tv->get_component<And::PointLight>();
         //p->SetIntensity(0.0f);
         //p->SetIntensity(1.0f);
@@ -823,6 +849,15 @@ int main(int argc, char** argv){
         }
 
     }
+
+    const float* src_pos = fly_cam.GetPosition();
+    const float* src_dir = fly_cam.GetDirection();
+
+    audio_tele.UpdateListenerPosition(src_pos);
+    //audio_tele.UpdateListenerDirection(src_dir);
+    audio_tele.ApplyEffects();
+
+    audio_manager.Update();
   
  
 

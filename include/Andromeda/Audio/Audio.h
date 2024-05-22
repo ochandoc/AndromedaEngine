@@ -276,6 +276,8 @@ protected:
 
   private:
 
+	  bool m_has_listener_orientation = false;
+
 
 }; 
 

@@ -774,7 +774,7 @@ int main(int argc, char** argv){
   audio_fuente.SetDopplerFactor(10.0f);
   audio_fuente.SetLooping(true);
   audio_fuente.SetPitch(1.0f);
-  audio_fuente.SetMaxDistance(10.0f);
+  audio_fuente.SetMaxDistance(20.0f);
 
   audio_manager.play(audio_fondo);
   audio_manager.play(audio_fuente);
