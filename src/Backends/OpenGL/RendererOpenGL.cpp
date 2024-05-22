@@ -587,8 +587,8 @@ void RendererOpenGL::draw_obj_shadows(MeshComponent* obj, TransformComponent* tr
   glm::vec3 pos = glm::make_vec3(l->GetPosition());
   float fov_radians = glm::radians(90.0f);
   float aspect_ratio = (float)m_shadows_buffer_->GetCreationInfo().Width / (float)m_shadows_buffer_->GetCreationInfo().Height;
-  float near = 10.0f;
-  float far = 310.0f;
+  float near = 1.0f;
+  float far = 10.0f;
   glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
 
   for(int i = 0; i < 6; i++){

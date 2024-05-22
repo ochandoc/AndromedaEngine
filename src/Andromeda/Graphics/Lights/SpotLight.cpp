@@ -252,6 +252,12 @@ void SpotLight::Recalculate(float aspect_ratio){
         glm::vec3 dir = glm::make_vec3(&m_raw.direction[0]);
 
         glm::vec3 up(0.0f, 1.0f, 0.0f);
+        float dot = glm::dot(up, dir);
+        dot = glm::abs(dot);
+        if (dot == 1.0f) {
+            up = glm::vec3(0.0f, 0.0f, 1.0f);
+        }
+
         glm::vec3 right = glm::normalize(glm::cross(up, dir));
         up = glm::cross(dir, right);
         glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(dir), up);
