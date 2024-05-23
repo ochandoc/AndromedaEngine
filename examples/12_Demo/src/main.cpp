@@ -38,6 +38,8 @@ static And::Entity* spot_estanteria2;
 
 static And::Entity* spheres_disco[3];
 
+static And::Entity* spot_cuadro[3];
+
 static And::Entity* points_habitaculo[4];
 
 void CreateHabitaculo(And::EntityComponentSystem& ecs, And::Entity* parent) {
@@ -259,7 +261,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         spot.SetCastShadows(true);
         spot.SetEnabled(true);
         spot.SetIntensity(300.0f);
-        ecs.new_entity(spot);
+        spot_cuadro[0] = ecs.new_entity(spot);
     }
     
     // Spot cuadro 2
@@ -281,7 +283,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         spot.SetCastShadows(true);
         spot.SetEnabled(true);
         spot.SetIntensity(300.0f);
-        ecs.new_entity(spot);
+        spot_cuadro[1] = ecs.new_entity(spot);
     }
     
     // Spot cuadro 3
@@ -303,7 +305,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         spot.SetCastShadows(true);
         spot.SetEnabled(true);
         spot.SetIntensity(300.0f);
-        ecs.new_entity(spot);
+        spot_cuadro[2] = ecs.new_entity(spot);
     }
     
     // Spot lamp
@@ -1185,6 +1187,7 @@ int main(int argc, char** argv){
 
         for (int i = 0; i < 3; i++) {
             spheres_disco[i]->get_component<And::TransformComponent>()->SetRotation(0.0f, time, 0.0f);
+            spot_cuadro[i]->get_component<And::SpotLight>()->SetEnabled(true);
         }
 
         
@@ -1210,6 +1213,10 @@ int main(int argc, char** argv){
         spot = spot_estanteria2->get_component<And::SpotLight>();
         spot->SetDiffuseColor(1.0f, 1.0f, 1.0f);
         spot->SetIntensity(300.0f);
+
+        for (int i = 0; i < 3; i++) {
+            spot_cuadro[i]->get_component<And::SpotLight>()->SetEnabled(false);
+        }
         
 
     }
