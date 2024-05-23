@@ -32,6 +32,12 @@ const float Global_Scale = 20.0f;
 
 static And::Entity* point_tv;
 
+static And::Entity* spot_estanteria0;
+static And::Entity* spot_estanteria1;
+static And::Entity* spot_estanteria2;
+
+static And::Entity* spheres_disco[3];
+
 static And::Entity* points_habitaculo[4];
 
 void CreateHabitaculo(And::EntityComponentSystem& ecs, And::Entity* parent) {
@@ -187,7 +193,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
     {
         const float intensity = 100.0f;
         And::PointLight point;
-        point.SetPosition(0.0f, 26.0f, 0.0f);
+        point.SetPosition(10.0f, 26.0f, -15.0f);
         point.SetSpecularColor(1.0f, 1.0f, 1.0f);
         point.SetSpecularShininess(32.0f);
         point.SetSpecularStrength(0.003f);
@@ -233,6 +239,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         // ecs.new_entity(directional);
     }
    
+    // Spot cuadro
     {
         And::SpotLight spot{};
         //spot.SetPosition(33.0f, 20.0f, 0.0f);
@@ -273,6 +280,72 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         spot.SetIntensity(300.0f);
         ecs.new_entity(spot);
     }
+    
+    // Spot estanteria
+    {
+        And::SpotLight spot{};
+        //spot.SetPosition(33.0f, 20.0f, 0.0f);
+        spot.SetPosition(35.0f, 31.0f, 43.0f);
+        spot.SetDirection(0.0f, -1.0f, 0.0f);
+        spot.SetDiffuseColor(0.976f, 0.518f, 0.3f);
+        spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        spot.SetSpecularStrength(0.003f);
+        spot.SetSpecularShininess(32.0f);
+        spot.SetConstantAtt(1.0f);
+        spot.SetLinearAtt(0.7f);
+        spot.SetQuadraticAtt(1.8f);
+        spot.SetCuttOff(2.5f);
+        spot.SetOuterCuttOff(30.0f);
+        spot.SetCastShadows(true);
+        spot.SetEnabled(true);
+        spot.SetIntensity(300.0f);
+        spot_estanteria0 = ecs.new_entity(spot);
+    }
+
+    // Spot estanteria 2
+    {
+        And::SpotLight spot{};
+        //spot.SetPosition(33.0f, 20.0f, 0.0f);
+        //43.0f - (scale_z * 1.5f)
+        spot.SetPosition(35.0f, 31.0f,43.0f - (8.0f * 1.5f));
+        spot.SetDirection(0.0f, -1.0f, 0.0f);
+        spot.SetDiffuseColor(0.976f, 0.518f, 0.3f);
+        spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        spot.SetSpecularStrength(0.003f);
+        spot.SetSpecularShininess(32.0f);
+        spot.SetConstantAtt(1.0f);
+        spot.SetLinearAtt(0.7f);
+        spot.SetQuadraticAtt(1.8f);
+        spot.SetCuttOff(2.5f);
+        spot.SetOuterCuttOff(30.0f);
+        spot.SetCastShadows(true);
+        spot.SetEnabled(true);
+        spot.SetIntensity(300.0f);
+        spot_estanteria1 = ecs.new_entity(spot);
+    }
+
+    // Spot estanteria 3
+    {
+        And::SpotLight spot{};
+        //spot.SetPosition(33.0f, 20.0f, 0.0f);
+        //43.0f - (scale_z * 1.5f)
+        spot.SetPosition(35.0f, 31.0f, 43.0f - (8.0f * 3.0f));
+        spot.SetDirection(0.0f, -1.0f, 0.0f);
+        spot.SetDiffuseColor(0.976f, 0.518f, 0.3f);
+        spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        spot.SetSpecularStrength(0.003f);
+        spot.SetSpecularShininess(32.0f);
+        spot.SetConstantAtt(1.0f);
+        spot.SetLinearAtt(0.7f);
+        spot.SetQuadraticAtt(1.8f);
+        spot.SetCuttOff(2.5f);
+        spot.SetOuterCuttOff(30.0f);
+        spot.SetCastShadows(true);
+        spot.SetEnabled(true);
+        spot.SetIntensity(300.0f);
+        spot_estanteria2 = ecs.new_entity(spot);
+    }
+
 }
 
 void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
@@ -666,7 +739,7 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
         std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/aluminio/albedo.png");
         std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/aluminio/normals.png");
-        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/woraluminion_metal/ao.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/aluminio/ao.png");
         std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/aluminio/metallic.png");
         std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/aluminio/roughness.png");
         mat->SetColorTexture(tex);
@@ -692,6 +765,156 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
     }
 
+    // Living room taza
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/iron/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/iron/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/iron/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/iron/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/iron/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("demo/obj/taza.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        tr.SetPosition(7.0f, 5.0f, -10.0f);
+        tr.SetRotation(0.0f, 0.0f, 0.0f);
+        tr.SetScale(16.0f, 16.0f, 16.0f);
+        tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
+        ecs.new_entity(mat_com, MC, tr);
+        //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
+    }
+
+    // Living room cafe
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/shiny_metal/albedo_white.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/shiny_metal/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/shiny_metal/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/shiny_metal/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/shiny_metal/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("sphere.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        tr.SetPosition(7.0f, 6.2f, -10.0f);
+        tr.SetRotation(0.0f, 0.0f, 0.0f);
+        tr.SetScale(0.7f, 0.2f, 0.7f);
+        tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
+        ecs.new_entity(mat_com, MC, tr);
+        //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
+    }
+
+    // Estanteria pared
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/bambu/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/bambu/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/bambu/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/bambu/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/bambu/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("cube.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        const float scale_x = 4.0f;
+        const float scale_z = 8.0f;
+        const float pos_y = 20.0f;
+        const float diference_y = 3.5f;
+
+        And::TransformComponent tr;
+        tr.SetPosition(35.0f, pos_y, 43.0f);
+        tr.SetRotation(0.0f, 0.0f, 0.0f);
+        tr.SetScale(scale_x, 0.25f, scale_z);
+        tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
+        ecs.new_entity(mat_com, MC, tr);
+        //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
+
+        tr.SetPosition(35.0f, pos_y - diference_y, 43.0f - (scale_z * 1.5f));
+        ecs.new_entity(mat_com, MC, tr);
+        
+        tr.SetPosition(35.0f, pos_y - (diference_y * 2.0f), 43.0f - (scale_z * 3.0f));
+        ecs.new_entity(mat_com, MC, tr);
+    }
+
+    // Estanteria sphere
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/metal_circulos/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/metal_circulos/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/metal_circulos/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/metal_circulos/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/metal_circulos/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("sphere.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        const float scale_x = 4.0f;
+        const float scale_z = 8.0f;
+        const float pos_y = 22.0f;
+        const float diference_y = 3.5f;
+
+        And::TransformComponent tr;
+        tr.SetPosition(35.0f, pos_y, 43.0f);
+        tr.SetRotation(0.0f, PI * -0.5f, 0.0f);
+        tr.SetScale(2.0f, 2.0f, 2.0f);
+        tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
+        spheres_disco[0] = ecs.new_entity(mat_com, MC, tr);
+
+        tr.SetPosition(35.0f, pos_y - diference_y, 43.0f - (8.0f * 1.5f));
+        spheres_disco[1] = ecs.new_entity(mat_com, MC, tr);
+        
+        tr.SetPosition(35.0f, pos_y - (diference_y * 2.0f), 43.0f - (8.0f * 3.0f));
+        spheres_disco[2] = ecs.new_entity(mat_com, MC, tr);
+
+
+    }
 }
 
 
@@ -837,6 +1060,23 @@ int main(int argc, char** argv){
         for (int i = 0; i < 4; i++) {
             points_habitaculo[i]->get_component<And::PointLight>()->SetEnabled(false);
         }
+        And::SpotLight* spot = spot_estanteria0->get_component<And::SpotLight>();
+        spot->SetDiffuseColor(1.0f, 0.0f, 0.0f);
+        spot->SetIntensity(300.0f);
+
+        spot = spot_estanteria1->get_component<And::SpotLight>();
+        spot->SetDiffuseColor(1.0f, 0.0f, 0.0f);
+        spot->SetIntensity(300.0f);
+
+        spot = spot_estanteria2->get_component<And::SpotLight>();
+        spot->SetDiffuseColor(1.0f, 0.0f, 0.0f);
+        spot->SetIntensity(300.0f);
+
+        for (int i = 0; i < 3; i++) {
+            spheres_disco[i]->get_component<And::TransformComponent>()->SetRotation(0.0f, time, 0.0f);
+        }
+
+        
     } else {
         audio_manager.stop(audio_tele);
         And::PointLight* p = point_tv->get_component<And::PointLight>();
@@ -847,6 +1087,19 @@ int main(int argc, char** argv){
         for (int i = 0; i < 4; i++) {
             points_habitaculo[i]->get_component<And::PointLight>()->SetEnabled(true);
         }
+
+        And::SpotLight* spot = spot_estanteria0->get_component<And::SpotLight>();
+        spot->SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        spot->SetIntensity(300.0f);
+
+        spot = spot_estanteria1->get_component<And::SpotLight>();
+        spot->SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        spot->SetIntensity(300.0f);
+        
+        spot = spot_estanteria2->get_component<And::SpotLight>();
+        spot->SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        spot->SetIntensity(300.0f);
+        
 
     }
 
