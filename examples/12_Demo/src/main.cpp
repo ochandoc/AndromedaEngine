@@ -238,14 +238,60 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         directional.SetIntensity(1.0f);
         // ecs.new_entity(directional);
     }
-   
-    // Spot cuadro
+    
+    const float distance_cuadros = 20.0f;
+    // Spot cuadro 1
+    {
+        And::SpotLight spot{};
+        //spot.SetPosition(33.0f, 20.0f, 0.0f);
+        spot.SetPosition(-35.5f, 32.0f, distance_cuadros);
+        spot.SetDirection(0.0f, -1.0f, 0.0f);
+        //spot.SetDiffuseColor(0.976f, 0.518f, 0.012f);
+        spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        spot.SetSpecularStrength(0.003f);
+        spot.SetSpecularShininess(32.0f);
+        spot.SetConstantAtt(1.0f);
+        spot.SetLinearAtt(0.7f);
+        spot.SetQuadraticAtt(1.8f);
+        spot.SetCuttOff(2.5f);
+        spot.SetOuterCuttOff(17.0f);
+        spot.SetCastShadows(true);
+        spot.SetEnabled(true);
+        spot.SetIntensity(300.0f);
+        ecs.new_entity(spot);
+    }
+    
+    // Spot cuadro 2
     {
         And::SpotLight spot{};
         //spot.SetPosition(33.0f, 20.0f, 0.0f);
         spot.SetPosition(-35.5f, 32.0f, 0.0f);
         spot.SetDirection(0.0f, -1.0f, 0.0f);
-        spot.SetDiffuseColor(0.976f, 0.518f, 0.012f);
+        //spot.SetDiffuseColor(0.976f, 0.518f, 0.012f);
+        spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        spot.SetSpecularStrength(0.003f);
+        spot.SetSpecularShininess(32.0f);
+        spot.SetConstantAtt(1.0f);
+        spot.SetLinearAtt(0.7f);
+        spot.SetQuadraticAtt(1.8f);
+        spot.SetCuttOff(2.5f);
+        spot.SetOuterCuttOff(17.0f);
+        spot.SetCastShadows(true);
+        spot.SetEnabled(true);
+        spot.SetIntensity(300.0f);
+        ecs.new_entity(spot);
+    }
+    
+    // Spot cuadro 3
+    {
+        And::SpotLight spot{};
+        //spot.SetPosition(33.0f, 20.0f, 0.0f);
+        spot.SetPosition(-35.5f, 32.0f, -distance_cuadros);
+        spot.SetDirection(0.0f, -1.0f, 0.0f);
+        //spot.SetDiffuseColor(0.976f, 0.518f, 0.012f);
+        spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
         spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
         spot.SetSpecularStrength(0.003f);
         spot.SetSpecularShininess(32.0f);
@@ -413,7 +459,72 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
     }
     
-    // Poster
+    const float distance_cuadros = 20.0f;
+    // Poster 1
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/poster/albedo_xema_raw.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/poster/normals_raw.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/poster/ao_raw.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/poster/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/poster/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("cube.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        tr.SetPosition(-36.5f, 15.0f, distance_cuadros);
+        tr.SetRotation(0.0f, 0.0f, 0.0f);
+        tr.SetScale(0.3f, 10.0f, 10.0f);
+        tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
+        ecs.new_entity(mat_com, MC, tr);
+        //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
+    }
+    
+    // Poster 2
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/poster/albedo_ochy_raw.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/poster/normals_raw.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/poster/ao_raw.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/poster/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/poster/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("cube.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        tr.SetPosition(-36.5f, 15.0f, 0.0f);
+        tr.SetRotation(0.0f, 0.0f, 0.0f);
+        tr.SetScale(0.3f, 10.0f, 10.0f);
+        tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
+        ecs.new_entity(mat_com, MC, tr);
+        //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
+    }
+    
+    // Poster 3
     {
         And::MaterialComponent mat_com;
         std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
@@ -436,7 +547,7 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         MC.SetMesh(mesh);
 
         And::TransformComponent tr;
-        tr.SetPosition(-36.5f, 15.0f, 0.0f);
+        tr.SetPosition(-36.5f, 15.0f, -distance_cuadros);
         tr.SetRotation(0.0f, 0.0f, 0.0f);
         tr.SetScale(0.3f, 10.0f, 10.0f);
         tr.HasRigidBody(false);
