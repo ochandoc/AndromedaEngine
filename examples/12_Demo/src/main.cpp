@@ -466,7 +466,7 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
     {
         And::MaterialComponent mat_com;
         std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
-        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/poster/albedo_xema_raw.png");
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/poster/albedo_esat.png");
         std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/poster/normals_raw.png");
         std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/poster/ao_raw.png");
         std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/poster/metallic.png");
@@ -530,9 +530,9 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
     {
         And::MaterialComponent mat_com;
         std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
-        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/poster/albedo_esat.png");
-        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/poster/normals.png");
-        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/poster/ao.png");
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/poster/albedo_xema_raw.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/poster/normals_raw.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/poster/ao_raw.png");
         std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/poster/metallic.png");
         std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/poster/roughness.png");
         mat->SetColorTexture(tex);
