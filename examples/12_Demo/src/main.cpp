@@ -42,6 +42,8 @@ static And::Entity* spot_cuadro[3];
 
 static And::Entity* points_habitaculo[4];
 
+static And::Entity* point_hexagonos;
+
 void CreateHabitaculo(And::EntityComponentSystem& ecs, And::Entity* parent) {
 
     const float scale_suelo = 75.0f;
@@ -392,6 +394,47 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         spot.SetEnabled(true);
         spot.SetIntensity(300.0f);
         spot_estanteria2 = ecs.new_entity(spot);
+    }
+    
+    // Spot hexagon tiles
+    {
+        And::SpotLight spot{};
+        //spot.SetPosition(33.0f, 20.0f, 0.0f);
+        //43.0f - (scale_z * 1.5f)
+        spot.SetPosition(35.0f, 31.0f, -39.0f );
+        spot.SetDirection(0.0f, -1.0f, 0.0f);
+        spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        spot.SetSpecularStrength(0.003f);
+        spot.SetSpecularShininess(32.0f);
+        spot.SetConstantAtt(1.0f);
+        spot.SetLinearAtt(0.7f);
+        spot.SetQuadraticAtt(1.8f);
+        spot.SetCuttOff(2.5f);
+        spot.SetOuterCuttOff(30.0f);
+        spot.SetCastShadows(true);
+        spot.SetEnabled(true);
+        spot.SetIntensity(300.0f);
+        //spot_hexagonos = ecs.new_entity(spot);
+    }
+
+
+    // Point hexagonos
+    {
+        const float intensity = 200.0f;
+        And::PointLight point;
+        point.SetPosition(25.0f, 17.0f, -39.0f);
+        point.SetSpecularColor(1.0f, 1.0f, 1.0f);
+        point.SetSpecularShininess(8.0f);
+        point.SetSpecularStrength(0.003f);
+        point.SetConstantAtt(1.0f);
+        point.SetLinearAtt(0.0f);
+        point.SetQuadraticAtt(0.0f);
+        point.SetEnabled(true);
+        point.SetCastShadows(true);
+        point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        point.SetIntensity(intensity);
+        point_hexagonos = ecs.new_entity(point);
     }
 
 }
@@ -846,7 +889,7 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
     }
     
-    // Living room mouse
+    // Living room mouse 
     {
         And::MaterialComponent mat_com;
         std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
@@ -1033,11 +1076,11 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
     {
         And::MaterialComponent mat_com;
         std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
-        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/shiny_metal/albedo.png");
-        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/shiny_metal/normals.png");
-        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/shiny_metal/ao.png");
-        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/shiny_metal/metallic.png");
-        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/shiny_metal/roughness.png");
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/fibra_carbono/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/fibra_carbono/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/fibra_carbono/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/fibra_carbono/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/fibra_carbono/roughness.png");
         mat->SetColorTexture(tex);
         mat->SetNormalTexture(normals);
         mat->SetAmbientOclusionTexture(ao);
@@ -1071,7 +1114,7 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
 
         for (int j = -tile_files; j <= tile_files; j++) {
             for (int i = 0; i < tile_num; i++) {
-                tr.SetPosition(37.0f, (16.0f - (2.1f * j)) + offset_y, ( -48.0f + (2.4f * i)) + std::abs(j) + (index * std::abs(j)));
+                tr.SetPosition(37.0f, (14.0f - (2.1f * j)) + offset_y, ( -48.0f + (2.4f * i)) + std::abs(j) + (index * std::abs(j)));
                 ecs.new_entity(mat_com, MC, tr);
 
                 tmp += 0.1f;
@@ -1222,7 +1265,7 @@ int main(int argc, char** argv){
         
         p->SetDiffuseColor(r, g, b);
 
-        printf("R %f G %f B %f\n", r, g, b);
+        //printf("R %f G %f B %f\n", r, g, b);
         p->SetIntensity(300.0f);
 
         for (int i = 0; i < 4; i++) {
@@ -1244,6 +1287,9 @@ int main(int argc, char** argv){
             spheres_disco[i]->get_component<And::TransformComponent>()->SetRotation(0.0f, time, 0.0f);
             spot_cuadro[i]->get_component<And::SpotLight>()->SetEnabled(true);
         }
+
+        point_hexagonos->get_component<And::PointLight>()->SetDiffuseColor(1.0f, 0.0f, 0.0f);
+        point_hexagonos->get_component<And::PointLight>()->SetIntensity(100.0f);
 
         
     } else {
@@ -1272,6 +1318,9 @@ int main(int argc, char** argv){
         for (int i = 0; i < 3; i++) {
             spot_cuadro[i]->get_component<And::SpotLight>()->SetEnabled(false);
         }
+
+        point_hexagonos->get_component<And::PointLight>()->SetDiffuseColor(1.0f, 1.0f, 1.0f);
+        point_hexagonos->get_component<And::PointLight>()->SetIntensity(300.0f);
         
 
     }
