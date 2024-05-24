@@ -1028,6 +1028,61 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
 
 
     }
+
+    // Living room hexagon tiles
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/shiny_metal/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/shiny_metal/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/shiny_metal/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/shiny_metal/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/shiny_metal/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("demo/obj/furniture/hexagon_tile.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        tr.SetPosition(37.0f, 19.0f, -38.0f);
+        tr.SetRotation(0.0f, PI * 0.5f, PI * 0.5f);
+        tr.SetScale(10.0f, 10.0f, 10.0f);
+        tr.HasRigidBody(false);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
+        //ecs.new_entity(mat_com, MC, tr);
+
+        const int tile_num = 7;
+        const int tile_files = 2;
+
+        float offset_y = 1.3f;
+        float offset_z = 0.0f;
+
+        float tmp = 0.0f;
+
+        float index = 0.2f;
+
+        for (int j = -tile_files; j <= tile_files; j++) {
+            for (int i = 0; i < tile_num; i++) {
+                tr.SetPosition(37.0f, (16.0f - (2.1f * j)) + offset_y, ( -48.0f + (2.4f * i)) + std::abs(j) + (index * std::abs(j)));
+                ecs.new_entity(mat_com, MC, tr);
+
+                tmp += 0.1f;
+                //index += 0.2f;
+            }
+            //index = 0.0f;
+            tmp = 0.0f;
+            offset_y += 0.1f;
+            offset_z += 0.9f;
+        }
+    }
 }
 
 
@@ -1161,7 +1216,7 @@ int main(int argc, char** argv){
         const float speed = 0.2f;
         //float r = std::abs(sinf(time * speed));
         float r = 1.0f;
-        float g = std::abs(cosf(time * speed));
+        float g = (cosf(time * speed) * 0.5f) + 0.5f;
         float b = 0.1f;
         //float b = std::abs(cosf(time * 0.7f * speed));
         
