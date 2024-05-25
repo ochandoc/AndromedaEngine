@@ -106,6 +106,6 @@ namespace And
     static int GetNumActiveThreads();
 
   private:
-    struct ThreadData* m_Data;
+    std::unique_ptr<struct ThreadData> m_Data;
   };
 }

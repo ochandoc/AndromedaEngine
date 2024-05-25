@@ -29,7 +29,6 @@ namespace And
     size_t size() const;
 
   private:
-    char* m_Content;
-    size_t m_Size;
+    std::vector<char> m_Content;
   };
 };

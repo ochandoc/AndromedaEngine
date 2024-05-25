@@ -18,10 +18,8 @@ namespace And
   };
 }
 
-And::Camera::Camera(Window& w)
+And::Camera::Camera(Window& w) : m_Data(new And::CameraData)
 {
-  m_Data = new CameraData;
-
   SetPosition(0.0f, 0.0f, 0.0f);
   SetDirection(0.0f, 0.0f, 1.0f);
   SetFov(90.0f);
@@ -30,7 +28,6 @@ And::Camera::Camera(Window& w)
 
 And::Camera::~Camera()
 {
-  delete m_Data;
 }
 
 void And::Camera::SetPosition(float* Position)
@@ -208,17 +205,14 @@ namespace And
   };
 }
 
-And::OrthographicCamera::OrthographicCamera(Window& w)
+And::OrthographicCamera::OrthographicCamera(Window& w) : m_Data(new And::OrthographicCameraData)
 {
-  m_Data = new And::OrthographicCameraData;
-
   SetPosition(0.0f, 0.0f, 0.0f);
   SetDirection(0.0f, 0.0f, 1.0f);
 }
 
 And::OrthographicCamera::~OrthographicCamera()
 {
-  delete m_Data;
 }
 
 void And::OrthographicCamera::SetPosition(float* Position)

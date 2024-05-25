@@ -77,7 +77,7 @@ namespace And
     float m_Near;
     float m_Far;
 
-    struct CameraData* m_Data;
+    std::unique_ptr<struct CameraData> m_Data;
   };
   
   class OrthographicCamera : public CameraBase
@@ -113,6 +113,6 @@ namespace And
     float m_Near;
     float m_Far;
 
-    struct OrthographicCameraData* m_Data;
+    std::unique_ptr<struct OrthographicCameraData> m_Data;
   };
 }

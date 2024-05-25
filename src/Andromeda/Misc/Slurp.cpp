@@ -5,7 +5,7 @@
 
 namespace And
 {
-  Slurp::Slurp(const char* filePath) : m_Size(0), m_Content(nullptr)
+  Slurp::Slurp(const char* filePath)
   {
     FILE *f;
     f = fopen(filePath, "rb");
@@ -16,30 +16,29 @@ namespace And
     }
     
     fseek(f, 0L, SEEK_END);
-    m_Size = ftell(f);
+    int size = ftell(f);
     fseek(f, 0L, SEEK_SET);
 
     
     //printf("Size of file in bytes-> %d\n", (int)m_Size);
 
-    m_Content = new char[m_Size+1];
+    m_Content.resize(size + 1);
     
-    fread(m_Content, sizeof(char), m_Size, f);
-    m_Content[m_Size] = '\0';
+    fread(m_Content.data(), sizeof(char), size, f);
+    m_Content[size] = '\0';
     //printf("\n%s\n",m_Content);
 
     fclose(f);
 
   }
 
-  Slurp::Slurp(Slurp&& other) : m_Content(other.m_Content), m_Size(other.m_Size) 
+  Slurp::Slurp(Slurp&& other)
   {
-    other.m_Content = nullptr;
+    std::swap(m_Content, other.m_Content);
   }
 
   Slurp::~Slurp()
   {
-    delete[] m_Content;
   }
 
   Slurp& Slurp::operator =(Slurp&& other)
@@ -47,7 +46,6 @@ namespace And
     if (this != &other)
     {
       std::swap(m_Content, other.m_Content);
-      std::swap(m_Size, other.m_Size);
     }
 
     return *this;
@@ -55,12 +53,12 @@ namespace And
 
   char* Slurp::data()
   {
-    return m_Content;
+    return m_Content.data();
   }
 
   size_t Slurp::size() const
   {
-    return m_Size;
+    return m_Content.size();
   }
 
 }

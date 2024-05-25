@@ -47,11 +47,8 @@ namespace And
     std::unordered_map<std::string, size_t> ThreadIds;
   } ThreadGlobals;
 
-  Thread::Thread(const ThreadCreationInfo& CreationInfo)
+  Thread::Thread(const ThreadCreationInfo& CreationInfo) : m_Data(new ThreadData)
   {
-    /** Alloc the data of the thread */
-    m_Data = new ThreadData;
-
     /** Set the id of the parent */
     m_Data->ParentId = GetCurrentThreadId();
 
@@ -134,9 +131,6 @@ namespace And
     /** Wait for the thread end */
     if (Joinable())
       Join();
-
-    /** Free the data */
-    delete m_Data;
   }
 
   void* Thread::GetData()
