@@ -36,7 +36,7 @@ struct PhysicsEngineData {
 		
 		physx::PxPvd*						pvd = nullptr;
 		physx::PxPvdTransport*				transport = nullptr;
-		physx::PxSceneDesc*					sceneDesc; // Esto no era un puntero
+		std::shared_ptr<physx::PxSceneDesc> sceneDesc; // Esto no era un puntero
 		physx::PxPvdSceneClient*			client;
 	};
 
@@ -68,7 +68,7 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(bool executeOnGPU, unsigned i
 	}
 
 	// Gravity
-	(engine->m_physics_data->sceneDesc) = new physx::PxSceneDesc(engine->m_physics_data->physics->getTolerancesScale());
+	(engine->m_physics_data->sceneDesc) = std::make_shared<physx::PxSceneDesc>(engine->m_physics_data->physics->getTolerancesScale());
 	engine->m_physics_data->sceneDesc->gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 
 	// Sub steps (physics quality)

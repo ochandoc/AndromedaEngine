@@ -26,7 +26,9 @@ struct AudioContext{
 
 
 // RAII
-AudioManager::AudioManager() : m_audio_data(new AudioContext){
+AudioManager::AudioManager(){
+
+  m_audio_data = std::make_shared<AudioContext>();
 
   const char * devicename = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
   m_audio_data->device = alcOpenDevice(devicename);
@@ -73,7 +75,7 @@ AudioManager::~AudioManager(){
   alcMakeContextCurrent(nullptr); 
   alcDestroyContext(m_audio_data->context);
   alcCloseDevice(m_audio_data->device);
-  delete m_audio_data;
+  //delete m_audio_data;
 }
 
 void AudioManager::Update() {

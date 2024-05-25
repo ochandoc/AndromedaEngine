@@ -65,7 +65,7 @@ class AudioManager{
     */
     void Update();
   private:
-    AudioContext* m_audio_data;
+    std::shared_ptr<AudioContext> m_audio_data;
  
 };
 
