@@ -107,9 +107,9 @@ namespace And {
 		this->m_matrix = std::make_shared<Mat4>();
 		this->m_should_recalculate = true;
 
-		TransformComponent* tr_tmp = this->m_parent;
+		Entity* entity_tmp = this->m_parent;
 		this->m_parent = other.m_parent;
-		other.m_parent = tr_tmp;
+		other.m_parent = entity_tmp;
 
 		return *this;
 		
@@ -140,7 +140,7 @@ namespace And {
 			m_matrix->model = glm::scale(m_matrix->model, objScale);
 
 			if (m_parent) {
-				m_matrix->model = glm::make_mat4(m_parent->GetModelMatrix()) * m_matrix->model;
+				m_matrix->model = glm::make_mat4(m_parent->get_component<TransformComponent>()->GetModelMatrix()) * m_matrix->model;
 			}
 
 			
@@ -153,7 +153,7 @@ namespace And {
 
 	}
 	
-	void TransformComponent::SetParent(TransformComponent* parent) {
+	void TransformComponent::SetParent(Entity* parent) {
 		m_parent = parent;
 	}
 

@@ -25,13 +25,13 @@ namespace And
     TransformComponent operator=(TransformComponent&&);
 
 
-    TransformComponent* m_parent = nullptr;
+    Entity* m_parent = nullptr;
 
     // hijo  * padre
 
 
     float* GetModelMatrix();
-    void SetParent(TransformComponent* parent);
+    void SetParent(Entity* parent);
     void SetPosition(float* p);
     void SetPosition(float x, float y, float z);
 
