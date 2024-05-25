@@ -37,12 +37,10 @@ static And::Entity* spot_estanteria1;
 static And::Entity* spot_estanteria2;
 
 static And::Entity* spheres_disco[3];
-
 static And::Entity* spot_cuadro[3];
-
 static And::Entity* points_habitaculo[4];
-
 static And::Entity* point_hexagonos;
+static And::Entity* tubos_entity;
 
 static And::Audio audio_tele;
 static And::Audio audio_lapiz;
@@ -857,6 +855,39 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         tr.SetScale(14.0f, 14.0f, 14.0f);
         tr.HasRigidBody(false);
         //tr.SetParent(parent->get_component<And::TransformComponent>());
+        tubos_entity = ecs.new_entity(mat_com, MC, tr);
+        //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
+    }
+
+    // office pencil
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/wood/albedo.png");
+        std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/wood/normals.png");
+        std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/wood/ao.png");
+        std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/wood/metallic.png");
+        std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/wood/roughness.png");
+        mat->SetColorTexture(tex);
+        mat->SetNormalTexture(normals);
+        mat->SetAmbientOclusionTexture(ao);
+        mat->SetMetallicTexture(metallic);
+        mat->SetRoughnessTexture(rou);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("demo/obj/office/pencil.obj");
+        And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        tr.SetPosition(0.175f, 0.04f, 0.0f);
+        tr.SetRotation(PI * 0.5f, 0.0f, PI * 0.25f);
+        tr.SetScale(1.0f, 1.0f, 1.0f);
+        tr.HasRigidBody(false);
+        tr.SetParent(tubos_entity);
+        //tr.SetParent(parent->get_component<And::TransformComponent>());
         ecs.new_entity(mat_com, MC, tr);
         //ecs.new_entity(mat_com, MC, tr)->get_component<And::TransformComponent>()->SetParent(parent->get_component<And::TransformComponent>());
     }
@@ -1162,6 +1193,7 @@ void CreateAudios() {
     audio_teclado.SetPitch(1.0f);
     audio_teclado.SetMaxDistance(15.0f);
 }
+
 int main(int argc, char** argv){
 
     And::Engine e;
@@ -1346,6 +1378,8 @@ int main(int argc, char** argv){
 
     }
 
+
+    tubos_entity->get_component<And::TransformComponent>()->SetRotation(0.0f, PI + sinf(time), 0.0f);
     const float* src_pos = fly_cam.GetPosition();
     const float* src_dir = fly_cam.GetDirection();
 
@@ -1355,10 +1389,6 @@ int main(int argc, char** argv){
 
     audio_manager.Update();
   
- 
-
-
-
 
     //physics_engine->Simulate(window->get_delta_time() > 1.0f ? 1.0f / 30.0f : window->get_delta_time());
     //physics_engine->Apply(entity_comp);
