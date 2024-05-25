@@ -1216,17 +1216,19 @@ int main(int argc, char** argv){
     g_renderer->set_skybox_texture(sky_box);
     g_renderer->enable_skybox(true);
 
-
     And::FlyCamera fly_cam{*window};
-    fly_cam.SetPosition(-5.0f, 10.0f, 10.0f);
-    fly_cam.SetSize(1920.0f, 1080.0f);
-    fly_cam.SetFar(1000.0f);
-    fly_cam.SetNear(0.1f);
-    fly_cam.SetPosition(0.0f, 5.0f, 10.0f);
-    fly_cam.SetFov(90.0f);
-    fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
-    fly_cam.SetSpeed(10.0f);
-    g_renderer->set_camera(&fly_cam);
+    
+    {
+        fly_cam.SetPosition(-5.0f, 10.0f, 10.0f);
+        fly_cam.SetSize(1920.0f, 1080.0f);
+        fly_cam.SetFar(1000.0f);
+        fly_cam.SetNear(0.1f);
+        fly_cam.SetPosition(0.0f, 5.0f, 10.0f);
+        fly_cam.SetFov(90.0f);
+        fly_cam.SetDirection(0.0f, 0.0f, -1.0f);
+        fly_cam.SetSpeed(10.0f);
+        g_renderer->set_camera(&fly_cam);
+    }
 
     And::ResourceManager r_manager{*window, ts};
     r_manager.AddGenerator<And::ShaderGenerator>();

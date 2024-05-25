@@ -260,13 +260,13 @@ protected:
 	 * @brief AudioEffect* struct
 	 * 
 	 */
-	AudioEffect* m_audio_effect;
+	std::shared_ptr<AudioEffect> m_audio_effect;
 
 	/**
 	 * @brief AudioData* struct
 	 * 
 	 */
-	AudioData* m_audio_data;
+	std::shared_ptr<AudioData> m_audio_data;
 
 	/**
 	 * @brief mutted sound
