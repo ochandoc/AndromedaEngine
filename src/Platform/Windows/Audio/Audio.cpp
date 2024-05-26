@@ -269,12 +269,14 @@ void Audio::UpdateListenerPosition(const float p[3]) {
 
 void Audio::UpdateListenerDirection(const float pos[3]){
     glm::vec3 forward(pos[0], pos[1], pos[2]);
-    glm::vec3 up = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), forward);
+    /*glm::vec3 up = glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), forward);
     if (glm::length(up) < 0.01f) {
         up = glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), forward);
     }
     up = glm::normalize(up);
-    glm::vec3 right = glm::cross(forward, up);
+    glm::vec3 right = glm::cross(forward, up);*/
+
+    glm::vec3 up(0.0f, 1.0f, 0.0f);
 
     m_audio_effect->listener_orientation[0] = forward.x;
     m_audio_effect->listener_orientation[1] = forward.y;
