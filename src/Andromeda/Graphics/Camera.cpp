@@ -121,7 +121,7 @@ void And::Camera::ShowValues()
   }
   ImGui::BulletText("Direction");
   ImGui::SameLine();
-  if (ImGui::DragFloat3("##CameraDirection", m_Direction))
+  if (ImGui::DragFloat3("##CameraDirection", m_Direction, 0.05f, -1.0f, 1.0f))
   {
     recaluclueView = true;
   }

@@ -1386,8 +1386,16 @@ int main(int argc, char** argv){
     const float* src_dir = fly_cam.GetDirection();
 
     audio_tele.UpdateListenerPosition(src_pos);
+    audio_teclado.UpdateListenerPosition(src_pos);
+    audio_lapiz.UpdateListenerPosition(src_pos);
+
     audio_tele.UpdateListenerDirection(src_dir);
+    audio_teclado.UpdateListenerDirection(src_dir);
+    audio_lapiz.UpdateListenerDirection(src_dir);
+    
     audio_tele.ApplyEffects();
+    audio_teclado.ApplyEffects();
+    audio_lapiz.ApplyEffects();
 
     audio_manager.Update();
   

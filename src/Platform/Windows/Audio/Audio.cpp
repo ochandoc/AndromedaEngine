@@ -83,7 +83,6 @@ Audio::~Audio(){
   alSourceStop(m_audio_data->source);
   alDeleteSources(1, &(m_audio_data->source));
   alDeleteBuffers(1, &(m_audio_data->buffer));
-  //delete m_audio_data;
 }
 
 /**
