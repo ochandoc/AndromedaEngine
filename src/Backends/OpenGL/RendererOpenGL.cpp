@@ -28,6 +28,7 @@
 #include "Andromeda/Graphics/Lights/DirectionalLight.h"
 #include "Andromeda/Graphics/Lights/PointLight.h"
 #include "Andromeda/ECS/Components/MaterialComponent.h"
+#include "Andromeda/ECS/Components/BillBoardComponent.h"
 #include "Backends/OpenGL/OpenGLIndexBuffer.h"
 #include "Backends/OpenGL/OpenGLVertexBuffer.h"
 #include "Andromeda/Graphics/Material.h"
@@ -167,7 +168,7 @@ RendererOpenGL::RendererOpenGL(Window& window) : m_Window(window), m_UserCamera(
   //
 
 
-
+  m_shader_billboard = MakeShader("shaders/opengl/billboard.shader");
 
   m_shader_skybox = MakeShader("shaders/opengl/skybox.shader");
   m_skybox_mesh = RawMesh::CreateSkybox();
@@ -843,6 +844,113 @@ void RendererOpenGL::DrawSkyBox(){
     }
 }
 
+void RendererOpenGL::DrawBillBoard(EntityComponentSystem& ecs){
+
+    OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_pbr_geometry.get());
+    CameraBase* cam = &m_DefaultCamera;
+    if (m_UserCamera) cam = m_UserCamera;
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    for (auto [transform, bill] : ecs.get_components<TransformComponent, BillBoardComponent>()) {
+        if (bill->GetActive()) {
+
+            //obj->MeshOBJ->UseTexture(0);
+            std::shared_ptr<MaterialComponent> mat = bill->GetBillBoard()->GetMaterialComponent();
+            std::shared_ptr<Material> mat_tmp;
+            if (mat) {
+                mat_tmp = mat->GetMaterial();
+            }
+
+            tmp->Use();
+
+            //auto start_time_material = std::chrono::steady_clock::now();
+            CheckPBRMaterial(tmp, mat_tmp);
+            //CheckTime(start_time_material, std::chrono::steady_clock::now(), "Check Material: ");
+ 
+
+            //auto start_time_draw = std::chrono::steady_clock::now();
+            TransformComponent tr_tmp = *transform;
+            tr_tmp.scale[0] = bill->bScale[0];
+            tr_tmp.scale[1] = bill->bScale[1];
+            tr_tmp.scale[2] = bill->bScale[2];
+
+
+            //glm::vec3 bill_pos = glm::make_vec3(tr_tmp.position);
+            glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
+
+            //glm::vec3 look_dir = glm::normalize(cam_pos - bill_pos);
+
+            //glm::mat4 viewMatrix_tmp = glm::lookAt(bill_pos, cam_pos, glm::vec3(0.0f, 1.0f, 0.0f));
+
+            //glm::mat3 rotationMatrix = glm::mat3(viewMatrix_tmp);
+
+
+            glm::mat4 viewMatrix = glm::make_mat4(cam->GetViewMatrix());
+            glm::mat4 projectionMatrix = glm::make_mat4(cam->GetProjectionMatrix());
+
+            glm::mat4 modelMatrix = glm::make_mat4(tr_tmp.GetModelMatrix());
+            //modelMatrix *= glm::mat4(rotationMatrix);
+
+
+            UniformBlockMatrices matrices_tmp = { modelMatrix, viewMatrix, projectionMatrix, cam_pos };
+            m_buffer_matrix->upload_data((void*)&matrices_tmp, 208);
+            m_buffer_matrix->bind();
+
+
+            OpenGLVertexBuffer* vertex_buffer = static_cast<OpenGLVertexBuffer*>(bill->GetBillBoard()->GetMeshComponent()->GetMesh()->GetVertexBuffer());
+
+            vertex_buffer->BindVAO();
+
+            //start = std::chrono::high_resolution_clock::now(); 
+            glDrawElements(GL_TRIANGLES, vertex_buffer->GetNumIndices(), GL_UNSIGNED_INT, 0);
+            //CheckTime(start, std::chrono::high_resolution_clock::now(), "Draw Elements OBJ-> ");
+        }
+    }
+
+}
+
+void RendererOpenGL::RenderBillBoard(EntityComponentSystem& ecs){
+
+    OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_billboard.get());
+    for (auto [bill] : ecs.get_components<BillBoardComponent>()) {
+        if (bill->GetActive()) {
+            tmp->Use();
+
+            std::vector<std::shared_ptr<Texture>> tex_gbuffer = m_gBuffer_->GetTextures();
+            OpenGLTexture2D* position_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[0].get());
+            OpenGLTexture2D* normal_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[1].get());
+            OpenGLTexture2D* color_tex = static_cast<OpenGLTexture2D*>(tex_gbuffer[2].get());
+            OpenGLTexture2D* met_rog_au = static_cast<OpenGLTexture2D*>(tex_gbuffer[3].get());
+
+            tmp->SetTexture("Frag_Position", 0);
+            position_tex->Activate(0);
+
+            tmp->SetTexture("Frag_Normal", 1);
+            normal_tex->Activate(1);
+
+            tmp->SetTexture("Frag_Color", 2);
+            color_tex->Activate(2);
+
+            tmp->SetTexture("Met_Roug_Ao", 3);
+            met_rog_au->Activate(3);
+
+            OpenGLRenderTarget* opengl_render_target = static_cast<OpenGLRenderTarget*>(m_gBuffer_.get());
+            glEnable(GL_BLEND);
+            glBindVertexArray(m_quad_vao);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, opengl_render_target->GetId());
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+            glBlitFramebuffer(0, 0, m_Window.get_width(), m_Window.get_height(), 0, 0, m_Window.get_width(), m_Window.get_height(), GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+           
+        }
+        
+    
+    }
+
+
+}
+
 void RendererOpenGL::RenderLight(std::shared_ptr<And::RenderTarget> shadow_buffer, Light* light) {
 
     
@@ -1083,7 +1191,7 @@ void RendererOpenGL::CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> ma
         if (t) {
             t->Activate(0);
             s->SetTexture("texMaterial", 0);
-            s->SetInt("m_use_texture", 1);
+            //s->SetInt("m_use_texture", 1);
         }else {
             // Si no tiene textura, uso el color
             //static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
@@ -1538,6 +1646,10 @@ void RendererOpenGL::draw_pbr(EntityComponentSystem& entity){
         draw_obj(obj, nullptr, transform);
         //CheckTime(start_time_draw, std::chrono::steady_clock::now(), "*** Draw OBJ TOTAL *** : ");
     }
+
+   
+    DrawBillBoard(entity);
+
     m_gBuffer_->Desactivate();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -1545,10 +1657,14 @@ void RendererOpenGL::draw_pbr(EntityComponentSystem& entity){
 
 
     //start_time = std::chrono::steady_clock::now();
-    // Lighting Pass
-
-    // Ambient light
+    
+    
     glBlendFunc(GL_ONE, GL_ZERO);
+    // Lighting Pass
+    
+    //RenderBillBoard(entity);
+    
+    // Ambient light
     for (auto [light] : entity.get_components<AmbientLight>()) {
         if (light->GetEnabled()) {
             RenderPBRLight(nullptr, light);
@@ -1636,6 +1752,11 @@ void RendererOpenGL::draw_pbr(EntityComponentSystem& entity){
     }
 
     //CheckTime(start_time, std::chrono::steady_clock::now(), "Lighting Pass: ");
+
+
+
+
+
 
     DrawSkyBox();
 

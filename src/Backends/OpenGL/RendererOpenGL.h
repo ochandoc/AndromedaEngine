@@ -60,6 +60,8 @@ namespace And{
         void draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* dir);
 
         void DrawSkyBox();
+        void DrawBillBoard(EntityComponentSystem& ecs);
+        void RenderBillBoard(EntityComponentSystem& ecs);
 
         void CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> mat);
         void CheckPBRMaterial(OpenGLShader* s, std::shared_ptr<Material> mat);
@@ -110,6 +112,7 @@ namespace And{
         std::shared_ptr<Shader> m_shader_quad_directional_pbr;
 
         std::shared_ptr<Shader> m_shader_skybox;
+        std::shared_ptr<Shader> m_shader_billboard;
 
         std::shared_ptr<UniformBuffer> m_buffer_matrix; // 208
         std::shared_ptr<UniformBuffer> m_buffer_matrix_pointLight; // 208 + 16 * 5

@@ -12,6 +12,7 @@
 #include "Andromeda/ECS/EntityComponentSystem.h"
 #include "Andromeda/Physics/RigidBody.h"
 #include "Andromeda/ECS/Components/MaterialComponent.h"
+#include "Andromeda/ECS/Components/BillBoardComponent.h"
 
 namespace And
 {
@@ -40,5 +41,6 @@ namespace And
 		e.add_component_class<And::PointLight>();
 		e.add_component_class<And::RigidBody>();
 		e.add_component_class<And::MaterialComponent>();
+		e.add_component_class<And::BillBoardComponent>();
 	}
 }

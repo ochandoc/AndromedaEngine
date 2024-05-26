@@ -68,5 +68,6 @@
 
 #include "Andromeda/Graphics/Material.h"
 #include "Andromeda/ECS/Components/MaterialComponent.h"
+#include "Andromeda/ECS/Components/BillBoardComponent.h"
 
 #include "andpch.hpp"
