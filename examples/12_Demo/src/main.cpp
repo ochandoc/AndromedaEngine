@@ -227,7 +227,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         const float intensity = 100.0f;
         And::PointLight point;
         point.SetPosition(-esquina_x, 26.0f, esquina_z);
-        AddBillBoardAtLocation(ecs, -esquina_x, 26.0f, esquina_z, materiales[0]);
+        //AddBillBoardAtLocation(ecs, -esquina_x, 26.0f, esquina_z, materiales[0]);
         point.SetSpecularColor(1.0f, 1.0f, 1.0f);
         point.SetSpecularShininess(32.0f);
         point.SetSpecularStrength(0.003f);
@@ -1221,10 +1221,11 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
     }
 }
 
-void CreateAudios() {
+void CreateAudios(And::EntityComponentSystem& ecs) {
 
     audio_tele.load("demo/audio/jazz_estereo.wav");
     audio_tele.SetPosition(33.0f, 5.0f, -15.0f);
+    AddBillBoardAtLocation(ecs, 33.0f, 5.0f, -15.0f, materiales[2]);
     audio_tele.SetGain(1.0f);
     audio_tele.SetDoppler(true);
     audio_tele.SetDopplerFactor(10.0f);
@@ -1235,6 +1236,7 @@ void CreateAudios() {
 
     audio_lapiz.load("demo/audio/lapiz.wav");
     audio_lapiz.SetPosition(-16.0f, 10.0f, 50.0f);
+    AddBillBoardAtLocation(ecs, -16.0f, 10.0f, 50.0f, materiales[2]);
     audio_lapiz.SetGain(1.0f);
     audio_lapiz.SetDoppler(true);
     audio_lapiz.SetDopplerFactor(5.0f);
@@ -1244,6 +1246,7 @@ void CreateAudios() {
     
     audio_teclado.load("demo/audio/teclado.wav");
     audio_teclado.SetPosition(9.0f, 5.0f, -16.0f);
+    AddBillBoardAtLocation(ecs, 9.0f, 5.0f, -16.0f, materiales[2]);
     audio_teclado.SetGain(1.0f);
     audio_teclado.SetDoppler(true);
     audio_teclado.SetDopplerFactor(10.0f);
@@ -1310,6 +1313,7 @@ int main(int argc, char** argv){
       scene.SetPosition(0.0f, 0.0f, 0.0f);
       scene.SetScale(1.0f, 1.0f, 1.0f);
       scene.SetRotation(0.0f, 0.0f, 0.0f);
+
       And::Entity* scene_entity = entity_comp.new_entity(scene);
       
       LoadMaterials("billboard_bulb.png");
@@ -1325,7 +1329,7 @@ int main(int argc, char** argv){
   And::AudioManager audio_manager;
   
 
-  CreateAudios();
+  CreateAudios(entity_comp);
 
   audio_manager.play(audio_lapiz);
   audio_manager.play(audio_teclado);
