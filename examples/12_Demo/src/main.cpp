@@ -46,6 +46,47 @@ static And::Audio audio_tele;
 static And::Audio audio_lapiz;
 static And::Audio audio_teclado;
 
+static std::vector<And::Entity*> billboards;
+static std::vector<And::MaterialComponent> materiales;
+
+
+void LoadMaterials(std::string file) {
+
+    And::MaterialComponent mat_com;
+    std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+    std::shared_ptr<And::Texture> tex = And::MakeTexture(file.c_str());
+    std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/titanio/normals.png");
+    std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/titanio/ao.png");
+    std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/titanio/metallic.png");
+    std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/titanio/ao.png");
+    mat->SetColorTexture(tex);
+    mat->SetNormalTexture(normals);
+    mat->SetAmbientOclusionTexture(ao);
+    mat->SetMetallicTexture(metallic);
+    mat->SetRoughnessTexture(rou);
+    mat_com.SetMaterial(mat);
+
+    materiales.push_back(mat_com);
+}
+
+void AddBillBoardAtLocation(And::EntityComponentSystem& ecs, float x, float y, float z, And::MaterialComponent& mat_com) {
+
+    std::shared_ptr<And::BillBoardComponent> billboard_comp = std::make_shared<And::BillBoardComponent>();
+
+    std::shared_ptr<And::BillBoard> bill = std::make_shared<And::BillBoard>();
+    bill->SetMaterial(std::make_shared<And::MaterialComponent>(mat_com));
+    billboard_comp->SetBillBoard(bill);
+    billboard_comp->bScale[0] = 4.0f;
+    billboard_comp->bScale[1] = 4.0f;
+
+    And::TransformComponent tr_com;
+    tr_com.position[0] = x;
+    tr_com.position[1] = y;
+    tr_com.position[2] = z;
+    billboards.push_back(ecs.new_entity(tr_com, *billboard_comp));
+
+}
+
 void CreateHabitaculo(And::EntityComponentSystem& ecs, And::Entity* parent) {
 
     const float scale_suelo = 75.0f;
@@ -123,11 +164,13 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
     const float esquina_x = 30.0f;
     const float esquina_z = 49.0f;
     
+
     // Point esquina
     {
         const float intensity = 100.0f;
         And::PointLight point;
         point.SetPosition(esquina_x, 26.0f, esquina_z);
+        AddBillBoardAtLocation(ecs, esquina_x, 26.0f, esquina_z, materiales[0]);
         point.SetSpecularColor(1.0f, 1.0f, 1.0f);
         point.SetSpecularShininess(32.0f);
         point.SetSpecularStrength(0.003f);
@@ -146,6 +189,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         const float intensity = 100.0f;
         And::PointLight point;
         point.SetPosition(-esquina_x, 26.0f, -esquina_z);
+        AddBillBoardAtLocation(ecs, -esquina_x, 26.0f, -esquina_z, materiales[0]);
         point.SetSpecularColor(1.0f, 1.0f, 1.0f);
         point.SetSpecularShininess(32.0f);
         point.SetSpecularStrength(0.003f);
@@ -163,6 +207,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
     {
         const float intensity = 100.0f;
         And::PointLight point;
+        AddBillBoardAtLocation(ecs, esquina_x, 26.0f, -esquina_z, materiales[0]);
         point.SetPosition(esquina_x, 26.0f, -esquina_z);
         point.SetSpecularColor(1.0f, 1.0f, 1.0f);
         point.SetSpecularShininess(32.0f);
@@ -182,6 +227,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         const float intensity = 100.0f;
         And::PointLight point;
         point.SetPosition(-esquina_x, 26.0f, esquina_z);
+        AddBillBoardAtLocation(ecs, -esquina_x, 26.0f, esquina_z, materiales[0]);
         point.SetSpecularColor(1.0f, 1.0f, 1.0f);
         point.SetSpecularShininess(32.0f);
         point.SetSpecularStrength(0.003f);
@@ -200,6 +246,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         const float intensity = 100.0f;
         And::PointLight point;
         point.SetPosition(10.0f, 26.0f, -15.0f);
+        AddBillBoardAtLocation(ecs, 10.0f, 26.0f, -15.0f, materiales[0]);
         point.SetSpecularColor(1.0f, 1.0f, 1.0f);
         point.SetSpecularShininess(32.0f);
         point.SetSpecularStrength(0.003f);
@@ -218,6 +265,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         const float intensity = 200.0f;
         And::PointLight point;
         point.SetPosition(34.5f,9.0f, -15.0f);
+        AddBillBoardAtLocation(ecs, 34.5f, 9.0f, -15.0f, materiales[0]);
         point.SetSpecularColor(0.0f, 0.0f, 0.0f);
         point.SetSpecularShininess(2.0f);
         point.SetSpecularStrength(0.0f);
@@ -251,6 +299,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         And::SpotLight spot{};
         //spot.SetPosition(33.0f, 20.0f, 0.0f);
         spot.SetPosition(-35.5f, 32.0f, distance_cuadros);
+        AddBillBoardAtLocation(ecs, -35.5f, 32.0f, distance_cuadros, materiales[1]);
         spot.SetDirection(0.0f, -1.0f, 0.0f);
         //spot.SetDiffuseColor(0.976f, 0.518f, 0.012f);
         spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
@@ -273,6 +322,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         And::SpotLight spot{};
         //spot.SetPosition(33.0f, 20.0f, 0.0f);
         spot.SetPosition(-35.5f, 32.0f, 0.0f);
+        AddBillBoardAtLocation(ecs, -35.5f, 32.0f, 0.0f, materiales[1]);
         spot.SetDirection(0.0f, -1.0f, 0.0f);
         //spot.SetDiffuseColor(0.976f, 0.518f, 0.012f);
         spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
@@ -295,6 +345,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         And::SpotLight spot{};
         //spot.SetPosition(33.0f, 20.0f, 0.0f);
         spot.SetPosition(-35.5f, 32.0f, -distance_cuadros);
+        AddBillBoardAtLocation(ecs, -35.5f, 32.0f, -distance_cuadros, materiales[1]);
         spot.SetDirection(0.0f, -1.0f, 0.0f);
         //spot.SetDiffuseColor(0.976f, 0.518f, 0.012f);
         spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
@@ -317,6 +368,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         And::SpotLight spot{};
         //spot.SetPosition(33.0f, 20.0f, 0.0f);
         spot.SetPosition(-9.5f, 12.5f, 52.0f);
+        AddBillBoardAtLocation(ecs, -9.5f, 12.5f, 52.0f, materiales[1]);
         spot.SetDirection(-1.0f, -0.5f, 0.0f);
         spot.SetDiffuseColor(0.976f, 0.518f, 0.3f);
         spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
@@ -338,6 +390,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         And::SpotLight spot{};
         //spot.SetPosition(33.0f, 20.0f, 0.0f);
         spot.SetPosition(35.0f, 31.0f, 43.0f);
+        AddBillBoardAtLocation(ecs, 35.0f, 31.0f, 43.0f, materiales[1]);
         spot.SetDirection(0.0f, -1.0f, 0.0f);
         spot.SetDiffuseColor(0.976f, 0.518f, 0.3f);
         spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
@@ -360,6 +413,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         //spot.SetPosition(33.0f, 20.0f, 0.0f);
         //43.0f - (scale_z * 1.5f)
         spot.SetPosition(35.0f, 31.0f,43.0f - (8.0f * 1.5f));
+        AddBillBoardAtLocation(ecs, 35.0f, 31.0f, 43.0f - (8.0f * 1.5f), materiales[1]);
         spot.SetDirection(0.0f, -1.0f, 0.0f);
         spot.SetDiffuseColor(0.976f, 0.518f, 0.3f);
         spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
@@ -382,6 +436,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         //spot.SetPosition(33.0f, 20.0f, 0.0f);
         //43.0f - (scale_z * 1.5f)
         spot.SetPosition(35.0f, 31.0f, 43.0f - (8.0f * 3.0f));
+        AddBillBoardAtLocation(ecs, 35.0f, 31.0f, 43.0f - (8.0f * 3.0f), materiales[1]);
         spot.SetDirection(0.0f, -1.0f, 0.0f);
         spot.SetDiffuseColor(0.976f, 0.518f, 0.3f);
         spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
@@ -404,6 +459,7 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
         //spot.SetPosition(33.0f, 20.0f, 0.0f);
         //43.0f - (scale_z * 1.5f)
         spot.SetPosition(35.0f, 31.0f, -39.0f );
+        //AddBillBoardAtLocation(ecs, 35.0f, 31.0f, 43.0f - (8.0f * 3.0f), materiales[1]);
         spot.SetDirection(0.0f, -1.0f, 0.0f);
         spot.SetDiffuseColor(1.0f, 1.0f, 1.0f);
         spot.SetSpecularColor(1.0f, 1.0f, 1.0f);
@@ -421,11 +477,13 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
     }
 
 
+   
     // Point hexagonos
     {
         const float intensity = 200.0f;
         And::PointLight point;
         point.SetPosition(25.0f, 17.0f, -39.0f);
+        AddBillBoardAtLocation(ecs, 25.0f, 17.0f, -39.0f, materiales[0]);
         point.SetSpecularColor(1.0f, 1.0f, 1.0f);
         point.SetSpecularShininess(8.0f);
         point.SetSpecularStrength(0.003f);
@@ -1254,6 +1312,9 @@ int main(int argc, char** argv){
       scene.SetRotation(0.0f, 0.0f, 0.0f);
       And::Entity* scene_entity = entity_comp.new_entity(scene);
       
+      LoadMaterials("billboard_bulb.png");
+      LoadMaterials("billboard_spot.png");
+      LoadMaterials("billboard_audio.png");
 
       CreateHabitaculo(entity_comp, scene_entity);
       CreateLighting(entity_comp);
@@ -1272,9 +1333,13 @@ int main(int argc, char** argv){
 
   And::Input input{ *window };
   And::ActionInput light_tv{ "LightTV", And::KeyState::Press, { And::KeyCode::T} };
+  And::ActionInput billboards_input{ "BillBoard", And::KeyState::Press, { And::KeyCode::B} };
+  
   bool is_light_tv = false;
+  bool is_bilboard_input= false;
 
   bool change_light = false;
+  bool active_bilboards = true;
 
   float time = 0.0f;
   float fps_count = 0.0f;
@@ -1300,6 +1365,21 @@ int main(int argc, char** argv){
     }
     else {
         is_light_tv = false;
+    }
+    
+    if (input.check_action(billboards_input)) {
+
+        //static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem & ecs, And::PhysicsEngine & engine, And::MeshComponent & mesh, And::MaterialComponent & material_comp)
+        if (!is_bilboard_input) {
+            active_bilboards = !active_bilboards;
+        }
+        is_bilboard_input = true;
+    }else {
+        is_bilboard_input = false;
+    }
+
+    for (And::Entity* e : billboards) {
+        e->get_component<And::BillBoardComponent>()->ActiveBillBoard(active_bilboards);
     }
 
 
