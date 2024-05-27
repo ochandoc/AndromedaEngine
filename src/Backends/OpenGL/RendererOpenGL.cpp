@@ -1174,7 +1174,7 @@ namespace And
             if (t) {
                 t->Activate(0);
                 s->SetTexture("texMaterial", 0);
-                //s->SetInt("m_use_texture", 1);
+                s->SetInt("m_use_texture", 1);
             } else {
                 // Si no tiene textura, uso el color
                 //static_cast<OpenGLTexture2D*>(m_material_default.GetColorTexture().get())->Activate(0);
