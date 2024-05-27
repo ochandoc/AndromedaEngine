@@ -1348,7 +1348,9 @@ int main(int argc, char** argv){
   float time = 0.0f;
   float fps_count = 0.0f;
   while (window->is_open()){
-       
+
+    //auto start_time = std::chrono::steady_clock::now();
+    
     window->update();
     g_renderer->new_frame();
     editor.ShowWindows();
@@ -1495,6 +1497,15 @@ int main(int argc, char** argv){
     fps_count += 0.5f * window->get_delta_time();
     g_renderer->end_frame();
     window->swap_buffers();
+
+
+
+
+
+    //auto end = std::chrono::steady_clock::now();
+    //auto diff = end - start_time;
+    //double tiempo_en_milisegundos = std::chrono::duration<double, std::milli>(diff).count();
+    //std::cout << "TOTAL" << tiempo_en_milisegundos << " milisegundos" << std::endl;
   }
 
   //physics_engine->Release(entity_comp);
