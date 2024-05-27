@@ -184,6 +184,24 @@ void RigidBody::SetPosition(float x, float y, float z){
 	m_data->actor->setGlobalPose(tr);
 }
 
+void RigidBody::SetRotation(float x, float y, float z) {
+	
+	glm::vec3 eulerAngles(glm::radians(x), glm::radians(y), glm::radians(z));
+	glm::quat quaternion = glm::quat(eulerAngles);
+	
+	physx::PxTransform tr = m_data->actor->getGlobalPose();
+
+	tr.q.x = quaternion.x;
+	tr.q.y = quaternion.y;
+	tr.q.z = quaternion.z;
+	tr.q.w = quaternion.w;
+
+
+	m_data->actor->setGlobalPose(tr);
+	
+}
+
+
 void RigidBody::GetPosition(float* position){
 
 	physx::PxTransform transform = m_data->actor->getGlobalPose();

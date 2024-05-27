@@ -44,6 +44,7 @@ public:
 	void SetPosition(float* pos);
 	void SetPosition(float x, float y, float z);
 
+	void SetRotation(float x, float y, float z);
 
 	void GetPosition(float* position);
 	void GetRotation(float* rotation);
