@@ -32,7 +32,6 @@ uniform vec4 m_albedoColor;
 uniform int m_use_texture;
 uniform int m_use_specular_texture;
 
-out vec3 blend_color;
 out vec3 s_normal;
 out vec3 s_fragPos;
 out vec3 camera_pos;
@@ -41,10 +40,14 @@ out vec2 uv;
 
 void main(){
   gl_Position = projection * view * model * vec4(position, 1.0);
-  blend_color = vec3(camera_position.x/20.0, camera_position.y/20.0, camera_position.z/20.0);
+
   s_fragPos = vec3(model * vec4(position, 1.0));
-  s_normal = normals;
+
+  s_normal = vec3(transpose(inverse(model))  * vec4(normals, 0.0));
+  //s_normal = normals;
+  
   camera_pos = camera_position;
+
   uv = TexCoord;
 }
 
@@ -69,7 +72,6 @@ uniform vec4 m_albedoColor;
 uniform int m_use_texture;
 uniform int m_use_specular_texture;
 
-in vec3 blend_color;
 in vec3 s_normal;
 in vec3 s_fragPos;
 in vec3 camera_pos;

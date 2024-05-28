@@ -51,7 +51,7 @@ void main(){
   blend_color = vec3(camera_position.x/20.0, camera_position.y/20.0, camera_position.z/20.0);
   s_fragPos = vec3(model * vec4(position, 1.0));
 
-  s_normal = normals;
+  s_normal = vec3(transpose(inverse(model))  * vec4(normals, 0.0));
   camera_pos = camera_position;
   uv = TexCoord;
   for(int i = 0; i < 6; i++){

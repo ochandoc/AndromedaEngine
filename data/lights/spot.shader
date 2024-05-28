@@ -52,7 +52,7 @@ void main(){
   
   gl_Position = projection * view * model * vec4(position, 1.0);
   s_fragPos = vec3(model * vec4(position, 1.0));
-  s_normal = normals;
+  s_normal = vec3(transpose(inverse(model))  * vec4(normals, 0.0));
   camera_pos = camera_position;
   uv = TexCoord;
 }
