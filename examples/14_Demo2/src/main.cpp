@@ -990,8 +990,8 @@ int main(int argc, char** argv){
 
     physics_engine->Apply(entity_comp);
         
-    g_renderer->draw_forward(entity_comp);
-    //g_renderer->draw_deferred(entity_comp);
+    //g_renderer->draw_forward(entity_comp);
+    g_renderer->draw_deferred(entity_comp);
     
     frames++;
     time += window->get_delta_time();

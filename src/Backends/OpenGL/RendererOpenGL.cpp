@@ -468,7 +468,10 @@ namespace And
             glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
 
             glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, cam->GetNear(), cam->GetFar());
-            glm::mat4 projViewLight = orto * viewLight;
+            //glm::mat4 projViewLight = orto * viewLight;
+
+            glm::mat4 projViewLight = glm::make_mat4(directional->GetProjectViewMatrix(0.0f));
+
             matrices_tmp = { modelMatrix, viewProjCam, projViewLight, cam_pos };
 
             m_buffer_directional_light->upload_data(directional->GetData(), 48);
@@ -1015,7 +1018,7 @@ namespace And
 
             if (!point) {
 
-                // Shadows ambient or spot
+                // Shadows directional or spot
                 std::vector<std::shared_ptr<And::Texture>> shadow_texture = shadow_buffer->GetTextures();
                 OpenGLTexture2D* tex_shadow = static_cast<OpenGLTexture2D*>(shadow_texture[0].get());
 
