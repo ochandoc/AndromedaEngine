@@ -117,12 +117,12 @@ std::shared_ptr<Geometry> Geometry::load(std::string filename, std::string base_
   glBindVertexArray(0);  */
 
   obj.filename_ = std::string(filename);
-  obj.m_texture = MakeTexture("default_texture.jpg");
-  obj.m_error_texture = MakeTexture("error_texture.png");
-  obj.m_texture_casted = std::make_shared<TextureCasted>();
-  obj.m_texture_casted->tex = static_cast<OpenGLTexture2D*>(obj.m_texture.get());
+  //obj.m_texture = MakeTexture("default_texture.jpg");
+  //obj.m_error_texture = MakeTexture("error_texture.png");
+  //obj.m_texture_casted = std::make_shared<TextureCasted>();
+  //obj.m_texture_casted->tex = static_cast<OpenGLTexture2D*>(obj.m_texture.get());
 
-  WAIT_GPU_LOAD()
+  //WAIT_GPU_LOAD()
   return std::make_shared<Geometry>(std::move(obj));
 }
 
