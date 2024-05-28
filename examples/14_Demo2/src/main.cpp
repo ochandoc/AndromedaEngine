@@ -34,6 +34,8 @@ static std::random_device rd;
 static std::mt19937 gen(rd());
 
 static And::Entity* cuadros[6];
+static And::Entity* cubos_1[6*6];
+static And::Entity* cubos_2[6*6];
 
 static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, And::MeshComponent& mesh, And::MaterialComponent& material_comp, bool big = false) {
 
@@ -505,6 +507,68 @@ void CreateCuadros(And::EntityComponentSystem& ecs) {
     }
 }
 
+void CreateMuros(And::EntityComponentSystem& ecs, And::PhysicsEngine& engine){
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        mat->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("cube.obj");
+        And::RawMesh raw_mesh(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        //tr.SetPosition(18.0f, 3.0f, -42.0f);
+        tr.SetRotation(0.0f, 0.0f, 0.0f);
+        tr.SetScale(2.0f, 2.0f, 2.0f);
+
+        float scale[3] = {2.0f, 2.0f, 2.0f};
+
+        int index = 0;
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                And::RigidBody rb = engine.CreateRigidBody();
+                float x = 18.0f;
+                float y = 3.5f + (float)(j) * 2.0f;
+                float z = -42.0f + (float)(i * 2.0f);
+
+                float pos[3] = {x,y,z};
+                tr.SetPosition(x, y, z);
+                rb.AddBoxCollider(pos, scale, And::ColliderType::RigidDynamic, 0.5f, 0.5f, 6.0f);
+                rb.SetMass(10.0f);
+                rb.AffectsGravity(true);
+                tr.HasRigidBody(true);
+                cubos_1[index] = ecs.new_entity(mat_com, MC, tr, rb);
+                index++;
+            }
+        }
+
+        index = 0;
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                And::RigidBody rb = engine.CreateRigidBody();
+                float x = -18.0f;
+                float y = 3.5f + (float)(j) * 2.0f;
+                float z = -42.0f + (float)(i * 2.0f);
+
+                float pos[3] = { x,y,z };
+                tr.SetPosition(x, y, z);
+                rb.AddBoxCollider(pos, scale, And::ColliderType::RigidDynamic, 0.5f, 0.5f, 6.0f);
+                rb.SetMass(10.0f);
+                rb.AffectsGravity(true);
+                tr.HasRigidBody(true);
+                cubos_2[index] = ecs.new_entity(mat_com, MC, tr, rb);
+                index++;
+            }
+        }
+
+        
+    }
+}
+
 void UpdateCuadrosColor(float time) {
 
     for (int i = 0; i < 6; i++) {
@@ -512,6 +576,18 @@ void UpdateCuadrosColor(float time) {
         float g = sinf(time * 0.7f) * 0.5f + 0.5f;
         float b = cosf(time * 0.6f) * 0.5f + 0.5f;
         cuadros[i]->get_component<And::MaterialComponent>()->GetMaterial()->SetColor(r,g,b, 1.0f);
+    }
+
+}
+
+void UpdateCubosColor(float time) {
+
+    for (int i = 0; i < 6*6; i++) {
+        float r = cosf(time * 0.8f) * 0.5f + 0.5f;
+        float g = sinf(time * 0.7f) * 0.5f + 0.5f;
+        float b = cosf(time * 0.6f) * 0.5f + 0.5f;
+        cubos_1[i]->get_component<And::MaterialComponent>()->GetMaterial()->SetColor(r,g,b, 1.0f);
+        cubos_2[i]->get_component<And::MaterialComponent>()->GetMaterial()->SetColor(r,g,b, 1.0f);
     }
 
 }
@@ -787,6 +863,8 @@ int main(int argc, char** argv){
 
 
   CreateCuadros(entity_comp);
+  CreateMuros(entity_comp, *physics_engine);
+
 
   And::AudioManager audio_manager;
   And::Audio audio_fondo;
@@ -908,6 +986,7 @@ int main(int argc, char** argv){
     }
 
     UpdateCuadrosColor(time);
+    UpdateCubosColor(time);
 
 
     //And::TransformComponent* tmp_nose = bolinga_entity->get_component<And::TransformComponent>();
@@ -918,6 +997,7 @@ int main(int argc, char** argv){
     physics_engine->Apply(entity_comp);
         
     g_renderer->draw_forward(entity_comp);
+    //g_renderer->draw_deferred(entity_comp);
     
     frames++;
     time += window->get_delta_time();
