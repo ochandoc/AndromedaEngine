@@ -75,9 +75,6 @@ namespace And
 
     virtual void enable_skybox(bool value) {}
     virtual void set_skybox_texture(std::shared_ptr<SkyboxTexture> texture) {}
-
-    virtual void Draw(Mesh* mesh, Shader* s) {}
-
   };
 
 }

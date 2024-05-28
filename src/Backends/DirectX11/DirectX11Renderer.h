@@ -44,8 +44,7 @@ namespace And
 
     void SkyboxPass();
     void ObjectPass(Mesh* mesh, TransformComponent* tr, Material* material, const std::string& shader);
-
-    virtual void Draw(Mesh* mesh, Shader* s) override;
+    void BillboardPass(const glm::vec3& pos, const glm::vec2 size, Texture* tex);
 
     static ID3D11Device* GetDevice();
     static ID3D11DeviceContext* GetDeviceContext();
@@ -58,14 +57,23 @@ namespace And
     ComPtr<ID3D11DepthStencilView> m_DepthStencilView;
     ComPtr<ID3D11RenderTargetView> m_RenderTargetView;
     ComPtr<ID3D11RasterizerState> m_RasterizerState;
+    ComPtr<ID3D11BlendState> m_ZeroBlendState;
+    ComPtr<ID3D11BlendState> m_LightsBlendState;
     struct {
       bool Enabled;
       std::shared_ptr<Mesh> Mesh;
       std::shared_ptr<SkyboxTexture> Texture;
       ComPtr<ID3D11DepthStencilState> DepStencilState;
     } m_Skybox;
-    ComPtr<ID3D11DepthStencilState> m_DepthStencil;
+    struct {
+      std::shared_ptr<DirectX11VertexBuffer> VertexBuffer;
+      std::shared_ptr<DirectX11IndexBuffer> IndexBuffer;
+    } m_Billboard;
+    struct {
+      ComPtr<ID3D11DepthStencilState> LessEqual;
+    } m_DepthStencil;
     DirectX11ShaderLibrary m_ShaderLibrary;
+    std::shared_ptr<DirectX11Texture2D> m_LightTexture;
     std::vector<ID3D11Buffer*> m_VSConstantBuffers;
     std::vector <ID3D11Buffer*> m_PSConstantBuffers;
     std::shared_ptr<DirectX11ConstantBuffer> m_VSObjectData;

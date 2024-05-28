@@ -83,16 +83,20 @@ PS_OUTPUT main(PS_INPUT input) : SV_TARGET
     object_color = Color;
   
   float3 ViewDir = normalize(CameraPos - input.WorldPos);
+  float3 LightDir = normalize(Position - input.WorldPos);
   
-  float diff = max(dot(input.Normal, Direction), 0.0f);
-  float3 diffuse = diff * DiffuseColor;
+  float Distance = length(Position - input.WorldPos);
+  float AttenuationAmount = 1.0f / ((ConstantAttenuation + LinearAttenuation * Distance) + (QuadraticAttenuation * Distance * Distance));
   
-  float3 ReflectDir = reflect(-Direction, normalize(input.Normal));
-  float spec = pow(max(dot(normalize(ViewDir), normalize(ReflectDir)), 0.0f), SpecularShininess);
-  float3 specular = SpecularStrength * spec * float3(1.0f, 1.0f, 1.0f);
-
-  float3 light_color = diffuse + specular;
+  float diff = max(dot(input.Normal, LightDir), 0.0f);
+  float3 diffuse = diff * DiffuseColor * AttenuationAmount;
   
-  output.Color = float4(light_color * object_color.xyz, object_color.w);
+  float3 ReflectDir = reflect(-LightDir, input.Normal);
+  float spec = pow(max(dot(ViewDir, ReflectDir), 0.0f), SpecularShininess);
+  float3 specular = SpecularStrength * spec * float3(1.0f, 1.0f, 1.0f) * AttenuationAmount;
+  
+  float3 LightColor = diffuse + specular;
+  
+  output.Color = float4(LightColor * object_color.xyz, object_color.w);
   return output;
 }
