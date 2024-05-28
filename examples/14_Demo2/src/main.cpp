@@ -739,7 +739,7 @@ int main(int argc, char** argv){
       And::AmbientLight ambient;
       ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
       ambient.SetAmbientStrenght(0.1f);
-      And::Entity* ambient_entity = entity_comp.new_entity(ambient);
+      //And::Entity* ambient_entity = entity_comp.new_entity(ambient);
 
 
       And::DirectionalLight directional;
@@ -784,7 +784,7 @@ int main(int argc, char** argv){
           spot.SetCastShadows(true);
           spot.SetEnabled(true);
           spot.SetIntensity(intensity);
-          entity_comp.new_entity(spot);
+          //entity_comp.new_entity(spot);
       }
   }
 
@@ -798,6 +798,7 @@ int main(int argc, char** argv){
   And::ActionInput shot{ "Shot", And::KeyState::Press, { And::KeyCode::C} };
   And::ActionInput big_shot{ "BigShot", And::KeyState::Press, { And::KeyCode::V} };
   And::ActionInput changePoint{ "ChangePoint", And::KeyState::Press, { And::KeyCode::L} };
+  And::ActionInput changeGravity{ "Changegravity", And::KeyState::Press, { And::KeyCode::G} };
 
   And::Entity* balls_pool[POOL_SIZE];
   int index_pool = 0;
@@ -902,6 +903,9 @@ int main(int argc, char** argv){
   bool is_down = false;
   bool is_big_down = false;
   bool is_pointlight_down = false;
+  bool is_gravity_down = false;
+
+  bool change_gravity_tmp = false;
 
   //And::TransformComponent* tr_tmp = bolinga_entity->get_component<And::TransformComponent>();
   //g_renderer->enable_skybox(false);
@@ -937,6 +941,25 @@ int main(int argc, char** argv){
     }else {
         is_big_down = false;
     }
+    
+    if (input.check_action(changeGravity)) {
+
+        //static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem & ecs, And::PhysicsEngine & engine, And::MeshComponent & mesh, And::MaterialComponent & material_comp)
+        if (!is_gravity_down) {
+            change_gravity_tmp = !change_gravity_tmp;
+            if (change_gravity_tmp) {
+                physics_engine->SetGravity(0.0f, 9.81f, 0.0f);
+            }
+            else {
+                physics_engine->SetGravity(0.0f, -9.81f, 0.0f);
+            }
+        }
+        is_gravity_down = true;
+    }else {
+        is_gravity_down = false;
+    }
+
+    
 
 
     if (input.check_action(jump)) {
