@@ -152,9 +152,13 @@ float ShadowCalculation(vec4 fragPosLightSpace){
   // calculate bias (based on depth map resolution and slope)
   vec3 normal = normalize(s_normal);
 
-  float x = camera_position.x + ( (-1.0 * directional_light.direction.x) * 50.0);
-  float z = camera_position.z + ( (-1.0 * directional_light.direction.z) * 50.0);
-  vec3 light_pos = vec3(x, camera_position.y, z);
+  //float x = camera_position.x + ( (-1.0 * directional_light.direction.x) * 50.0);
+  //float z = camera_position.z + ( (-1.0 * directional_light.direction.z) * 50.0);
+
+  // -35.0f, 36.0f, -86.0f 
+
+  //vec3 light_pos = vec3(x, camera_position.y, z);
+  vec3 light_pos = vec3(-35.0, 36.0, -86.0);
 
   vec3 lightDir = normalize(light_pos - s_fragPos);
   float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);

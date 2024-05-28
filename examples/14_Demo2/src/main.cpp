@@ -733,6 +733,7 @@ int main(int argc, char** argv){
     }
 
   {
+        
 
 
       And::AmbientLight ambient;
@@ -748,7 +749,7 @@ int main(int argc, char** argv){
       directional.SetSpecularShininess(32.0f);
       directional.SetSpecularStrength(0.003f);
       directional.SetEnabled(true);
-      directional.SetCastShadows(false);
+      directional.SetCastShadows(true);
       directional.SetIntensity(1.0f);
       entity_comp.new_entity(directional);
 

@@ -742,15 +742,16 @@ namespace And
     void RendererOpenGL::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran) {
         CameraBase* cam = &m_DefaultCamera;
         if (m_UserCamera) cam = m_UserCamera;
-        glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
+        //glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
         glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
 
-        float x = cam_pos.x + ((-1.0f * light_dir.x) * 50.0f);
-        float z = cam_pos.z + ((-1.0f * light_dir.z) * 50.0f);
+        //float x = cam_pos.x + ((-1.0f * light_dir.x) * 50.0f);
+        //float z = cam_pos.z + ((-1.0f * light_dir.z) * 50.0f);
         //float x = 0.0f + ( (-1.0f * light_dir.x) * 50.0f);
         //float z = 0.0f + ( (-1.0f * light_dir.z) * 50.0f);
 
-        glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
+        //glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
+        glm::vec3 pos = glm::vec3(-35.0f, 36.0f, -86.0f );
         //glm::vec3 pos = glm::vec3(x, 50.0f, z);
         glm::vec3 up(0.0f, 1.0f, 0.0f);
         glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
