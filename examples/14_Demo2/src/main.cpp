@@ -26,11 +26,14 @@
 
 
 #define POOL_SIZE 5
+const float PI = 3.14159265f;
 
 
 static And::Entity* big_balls[POOL_SIZE];
 static std::random_device rd;
 static std::mt19937 gen(rd());
+
+static And::Entity* cuadros[6];
 
 static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, And::MeshComponent& mesh, And::MaterialComponent& material_comp, bool big = false) {
 
@@ -470,6 +473,49 @@ void UpdateLight(And::Entity* point, And::Entity* vela, And::FlyCamera& cam) {
     tmp->SetRotation(0.0f, yaw, 0.0f);
 }
 
+void CreateCuadros(And::EntityComponentSystem& ecs) {
+
+    {
+        And::MaterialComponent mat_com;
+        std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
+        mat->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+        mat_com.SetMaterial(mat);
+
+        And::MeshComponent MC;
+        MC.MeshOBJ = And::Geometry::load("cube.obj");
+        And::RawMesh raw_mesh(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+        std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh);
+        MC.SetMesh(mesh);
+
+        And::TransformComponent tr;
+        tr.SetPosition(28.0f, 14.0f, -42.0f);
+        tr.SetRotation(0.0f, PI * 0.5f, 0.0f);
+        tr.SetScale(7.5f, 7.5f, 1.0f);
+
+        const float distance = 25.0f;
+        for (int i = 0; i < 3; i++) {
+            tr.SetPosition(28.0f, 14.0f, -42.0f + (float)(i * distance)),
+            cuadros[i] = ecs.new_entity(mat_com, MC, tr);
+        }
+        
+        for (int i = 0; i < 3; i++) {
+            tr.SetPosition(-28.0f, 14.0f, -42.0f + (float)(i * distance)),
+            cuadros[i + 3] = ecs.new_entity(mat_com, MC, tr);
+        }
+    }
+}
+
+void UpdateCuadrosColor(float time) {
+
+    for (int i = 0; i < 6; i++) {
+        float r = cosf(time * 0.8f) * 0.5f + 0.5f;
+        float g = sinf(time * 0.7f) * 0.5f + 0.5f;
+        float b = cosf(time * 0.6f) * 0.5f + 0.5f;
+        cuadros[i]->get_component<And::MaterialComponent>()->GetMaterial()->SetColor(r,g,b, 1.0f);
+    }
+
+}
+
 int main(int argc, char** argv){
 
     And::Engine e;
@@ -615,8 +661,8 @@ int main(int argc, char** argv){
 
       And::AmbientLight ambient;
       ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-      ambient.SetAmbientStrenght(0.025f);
-      //And::Entity* ambient_entity = entity_comp.new_entity(ambient);
+      ambient.SetAmbientStrenght(0.1f);
+      And::Entity* ambient_entity = entity_comp.new_entity(ambient);
 
 
       And::DirectionalLight directional;
@@ -740,6 +786,8 @@ int main(int argc, char** argv){
   }
 
 
+  CreateCuadros(entity_comp);
+
   And::AudioManager audio_manager;
   And::Audio audio_fondo;
   And::Audio audio_fuente;
@@ -858,6 +906,8 @@ int main(int argc, char** argv){
         index_pool++;
         if (index_pool >= POOL_SIZE)index_pool = 0;
     }
+
+    UpdateCuadrosColor(time);
 
 
     //And::TransformComponent* tmp_nose = bolinga_entity->get_component<And::TransformComponent>();
