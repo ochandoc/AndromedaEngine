@@ -18,8 +18,6 @@ struct DirectionalLight{
 
 layout (std140, binding = 0) uniform UniformBlock{
   mat4 model;
-  //mat4 view;
-  //mat4 projection;
   mat4 ProjViewCam;
   mat4 ProjViewLight;
   vec3 camera_position;
@@ -35,7 +33,6 @@ uniform vec4 m_albedoColor;
 uniform int m_use_texture;
 uniform int m_use_specular_texture;
 
-out vec3 blend_color;
 out vec3 s_normal;
 out vec3 s_fragPos;
 out vec3 camera_pos;
@@ -46,11 +43,11 @@ out vec4 lightSpace;
 void main(){
   vec4 obj_position = model * vec4(position, 1.0);
   gl_Position = ProjViewCam * model * vec4(position, 1.0);
-  blend_color = vec3(camera_position.x/20.0, camera_position.y/20.0, camera_position.z/20.0);
   s_fragPos = vec3(model * vec4(position, 1.0));
   s_normal = vec3(transpose(inverse(model))  * vec4(normals, 0.0));
   camera_pos = camera_position;
   uv = TexCoord;
+
   lightSpace = ProjViewLight * obj_position;
 }
 
@@ -69,7 +66,7 @@ uniform sampler2D texMetallic;
 uniform sampler2D texRoughness;
 uniform sampler2D texAmbientOclusion;
 
-in vec3 blend_color;
+
 in vec3 s_normal;
 in vec3 s_fragPos;
 in vec3 camera_pos;
@@ -158,7 +155,7 @@ float ShadowCalculation(vec4 fragPosLightSpace){
   // -35.0f, 36.0f, -86.0f 
 
   //vec3 light_pos = vec3(x, camera_position.y, z);
-  vec3 light_pos = vec3(-35.0, 36.0, -86.0);
+  vec3 light_pos = vec3(-36.0, 30.0, -76.0);
 
   vec3 lightDir = normalize(light_pos - s_fragPos);
   float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
@@ -197,7 +194,6 @@ void main(){
     normal_value = s_normal;
   }
   
-  vec3 projCoords = lightSpace.xyz / lightSpace.w;
 
   color = CalculeDirLight(directional_light, normal_value, view_direction, color_base);
   float shadow = ShadowCalculation(lightSpace);
@@ -211,5 +207,4 @@ void main(){
   }
 
   FragColor = vec4(color, 1.0) * tex_color;
-  //FragColor = vec4(shadow, shadow, shadow, 1.0);
 }

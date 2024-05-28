@@ -171,29 +171,36 @@ void  DirectionalLight::GetDirection(float& x, float& y, float& z){
 }
 
 void DirectionalLight::Recalculate(float aspect_ratio){
-    
-    /*if(m_must_recalculate){
+    if (m_must_recalculate) {
 
-        glm::vec3 cam_pos = glm::make_vec3(m_cam_pos);
-        glm::vec3 light_dir = glm::make_vec3(m_raw.direction);
+        glm::vec3 pos = glm::vec3(-36.0, 30.0, -76.0);
+        glm::vec3 dir = glm::make_vec3(&m_raw.direction[0]);
 
-        float x = cam_pos.x + ( (-1.0f * light_dir.x) * 50.0f);
-        float z = cam_pos.z + ( (-1.0f * light_dir.z) * 50.0f);
-        
-        glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
-        
         glm::vec3 up(0.0f, 1.0f, 0.0f);
-        glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
-        up = glm::cross(light_dir, right);
-        glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
+        /*float dot = glm::dot(up, dir);
+        dot = glm::abs(dot);
+        if (dot == 1.0f) {
+            up = glm::vec3(0.0f, 0.0f, 1.0f);
+        }
 
-        glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 1.0f, 300.0f);
-        glm::mat4 viewLight_tmp = glm::lookAt(20.0f * cam_pos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        m_matrix->projection_matrix = orto;
-        m_matrix->view_matrix = viewLight_tmp;
-        m_matrix->projection_view_matrix = orto * viewLight_tmp;
+        glm::vec3 right = glm::normalize(glm::cross(up, dir));
+        up = glm::cross(dir, right);*/
+        glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(dir), up);
+
+        //float fov_radians = glm::radians(m_raw.outer_cut_off) * 1.5f;
+        float near = 1.0f;
+        float far = 300.0f;
+        //glm::mat4 projLight = glm::perspective(fov_radians, aspect_ratio, near, far);
+        glm::mat4 projLight = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 10.0f, 300.0f);
+
+        glm::mat4 projViewLight = projLight * viewLight;
+
+        m_matrix->projection_matrix = projLight;
+        m_matrix->view_matrix = viewLight;
+        m_matrix->projection_view_matrix = projViewLight;
+
         m_must_recalculate = false;
-    }*/
+    }
 
 
 }

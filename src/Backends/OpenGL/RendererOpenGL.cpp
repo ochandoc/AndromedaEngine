@@ -647,18 +647,24 @@ namespace And
 
         glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
         //glm::vec3 simulated_pos = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
+        //glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
         //glm::vec3 pos = glm::make_vec3(simulated_pos + ( (-1.0f * light_dir) * 50.0f));
-        glm::vec3 pos = glm::make_vec3(cam_pos + ((-1.0f * light_dir) * 50.0f));
+        //glm::vec3 pos = glm::make_vec3(cam_pos + ((-1.0f * light_dir) * 50.0f));
+        //glm::vec3 pos = glm::vec3(-36.0, 30.0, -76.0);
 
 
-        glm::vec3 up(0.0f, 1.0f, 0.0f);
-        glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
-        up = glm::cross(light_dir, right);
-        glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
+        //glm::vec3 up(0.0f, 1.0f, 0.0f);
+        //glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
+        //up = glm::cross(light_dir, right);
+        //glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
 
-        glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, cam->GetNear(), cam->GetFar());
-        glm::mat4 projViewLight = orto * viewLight;
+        //glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, cam->GetNear(), cam->GetFar());
+        //glm::mat4 projViewLight = orto * viewLight;
+        
+        //glm::mat4 projViewLight = glm::make_mat4(l->GetProjectViewMatrix(0.0f));
+        glm::mat4 viewLight = glm::make_mat4(l->GetViewMatrix(0.1f));
+        glm::mat4 projLight = glm::make_mat4(l->GetProjectMatrix(0.0f)); 
+        glm::mat4 projViewLight = projLight * viewLight;
 
         UniformBlockMatrices matrices_tmp = { modelMatrix, viewProjCam, projViewLight, cam_pos };
 
@@ -740,7 +746,7 @@ namespace And
     }
 
     void RendererOpenGL::draw_shadows(DirectionalLight* l, MeshComponent* obj, TransformComponent* tran) {
-        CameraBase* cam = &m_DefaultCamera;
+        /*CameraBase* cam = &m_DefaultCamera;
         if (m_UserCamera) cam = m_UserCamera;
         //glm::vec3 cam_pos = glm::make_vec3(cam->GetPosition());
         glm::vec3 light_dir = glm::make_vec3(l->GetDirection());
@@ -751,15 +757,21 @@ namespace And
         //float z = 0.0f + ( (-1.0f * light_dir.z) * 50.0f);
 
         //glm::vec3 pos = glm::vec3(x, cam_pos.y, z);
-        glm::vec3 pos = glm::vec3(-35.0f, 36.0f, -86.0f );
-        //glm::vec3 pos = glm::vec3(x, 50.0f, z);
+
+        glm::vec3 pos = glm::vec3(-36.0f, 30.0f, -76.0f);
         glm::vec3 up(0.0f, 1.0f, 0.0f);
         glm::vec3 right = glm::normalize(glm::cross(up, light_dir));
-        up = glm::cross(light_dir, right);
-        glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
-        glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, cam->GetNear(), cam->GetFar());
+        //up = glm::cross(light_dir, right);
 
-        draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(viewLight), glm::value_ptr(orto));
+        glm::mat4 viewLight = glm::lookAt(pos, pos + glm::normalize(light_dir), up);
+        glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 10.0f, 300.0f);
+        //glm::mat4 orto = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, cam->GetNear(), cam->GetFar());*/
+
+
+        glm::mat4 view = glm::make_mat4(l->GetViewMatrix(0.0f));
+        glm::mat4 persp = glm::make_mat4(l->GetProjectMatrix(0.0f));
+
+        draw_deep_obj(obj, m_depth_shader, tran, glm::value_ptr(view), glm::value_ptr(persp));
     }
 
     void RendererOpenGL::draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* lightDir) {

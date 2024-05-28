@@ -42,7 +42,7 @@ uniform vec4 m_albedoColor;
 uniform int m_use_texture;
 uniform int m_use_specular_texture;
 
-out vec3 blend_color;
+
 out vec3 s_normal;
 out vec3 s_fragPos;
 out vec3 camera_pos;
@@ -53,13 +53,12 @@ out vec4 lightSpace;
 void main(){
   vec4 obj_position = model * vec4(position, 1.0);
   gl_Position = ProjViewCam * obj_position;
-  blend_color = vec3(camera_position.x/20.0, camera_position.y/20.0, camera_position.z/20.0);
   s_fragPos = vec3(model * vec4(position, 1.0));
   s_normal = vec3(transpose(inverse(model))  * vec4(normals, 0.0));
   camera_pos = camera_position;
   uv = TexCoord;
+
   lightSpace = ProjViewLight * obj_position;
-  //lightSpace = vec4(1.0);
 }
 
 
@@ -79,7 +78,6 @@ uniform sampler2D texAmbientOclusion;
 
 in vec2 TexCoord;
 
-in vec3 blend_color;
 in vec3 s_normal;
 in vec3 s_fragPos;
 in vec3 camera_pos;

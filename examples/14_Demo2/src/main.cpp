@@ -674,15 +674,9 @@ int main(int argc, char** argv){
     And::MaterialComponent bolinga_mat_comp;
     std::shared_ptr<And::Material> bolinga_mat = std::make_shared<And::Material>();
     std::shared_ptr<And::Texture> bolinga_tex = And::MakeTexture("demo/textures/bola/albedo.png");
-    std::shared_ptr<And::Texture> bolinga_normals = And::MakeTexture("demo/textures/bola/normals.png");
-    std::shared_ptr<And::Texture> bolinga_ao = And::MakeTexture("demo/textures/bola/ao.png");
-    std::shared_ptr<And::Texture> bolinga_metallic = And::MakeTexture("demo/textures/bola/metallic.png");
-    std::shared_ptr<And::Texture> bolinga_rou = And::MakeTexture("demo/textures/bola/roughness.png");
+
     bolinga_mat->SetColorTexture(bolinga_tex);
-    bolinga_mat->SetNormalTexture(bolinga_normals);
-    bolinga_mat->SetAmbientOclusionTexture(bolinga_ao);
-    bolinga_mat->SetMetallicTexture(bolinga_metallic);
-    bolinga_mat->SetRoughnessTexture(bolinga_rou);
+
     bolinga_mat_comp.SetMaterial(bolinga_mat);
 
     And::TransformComponent bolinga_tran; 
@@ -702,15 +696,9 @@ int main(int argc, char** argv){
     And::MaterialComponent suelo_mat_comp;
     std::shared_ptr<And::Material> suelo_mat = std::make_shared<And::Material>();
     std::shared_ptr<And::Texture> suelo_tex_b = And::MakeTexture("demo/textures/suelo_3/albedo.png");
-    std::shared_ptr<And::Texture> suelo_normals_b = And::MakeTexture("demo/textures/suelo_3/normals.png");
-    std::shared_ptr<And::Texture> suelo_ao_b = And::MakeTexture("demo/textures/suelo_3/ao.png");
-    std::shared_ptr<And::Texture> suelo_metallic_b = And::MakeTexture("demo/textures/suelo_3/metallic.png");
-    std::shared_ptr<And::Texture> suelo_rou_b = And::MakeTexture("demo/textures/suelo_3/roughness.png");
+
     suelo_mat->SetColorTexture(suelo_tex_b);
-    suelo_mat->SetNormalTexture(suelo_normals_b);
-    suelo_mat->SetAmbientOclusionTexture(suelo_ao_b);
-    suelo_mat->SetMetallicTexture(suelo_metallic_b);
-    suelo_mat->SetRoughnessTexture(suelo_rou_b);
+
     suelo_mat_comp.SetMaterial(suelo_mat);
     
     CreateBowlingSuelo(entity_comp, *physics_engine, MC_suelo, suelo_mat_comp);
@@ -718,15 +706,9 @@ int main(int argc, char** argv){
       And::MaterialComponent suelo2_mat_comp;
       std::shared_ptr<And::Material> suelo2_mat = std::make_shared<And::Material>();
       std::shared_ptr<And::Texture> suelo2_tex_b = And::MakeTexture("demo/textures/marmol/albedo.png");
-      std::shared_ptr<And::Texture> suelo2_normals_b = And::MakeTexture("demo/textures/marmol/normals.png");
-      std::shared_ptr<And::Texture> suelo2_ao_b = And::MakeTexture("demo/textures/marmol/ao.png");
-      std::shared_ptr<And::Texture> suelo2_metallic_b = And::MakeTexture("demo/textures/marmol/metallic.png");
-      std::shared_ptr<And::Texture> suelo2_rou_b = And::MakeTexture("demo/textures/marmol/roughness.png");
+
       suelo2_mat->SetColorTexture(suelo2_tex_b);
-      suelo2_mat->SetNormalTexture(suelo2_normals_b);
-      suelo2_mat->SetAmbientOclusionTexture(suelo2_ao_b);
-      suelo2_mat->SetMetallicTexture(suelo2_metallic_b);
-      suelo2_mat->SetRoughnessTexture(suelo2_rou_b);
+
       suelo2_mat_comp.SetMaterial(suelo2_mat);
       CreateSuelo(entity_comp, *physics_engine, MC_suelo, suelo2_mat_comp);
       CreateWalls(entity_comp, *physics_engine, MC_suelo, suelo2_mat_comp);
@@ -739,7 +721,7 @@ int main(int argc, char** argv){
       And::AmbientLight ambient;
       ambient.SetDiffuseColor(1.0f, 1.0f, 1.0f);
       ambient.SetAmbientStrenght(0.1f);
-      //And::Entity* ambient_entity = entity_comp.new_entity(ambient);
+      And::Entity* ambient_entity = entity_comp.new_entity(ambient);
 
 
       And::DirectionalLight directional;
@@ -807,19 +789,13 @@ int main(int argc, char** argv){
   And::MaterialComponent mat_comp;
   std::shared_ptr<And::Material> mat = std::make_shared<And::Material>();
   std::shared_ptr<And::Texture> tex = And::MakeTexture("demo/textures/bola/albedo.png");
-  std::shared_ptr<And::Texture> normals = And::MakeTexture("demo/textures/bola/normals.png");
-  std::shared_ptr<And::Texture> ao = And::MakeTexture("demo/textures/bola/ao.png");
-  std::shared_ptr<And::Texture> metallic = And::MakeTexture("demo/textures/bola/metallic.png");
-  std::shared_ptr<And::Texture> rou = And::MakeTexture("demo/textures/bola/roughness.png");
+
 
 
   mat->SetColor(0.2f, 0.2f, 1.0f, 1.0f);
   mat->SetColor(0.353f, 0.698f, 1.0f, 1.0f);
   mat->SetColorTexture(tex);
-  mat->SetNormalTexture(normals);
-  mat->SetAmbientOclusionTexture(ao);
-  mat->SetMetallicTexture(metallic);
-  mat->SetRoughnessTexture(rou);
+
 
   mat_comp.SetMaterial(mat);
 
@@ -834,15 +810,9 @@ int main(int argc, char** argv){
       And::MaterialComponent mat_com;
       std::shared_ptr<And::Material> mat= std::make_shared<And::Material>();
       std::shared_ptr<And::Texture> tex= And::MakeTexture("demo/textures/bambu/albedo.png");
-      std::shared_ptr<And::Texture> normals= And::MakeTexture("demo/textures/bambu/normals.png");
-      std::shared_ptr<And::Texture> ao= And::MakeTexture("demo/textures/bambu/ao.png");
-      std::shared_ptr<And::Texture> metallic= And::MakeTexture("demo/textures/bambu/metallic.png");
-      std::shared_ptr<And::Texture> rou= And::MakeTexture("demo/textures/bambu/roughness.png");
+
       mat->SetColorTexture(tex);
-      mat->SetNormalTexture(normals);
-      mat->SetAmbientOclusionTexture(ao);
-      mat->SetMetallicTexture(metallic);
-      mat->SetRoughnessTexture(rou);
+      
       mat_com.SetMaterial(mat);
 
       And::MeshComponent MC;
