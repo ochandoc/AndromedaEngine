@@ -499,8 +499,30 @@ void CreateLighting(And::EntityComponentSystem& ecs) {
 
 }
 
-void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
+void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent, And::TaskSystem& ts){
     
+  And::Future<std::shared_ptr<And::Geometry>> office_desk = ts.AddTask(&And::Geometry::load, "demo/obj/office_desk.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> guitar = ts.AddTask(&And::Geometry::load, "demo/obj/guitar.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> cube = ts.AddTask(&And::Geometry::load, "cube.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> cube2 = ts.AddTask(&And::Geometry::load, "cube.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> cube3 = ts.AddTask(&And::Geometry::load, "cube.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> tv = ts.AddTask(&And::Geometry::load, "demo/obj/tv.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> sofa = ts.AddTask(&And::Geometry::load, "demo/obj/furniture/sofa.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> display_table = ts.AddTask(&And::Geometry::load, "demo/obj/furniture/display_table.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> desk = ts.AddTask(&And::Geometry::load, "demo/obj/office/desk.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> chair = ts.AddTask(&And::Geometry::load, "demo/obj/office/chair.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> lamp = ts.AddTask(&And::Geometry::load, "demo/obj/office/lamp.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> calendar = ts.AddTask(&And::Geometry::load, "demo/obj/office/calendar.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> tubos = ts.AddTask(&And::Geometry::load, "demo/obj/office/tubos.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> pencil = ts.AddTask(&And::Geometry::load, "demo/obj/office/pencil.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> keyboard = ts.AddTask(&And::Geometry::load, "demo/obj/keyboard.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> mouse = ts.AddTask(&And::Geometry::load, "demo/obj/mouse.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> taza = ts.AddTask(&And::Geometry::load, "demo/obj/taza.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> sphere = ts.AddTask(&And::Geometry::load, "sphere.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> cube4 = ts.AddTask(&And::Geometry::load, "cube.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> sphere2 = ts.AddTask(&And::Geometry::load, "sphere.obj", "");
+  And::Future<std::shared_ptr<And::Geometry>> hexagon_tile = ts.AddTask(&And::Geometry::load, "demo/obj/furniture/hexagon_tile.obj", "");
+
     // Mesa 
     {
         And::MaterialComponent mat_com;
@@ -518,7 +540,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/office_desk.obj");
+        office_desk.Wait();
+        MC.MeshOBJ = office_desk.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -549,7 +572,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/guitar.obj");
+        guitar.Wait();
+        MC.MeshOBJ = guitar.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -582,7 +606,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("cube.obj");
+        cube.Wait();
+        MC.MeshOBJ = cube.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -614,7 +639,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("cube.obj");
+        cube2.Wait();
+        MC.MeshOBJ = cube2.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -646,7 +672,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("cube.obj");
+        cube3.Wait();
+        MC.MeshOBJ = cube3.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -678,7 +705,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/tv.obj");
+        tv.Wait();
+        MC.MeshOBJ = tv.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -710,7 +738,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/furniture/sofa.obj");
+        sofa.Wait();
+        MC.MeshOBJ = sofa.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -742,7 +771,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/furniture/display_table.obj");
+        display_table.Wait();
+        MC.MeshOBJ = display_table.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -774,7 +804,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/office/desk.obj");
+        desk.Wait();
+        MC.MeshOBJ = desk.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -806,7 +837,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/office/chair.obj");
+        chair.Wait();
+        MC.MeshOBJ = chair.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -838,7 +870,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/office/lamp.obj");
+        lamp.Wait();
+        MC.MeshOBJ = lamp.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -870,7 +903,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/office/calendar.obj");
+        calendar.Wait();
+        MC.MeshOBJ = calendar.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -902,7 +936,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/office/tubos.obj");
+        tubos.Wait();
+        MC.MeshOBJ = tubos.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -934,7 +969,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/office/pencil.obj");
+        pencil.Wait();
+        MC.MeshOBJ = pencil.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -967,7 +1003,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/keyboard.obj");
+        keyboard.Wait();
+        MC.MeshOBJ = keyboard.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -999,7 +1036,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/mouse.obj");
+        mouse.Wait();
+        MC.MeshOBJ = mouse.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -1031,7 +1069,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/taza.obj");
+        taza.Wait();
+        MC.MeshOBJ = taza.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -1063,7 +1102,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("sphere.obj");
+        sphere.Wait();
+        MC.MeshOBJ = sphere.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -1095,7 +1135,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("cube.obj");
+        cube4.Wait();
+        MC.MeshOBJ = cube4.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -1138,7 +1179,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("sphere.obj");
+        sphere2.Wait();
+        MC.MeshOBJ = sphere2.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -1182,7 +1224,8 @@ void CreateFurnitures(And::EntityComponentSystem& ecs, And::Entity* parent){
         mat_com.SetMaterial(mat);
 
         And::MeshComponent MC;
-        MC.MeshOBJ = And::Geometry::load("demo/obj/furniture/hexagon_tile.obj");
+        hexagon_tile.Wait();
+        MC.MeshOBJ = hexagon_tile.Get();
         And::RawMesh raw_mesh_mesa(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
         std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh_mesa);
         MC.SetMesh(mesh);
@@ -1260,12 +1303,77 @@ int main(int argc, char** argv){
     And::Engine e;
     And::TaskSystem ts;
 
-    And::WorkerCreationInfo workerCreationInfo;
-    workerCreationInfo.Name = "Test";
-    workerCreationInfo.Function = And::GetGenericWorkerFunction();
-    workerCreationInfo.UserData = nullptr;
+    {
+      And::WorkerCreationInfo workerCreationInfo;
+      workerCreationInfo.Name = "Worker 1";
+      workerCreationInfo.Function = And::GetGenericWorkerFunction();
+      workerCreationInfo.UserData = nullptr;
 
-    ts.AddWorker(workerCreationInfo);
+      ts.AddWorker(workerCreationInfo);
+    }
+
+    {
+      And::WorkerCreationInfo workerCreationInfo;
+      workerCreationInfo.Name = "Worker 2";
+      workerCreationInfo.Function = And::GetGenericWorkerFunction();
+      workerCreationInfo.UserData = nullptr;
+
+      ts.AddWorker(workerCreationInfo);
+    }
+
+    {
+      And::WorkerCreationInfo workerCreationInfo;
+      workerCreationInfo.Name = "Worker 3";
+      workerCreationInfo.Function = And::GetGenericWorkerFunction();
+      workerCreationInfo.UserData = nullptr;
+
+      ts.AddWorker(workerCreationInfo);
+    }
+
+    {
+      And::WorkerCreationInfo workerCreationInfo;
+      workerCreationInfo.Name = "Worker 4";
+      workerCreationInfo.Function = And::GetGenericWorkerFunction();
+      workerCreationInfo.UserData = nullptr;
+
+      ts.AddWorker(workerCreationInfo);
+    }
+
+    {
+      And::WorkerCreationInfo workerCreationInfo;
+      workerCreationInfo.Name = "Worker 5";
+      workerCreationInfo.Function = And::GetGenericWorkerFunction();
+      workerCreationInfo.UserData = nullptr;
+
+      ts.AddWorker(workerCreationInfo);
+    }
+
+    {
+      And::WorkerCreationInfo workerCreationInfo;
+      workerCreationInfo.Name = "Worker 6";
+      workerCreationInfo.Function = And::GetGenericWorkerFunction();
+      workerCreationInfo.UserData = nullptr;
+
+      ts.AddWorker(workerCreationInfo);
+    }
+
+    {
+      And::WorkerCreationInfo workerCreationInfo;
+      workerCreationInfo.Name = "Worker 7";
+      workerCreationInfo.Function = And::GetGenericWorkerFunction();
+      workerCreationInfo.UserData = nullptr;
+
+      ts.AddWorker(workerCreationInfo);
+    }
+
+    {
+      And::WorkerCreationInfo workerCreationInfo;
+      workerCreationInfo.Name = "Worker 8";
+      workerCreationInfo.Function = And::GetGenericWorkerFunction();
+      workerCreationInfo.UserData = nullptr;
+
+      ts.AddWorker(workerCreationInfo);
+    }
 
     std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine", And::EGraphicsApiType::OpenGL);
     //window->set_vsync(true);
@@ -1322,7 +1430,7 @@ int main(int argc, char** argv){
 
       CreateHabitaculo(entity_comp, scene_entity);
       CreateLighting(entity_comp);
-      CreateFurnitures(entity_comp, scene_entity);
+      CreateFurnitures(entity_comp, scene_entity, ts);
     
   }
 
