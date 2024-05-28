@@ -157,6 +157,7 @@ namespace And
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		}
 		glTexImage2D(GL_TEXTURE_2D, 0, GetOpenGLInternalFormat(CreationInfo.Format), CreationInfo.Width, CreationInfo.Height, 0, GetOpenGLFormat(CreationInfo.Format), GetOpenGLFormatType(CreationInfo.Format), NULL);
+		glGenerateMipmap(GL_TEXTURE_2D);
 
 		WAIT_GPU_LOAD();
 		glBindTexture(GL_TEXTURE_2D, 0);

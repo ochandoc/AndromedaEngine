@@ -18,6 +18,11 @@ namespace And
     m_Color[3] = other.m_Color[3];
 
     m_ColorTexture = other.m_ColorTexture;
+    m_NormalTexture = other.m_NormalTexture;
+    m_SpecularTexture = other.m_SpecularTexture;
+    m_MetallicTexture = other.m_MetallicTexture;
+    m_RoughnessTexture = other.m_RoughnessTexture;
+    m_AmbienOclusionTexture = other.m_AmbienOclusionTexture;
   }
 
   Material::Material(Material&& other)
@@ -28,6 +33,11 @@ namespace And
     m_Color[3] = other.m_Color[3];
 
     m_ColorTexture.swap(other.m_ColorTexture);
+    m_NormalTexture.swap(other.m_NormalTexture);
+    m_SpecularTexture.swap(other.m_SpecularTexture);
+    m_MetallicTexture.swap(other.m_MetallicTexture);
+    m_RoughnessTexture.swap(other.m_RoughnessTexture);
+    m_AmbienOclusionTexture.swap(other.m_AmbienOclusionTexture);
   }
 
   Material::~Material()
@@ -44,6 +54,11 @@ namespace And
       m_Color[3] = other.m_Color[3];
 
       m_ColorTexture = other.m_ColorTexture;
+      m_NormalTexture = other.m_NormalTexture;
+      m_SpecularTexture = other.m_SpecularTexture;
+      m_MetallicTexture = other.m_MetallicTexture;
+      m_RoughnessTexture = other.m_RoughnessTexture;
+      m_AmbienOclusionTexture = other.m_AmbienOclusionTexture;
     }
     return *this;
   }
@@ -58,6 +73,11 @@ namespace And
       m_Color[3] = other.m_Color[3];
 
       m_ColorTexture.swap(other.m_ColorTexture);
+      m_NormalTexture.swap(other.m_NormalTexture);
+      m_SpecularTexture.swap(other.m_SpecularTexture);
+      m_MetallicTexture.swap(other.m_MetallicTexture);
+      m_RoughnessTexture.swap(other.m_RoughnessTexture);
+      m_AmbienOclusionTexture.swap(other.m_AmbienOclusionTexture);
     }
     return *this;
   }

@@ -172,19 +172,19 @@ void RigidBody::AddForce(const float* direction, ForceMode fmod){
 	}
 }
 
-void RigidBody::SetPosition(float* pos){
+void RigidBody::SetPosition(float* pos, bool Awake){
 
 	physx::PxTransform tr{ pos[0], pos[1], pos[2]};
-	m_data->actor->setGlobalPose(tr);
+	m_data->actor->setGlobalPose(tr, Awake);
 }
 
-void RigidBody::SetPosition(float x, float y, float z){
+void RigidBody::SetPosition(float x, float y, float z, bool Awake){
 
 	physx::PxTransform tr{ x, y, z };
-	m_data->actor->setGlobalPose(tr);
+	m_data->actor->setGlobalPose(tr, Awake);
 }
 
-void RigidBody::SetRotation(float x, float y, float z) {
+void RigidBody::SetRotation(float x, float y, float z, bool Awake) {
 	
 	glm::vec3 eulerAngles(glm::radians(x), glm::radians(y), glm::radians(z));
 	glm::quat quaternion = glm::quat(eulerAngles);
@@ -197,7 +197,7 @@ void RigidBody::SetRotation(float x, float y, float z) {
 	tr.q.w = quaternion.w;
 
 
-	m_data->actor->setGlobalPose(tr);
+	m_data->actor->setGlobalPose(tr, Awake);
 	
 }
 

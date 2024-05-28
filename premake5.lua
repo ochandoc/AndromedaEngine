@@ -163,6 +163,7 @@ group "Examples"
   include "examples/11_NvidiaPhysics"
   include "examples/12_Demo"
   include "examples/13_DemoPBR"
+  include "examples/14_Demo2"
   include "examples/Audio"
 group ""
 

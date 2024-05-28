@@ -41,10 +41,10 @@ public:
 	void AddForce(const float x, const float y, const float z, ForceMode fmod = ForceMode::FORCE);
 	void AddForce(const float* direction, ForceMode fmod);
 
-	void SetPosition(float* pos);
-	void SetPosition(float x, float y, float z);
+	void SetPosition(float* pos, bool Awake = true);
+	void SetPosition(float x, float y, float z, bool Awake = true);
 
-	void SetRotation(float x, float y, float z);
+	void SetRotation(float x, float y, float z, bool Awake = true);
 
 	void GetPosition(float* position);
 	void GetRotation(float* rotation);
