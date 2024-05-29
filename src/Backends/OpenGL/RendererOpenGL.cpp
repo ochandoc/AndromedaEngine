@@ -1489,14 +1489,16 @@ namespace And
 
         ResetTransforms(entity);
 
-        m_PostProcessShader->Use();
+        if (enable_postprocess)
+        {
+          m_PostProcessShader->Use();
 
-        std::static_pointer_cast<OpenGLTexture2D>(m_PostProcessRenderTarget->GetTextures()[0])->Activate(0);
-        m_PostProcessShader->SetTexture("screenTex", 0);
+          std::static_pointer_cast<OpenGLTexture2D>(m_PostProcessRenderTarget->GetTextures()[0])->Activate(0);
+          m_PostProcessShader->SetTexture("screenTex", 0);
 
-        glBindVertexArray(m_quad_vao);
-        glDrawElements(GL_TRIANGLES, sizeof(dIndices) / sizeof(dIndices[0]), GL_UNSIGNED_INT, 0);
-
+          glBindVertexArray(m_quad_vao);
+          glDrawElements(GL_TRIANGLES, sizeof(dIndices) / sizeof(dIndices[0]), GL_UNSIGNED_INT, 0);
+        }
     }
 
     void RendererOpenGL::draw_deferred(EntityComponentSystem& entity) {
