@@ -20,6 +20,12 @@ class Renderer;
 class RendererOpenGL;
 class GraphicsContext;
 
+/**
+ * @enum EGraphicsApiType
+ * @brief Enumerates the different types of graphics APIs supported.
+ *
+ * This enumeration lists the types of graphics APIs that can be used for rendering.
+ */
 enum class EGraphicsApiType : uint8
 {
 	OpenGL,
