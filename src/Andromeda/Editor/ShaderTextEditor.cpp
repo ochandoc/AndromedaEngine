@@ -2,7 +2,6 @@
 
 #include "Andromeda/UI/TextEditor.h"
 #include "Andromeda/Misc/Threw.h"
-#include "Andromeda/Resources/ResourceManager.h"
 #include "Andromeda/Misc/Slurp.h"
 #include "Andromeda/Graphics/Shader.h"
 
@@ -107,10 +106,6 @@ namespace And
             if(ImGui::MenuItem("Save")){
               printf("\n*** Reload OldShader ***\n");
               Save();
-              // ReloadResource
-              if(m_resourceManager){
-                m_resourceManager->ReloadResource<OldShader>(m_Data->Path);
-              }
             }
             ImGui::EndMenu();
           }

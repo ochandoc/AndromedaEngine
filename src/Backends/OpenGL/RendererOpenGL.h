@@ -6,7 +6,6 @@
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/FlyCamera.h"
 #include "Andromeda/Graphics/Camera.h"
-#include "Andromeda/Graphics/LightOld.h"
 #include "Andromeda/ECS/Components/MeshComponent.h"
 #include "Andromeda/ECS/Scene.h"
 #include "Andromeda/Graphics/Lights/SpotLight.h"

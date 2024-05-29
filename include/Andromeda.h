@@ -28,12 +28,9 @@
 #include "Andromeda/Graphics/Renderer.h"
 
 #include "Andromeda/Graphics/Geometry.h"
-#include "Andromeda/Graphics/ObjGenerator.h"
 #include "Andromeda/Graphics/Shader.h"
-#include "Andromeda/Graphics/ShaderGenerator.h"
 #include "Andromeda/Graphics/RenderTarget.h"
 
-#include "Andromeda/Graphics/LightOld.h"
 #include "Andromeda/Graphics/Texture.h"
 #include "Andromeda/Graphics/Texture.h"
 #include "Andromeda/Graphics/Lights/DirectionalLight.h"
@@ -47,9 +44,6 @@
 
 #include "Andromeda/Graphics/RenderTarget.h"
 #include "Andromeda/Graphics/Triangle.h"
-
-#include "Andromeda/Resources/ResourceManager.h"
-#include "Andromeda/Resources/Resource.h"
 
 #include "Andromeda/ECS/Entity.h"
 #include "Andromeda/ECS/EntityComponentSystem.h"

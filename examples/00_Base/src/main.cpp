@@ -28,12 +28,11 @@ int main(int argc, char** argv){
   And::Engine e;
   And::TaskSystem ts;
 
-  std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine");
+  std::shared_ptr<And::Window> window = And::Window::make(e, 1920, 1080, "Andromeda Engine", And::EGraphicsApiType::OpenGL);
   std::shared_ptr<And::GraphicsContext> g_context = window->get_context();
-  And::Renderer g_renderer(*window);  
+  std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
-  And::ResourceManager r_manager{*window, ts};
-  And::Editor editor{*window, &r_manager};
+  And::Editor editor{*window};
   editor.AddWindow(ts.GetEditorWindow());
 
   And::EntityComponentSystem entity_comp;
@@ -141,7 +140,7 @@ int main(int argc, char** argv){
   
   while (window->is_open()){
     window->update();
-    g_renderer.new_frame();
+    g_renderer->new_frame();
     editor.ShowWindows();
 
     tr->position[0] += 0.001f;
@@ -160,9 +159,7 @@ int main(int argc, char** argv){
     mouse_x = input.GetMouseX();
     mouse_y = input.GetMouseY();
 
-    And::DrawForward(entity_comp, g_renderer);
-
-    g_renderer.end_frame();
+    g_renderer->end_frame();
     window->swap_buffers();
   }
 

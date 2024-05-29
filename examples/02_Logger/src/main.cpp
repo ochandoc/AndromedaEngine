@@ -24,8 +24,8 @@
 int main(int argc, char** argv){
   And::Engine e;
 
-  std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine");
-  And::Renderer renderer(*window);
+  std::shared_ptr<And::Window> window = And::Window::make(e, 1024, 720, "Andromeda Engine", And::EGraphicsApiType::OpenGL);
+  std::shared_ptr<And::Renderer> g_renderer = And::Renderer::CreateShared(*window);
 
   And::LogWindow log_window("Logger window");
 
@@ -53,13 +53,13 @@ int main(int argc, char** argv){
   while (window->is_open())
   {
     window->update();
-    renderer.new_frame();
+    g_renderer->new_frame();
 
     //AND_LOG(TestLogCategory1, And::Debug, "Some debug Message");
 
     log_window.Show();
 
-    renderer.end_frame();
+    g_renderer->end_frame();
     window->swap_buffers();
   }
 

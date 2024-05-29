@@ -10,7 +10,7 @@
 
 namespace And{
 
-Editor::Editor(Window& window, ResourceManager* rm) : m_MainWindow(window), m_resourceManager(rm)
+Editor::Editor(Window& window) : m_MainWindow(window)
 {
 
   // Logger, OldShader editor, job system, content browser
@@ -26,7 +26,6 @@ Editor::Editor(Window& window, ResourceManager* rm) : m_MainWindow(window), m_re
 	{
 		window->m_Editor = this;
 		window->m_Window = &m_MainWindow;
-		window->m_resourceManager = rm;
 	}
 
 	// Debug
@@ -41,7 +40,6 @@ void Editor::AddWindow(std::shared_ptr<EditorWindow> window)
 {
 	window->m_Editor = this;
 	window->m_Window = &m_MainWindow;
-	window->m_resourceManager = m_resourceManager;
 	m_Windows.insert({window->m_title, window});
 }
 

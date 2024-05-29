@@ -388,12 +388,8 @@ int main(int argc, char** argv){
     fly_cam.SetSpeed(10.0f);
 
     g_renderer->set_camera(&fly_cam);
-
-
-    And::ResourceManager r_manager{*window, ts};
-    r_manager.AddGenerator<And::ShaderGenerator>();
   
-    And::Editor editor{*window, &r_manager};
+    And::Editor editor{*window};
 
     editor.AddWindow(ts.GetEditorWindow());
 

@@ -51,7 +51,7 @@ static void CreateJouCube(const float* pos, const float* dir, float force, And::
     tran.scale[2] = 2.0f;
 
     And::RigidBody rb = engine.CreateRigidBody();
-    rb.AddBoxCollider(tran.position, tran.scale);
+    rb.AddBoxCollider(tran.position, tran.scale, And::ColliderType::RigidDynamic);
     rb.AffectsGravity(true);
     rb.SetMass(5.0f);
 
@@ -95,12 +95,8 @@ int main(int argc, char** argv){
 
 
   //std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
-
-  And::ResourceManager r_manager{*window, ts};
-  //r_manager.AddGenerator<And::ObjGenerator>();
-  r_manager.AddGenerator<And::ShaderGenerator>();
   
-  And::Editor editor{*window, &r_manager};
+  And::Editor editor{*window};
 
   editor.AddWindow(ts.GetEditorWindow());
 
@@ -234,10 +230,10 @@ int main(int argc, char** argv){
 
   And::RigidBody rb = physics_engine->CreateRigidBody();
   And::RigidBody rb_up = physics_engine->CreateRigidBody();
-  rb.AddBoxCollider(tran_cube.position, tran_cube.scale);
+  rb.AddBoxCollider(tran_cube.position, tran_cube.scale, And::ColliderType::RigidDynamic);
   rb.AffectsGravity(true);
   rb.SetMass(5.0f);
-  rb_up.AddBoxCollider(tran_cube_up.position, tran_cube_up.scale);
+  rb_up.AddBoxCollider(tran_cube_up.position, tran_cube_up.scale, And::ColliderType::RigidDynamic);
   rb_up.AffectsGravity(true);
   rb.SetMass(5.0f);
 

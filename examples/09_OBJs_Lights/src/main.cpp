@@ -66,12 +66,8 @@ int main(int argc, char** argv){
 
 
   //std::shared_ptr<And::Shader> s = And::MakeShader("default/geometry.shader");
-
-  And::ResourceManager r_manager{*window, ts};
-  //r_manager.AddGenerator<And::ObjGenerator>();
-  r_manager.AddGenerator<And::ShaderGenerator>();
   
-  And::Editor editor{*window, &r_manager};
+  And::Editor editor{*window};
 
   editor.AddWindow(ts.GetEditorWindow());
 
@@ -166,7 +162,7 @@ int main(int argc, char** argv){
 
   And::TransformComponent* tr_cube = obj_cube_id->get_component<And::TransformComponent>();
   And::TransformComponent* tr_cube2 = obj_cube_id2->get_component<And::TransformComponent>();
-  tr_cube2->SetParent(tr_cube);
+  tr_cube2->SetParent(tr_cube->GetOwner());
   //And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
   //And::Entity* obj_teapot_id2 = entity_comp.new_entity(MC_teapot2, tran_teapot2);
  

@@ -30,13 +30,19 @@
 
 std::vector<int> test_V;
 
-struct int_comp
+class int_comp : public And::ComponentBase
 {
+public:
+  int_comp() {}
+  int_comp(int value) : num(value) {}
   int num;
 };
 
-struct float_comp 
+class float_comp : public And::ComponentBase
 {
+public:
+  float_comp() {}
+  float_comp(float value) : fnum(value) {}
   float fnum;
 };
 
@@ -55,7 +61,7 @@ void manolo2(int_comp* c1)
 
 int main(int argc, char** argv)
 {
-  And::Entity e;
+  And::Entity* e;
 
   And::EntityComponentSystem ecs;
 

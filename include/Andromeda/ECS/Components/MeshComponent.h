@@ -4,7 +4,6 @@
 #include "Andromeda/HAL/Types.h"
 
 #include "Andromeda/ECS/ComponentBase.h"
-#include "Andromeda/Resources/Resource.h"
 #include "Andromeda/Graphics/Geometry.h"
 
 #include "Andromeda/Graphics/Mesh.h"

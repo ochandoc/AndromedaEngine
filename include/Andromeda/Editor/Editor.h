@@ -1,6 +1,5 @@
 #pragma once
 #include "EditorWindow.h"
-#include "Andromeda/Resources/ResourceManager.h"
 #include <vector>
 #include <memory>
 
@@ -10,7 +9,7 @@ namespace And{
   {
   public:
 
-    Editor(Window& window, ResourceManager* rm = nullptr);
+    Editor(Window& window);
     Editor(const Editor&) = delete;
     Editor(Editor&&) = delete;
     ~Editor();
@@ -21,6 +20,5 @@ namespace And{
   private:
     std::unordered_map<std::string, std::shared_ptr<EditorWindow>> m_Windows;
     Window& m_MainWindow;
-    ResourceManager* m_resourceManager;
   };
 }
