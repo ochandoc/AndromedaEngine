@@ -1,4 +1,4 @@
-project "13_DemoPBR"
+project "03_EntityComponentSystem"
   kind "ConsoleApp"
   language "C++"
   cppdialect "C++20"

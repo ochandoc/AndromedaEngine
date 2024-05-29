@@ -1,4 +1,4 @@
-project "10_DirectX11"
+project "SandBox"
   kind "ConsoleApp"
   language "C++"
   cppdialect "C++20"

@@ -1,4 +1,4 @@
-project "09_OBJs_Lights"
+project "06_NvidiaPhysics"
   kind "ConsoleApp"
   language "C++"
   cppdialect "C++20"

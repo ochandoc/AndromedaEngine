@@ -1,4 +1,4 @@
-project "05_EntityComponentSystem"
+project "05_DirectX11"
   kind "ConsoleApp"
   language "C++"
   cppdialect "C++20"
