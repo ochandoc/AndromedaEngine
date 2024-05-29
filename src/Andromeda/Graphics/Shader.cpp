@@ -17,6 +17,8 @@ namespace And
       return DirectX11Shader::CreateShared(Path);
       break;
     }
+
+    return nullptr;
   }
 }
 

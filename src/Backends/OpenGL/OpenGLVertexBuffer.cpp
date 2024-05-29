@@ -47,7 +47,7 @@ namespace And {
         vertex_buffer->m_vao = VAO;
         vertex_buffer->m_ebo = EBO;
         vertex_buffer->m_NumVertices = Vertices.size();
-        vertex_buffer->m_NumIndices = Indices.size();
+        vertex_buffer->m_NumIndices = (unsigned int)Indices.size();
 
         WAIT_GPU_LOAD();
 

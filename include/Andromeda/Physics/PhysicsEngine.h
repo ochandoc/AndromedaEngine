@@ -24,7 +24,7 @@ class PhysicsEngine final{
     NON_COPYABLE_CLASS(PhysicsEngine)
 
 
-    void Simulate(double dt, bool fetch = true);
+    void Simulate(float dt, bool fetch = true);
     void Apply(EntityComponentSystem& ecs);
     void Release(EntityComponentSystem& ecs);
 

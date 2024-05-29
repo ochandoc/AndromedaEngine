@@ -122,8 +122,8 @@ static void ThrowBall(And::Entity* pool[], int index) {
     int numero_aleatorio_x = distribucion(gen);
     int numero_aleatorio_z = distribucion(gen);
 
-    float x = numero_aleatorio_x / 100;
-    float z = numero_aleatorio_z / 100;
+    float x = numero_aleatorio_x / 100.0f;
+    float z = numero_aleatorio_z / 100.0f;
 
     rb->AddForce(x, 50.0f, z, And::ForceMode::IMPULSE);
     printf("Lanuch at X:%f Y:%f Z:%f\n", x, 50.0f, z);

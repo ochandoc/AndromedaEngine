@@ -58,7 +58,7 @@ std::shared_ptr<PhysicsEngine> PhysicsEngine::Init(bool executeOnGPU, unsigned i
 	engine->m_physics_data->tolerance_scale.length = 1; // typical lenght of an object
 	engine->m_physics_data->tolerance_scale.speed = 981; // speed of and object in earth gravity
 
-	physx::PxFoundation* foundation_tmp;
+	physx::PxFoundation* foundation_tmp = nullptr;
 	physx::PxTolerancesScale scale_tmp;
 	
 	engine->m_physics_data->physics = PxCreateBasePhysics(PX_PHYSICS_VERSION, *(engine->m_physics_data->foundation), engine->m_physics_data->tolerance_scale, true, engine->m_physics_data->pvd);
@@ -155,7 +155,7 @@ RigidBody PhysicsEngine::CreateRigidBody(){
 	return rb;
 }
 
-void PhysicsEngine::Simulate(double dt, bool fetch) {
+void PhysicsEngine::Simulate(float dt, bool fetch) {
 	m_physics_data->scene->simulate(dt);
 
 	// Advanced split method (for complex scenes)

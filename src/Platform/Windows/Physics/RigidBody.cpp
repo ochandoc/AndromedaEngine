@@ -63,7 +63,7 @@ void RigidBody::AddBoxCollider(const float* position, const float* scale, Collid
 		case ColliderType::RigidStatic: m_data->actor = m_data->physics->createRigidStatic(transform); m_collider_type = ColliderType::RigidStatic; break;
 	}
 	
-	assert(m_data->actor, "Creating box collider | Actor is null");
+	assert(m_data->actor);
 			
 	
 	
@@ -94,7 +94,7 @@ void RigidBody::AddSphereCollider(const float* position, const float radius, Col
 		case ColliderType::RigidDynamic: m_data->actor = m_data->physics->createRigidDynamic(transform); m_collider_type = ColliderType::RigidDynamic; break;
 		case ColliderType::RigidStatic: m_data->actor = m_data->physics->createRigidStatic(transform); m_collider_type = ColliderType::RigidStatic; break;
 	}
-	assert(m_data->actor, "Creating sphere collider | Actor is null");
+	assert(m_data->actor);
 	m_collider_type = type;
 
 
