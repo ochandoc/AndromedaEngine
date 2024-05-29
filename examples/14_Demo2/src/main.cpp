@@ -910,6 +910,8 @@ int main(int argc, char** argv){
   bool point_state = true;
   bool bill_board_state = false;
 
+  bool enable_post_process = false;
+
   bool change_gravity_tmp = false;
 
   //And::TransformComponent* tr_tmp = bolinga_entity->get_component<And::TransformComponent>();
@@ -1002,7 +1004,8 @@ int main(int argc, char** argv){
         //tmp->SetEnabled(!tmp->GetEnabled());
       if (!is_jumping)
       {
-        g_renderer->enable_gray_scale(!is_jumping);
+          enable_post_process = !enable_post_process;
+        g_renderer->enable_gray_scale(enable_post_process);
       }
       is_jumping = true;
     }
@@ -1062,8 +1065,8 @@ int main(int argc, char** argv){
 
     physics_engine->Apply(entity_comp);
         
-    //g_renderer->draw_forward(entity_comp);
-    g_renderer->draw_deferred(entity_comp);
+    g_renderer->draw_forward(entity_comp);
+    //g_renderer->draw_deferred(entity_comp);
     
     frames++;
     time += window->get_delta_time();
