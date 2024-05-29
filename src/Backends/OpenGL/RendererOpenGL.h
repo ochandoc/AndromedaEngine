@@ -40,6 +40,8 @@ namespace And{
         void draw_deferred(EntityComponentSystem& entity) override;
         void draw_pbr(EntityComponentSystem& entity) override;
 
+        virtual void enable_gray_scale(bool enable) { enable_postprocess = enable; }
+
     private:
         void draw_triangle(Triangle* t);
         void draw_obj(MeshComponent* obj, Light* l, TransformComponent* tran);
@@ -72,6 +74,7 @@ namespace And{
         std::vector<std::shared_ptr<RenderTarget>> get_shadow_buffer_pointLight();
 
         bool m_bDrawOnTexture;
+        bool enable_postprocess = false;
 
         CameraBase* m_UserCamera;
         FlyCamera m_DefaultCamera;

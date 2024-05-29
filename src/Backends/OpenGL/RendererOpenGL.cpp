@@ -1273,7 +1273,8 @@ namespace And
 
         std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
 
-        m_PostProcessRenderTarget->Activate();
+        if (enable_postprocess)
+          m_PostProcessRenderTarget->Activate();
         // Ambient light
         for (auto [light] : entity.get_components<AmbientLight>()) {
 
@@ -1291,7 +1292,8 @@ namespace And
             }
             glBlendFunc(GL_ONE, GL_ONE);
         }
-        m_PostProcessRenderTarget->Desactivate();
+        if (enable_postprocess)
+          m_PostProcessRenderTarget->Desactivate();
         //glEnable(GL_BLEND);
 
 
@@ -1309,7 +1311,8 @@ namespace And
             shadow_buffer->Desactivate();
             glEnable(GL_BLEND);
 
-            m_PostProcessRenderTarget->Activate(false);
+            if (enable_postprocess)
+              m_PostProcessRenderTarget->Activate(false);
             // Render Directional
             for (auto [light] : entity.get_components<DirectionalLight>()) {
                 for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
@@ -1350,7 +1353,8 @@ namespace And
                 }
                 glBlendFunc(GL_ONE, GL_ONE);
             }
-            m_PostProcessRenderTarget->Desactivate();
+            if (enable_postprocess)
+              m_PostProcessRenderTarget->Desactivate();
         }
         // -----------------------
 
@@ -1370,7 +1374,8 @@ namespace And
             shadow_buffer->Desactivate();
             glEnable(GL_BLEND);
 
-            m_PostProcessRenderTarget->Activate(false);
+            if (enable_postprocess)
+              m_PostProcessRenderTarget->Activate(false);
             // Render SpotLight 
             for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
 
@@ -1401,7 +1406,8 @@ namespace And
                 }
             }
             glBlendFunc(GL_ONE, GL_ONE);
-            m_PostProcessRenderTarget->Desactivate();
+            if (enable_postprocess)
+              m_PostProcessRenderTarget->Desactivate();
         }
 
         // Coger vector de shadow buffer de la point light
@@ -1424,7 +1430,8 @@ namespace And
                 }
             glEnable(GL_BLEND);
 
-            m_PostProcessRenderTarget->Activate(false);
+            if (enable_postprocess)
+              m_PostProcessRenderTarget->Activate(false);
             /* Render PointLight */
             for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
 
@@ -1469,12 +1476,15 @@ namespace And
                 }
             }
             glBlendFunc(GL_ONE, GL_ONE);
-            m_PostProcessRenderTarget->Desactivate();
+            if (enable_postprocess)
+              m_PostProcessRenderTarget->Desactivate();
         }
 
-        m_PostProcessRenderTarget->Activate(false);
+        if (enable_postprocess)
+          m_PostProcessRenderTarget->Activate(false);
         DrawSkyBox();
-        m_PostProcessRenderTarget->Desactivate();
+        if (enable_postprocess)
+          m_PostProcessRenderTarget->Desactivate();
         
 
         ResetTransforms(entity);

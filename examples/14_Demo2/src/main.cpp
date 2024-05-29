@@ -905,6 +905,7 @@ int main(int argc, char** argv){
   bool is_gravity_down = false;
   bool is_change_billboards = false;
   bool is_change_point_medium = false;
+  bool is_jumping = false;
 
   bool point_state = true;
   bool bill_board_state = false;
@@ -999,7 +1000,15 @@ int main(int argc, char** argv){
     if (input.check_action(jump)) {
         //And::AmbientLight* tmp = ambient_entity->get_component<And::AmbientLight>();
         //tmp->SetEnabled(!tmp->GetEnabled());
-      
+      if (!is_jumping)
+      {
+        g_renderer->enable_gray_scale(!is_jumping);
+      }
+      is_jumping = true;
+    }
+    else
+    {
+      is_jumping = false;
     }
 
 
