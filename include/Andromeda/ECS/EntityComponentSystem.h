@@ -10,19 +10,29 @@ namespace And
 
 	namespace internal
 	{
+		/**
+		 * @struct component
+		 * @brief Represents a component with an ID and a value.
+		 * @tparam T The type of the component value.
+		 */
 		template<typename T>
 		struct component
 		{
 			component(ID i) : id(i), value() {}
 			component(ID i, const T& v) : id(i) { value = v; }
-			ID id;
-			T value;
+			ID id;					/**< The ID of the component. */
+			T value;				/**< The value of the component. */
 			
 			bool operator <(const component& other) { return id < other.id; }
 			bool operator >(const component& other) { return id > other.id; }
 			bool operator ==(const component& other)	{	return id == other.id;	}
 		};
 
+		/**
+		 * @class component_list_iterator
+		 * @brief An iterator for iterating over a list of components.
+		 * @tparam T The type of the components.
+		 */
 		template<typename T>
 		class component_list_iterator
 		{
@@ -65,23 +75,57 @@ namespace And
 
 			virtual ~component_list_abs() = default;
 
+			/**
+			 * @brief Adds an empty component with the given ID.
+			 * @param id The ID of the component.
+			 */
 			virtual void add_empty(ID id) = 0;
+			/**
+			 * @brief Removes the component with the given ID.
+			 * @param id The ID of the component.
+			 * @return True if the component was removed, false otherwise.
+			 */
 			virtual bool remove(ID id) = 0;
+			/**
+			 * @brief Gets the number of components in the list.
+			 * @return The number of components.
+			 */
 			virtual size_t size() = 0;
 		};
 
+		/**
+		 * @class component_list_base
+		 * @brief Base class for a list of components of a specific type.
+		 * @tparam T The type of the components.
+		 */
 		template<typename T>
 		class component_list_base : public component_list_abs
 		{
 		public:
 			component_list_base() = default;
 
+			/**
+			 * @brief Gets the component with the given ID.
+			 * @param id The ID of the component.
+			 * @return Pointer to the component, or nullptr if not found.
+			 */
 			virtual ~component_list_base() = default;
 
+			/**
+			 * @brief Adds a component with the given ID and value.
+			 * @param id The ID of the component.
+			 * @param value The value of the component.
+			 * @return Pointer to the added component.
+			 */
 			virtual T* get_component(ID id) = 0;
 			virtual T* add(ID id, const T& value) = 0;
 		};
 
+		/**
+		* @class component_list_imp
+		* @brief Implementation of a list of components of a specific type.
+		* @tparam T The type of the components.
+		*/
 		template<typename T>
 		class component_list_imp : public component_list_base<T>
 		{
@@ -166,6 +210,11 @@ namespace And
 			bool m_Sorted;
 		};
 
+		/**
+		 * @class tuple_iterator
+		 * @brief Iterator for iterating over a tuple of component lists.
+		 * @tparam comps_t The types of the components in the tuple.
+		 */
 		template<typename... comps_t>
 		class tuple_iterator
 		{
@@ -339,6 +388,10 @@ namespace And
 		iterator m_End;
 	};
 
+	/**
+	 * @class EntityComponentSystem
+	 * @brief Manages a system of entities and their components.
+	 */
 	class EntityComponentSystem
 	{
 		NON_COPYABLE_CLASS(EntityComponentSystem)
