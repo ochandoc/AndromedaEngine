@@ -60,7 +60,7 @@ namespace And{
         void draw_shadows(PointLight* l, MeshComponent* obj, TransformComponent* tran, float* dir);
 
         void DrawSkyBox();
-        void DrawBillBoard(EntityComponentSystem& ecs);
+        void DrawBillBoard(EntityComponentSystem& ecs, bool is_pbr = true);
         void RenderBillBoard(EntityComponentSystem& ecs);
 
         void CheckMaterial(OpenGLShader* s, std::shared_ptr<Material> mat);

@@ -173,7 +173,7 @@ void  DirectionalLight::GetDirection(float& x, float& y, float& z){
 void DirectionalLight::Recalculate(float aspect_ratio){
     if (m_must_recalculate) {
 
-        glm::vec3 pos = glm::vec3(-36.0, 30.0, -76.0);
+        glm::vec3 pos = glm::vec3(-37.0f, 31.0f, -77.0f);
         glm::vec3 dir = glm::make_vec3(&m_raw.direction[0]);
 
         glm::vec3 up(0.0f, 1.0f, 0.0f);

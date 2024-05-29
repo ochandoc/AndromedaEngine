@@ -843,7 +843,7 @@ namespace And
             }
     }
 
-    void RendererOpenGL::DrawBillBoard(EntityComponentSystem& ecs) {
+    void RendererOpenGL::DrawBillBoard(EntityComponentSystem& ecs, bool is_pbr) {
 
         OpenGLShader* tmp = static_cast<OpenGLShader*>(m_shader_pbr_geometry.get());
         CameraBase* cam = &m_DefaultCamera;
@@ -863,7 +863,11 @@ namespace And
                 tmp->Use();
 
                 //auto start_time_material = std::chrono::steady_clock::now();
-                CheckPBRMaterial(tmp, mat_tmp);
+                if (is_pbr) {
+                    CheckPBRMaterial(tmp, mat_tmp);
+                }else {
+                    CheckMaterial(tmp, mat_tmp);
+                }
                 //CheckTime(start_time_material, std::chrono::steady_clock::now(), "Check Material: ");
 
 
@@ -1498,6 +1502,9 @@ namespace And
             draw_obj(obj, nullptr, transform);
             //CheckTime(start_time_draw, std::chrono::steady_clock::now(), "*** Draw OBJ TOTAL *** : ");
         }
+        
+        DrawBillBoard(entity, false);
+
         m_gBuffer_->Desactivate();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

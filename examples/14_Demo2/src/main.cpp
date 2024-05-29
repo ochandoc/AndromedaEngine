@@ -37,6 +37,28 @@ static And::Entity* cuadros[6];
 static And::Entity* cubos_1[6*6];
 static And::Entity* cubos_2[6*6];
 
+std::vector<And::Entity*> billboards;
+
+static And::Entity* point_entity;
+
+void AddBillBoardAtLocation(And::EntityComponentSystem& ecs, float x, float y, float z, And::MaterialComponent& mat_com) {
+
+    std::shared_ptr<And::BillBoardComponent> billboard_comp = std::make_shared<And::BillBoardComponent>();
+
+    std::shared_ptr<And::BillBoard> bill = std::make_shared<And::BillBoard>();
+    bill->SetMaterial(std::make_shared<And::MaterialComponent>(mat_com));
+    billboard_comp->SetBillBoard(bill);
+    billboard_comp->bScale[0] = 4.0f;
+    billboard_comp->bScale[1] = 4.0f;
+
+    And::TransformComponent tr_com;
+    tr_com.position[0] = x;
+    tr_com.position[1] = y;
+    tr_com.position[2] = z;
+    billboards.push_back(ecs.new_entity(tr_com, *billboard_comp));
+
+}
+
 static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem& ecs, And::PhysicsEngine& engine, And::MeshComponent& mesh, And::MaterialComponent& material_comp, bool big = false) {
 
     And::TransformComponent tran;
@@ -735,9 +757,18 @@ int main(int argc, char** argv){
       directional.SetIntensity(1.0f);
       entity_comp.new_entity(directional);
 
+      And::MaterialComponent mat_comp_bulb;
+      std::shared_ptr<And::Material> m_bulb = std::make_shared<And::Material>();
+      std::shared_ptr<And::Texture> tex_bulb = And::MakeTexture("billboard_bulb.png");
+      m_bulb->SetColorTexture(tex_bulb);
+      mat_comp_bulb.SetMaterial(m_bulb);
+
+
+
       float intensity = 2.0f;
       And::PointLight point;
-      point.SetPosition(0.0f, 14.0f, 0.0f);
+      point.SetPosition(1.0f, 14.0f, -36.0f);
+      AddBillBoardAtLocation(entity_comp, 1.0f, 14.0f, -36.0f, mat_comp_bulb);
       point.SetSpecularColor(1.0f, 1.0f, 1.0f);
       point.SetSpecularShininess(32.0f);
       point.SetSpecularStrength(0.003f);
@@ -748,7 +779,7 @@ int main(int argc, char** argv){
       point.SetCastShadows(true);
       point.SetIntensity(intensity);
       point.SetDiffuseColor(1.0f, 1.0f, 1.0f);
-      //And::Entity* entity_tmp = entity_comp.new_entity(point);
+      point_entity = entity_comp.new_entity(point);
 
       {
           And::SpotLight spot{};
@@ -766,7 +797,7 @@ int main(int argc, char** argv){
           spot.SetCastShadows(true);
           spot.SetEnabled(true);
           spot.SetIntensity(intensity);
-          //entity_comp.new_entity(spot);
+          entity_comp.new_entity(spot);
       }
   }
 
@@ -781,6 +812,8 @@ int main(int argc, char** argv){
   And::ActionInput big_shot{ "BigShot", And::KeyState::Press, { And::KeyCode::V} };
   And::ActionInput changePoint{ "ChangePoint", And::KeyState::Press, { And::KeyCode::L} };
   And::ActionInput changeGravity{ "Changegravity", And::KeyState::Press, { And::KeyCode::G} };
+  And::ActionInput changeBillboards{ "ChangeBillboards", And::KeyState::Press, { And::KeyCode::B} };
+  And::ActionInput changePointMedium{ "ChangePoinlightMedium", And::KeyState::Press, { And::KeyCode::Q} };
 
   And::Entity* balls_pool[POOL_SIZE];
   int index_pool = 0;
@@ -862,7 +895,7 @@ int main(int argc, char** argv){
 
 
   float fps_count = 0.0f;
-  const float force = 600.0f;
+  const float force = 600.1f;
   int frames = 0;
   float secondsToSpawn = 4.0f;
 
@@ -874,6 +907,11 @@ int main(int argc, char** argv){
   bool is_big_down = false;
   bool is_pointlight_down = false;
   bool is_gravity_down = false;
+  bool is_change_billboards = false;
+  bool is_change_point_medium = false;
+
+  bool point_state = true;
+  bool bill_board_state = false;
 
   bool change_gravity_tmp = false;
 
@@ -910,6 +948,36 @@ int main(int argc, char** argv){
         is_big_down = true;
     }else {
         is_big_down = false;
+    }
+    
+    if (input.check_action(changeBillboards)) {
+
+        //static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem & ecs, And::PhysicsEngine & engine, And::MeshComponent & mesh, And::MaterialComponent & material_comp)
+        if (!is_change_billboards) {
+            bill_board_state = !bill_board_state;
+            for (auto& e : billboards) {
+                e->get_component<And::BillBoardComponent>()->ActiveBillBoard(bill_board_state);
+            }
+        is_change_billboards = true;
+        }
+    }else {
+        is_change_billboards = false;
+    }
+    
+    
+    if (input.check_action(changePointMedium)) {
+
+        //static void LaunchBall(const float* pos, const float* dir, float force, And::EntityComponentSystem & ecs, And::PhysicsEngine & engine, And::MeshComponent & mesh, And::MaterialComponent & material_comp)
+        if (!is_change_point_medium) {
+            point_state = !point_state;
+
+            point_entity->get_component<And::PointLight>()->SetEnabled(point_state);
+            
+
+            is_change_point_medium = true;
+        }
+    }else {
+        is_change_point_medium = false;
     }
     
     if (input.check_action(changeGravity)) {
