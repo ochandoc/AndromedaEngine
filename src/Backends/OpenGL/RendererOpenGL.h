@@ -15,6 +15,7 @@
 #include "Andromeda/Graphics/Material.h"
 #include "Backends/OpenGL/OpenGLShader.h"
 #include "Backends/OpenGL/opengl_skybox_texture.h"
+#include "Backends/OpenGL/OpenGLRenderTarget.h"
 
 #include "Andromeda/Graphics/Renderer.h"
 
@@ -79,12 +80,14 @@ namespace And{
         std::shared_ptr<RenderTarget> m_shadows_buffer_;
         std::shared_ptr<RenderTarget> m_gBuffer_;
         std::shared_ptr<RenderTarget> m_full_quad_;
+        std::shared_ptr<OpenGLRenderTarget> m_PostProcessRenderTarget;
         
 
         std::vector<std::shared_ptr<RenderTarget>> m_shadows_buffer_pointLight;
 
         std::shared_ptr<Shader> m_shadow_shader;
         std::shared_ptr<Shader> m_depth_shader;
+        std::shared_ptr<OpenGLShader> m_PostProcessShader;
 
         std::shared_ptr<Shader> m_shader_ambient;
         std::shared_ptr<Shader> m_shader_directional;

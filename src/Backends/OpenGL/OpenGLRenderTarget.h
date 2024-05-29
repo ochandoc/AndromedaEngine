@@ -16,7 +16,7 @@ namespace And
 
     static std::shared_ptr<OpenGLRenderTarget> Make(const RenderTargetCreationInfo& CreationInfo);
 
-    virtual void Activate() const override;
+    virtual void Activate(bool Clear = true) const override;
     virtual void Desactivate() const override;
     virtual void Resize(uint32 width, uint32 height) override;
 

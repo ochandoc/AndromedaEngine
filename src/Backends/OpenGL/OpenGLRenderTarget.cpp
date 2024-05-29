@@ -149,10 +149,11 @@ namespace And
     return Rendertarget;
   }
 
-  void OpenGLRenderTarget::Activate() const
+  void OpenGLRenderTarget::Activate(bool Clear) const
   {
     glBindFramebuffer(GL_FRAMEBUFFER, m_Id);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (Clear)
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 
   void OpenGLRenderTarget::Desactivate() const

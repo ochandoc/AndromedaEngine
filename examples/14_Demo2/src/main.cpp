@@ -1050,7 +1050,6 @@ int main(int argc, char** argv){
     UpdateCuadrosColor(time);
     UpdateCubosColor(time);
 
-
     //And::TransformComponent* tmp_nose = bolinga_entity->get_component<And::TransformComponent>();
     //tmp_nose->SetRotation(tmp_nose->rotation[0], time, tmp_nose->rotation[2]);
 

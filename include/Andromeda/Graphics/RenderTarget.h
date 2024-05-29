@@ -22,7 +22,7 @@ namespace And
 
     virtual ~RenderTarget() = default;
 
-    virtual void Activate() const = 0;
+    virtual void Activate(bool Clear = true) const = 0;
     virtual void Desactivate() const = 0;
     virtual void Resize(uint32 width, uint32 height) = 0;
 

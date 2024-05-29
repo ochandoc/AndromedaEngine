@@ -99,6 +99,10 @@ namespace And
         m_gBuffer_ = MakeRenderTarget(info);
 
         info.Formats.clear();
+        info.Formats.push_back(ETextureFormat::RGBA8);
+        m_PostProcessRenderTarget = OpenGLRenderTarget::Make(info);
+
+        info.Formats.clear();
         info.Formats.push_back(ETextureFormat::Depth);
         // Shadow buffers for point light
         for (int i = 0; i < 6; i++) {
@@ -111,6 +115,7 @@ namespace And
         m_shader_ambient = MakeShader("lights/ambient.shader");
         m_shader_directional = MakeShader("lights/directional.shader");
         m_shader_shadows_directional = MakeShader("lights/directional_shadows.shader");
+        m_PostProcessShader = OpenGLShader::Make("lights/post_process.shader");
 
         m_shader_point = MakeShader("lights/point.shader");
         m_shader_shadows_point = MakeShader("lights/point_shadow.shader");
@@ -1268,6 +1273,7 @@ namespace And
 
         std::shared_ptr<And::RenderTarget> shadow_buffer = get_shadow_buffer();
 
+        m_PostProcessRenderTarget->Activate();
         // Ambient light
         for (auto [light] : entity.get_components<AmbientLight>()) {
 
@@ -1285,6 +1291,7 @@ namespace And
             }
             glBlendFunc(GL_ONE, GL_ONE);
         }
+        m_PostProcessRenderTarget->Desactivate();
         //glEnable(GL_BLEND);
 
 
@@ -1302,6 +1309,7 @@ namespace And
             shadow_buffer->Desactivate();
             glEnable(GL_BLEND);
 
+            m_PostProcessRenderTarget->Activate(false);
             // Render Directional
             for (auto [light] : entity.get_components<DirectionalLight>()) {
                 for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
@@ -1342,7 +1350,7 @@ namespace And
                 }
                 glBlendFunc(GL_ONE, GL_ONE);
             }
-
+            m_PostProcessRenderTarget->Desactivate();
         }
         // -----------------------
 
@@ -1362,6 +1370,7 @@ namespace And
             shadow_buffer->Desactivate();
             glEnable(GL_BLEND);
 
+            m_PostProcessRenderTarget->Activate(false);
             // Render SpotLight 
             for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
 
@@ -1392,7 +1401,7 @@ namespace And
                 }
             }
             glBlendFunc(GL_ONE, GL_ONE);
-
+            m_PostProcessRenderTarget->Desactivate();
         }
 
         // Coger vector de shadow buffer de la point light
@@ -1415,6 +1424,7 @@ namespace And
                 }
             glEnable(GL_BLEND);
 
+            m_PostProcessRenderTarget->Activate(false);
             /* Render PointLight */
             for (auto [transform, obj] : entity.get_components<And::TransformComponent, And::MeshComponent>()) {
 
@@ -1459,11 +1469,23 @@ namespace And
                 }
             }
             glBlendFunc(GL_ONE, GL_ONE);
+            m_PostProcessRenderTarget->Desactivate();
         }
 
+        m_PostProcessRenderTarget->Activate(false);
         DrawSkyBox();
+        m_PostProcessRenderTarget->Desactivate();
+        
 
         ResetTransforms(entity);
+
+        m_PostProcessShader->Use();
+
+        std::static_pointer_cast<OpenGLTexture2D>(m_PostProcessRenderTarget->GetTextures()[0])->Activate(0);
+        m_PostProcessShader->SetTexture("screenTex", 0);
+
+        glBindVertexArray(m_quad_vao);
+        glDrawElements(GL_TRIANGLES, sizeof(dIndices) / sizeof(dIndices[0]), GL_UNSIGNED_INT, 0);
 
     }
 
