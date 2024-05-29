@@ -38,10 +38,17 @@ int main(int argc, char** argv){
   And::EntityComponentSystem entity_comp;
   And::AddBasicComponents(entity_comp);
 
+  And::MaterialComponent mat_comp;
+  std::shared_ptr<And::Material> m_ = std::make_shared<And::Material>();
+  std::shared_ptr<And::Texture> tex_ = And::MakeTexture("billboard_bulb.png");
+  m_->SetColorTexture(tex_);
+  mat_comp.SetMaterial(m_);
+
   And::MeshComponent MC;
   MC.MeshOBJ = And::Geometry::load("cube.obj");
-  std::shared_ptr<And::Texture> texture = And::MakeTexture("bricks.jpg");
-  MC.MeshOBJ->SetTexture(texture);
+  And::RawMesh raw_mesh(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+  std::shared_ptr<And::Mesh> mesh = std::make_shared<And::Mesh>(raw_mesh);
+  MC.SetMesh(mesh);
   
   
   And::TransformComponent tran;

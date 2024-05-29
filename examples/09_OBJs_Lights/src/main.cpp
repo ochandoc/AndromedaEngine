@@ -93,12 +93,62 @@ int main(int argc, char** argv){
   MC_teapot.MeshOBJ = And::Geometry::load("teapot.obj");
   MC_teapot2.MeshOBJ = And::Geometry::load("teapot.obj");
 
-  std::shared_ptr<And::Texture> texture_bricks = And::MakeTexture("bricks.jpg");
-  std::shared_ptr<And::Texture> texture_jou = And::MakeTexture("sphere_basecolor.png");
-  std::shared_ptr<And::Texture> texture_cara_de_jou = And::MakeTexture("jou_cumple.png");
-  MC.MeshOBJ->SetTexture(texture_bricks);
-  MC_cube.MeshOBJ->SetTexture(texture_jou);
-  MC_cube2.MeshOBJ->SetTexture(texture_cara_de_jou);
+  {
+    And::RawMesh raw_mesh_tmp(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices());
+    std::shared_ptr<And::Mesh> mesh_tmp = std::make_shared<And::Mesh>(raw_mesh_tmp);
+    MC.SetMesh(mesh_tmp);
+  }
+  
+  {
+    And::RawMesh raw_mesh_tmp(MC_cube.MeshOBJ->get_vertices(), MC_cube.MeshOBJ->get_indices());
+    std::shared_ptr<And::Mesh> mesh_tmp = std::make_shared<And::Mesh>(raw_mesh_tmp);
+    MC_cube.SetMesh(mesh_tmp);
+  }
+  
+  {
+    And::RawMesh raw_mesh_tmp(MC_cube2.MeshOBJ->get_vertices(), MC_cube2.MeshOBJ->get_indices());
+    std::shared_ptr<And::Mesh> mesh_tmp = std::make_shared<And::Mesh>(raw_mesh_tmp);
+    MC_cube2.SetMesh(mesh_tmp);
+  }
+  
+  {
+    And::RawMesh raw_mesh_tmp(MC_teapot.MeshOBJ->get_vertices(), MC_teapot.MeshOBJ->get_indices());
+    std::shared_ptr<And::Mesh> mesh_tmp = std::make_shared<And::Mesh>(raw_mesh_tmp);
+    MC_teapot.SetMesh(mesh_tmp);
+  }
+  
+  {
+    And::RawMesh raw_mesh_tmp(MC_teapot2.MeshOBJ->get_vertices(), MC_teapot2.MeshOBJ->get_indices());
+    std::shared_ptr<And::Mesh> mesh_tmp = std::make_shared<And::Mesh>(raw_mesh_tmp);
+    MC_teapot2.SetMesh(mesh_tmp);
+  }
+
+  //std::shared_ptr<And::Texture> texture_bricks = And::MakeTexture("bricks.jpg");
+  //std::shared_ptr<And::Texture> texture_jou = And::MakeTexture("sphere_basecolor.png");
+  //std::shared_ptr<And::Texture> texture_cara_de_jou = And::MakeTexture("jou_cumple.png");
+
+  And::MaterialComponent mat_comp;
+  std::shared_ptr<And::Material> mat= std::make_shared<And::Material>();
+  std::shared_ptr<And::Texture> tex = And::MakeTexture("bricks.jpg");
+  mat->SetColorTexture(tex);
+  mat_comp.SetMaterial(mat);
+  
+  And::MaterialComponent mat_comp_2;
+  std::shared_ptr<And::Material> mat_2= std::make_shared<And::Material>();
+  std::shared_ptr<And::Texture> tex_2 = And::MakeTexture("sphere_basecolor.png");
+  mat_2->SetColorTexture(tex_2);
+  mat_comp_2.SetMaterial(mat_2);
+  
+  And::MaterialComponent mat_comp_3;
+  std::shared_ptr<And::Material> mat_3= std::make_shared<And::Material>();
+  std::shared_ptr<And::Texture> tex_3 = And::MakeTexture("jou_cumple.png");
+  mat_3->SetColorTexture(tex_3);
+  mat_comp_3.SetMaterial(mat_3);
+
+
+  //MC.MeshOBJ->SetTexture(texture_bricks);
+  //MC_cube.MeshOBJ->SetTexture(texture_jou);
+  //MC_cube2.MeshOBJ->SetTexture(texture_cara_de_jou);
 
 
   And::TransformComponent tran;
@@ -145,9 +195,9 @@ int main(int argc, char** argv){
   tran_teapot2.scale[0] = 2.0f;
   tran_teapot2.scale[1] = 2.0f;
   tran_teapot2.scale[2] = 2.0f;
-  And::Entity* obj_id = entity_comp.new_entity(MC, tran);
+  And::Entity* obj_id = entity_comp.new_entity(MC, tran, mat_comp);
 
-  And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube);
+  And::Entity* obj_cube_id = entity_comp.new_entity(MC_cube, tran_cube, mat_comp_2);
 
   tran_cube2.position[0] = 3.0f;
   tran_cube2.position[1] = 0.0f;
@@ -158,11 +208,11 @@ int main(int argc, char** argv){
   tran_cube2.scale[0] = 1.0f;
   tran_cube2.scale[1] = 1.0f;
   tran_cube2.scale[2] = 1.0f;
-  And::Entity* obj_cube_id2 = entity_comp.new_entity(MC_cube2, tran_cube2);
+  And::Entity* obj_cube_id2 = entity_comp.new_entity(MC_cube2, tran_cube2, mat_comp_3);
 
   And::TransformComponent* tr_cube = obj_cube_id->get_component<And::TransformComponent>();
   And::TransformComponent* tr_cube2 = obj_cube_id2->get_component<And::TransformComponent>();
-  tr_cube2->SetParent(tr_cube->GetOwner());
+  tr_cube2->SetParent(obj_cube_id);
   //And::Entity* obj_teapot_id = entity_comp.new_entity(MC_teapot, tran_teapot);
   //And::Entity* obj_teapot_id2 = entity_comp.new_entity(MC_teapot2, tran_teapot2);
  
