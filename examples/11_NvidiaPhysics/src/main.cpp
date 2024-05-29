@@ -125,6 +125,12 @@ int main(int argc, char** argv){
   MC_cube2.MeshOBJ = And::Geometry::load("cube.obj");
   MC_teapot.MeshOBJ = And::Geometry::load("teapot.obj");
   MC_teapot2.MeshOBJ = And::Geometry::load("teapot.obj");
+  MC.SetMesh(std::make_shared<And::Mesh>(And::RawMesh(MC.MeshOBJ->get_vertices(), MC.MeshOBJ->get_indices())));
+  MC_cube.SetMesh(std::make_shared<And::Mesh>(And::RawMesh(MC_cube.MeshOBJ->get_vertices(), MC_cube.MeshOBJ->get_indices())));
+  MC_cube_up.SetMesh(std::make_shared<And::Mesh>(And::RawMesh(MC_cube_up.MeshOBJ->get_vertices(), MC_cube_up.MeshOBJ->get_indices())));
+  MC_cube2.SetMesh(std::make_shared<And::Mesh>(And::RawMesh(MC_cube2.MeshOBJ->get_vertices(), MC_cube2.MeshOBJ->get_indices())));
+  MC_teapot.SetMesh(std::make_shared<And::Mesh>(And::RawMesh(MC_teapot.MeshOBJ->get_vertices(), MC_teapot.MeshOBJ->get_indices())));
+  MC_teapot2.SetMesh(std::make_shared<And::Mesh>(And::RawMesh(MC_teapot2.MeshOBJ->get_vertices(), MC_teapot2.MeshOBJ->get_indices())));
   
   //std::shared_ptr<And::Physics> e_tmp(And::Physics(physics_engine));
   //std::shared_ptr<And::Physics> e_tmp = std::make_shared<And::Physics>(physics_tmp);
